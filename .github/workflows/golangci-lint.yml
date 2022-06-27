@@ -1,24 +1,19 @@
 name: Lint Golang Codebase
 
 on:
-  pull_request_target:
+  pull_request:
     paths-ignore:
       - 'docs/**'
       - '**/*.md'
 jobs:
   golangci:
     name: lint
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-go@v3
         with:
           go-version: '1.17'
       - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - run: ./hack/setup-git-redirect.sh
-        env:
-          GITHUB_PAT: ${{ secrets.BOT_PAT }}
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
