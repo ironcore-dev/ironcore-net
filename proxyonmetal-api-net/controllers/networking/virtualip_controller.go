@@ -55,6 +55,7 @@ type ProxyVirtualIPReconciler struct {
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips/finalizers,verbs=update
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;create;watch;update;patch;delete
+//+kubebuilder:rbac:groups="",resources=namespaces,verbs=get;list;watch
 
 func (r *ProxyVirtualIPReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
