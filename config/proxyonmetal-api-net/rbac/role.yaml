@@ -1,0 +1,43 @@
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - virtualips
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - virtualips/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - virtualips/status
+  verbs:
+  - get
+  - patch
+  - update
