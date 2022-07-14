@@ -13,9 +13,9 @@ require (
 	github.com/onsi/gomega v1.19.0
 	github.com/spf13/pflag v1.0.5
 	inet.af/netaddr v0.0.0-20210903134321-85fa6c94624e
-	k8s.io/api v0.24.1
-	k8s.io/apimachinery v0.24.1
-	k8s.io/client-go v0.24.1
+	k8s.io/api v0.24.3
+	k8s.io/apimachinery v0.24.3
+	k8s.io/client-go v0.24.3
 	sigs.k8s.io/controller-runtime v0.12.2-0.20220525133844-d15de977569f
 )
 
