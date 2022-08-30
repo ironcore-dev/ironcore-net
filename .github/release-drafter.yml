@@ -5,10 +5,6 @@ categories:
     labels:
       - 'feature'
       - 'enhancement'
-      - 'compute'
-      - 'networking'
-      - 'storage'
-      - 'api-change'
   - title: '🐛 Bug Fixes'
     labels:
       - 'fix'
@@ -35,18 +31,6 @@ version-resolver:
 exclude-labels:
   - 'skip-changelog'
 autolabeler:
-  - label: 'api-change'
-    files:
-      - '/apis/*'
-  - label: 'compute'
-    files:
-      - '/controllers/compute/*'
-  - label: 'storage'
-    files:
-      - '/controllers/storage/*'
-  - label: 'networking'
-    files:
-      - '/controllers/networking/*'
   - label: 'documentation'
     files:
       - '*.md'
