@@ -22,7 +22,7 @@ import (
 
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
-	"inet.af/netaddr"
+	"go4.org/netipx"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -61,8 +61,8 @@ type Allocation struct {
 type SecretAllocator struct {
 	client client.Client
 
-	ipv4Set *netaddr.IPSet
-	ipv6Set *netaddr.IPSet
+	ipv4Set *netipx.IPSet
+	ipv6Set *netipx.IPSet
 
 	secretKey client.ObjectKey
 }
@@ -72,9 +72,9 @@ type Options struct {
 	// SecretKey is the key of the secret to manage allocations in.
 	SecretKey client.ObjectKey
 	// IPv4Set is the root set of ipv4 addresses to allocate from. If nil, no ipv4 addresses can be allocated.
-	IPv4Set *netaddr.IPSet
+	IPv4Set *netipx.IPSet
 	// IPv6Set is the root set of ipv6 addresses to allocate from. If nil, no ipv6 addresses can be allocated.
-	IPv6Set *netaddr.IPSet
+	IPv6Set *netipx.IPSet
 }
 
 // NewSecretAllocator creates a new Allocator.
@@ -93,13 +93,13 @@ func NewSecretAllocator(cfg *rest.Config, opts Options) (*SecretAllocator, error
 		return nil, err
 	}
 
-	var ipV4Set *netaddr.IPSet
+	var ipV4Set *netipx.IPSet
 	if opts.IPv4Set != nil {
 		set := *opts.IPv4Set
 		ipV4Set = &set
 	}
 
-	var ipV6Set *netaddr.IPSet
+	var ipV6Set *netipx.IPSet
 	if opts.IPv6Set != nil {
 		set := *opts.IPv4Set
 		ipV6Set = &set
@@ -191,7 +191,7 @@ func (s *SecretAllocator) write(ctx context.Context, secret *corev1.Secret, stat
 	return nil
 }
 
-func (s *SecretAllocator) ipSetFor(ipFamily corev1.IPFamily) (*netaddr.IPSet, bool) {
+func (s *SecretAllocator) ipSetFor(ipFamily corev1.IPFamily) (*netipx.IPSet, bool) {
 	switch ipFamily {
 	case corev1.IPv4Protocol:
 		return s.ipv4Set, s.ipv4Set != nil
@@ -237,10 +237,10 @@ func (s *SecretAllocator) Allocate(ctx context.Context, id string, ipFamily core
 		return allocation, nil
 	}
 
-	var availableBldr netaddr.IPSetBuilder
+	var availableBldr netipx.IPSetBuilder
 	availableBldr.AddSet(ipSet)
 	for _, allocation := range state.Allocations {
-		availableBldr.Remove(allocation.IP)
+		availableBldr.Remove(allocation.Addr)
 	}
 
 	available, _ := availableBldr.IPSet()
@@ -249,7 +249,7 @@ func (s *SecretAllocator) Allocate(ctx context.Context, id string, ipFamily core
 		return commonv1alpha1.IP{}, ErrNoSpaceLeft
 	}
 
-	allocated := commonv1alpha1.IP{IP: allocatedPrefix.IP()}
+	allocated := commonv1alpha1.IP{Addr: allocatedPrefix.Addr()}
 	state.Allocations[id] = allocated
 	if err := s.write(ctx, secret, state); err != nil {
 		return commonv1alpha1.IP{}, err

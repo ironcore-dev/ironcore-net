@@ -39,7 +39,7 @@ var _ = Describe("Allocator", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		By("inspecting the ip")
-		Expect(ipv4Prefix.Contains(ip1.IP)).To(BeTrue(), "ip not contained in prefix: %s - %s", ip1, ipv4Prefix)
+		Expect(ipv4Prefix.Contains(ip1.Addr)).To(BeTrue(), "ip not contained in prefix: %s - %s", ip1, ipv4Prefix)
 
 		By("asserting the allocator state")
 		assertAllocations(Allocation{ID: "foo", IP: ip1})
@@ -52,7 +52,7 @@ var _ = Describe("Allocator", func() {
 		}).Should(Succeed())
 
 		By("inspecting the ip")
-		Expect(ipv4Prefix.Contains(ip2.IP)).To(BeTrue(), "ip not contained in prefix: %s - %s", ip2, ipv4Prefix)
+		Expect(ipv4Prefix.Contains(ip2.Addr)).To(BeTrue(), "ip not contained in prefix: %s - %s", ip2, ipv4Prefix)
 
 		By("asserting the allocator state")
 		assertAllocations(Allocation{ID: "foo", IP: ip1}, Allocation{ID: "bar", IP: ip2})

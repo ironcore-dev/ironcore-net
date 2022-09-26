@@ -19,6 +19,7 @@ package main
 import (
 	goflag "flag"
 	"fmt"
+	"net/netip"
 	"os"
 
 	"github.com/onmetal/controller-utils/configutils"
@@ -31,7 +32,6 @@ import (
 
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	flag "github.com/spf13/pflag"
-	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -72,8 +72,8 @@ func main() {
 	var allocatorSecretNamespace string
 	var allocatorSecretName string
 
-	var ipv4Prefixes []netaddr.IPPrefix
-	var ipv6Prefixes []netaddr.IPPrefix
+	var ipv4Prefixes []netip.Prefix
+	var ipv6Prefixes []netip.Prefix
 
 	var clusterName string
 

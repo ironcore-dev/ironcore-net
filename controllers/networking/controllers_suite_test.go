@@ -16,6 +16,7 @@ package networking_test
 
 import (
 	"context"
+	"net/netip"
 	"testing"
 	"time"
 
@@ -28,7 +29,7 @@ import (
 	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"inet.af/netaddr"
+	"go4.org/netipx"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -175,10 +176,10 @@ func SetupTest(ctx context.Context) (*corev1.Namespace, *allocator.SecretAllocat
 	return ns, secretAllocator
 }
 
-func mustParseIPSet(prefixes ...string) *netaddr.IPSet {
-	var bldr netaddr.IPSetBuilder
+func mustParseIPSet(prefixes ...string) *netipx.IPSet {
+	var bldr netipx.IPSetBuilder
 	for _, prefix := range prefixes {
-		p := netaddr.MustParseIPPrefix(prefix)
+		p := netip.MustParsePrefix(prefix)
 		bldr.AddPrefix(p)
 	}
 	set, err := bldr.IPSet()

@@ -20,9 +20,10 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net/netip"
 	"strings"
 
-	"inet.af/netaddr"
+	"go4.org/netipx"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -47,11 +48,11 @@ func writeAsCSV(vals []string) (string, error) {
 }
 
 type ipPrefixesVar struct {
-	value   *[]netaddr.IPPrefix
+	value   *[]netip.Prefix
 	changed bool
 }
 
-func newIPPrefixesVar(val []netaddr.IPPrefix, p *[]netaddr.IPPrefix) *ipPrefixesVar {
+func newIPPrefixesVar(val []netip.Prefix, p *[]netip.Prefix) *ipPrefixesVar {
 	v := new(ipPrefixesVar)
 	v.value = p
 	*p = val
@@ -68,13 +69,9 @@ func (v *ipPrefixesVar) Set(val string) error {
 		return err
 	}
 
-	out := make([]netaddr.IPPrefix, 0, len(ipPrefixStrSlice))
+	out := make([]netip.Prefix, 0, len(ipPrefixStrSlice))
 	for _, ipPrefixStr := range ipPrefixStrSlice {
-		prefix, err := netaddr.ParseIPPrefix(ipPrefixStr)
-		if err != nil {
-			return err
-		}
-
+		prefix := netip.MustParsePrefix(ipPrefixStr)
 		out = append(out, prefix)
 	}
 
@@ -102,27 +99,27 @@ func (v *ipPrefixesVar) String() string {
 	return "[" + out + "]"
 }
 
-func IPPrefixesVar(p *[]netaddr.IPPrefix, name string, value []netaddr.IPPrefix, usage string) {
+func IPPrefixesVar(p *[]netip.Prefix, name string, value []netip.Prefix, usage string) {
 	flag.Var(newIPPrefixesVar(value, p), name, usage)
 }
 
-func IPFamilySetFromPrefixes(ipFamily corev1.IPFamily, prefixes []netaddr.IPPrefix) (*netaddr.IPSet, error) {
+func IPFamilySetFromPrefixes(ipFamily corev1.IPFamily, prefixes []netip.Prefix) (*netipx.IPSet, error) {
 	if len(prefixes) == 0 {
 		return nil, nil
 	}
 
-	var validatePrefix func(prefix netaddr.IPPrefix) error
+	var validatePrefix func(prefix netip.Prefix) error
 	switch ipFamily {
 	case corev1.IPv4Protocol:
-		validatePrefix = func(prefix netaddr.IPPrefix) error {
-			if !prefix.IP().Is4() {
+		validatePrefix = func(prefix netip.Prefix) error {
+			if !prefix.Addr().Is4() {
 				return fmt.Errorf("invalid non ipv4-prefix: %s", prefix)
 			}
 			return nil
 		}
 	case corev1.IPv6Protocol:
-		validatePrefix = func(prefix netaddr.IPPrefix) error {
-			if !prefix.IP().Is6() {
+		validatePrefix = func(prefix netip.Prefix) error {
+			if !prefix.Addr().Is6() {
 				return fmt.Errorf("invalid non ipv6-prefix: %s", prefix)
 			}
 			return nil
@@ -131,7 +128,7 @@ func IPFamilySetFromPrefixes(ipFamily corev1.IPFamily, prefixes []netaddr.IPPref
 		return nil, fmt.Errorf("invalid ip family %s", ipFamily)
 	}
 
-	var bldr netaddr.IPSetBuilder
+	var bldr netipx.IPSetBuilder
 	for _, prefix := range prefixes {
 		if err := validatePrefix(prefix); err != nil {
 			return nil, err
