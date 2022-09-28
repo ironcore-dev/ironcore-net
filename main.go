@@ -18,16 +18,15 @@ package main
 
 import (
 	goflag "flag"
+	"net/netip"
 	"os"
 
 	"github.com/onmetal/controller-utils/configutils"
 	"github.com/onmetal/onmetal-api-net/allocator"
 	"github.com/onmetal/onmetal-api-net/controllers/networking"
 	netflag "github.com/onmetal/onmetal-api-net/flag"
-
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	flag "github.com/spf13/pflag"
-	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -67,8 +66,8 @@ func main() {
 	var allocatorSecretNamespace string
 	var allocatorSecretName string
 
-	var ipv4Prefixes []netaddr.IPPrefix
-	var ipv6Prefixes []netaddr.IPPrefix
+	var ipv4Prefixes []netip.Prefix
+	var ipv6Prefixes []netip.Prefix
 
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")

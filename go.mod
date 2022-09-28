@@ -7,12 +7,12 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/google/addlicense v1.0.0
 	github.com/onmetal/controller-utils v0.6.3
-	github.com/onmetal/onmetal-api v0.0.13-0.20220824093154-5a28b83e9d98
+	github.com/onmetal/onmetal-api v0.0.13-0.20220919185247-413b30bfd162
 	github.com/onmetal/poollet v0.0.0-20220622125814-30ac89d67f0b
 	github.com/onsi/ginkgo/v2 v2.1.6
 	github.com/onsi/gomega v1.20.2
 	github.com/spf13/pflag v1.0.5
-	inet.af/netaddr v0.0.0-20210903134321-85fa6c94624e
+	go4.org/netipx v0.0.0-20220812043211-3cc044ffd68d
 	k8s.io/api v0.24.3
 	k8s.io/apimachinery v0.24.3
 	k8s.io/client-go v0.24.3
@@ -64,8 +64,6 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
-	go4.org/intern v0.0.0-20210108033219-3eb7198706b2 // indirect
-	go4.org/unsafe/assume-no-moving-gc v0.0.0-20220617031537-928513b29760 // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
