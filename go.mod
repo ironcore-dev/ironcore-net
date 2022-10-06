@@ -10,7 +10,7 @@ require (
 	github.com/onmetal/onmetal-api v0.0.13-0.20220919185247-413b30bfd162
 	github.com/onmetal/poollet v0.0.0-20220622125814-30ac89d67f0b
 	github.com/onsi/ginkgo/v2 v2.1.6
-	github.com/onsi/gomega v1.20.2
+	github.com/onsi/gomega v1.21.0
 	github.com/spf13/pflag v1.0.5
 	go4.org/netipx v0.0.0-20220812043211-3cc044ffd68d
 	k8s.io/api v0.24.3
