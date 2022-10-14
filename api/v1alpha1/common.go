@@ -12,23 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package apiserverbin
+package v1alpha1
 
-import (
-	"path/filepath"
-	"runtime"
-
-	"github.com/onmetal/controller-utils/modutils"
+const (
+	ReconcileRequestAnnotation = "reconcile.apinet.api.onmetal.de/requestedAt"
 )
-
-var Path string
-
-func init() {
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		panic("apiserverbin: unable to determine filename")
-	}
-
-	Path = filepath.Join(filename, "..", "..", "..", "testbin", "apiserver")
-	modutils.Build(Path, "github.com/onmetal/onmetal-api", "cmd", "apiserver")
-}

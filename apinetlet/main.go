@@ -17,18 +17,18 @@ limitations under the License.
 package main
 
 import (
+	"errors"
 	goflag "flag"
-	"net/netip"
+	"fmt"
 	"os"
 
 	"github.com/onmetal/controller-utils/configutils"
-	"github.com/onmetal/onmetal-api-net/allocator"
-	"github.com/onmetal/onmetal-api-net/controllers/networking"
-	netflag "github.com/onmetal/onmetal-api-net/flag"
+	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
+	apinetletclient "github.com/onmetal/onmetal-api-net/apinetlet/client"
+	"github.com/onmetal/onmetal-api-net/apinetlet/controllers"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	flag "github.com/spf13/pflag"
-	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -52,6 +52,7 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(networkingv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(onmetalapinetv1alpha1.AddToScheme(scheme))
 
 	//+kubebuilder:scaffold:scheme
 }
@@ -61,13 +62,10 @@ func main() {
 	var enableLeaderElection bool
 	var probeAddr string
 
-	var allocatorKubeconfig string
+	var apiNetKubeconfig string
 
-	var allocatorSecretNamespace string
-	var allocatorSecretName string
-
-	var ipv4Prefixes []netip.Prefix
-	var ipv6Prefixes []netip.Prefix
+	var clusterName string
+	var publicIPNamespace string
 
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
@@ -75,13 +73,9 @@ func main() {
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
 
-	flag.StringVar(&allocatorKubeconfig, "allocator-kubeconfig", "", "Path pointing to the allocator kubeconfig.")
-
-	flag.StringVar(&allocatorSecretNamespace, "allocator-secret-namespace", os.Getenv("ALLOCATOR_SECRET_NAMESPACE"), "allocator-secret-namespace")
-	flag.StringVar(&allocatorSecretName, "allocator-secret-name", "allocator", "allocator-secret-name")
-
-	netflag.IPPrefixesVar(&ipv4Prefixes, "ipv4-prefixes", nil, "IPv4 prefixes to allocate from")
-	netflag.IPPrefixesVar(&ipv6Prefixes, "ipv6-prefixes", nil, "IPv6 prefixes to allocate from")
+	flag.StringVar(&clusterName, "cluster-name", clusterName, "Name of the cluster to set in allocation refs.")
+	flag.StringVar(&apiNetKubeconfig, "api-net-kubeconfig", "", "Path pointing to the api-net kubeconfig.")
+	flag.StringVar(&publicIPNamespace, "public-ip-namespace", "", "Namespace to manage public ips in.")
 
 	opts := zap.Options{
 		Development: true,
@@ -90,7 +84,19 @@ func main() {
 	flag.CommandLine.AddGoFlagSet(goflag.CommandLine)
 	flag.Parse()
 
+	ctx := ctrl.SetupSignalHandler()
+
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+
+	if publicIPNamespace == "" {
+		setupLog.Error(errors.New("must specify --public-ip-namespace"), "Invalid configuration")
+		os.Exit(1)
+	}
+
+	if clusterName == "" {
+		setupLog.Error(errors.New("must specify --cluster-name"), "Invalid configuration")
+		os.Exit(1)
+	}
 
 	cfg, err := configutils.GetConfig()
 	if err != nil {
@@ -98,9 +104,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	allocatorCfg, err := configutils.GetConfig(configutils.Kubeconfig(allocatorKubeconfig))
+	apiNetCfg, err := configutils.GetConfig(configutils.Kubeconfig(apiNetKubeconfig))
 	if err != nil {
-		setupLog.Error(err, "unable to load allocator kubeconfig")
+		setupLog.Error(err, "unable to load api net kubeconfig")
 		os.Exit(1)
 	}
 
@@ -110,44 +116,44 @@ func main() {
 		Port:                   9443,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "ff142330.api.onmetal.de",
+		LeaderElectionID:       fmt.Sprintf("%s.apinetlet.apinet.api.onmetal.de", clusterName),
+		LeaderElectionConfig:   apiNetCfg,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
 
-	ipv4Set, err := netflag.IPFamilySetFromPrefixes(corev1.IPv4Protocol, ipv4Prefixes)
-	if err != nil {
-		setupLog.Error(err, "invalid ipv4 prefixes")
-		os.Exit(1)
-	}
-
-	ipv6Set, err := netflag.IPFamilySetFromPrefixes(corev1.IPv6Protocol, ipv6Prefixes)
-	if err != nil {
-		setupLog.Error(err, "invalid ipv6 prefixes")
-		os.Exit(1)
-	}
-
-	alloc, err := allocator.NewSecretAllocator(allocatorCfg, allocator.Options{
-		SecretKey: client.ObjectKey{
-			Namespace: allocatorSecretNamespace,
-			Name:      allocatorSecretName,
-		},
-		IPv4Set: ipv4Set,
-		IPv6Set: ipv6Set,
+	apiNetCluster, err := cluster.New(apiNetCfg, func(options *cluster.Options) {
+		options.Scheme = scheme
 	})
 	if err != nil {
-		setupLog.Error(err, "error setting up secret allocator")
+		setupLog.Error(err, "unable to create api net cluster")
 		os.Exit(1)
 	}
 
-	if err = (&networking.VirtualIPReconciler{
-		Client:        mgr.GetClient(),
-		EventRecorder: mgr.GetEventRecorderFor("virtualip"),
-		Allocator:     alloc,
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "VirtualIP")
+	if err := mgr.Add(apiNetCluster); err != nil {
+		setupLog.Error(err, "unable to add cluster", "cluster", "APINet")
+		os.Exit(1)
+	}
+
+	if err := apinetletclient.IndexPublicIPSpecVirtualIPAllocatorField(ctx, clusterName, apiNetCluster.GetFieldIndexer()); err != nil {
+		setupLog.Error(err, "unable to add field indexer", apinetletclient.PublicIPSpecVirtualIPAllocatorField)
+		os.Exit(1)
+	}
+
+	if err := apinetletclient.IndexVirtualIPRootAncestorField(ctx, mgr.GetFieldIndexer()); err != nil {
+		setupLog.Error(err, "unable to add field indexer", apinetletclient.VirtualIPRootAncestorUIDField)
+		os.Exit(1)
+	}
+
+	if err = (&controllers.VirtualIPReconciler{
+		Client:            mgr.GetClient(),
+		APINetClient:      apiNetCluster.GetClient(),
+		ClusterName:       clusterName,
+		PublicIPNamespace: publicIPNamespace,
+	}).SetupWithManager(mgr, apiNetCluster); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "PublicIP")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
@@ -162,7 +168,7 @@ func main() {
 	}
 
 	setupLog.Info("starting manager")
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+	if err := mgr.Start(ctx); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}

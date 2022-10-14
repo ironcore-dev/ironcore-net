@@ -8,27 +8,14 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - namespaces
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - secrets
+  - events
   verbs:
   - create
-  - delete
-  - get
-  - list
   - patch
-  - update
-  - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - apinet.api.onmetal.de
   resources:
-  - virtualips
+  - publicips
   verbs:
   - get
   - list
@@ -36,15 +23,15 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - apinet.api.onmetal.de
   resources:
-  - virtualips/finalizers
+  - publicips/finalizers
   verbs:
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - apinet.api.onmetal.de
   resources:
-  - virtualips/status
+  - publicips/status
   verbs:
   - get
   - patch

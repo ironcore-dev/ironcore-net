@@ -7,8 +7,8 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/google/addlicense v1.0.0
 	github.com/onmetal/controller-utils v0.6.3
-	github.com/onmetal/onmetal-api v0.0.13-0.20220919185247-413b30bfd162
-	github.com/onmetal/poollet v0.0.0-20220622125814-30ac89d67f0b
+	github.com/onmetal/onmetal-api v0.0.13-0.20220929155258-bb8f52c6ee23
+	github.com/onmetal/poollet v0.0.0-20221010133017-3a528370fc0e
 	github.com/onsi/ginkgo/v2 v2.1.6
 	github.com/onsi/gomega v1.20.2
 	github.com/spf13/pflag v1.0.5
@@ -82,7 +82,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apiextensions-apiserver v0.24.3 // indirect
 	k8s.io/component-base v0.24.3 // indirect
-	k8s.io/klog/v2 v2.60.1 // indirect
+	k8s.io/klog/v2 v2.80.0 // indirect
 	k8s.io/kube-aggregator v0.24.3 // indirect
 	k8s.io/kube-openapi v0.0.0-20220401212409-b28bf2818661 // indirect
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9 // indirect

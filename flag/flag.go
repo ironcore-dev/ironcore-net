@@ -18,13 +18,11 @@ import (
 	"bytes"
 	"encoding/csv"
 	"flag"
-	"fmt"
 	"io"
 	"net/netip"
 	"strings"
 
 	"go4.org/netipx"
-	corev1 "k8s.io/api/core/v1"
 )
 
 func readAsCSV(val string) ([]string, error) {
@@ -103,37 +101,9 @@ func IPPrefixesVar(p *[]netip.Prefix, name string, value []netip.Prefix, usage s
 	flag.Var(newIPPrefixesVar(value, p), name, usage)
 }
 
-func IPFamilySetFromPrefixes(ipFamily corev1.IPFamily, prefixes []netip.Prefix) (*netipx.IPSet, error) {
-	if len(prefixes) == 0 {
-		return nil, nil
-	}
-
-	var validatePrefix func(prefix netip.Prefix) error
-	switch ipFamily {
-	case corev1.IPv4Protocol:
-		validatePrefix = func(prefix netip.Prefix) error {
-			if !prefix.Addr().Is4() {
-				return fmt.Errorf("invalid non ipv4-prefix: %s", prefix)
-			}
-			return nil
-		}
-	case corev1.IPv6Protocol:
-		validatePrefix = func(prefix netip.Prefix) error {
-			if !prefix.Addr().Is6() {
-				return fmt.Errorf("invalid non ipv6-prefix: %s", prefix)
-			}
-			return nil
-		}
-	default:
-		return nil, fmt.Errorf("invalid ip family %s", ipFamily)
-	}
-
+func IPSetFromPrefixes(prefixes []netip.Prefix) (*netipx.IPSet, error) {
 	var bldr netipx.IPSetBuilder
 	for _, prefix := range prefixes {
-		if err := validatePrefix(prefix); err != nil {
-			return nil, err
-		}
-
 		bldr.AddPrefix(prefix)
 	}
 

@@ -25,9 +25,9 @@ jobs:
       matrix:
         image:
           - name: onmetal-api-net
-            target: manager
-          - name: proxyonmetal-api-net
-            target: proxy-manager
+            target: onmetal-api-net-manager
+          - name: apinetlet
+            target: apinetlet-manager
     if: ${{ github.event.label.name == 'ok-to-image' }} || ${{ github.event.label.name == 'ok-to-🐳' }} || ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
