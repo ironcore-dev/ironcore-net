@@ -24,6 +24,7 @@ import (
 	apinetletclient "github.com/onmetal/onmetal-api-net/apinetlet/client"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	"github.com/onmetal/onmetal-api/util/predicates"
 	mcmeta "github.com/onmetal/poollet/multicluster/meta"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -48,6 +49,8 @@ type VirtualIPReconciler struct {
 
 	ClusterName       string
 	PublicIPNamespace string
+
+	WatchFilterValue string
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
@@ -258,6 +261,7 @@ func (r *VirtualIPReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluster c
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&networkingv1alpha1.VirtualIP{}).
+		WithEventFilter(predicates.ResourceHasFilterLabel(log, r.WatchFilterValue)).
 		Watches(
 			source.NewKindWithCache(&onmetalapinetv1alpha1.PublicIP{}, apiNetCluster.GetCache()),
 			handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {

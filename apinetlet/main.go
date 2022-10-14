@@ -26,6 +26,7 @@ import (
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
 	apinetletclient "github.com/onmetal/onmetal-api-net/apinetlet/client"
 	"github.com/onmetal/onmetal-api-net/apinetlet/controllers"
+	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
 	flag "github.com/spf13/pflag"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
@@ -67,6 +68,9 @@ func main() {
 	var clusterName string
 	var publicIPNamespace string
 
+	var watchNamespace string
+	var watchFilterValue string
+
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
@@ -76,6 +80,9 @@ func main() {
 	flag.StringVar(&clusterName, "cluster-name", clusterName, "Name of the cluster to set in allocation refs.")
 	flag.StringVar(&apiNetKubeconfig, "api-net-kubeconfig", "", "Path pointing to the api-net kubeconfig.")
 	flag.StringVar(&publicIPNamespace, "public-ip-namespace", "", "Namespace to manage public ips in.")
+
+	flag.StringVar(&watchNamespace, "namespace", "", "Namespace that the controller watches to reconcile onmetal-api objects. If unspecified, the controller watches for onmetal-api objects across all namespaces.")
+	flag.StringVar(&watchFilterValue, "watch-filter", "", fmt.Sprintf("label value that the controller watches to reconcile onmetal-api objects. Label key is always %s. If unspecified, the controller watches for all onmetal-api objects", commonv1alpha1.WatchLabel))
 
 	opts := zap.Options{
 		Development: true,
@@ -98,6 +105,10 @@ func main() {
 		os.Exit(1)
 	}
 
+	if watchNamespace != "" {
+		setupLog.Info("Watching onmetal-api objects only in namespace for reconciliation", "namespace", watchNamespace)
+	}
+
 	cfg, err := configutils.GetConfig()
 	if err != nil {
 		setupLog.Error(err, "unable to load kubeconfig")
@@ -118,6 +129,7 @@ func main() {
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       fmt.Sprintf("%s.apinetlet.apinet.api.onmetal.de", clusterName),
 		LeaderElectionConfig:   apiNetCfg,
+		Namespace:              watchNamespace,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -152,6 +164,7 @@ func main() {
 		APINetClient:      apiNetCluster.GetClient(),
 		ClusterName:       clusterName,
 		PublicIPNamespace: publicIPNamespace,
+		WatchFilterValue:  watchFilterValue,
 	}).SetupWithManager(mgr, apiNetCluster); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "PublicIP")
 		os.Exit(1)
