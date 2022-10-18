@@ -15,10 +15,15 @@
 package controllers
 
 import (
+	"context"
+	"fmt"
 	"net/netip"
+	"time"
 
+	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func IPFamilyBitLen(ipFamily corev1.IPFamily) uint8 {
@@ -46,4 +51,33 @@ func NetIPAddrsToCommonV1Alpha1IPs(addrs []netip.Addr) []commonv1alpha1.IP {
 		res[i] = commonv1alpha1.IP{Addr: addr}
 	}
 	return res
+}
+
+func PatchAddReconcileAnnotation(ctx context.Context, c client.Client, obj client.Object) error {
+	base := obj.DeepCopyObject().(client.Object)
+
+	annotations := obj.GetAnnotations()
+	if annotations == nil {
+		annotations = make(map[string]string)
+	}
+
+	annotations[onmetalapinetv1alpha1.ReconcileRequestAnnotation] = time.Now().Format(time.RFC3339Nano)
+	obj.SetAnnotations(annotations)
+
+	if err := c.Patch(ctx, obj, client.MergeFrom(base)); err != nil {
+		return fmt.Errorf("error adding reconcile annotation: %w", err)
+	}
+	return nil
+}
+
+func PatchRemoveReconcileAnnotation(ctx context.Context, c client.Client, obj client.Object) error {
+	base := obj.DeepCopyObject().(client.Object)
+
+	annotations := obj.GetAnnotations()
+	delete(annotations, onmetalapinetv1alpha1.ReconcileRequestAnnotation)
+
+	if err := c.Patch(ctx, obj, client.MergeFrom(base)); err != nil {
+		return fmt.Errorf("error removing reconcile annotation: %w", err)
+	}
+	return nil
 }

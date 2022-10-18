@@ -76,6 +76,10 @@ func InitialAvailableIPs() *netipx.IPSet {
 
 const (
 	NoOfIPv4Addresses = 2
+
+	MinVNI   = 1
+	MaxVNI   = 2
+	NoOfVNIs = (MaxVNI - MinVNI) + 1
 )
 
 var _ = BeforeSuite(func() {
@@ -112,20 +116,24 @@ var _ = AfterSuite(func() {
 })
 
 func SetupTest(ctx context.Context) *corev1.Namespace {
-	var (
-		cancel context.CancelFunc
-	)
 	ns := &corev1.Namespace{}
 
 	BeforeEach(func() {
-		var mgrCtx context.Context
-		mgrCtx, cancel = context.WithCancel(ctx)
+		mgrCtx, cancel := context.WithCancel(ctx)
+		DeferCleanup(cancel)
+
 		*ns = corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "testns-",
 			},
 		}
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
+
+		DeferCleanup(func() {
+			Expect(k8sClient.DeleteAllOf(ctx, &onmetalapinetv1alpha1.Network{}, client.InNamespace(ns.Name))).To(Succeed(), "failed to delete networks")
+			Expect(k8sClient.DeleteAllOf(ctx, &onmetalapinetv1alpha1.PublicIP{}, client.InNamespace(ns.Name))).To(Succeed(), "failed to delete public ips")
+			Expect(k8sClient.Delete(ctx, ns)).To(Succeed(), "failed to delete test namespace")
+		})
 
 		k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
 			Scheme:             scheme.Scheme,
@@ -136,21 +144,24 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 
 		// register reconciler here
 		Expect((&PublicIPReconciler{
-			Client:              k8sManager.GetClient(),
 			EventRecorder:       &record.FakeRecorder{},
+			Client:              k8sManager.GetClient(),
 			APIReader:           k8sManager.GetAPIReader(),
 			InitialAvailableIPs: InitialAvailableIPs(),
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&NetworkReconciler{
+			EventRecorder: &record.FakeRecorder{},
+			Client:        k8sManager.GetClient(),
+			APIReader:     k8sManager.GetAPIReader(),
+			MinVNI:        MinVNI,
+			MaxVNI:        MaxVNI,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {
 			defer GinkgoRecover()
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
 		}()
-	})
-
-	AfterEach(func() {
-		cancel()
-		Expect(k8sClient.Delete(ctx, ns)).To(Succeed(), "failed to delete test namespace")
 	})
 
 	return ns

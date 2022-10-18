@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"net/netip"
 	"sync"
-	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
@@ -38,22 +37,134 @@ const (
 	publicIPFinalizer = "apinet.api.onmetal.de/publicip"
 )
 
-type Allocation struct {
+type publicIPAllocation struct {
 	UID types.UID
 	IPs []netip.Addr
+}
+
+type publicIPAllocations struct {
+	availableIPs     *netipx.IPSet
+	allocationsByKey map[client.ObjectKey]publicIPAllocation
+}
+
+func newPublicIPAllocations(availableIPs *netipx.IPSet) *publicIPAllocations {
+	return &publicIPAllocations{
+		availableIPs:     availableIPs,
+		allocationsByKey: make(map[client.ObjectKey]publicIPAllocation),
+	}
+}
+
+func (p *publicIPAllocations) get(key client.ObjectKey) *publicIPAllocation {
+	allocation, ok := p.allocationsByKey[key]
+	if ok {
+		return &allocation
+	}
+	return nil
+}
+
+func (p *publicIPAllocations) delete(key client.ObjectKey) *publicIPAllocation {
+	deleted, ok := p.allocationsByKey[key]
+	if !ok {
+		return nil
+	}
+
+	var sb netipx.IPSetBuilder
+	sb.AddSet(p.availableIPs)
+	for _, ip := range deleted.IPs {
+		sb.Add(ip)
+	}
+
+	p.availableIPs, _ = sb.IPSet()
+	delete(p.allocationsByKey, key)
+
+	return &deleted
+}
+
+type publicIPAllocationRequest struct {
+	ipFamilies []corev1.IPFamily
+	ips        []netip.Addr
+}
+
+func (p *publicIPAllocations) canFit(req publicIPAllocationRequest) bool {
+	if len(req.ips) > 0 {
+		for _, ip := range req.ips {
+			if !p.availableIPs.Contains(ip) {
+				return false
+			}
+		}
+		return true
+	}
+
+	var ok bool
+	ipSet := p.availableIPs
+	for _, ipFamily := range req.ipFamilies {
+		if _, ipSet, ok = ipSet.RemoveFreePrefix(IPFamilyBitLen(ipFamily)); !ok {
+			return false
+		}
+	}
+	return true
+}
+
+func (p *publicIPAllocations) allocate(key client.ObjectKey, uid types.UID, req publicIPAllocationRequest) ([]netip.Addr, error) {
+	if _, ok := p.allocationsByKey[key]; ok {
+		return nil, fmt.Errorf("allocation for %s already exists", key)
+	}
+
+	if len(req.ips) == 0 {
+		var ips []netip.Addr
+		set := p.availableIPs
+
+		for _, ipFamily := range req.ipFamilies {
+			var (
+				prefix netip.Prefix
+				ok     bool
+			)
+			prefix, set, ok = p.availableIPs.RemoveFreePrefix(IPFamilyBitLen(ipFamily))
+			if !ok {
+				return nil, fmt.Errorf("no free prefix available for ip family %s", ipFamily)
+			}
+
+			ips = append(ips, prefix.Addr())
+		}
+
+		p.availableIPs = set
+		p.allocationsByKey[key] = publicIPAllocation{
+			UID: uid,
+			IPs: ips,
+		}
+		return ips, nil
+	}
+
+	set := p.availableIPs
+	for _, ip := range req.ips {
+		if !set.Contains(ip) {
+			return nil, fmt.Errorf("ip %s is not available for allocation", ip)
+		}
+
+		var sb netipx.IPSetBuilder
+		sb.AddSet(set)
+		sb.Remove(ip)
+		set, _ = sb.IPSet()
+	}
+
+	p.availableIPs = set
+	p.allocationsByKey[key] = publicIPAllocation{
+		UID: uid,
+		IPs: req.ips,
+	}
+	return req.ips, nil
 }
 
 type PublicIPReconciler struct {
 	mu sync.RWMutex
 
-	client.Client
 	record.EventRecorder
+	client.Client
 	APIReader           client.Reader
 	InitialAvailableIPs *netipx.IPSet
 
-	ipReleased       chan struct{}
-	availableIPs     *netipx.IPSet
-	allocationsByKey map[client.ObjectKey]Allocation
+	allocations *publicIPAllocations
+	released    chan struct{}
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
@@ -64,7 +175,7 @@ type PublicIPReconciler struct {
 func (r *PublicIPReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
 	publicIP := &onmetalapinetv1alpha1.PublicIP{}
-	if err := r.Get(ctx, req.NamespacedName, publicIP); err != nil {
+	if err := r.APIReader.Get(ctx, req.NamespacedName, publicIP); err != nil {
 		if !apierrors.IsNotFound(err) {
 			return ctrl.Result{}, fmt.Errorf("error getting public ip %s: %w", req.NamespacedName, err)
 		}
@@ -98,93 +209,43 @@ func (r *PublicIPReconciler) delete(ctx context.Context, log logr.Logger, public
 	return ctrl.Result{}, nil
 }
 
+func (r *PublicIPReconciler) emitReleased(ctx context.Context) {
+	select {
+	case <-ctx.Done():
+	case r.released <- struct{}{}:
+	}
+}
+
 func (r *PublicIPReconciler) release(ctx context.Context, key client.ObjectKey) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	allocation, ok := r.allocationsByKey[key]
-	if !ok {
-		return
-	}
-
-	var sb netipx.IPSetBuilder
-	sb.AddSet(r.availableIPs)
-	for _, ip := range allocation.IPs {
-		sb.Add(ip)
-	}
-
-	r.availableIPs, _ = sb.IPSet()
-	delete(r.allocationsByKey, key)
-	select {
-	case <-ctx.Done():
-	case r.ipReleased <- struct{}{}:
+	if deleted := r.allocations.delete(key); deleted != nil {
+		r.emitReleased(ctx)
 	}
 }
 
-func (r *PublicIPReconciler) allocate(ctx context.Context, publicIP *onmetalapinetv1alpha1.PublicIP) ([]netip.Addr, error) {
+func (r *PublicIPReconciler) allocate(ctx context.Context, log logr.Logger, publicIP *onmetalapinetv1alpha1.PublicIP) ([]netip.Addr, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	key := client.ObjectKeyFromObject(publicIP)
-	allocation, ok := r.allocationsByKey[client.ObjectKeyFromObject(publicIP)]
-	if ok {
+	if allocation := r.allocations.get(key); allocation != nil {
 		if allocation.UID == publicIP.UID {
+			log.V(1).Info("Retrieved existing allocation", "UID", allocation.UID, "IPs", allocation.IPs)
 			return allocation.IPs, nil
 		}
 
-		var sb netipx.IPSetBuilder
-		sb.AddSet(r.availableIPs)
-		for _, ip := range allocation.IPs {
-			sb.Add(ip)
-		}
-
-		r.availableIPs, _ = sb.IPSet()
-		select {
-		case <-ctx.Done():
-		case r.ipReleased <- struct{}{}:
-		}
+		log.V(1).Info("Current allocation is outdated, releasing it", "UID", allocation.UID, "IPs", allocation.IPs)
+		r.allocations.delete(key)
+		r.emitReleased(ctx)
 	}
 
-	if len(publicIP.Spec.IPs) == 0 {
-		var ips []netip.Addr
-		set := r.availableIPs
-
-		for _, ipFamily := range publicIP.Spec.IPFamilies {
-			var prefix netip.Prefix
-			prefix, set, ok = r.availableIPs.RemoveFreePrefix(IPFamilyBitLen(ipFamily))
-			if !ok {
-				return nil, fmt.Errorf("no ip available")
-			}
-
-			ips = append(ips, prefix.Addr())
-		}
-
-		r.availableIPs = set
-		r.allocationsByKey[key] = Allocation{
-			UID: publicIP.UID,
-			IPs: ips,
-		}
-		return ips, nil
-	}
-
-	set := r.availableIPs
-	for _, ip := range publicIP.Spec.IPs {
-		if !set.Contains(ip.Addr) {
-			return nil, fmt.Errorf("cannot allocate")
-		}
-
-		var sb netipx.IPSetBuilder
-		sb.AddSet(set)
-		sb.Remove(ip.Addr)
-		set, _ = sb.IPSet()
-	}
-
-	r.availableIPs = set
-	r.allocationsByKey[key] = Allocation{
-		UID: publicIP.UID,
-		IPs: CommonV1Alpha1IPsToNetIPAddrs(publicIP.Spec.IPs),
-	}
-	return CommonV1Alpha1IPsToNetIPAddrs(publicIP.Spec.IPs), nil
+	log.V(1).Info("Requesting new allocation")
+	return r.allocations.allocate(key, publicIP.UID, publicIPAllocationRequest{
+		ipFamilies: publicIP.Spec.IPFamilies,
+		ips:        CommonV1Alpha1IPsToNetIPAddrs(publicIP.Spec.IPs),
+	})
 }
 
 func (r *PublicIPReconciler) reconcile(ctx context.Context, log logr.Logger, publicIP *onmetalapinetv1alpha1.PublicIP) (ctrl.Result, error) {
@@ -203,7 +264,7 @@ func (r *PublicIPReconciler) reconcile(ctx context.Context, log logr.Logger, pub
 
 	if _, ok := publicIP.Annotations[onmetalapinetv1alpha1.ReconcileRequestAnnotation]; ok {
 		log.V(1).Info("Removing reconcile annotation")
-		if err := r.removeReconciliationAnnotation(ctx, publicIP); err != nil {
+		if err := PatchRemoveReconcileAnnotation(ctx, r.Client, publicIP); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error removing reconcile annotation: %w", err)
 		}
 		log.V(1).Info("Removed reconcile annotation, requeueing")
@@ -211,9 +272,10 @@ func (r *PublicIPReconciler) reconcile(ctx context.Context, log logr.Logger, pub
 	}
 
 	log.V(1).Info("Allocating")
-	ips, err := r.allocate(ctx, publicIP)
+	ips, err := r.allocate(ctx, log, publicIP)
 	if err != nil {
 		log.V(1).Info("Error allocating, patching public ip as pending", "Error", err)
+		r.Eventf(publicIP, corev1.EventTypeNormal, FailedAllocatingPublicIP, "Failed allocating: %w", err)
 		if err := r.patchStatusPending(ctx, publicIP); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -222,7 +284,7 @@ func (r *PublicIPReconciler) reconcile(ctx context.Context, log logr.Logger, pub
 	}
 
 	log = log.WithValues("IPs", ips)
-	log.V(1).Info("Successfully allocated ips", "IPs", ips)
+	log.V(1).Info("Successfully allocated")
 
 	if len(publicIP.Spec.IPs) == 0 {
 		log.V(1).Info("Patching allocated ips into spec")
@@ -284,13 +346,12 @@ func (r *PublicIPReconciler) patchStatusAllocated(ctx context.Context, publicIP 
 
 func (r *PublicIPReconciler) isAllocated(publicIP *onmetalapinetv1alpha1.PublicIP) bool {
 	idx := onmetalapinetv1alpha1.PublicIPConditionIndex(publicIP.Status.Conditions, onmetalapinetv1alpha1.PublicIPAllocated)
-	return idx != 1 && publicIP.Status.Conditions[idx].Status == corev1.ConditionTrue
+	return idx != -1 && publicIP.Status.Conditions[idx].Status == corev1.ConditionTrue
 }
 
 func (r *PublicIPReconciler) initialize(ctx context.Context) error {
-	r.availableIPs = r.InitialAvailableIPs
-	r.allocationsByKey = make(map[client.ObjectKey]Allocation)
-	r.ipReleased = make(chan struct{}, 1024)
+	r.allocations = newPublicIPAllocations(r.InitialAvailableIPs)
+	r.released = make(chan struct{}, 1024)
 	publicIPList := &onmetalapinetv1alpha1.PublicIPList{}
 	if err := r.APIReader.List(ctx, publicIPList); err != nil {
 		return fmt.Errorf("error listing public ips: %w", err)
@@ -305,41 +366,16 @@ func (r *PublicIPReconciler) initialize(ctx context.Context) error {
 			continue
 		}
 
-		for _, ip := range publicIP.Status.IPs {
-			set, _ := sb.IPSet()
-			if !set.Contains(ip.Addr) {
-				return fmt.Errorf("[public ip %s] cannot allocate %s", publicIPKey, ip.Addr)
-			}
-
-			sb.Remove(ip.Addr)
+		req := publicIPAllocationRequest{
+			ipFamilies: publicIP.Spec.IPFamilies,
+			ips:        CommonV1Alpha1IPsToNetIPAddrs(publicIP.Status.IPs),
 		}
-
-		r.allocationsByKey[publicIPKey] = Allocation{
-			UID: publicIP.UID,
-			IPs: CommonV1Alpha1IPsToNetIPAddrs(publicIP.Status.IPs),
+		if _, err := r.allocations.allocate(publicIPKey, publicIP.UID, req); err != nil {
+			return fmt.Errorf("[public ip %s] cannot allocate: %w", publicIPKey, err)
 		}
 	}
 
 	return nil
-}
-
-func ipSetCanFitPublicIP(ipSet *netipx.IPSet, publicIP *onmetalapinetv1alpha1.PublicIP) bool {
-	if len(publicIP.Spec.IPs) > 0 {
-		for _, ip := range publicIP.Spec.IPs {
-			if !ipSet.Contains(ip.Addr) {
-				return false
-			}
-		}
-		return true
-	}
-
-	var ok bool
-	for _, ipFamily := range publicIP.Spec.IPFamilies {
-		if _, ipSet, ok = ipSet.RemoveFreePrefix(IPFamilyBitLen(ipFamily)); !ok {
-			return false
-		}
-	}
-	return true
 }
 
 func (r *PublicIPReconciler) determineReconciliationCandidates(publicIPs []onmetalapinetv1alpha1.PublicIP) []onmetalapinetv1alpha1.PublicIP {
@@ -356,32 +392,14 @@ func (r *PublicIPReconciler) determineReconciliationCandidates(publicIPs []onmet
 			continue
 		}
 
-		if ipSetCanFitPublicIP(r.availableIPs, &publicIP) {
+		if r.allocations.canFit(publicIPAllocationRequest{
+			ipFamilies: publicIP.Spec.IPFamilies,
+			ips:        CommonV1Alpha1IPsToNetIPAddrs(publicIP.Spec.IPs),
+		}) {
 			candidates = append(candidates, publicIP)
 		}
 	}
 	return candidates
-}
-
-func (r *PublicIPReconciler) requestReconciliation(ctx context.Context, publicIP *onmetalapinetv1alpha1.PublicIP) error {
-	base := publicIP.DeepCopy()
-	if publicIP.Annotations == nil {
-		publicIP.Annotations = make(map[string]string)
-	}
-	publicIP.Annotations[onmetalapinetv1alpha1.ReconcileRequestAnnotation] = time.Now().Format(time.RFC3339Nano)
-	if err := r.Patch(ctx, publicIP, client.MergeFrom(base)); err != nil {
-		return fmt.Errorf("error patching reconcile annotation: %w", err)
-	}
-	return nil
-}
-
-func (r *PublicIPReconciler) removeReconciliationAnnotation(ctx context.Context, publicIP *onmetalapinetv1alpha1.PublicIP) error {
-	base := publicIP.DeepCopy()
-	delete(publicIP.Annotations, onmetalapinetv1alpha1.ReconcileRequestAnnotation)
-	if err := r.Patch(ctx, publicIP, client.MergeFrom(base)); err != nil {
-		return fmt.Errorf("error removing reconcile annotation: %w", err)
-	}
-	return nil
 }
 
 func (r *PublicIPReconciler) requeuePublicIPCandidates(ctx context.Context) error {
@@ -391,7 +409,7 @@ func (r *PublicIPReconciler) requeuePublicIPCandidates(ctx context.Context) erro
 		case <-ctx.Done():
 			log.V(1).Info("Shutting down candidate requeuing")
 			return nil
-		case <-r.ipReleased:
+		case <-r.released:
 			if err := func() error {
 				log.V(1).Info("IP released")
 
@@ -407,7 +425,7 @@ func (r *PublicIPReconciler) requeuePublicIPCandidates(ctx context.Context) erro
 				var errs []error
 				for _, candidate := range candidates {
 					log.V(1).Info("Requesting reconciliation", "CandidateKey", client.ObjectKeyFromObject(&candidate))
-					if err := r.requestReconciliation(ctx, &candidate); err != nil {
+					if err := PatchAddReconcileAnnotation(ctx, r.Client, &candidate); err != nil {
 						errs = append(errs, err)
 					}
 				}

@@ -60,13 +60,18 @@ func main() {
 
 	var prefixes []netip.Prefix
 
+	var minVNI, maxVNI int32
+
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
 
-	netflag.IPPrefixesVar(&prefixes, "prefixes", nil, "IP Prefixes to allocate from")
+	netflag.IPPrefixesVar(&prefixes, "prefixes", nil, "IP Prefixes to allocate from.")
+
+	flag.Int32Var(&minVNI, "min-vni", controllers.DefaultMinVNI, "Default minimum vni to allocate.")
+	flag.Int32Var(&maxVNI, "max-vni", controllers.DefaultMaxVNI, "Default maximum vni to allocate.")
 
 	opts := zap.Options{
 		Development: true,
@@ -103,10 +108,21 @@ func main() {
 	}
 
 	if err = (&controllers.PublicIPReconciler{
-		Client:              mgr.GetClient(),
 		EventRecorder:       mgr.GetEventRecorderFor("publicip"),
+		Client:              mgr.GetClient(),
 		APIReader:           mgr.GetAPIReader(),
 		InitialAvailableIPs: initialAvailableIPs,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "PublicIP")
+		os.Exit(1)
+	}
+
+	if err = (&controllers.NetworkReconciler{
+		EventRecorder: mgr.GetEventRecorderFor("network"),
+		Client:        mgr.GetClient(),
+		APIReader:     mgr.GetAPIReader(),
+		MinVNI:        minVNI,
+		MaxVNI:        maxVNI,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "PublicIP")
 		os.Exit(1)

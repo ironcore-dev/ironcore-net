@@ -45,7 +45,7 @@ var _ = Describe("PublicIPController", func() {
 		Expect(k8sClient.Create(ctx, publicIP)).To(Succeed())
 
 		By("waiting for the public ip to be allocated")
-		Eventually(Object(publicIP)).Should(BeAllocated())
+		Eventually(Object(publicIP)).Should(BeAllocatedIP())
 	})
 
 	It("should mark public ips as pending if they can't be allocated and allocate them as soon as there's space", func() {
@@ -65,7 +65,7 @@ var _ = Describe("PublicIPController", func() {
 			publicIPKeys[i] = client.ObjectKeyFromObject(publicIP)
 
 			By("waiting for the public ip to be allocated")
-			Eventually(Object(publicIP)).Should(BeAllocated())
+			Eventually(Object(publicIP)).Should(BeAllocatedIP())
 		}
 
 		By("creating another public ip")
@@ -81,10 +81,10 @@ var _ = Describe("PublicIPController", func() {
 		Expect(k8sClient.Create(ctx, publicIP)).To(Succeed())
 
 		By("waiting for the public ip to be marked as non-allocated")
-		Eventually(Object(publicIP)).Should(BeNonAllocated())
+		Eventually(Object(publicIP)).Should(BeNonAllocatedIP())
 
 		By("asserting it stays that way")
-		Consistently(Object(publicIP)).Should(BeNonAllocated())
+		Consistently(Object(publicIP)).Should(BeNonAllocatedIP())
 
 		By("deleting one of the original public ips")
 		Expect(k8sClient.Delete(ctx, &onmetalapinetv1alpha1.PublicIP{
@@ -95,11 +95,11 @@ var _ = Describe("PublicIPController", func() {
 		})).To(Succeed())
 
 		By("waiting for the ip to be allocated")
-		Eventually(Object(publicIP)).Should(BeAllocated())
+		Eventually(Object(publicIP)).Should(BeAllocatedIP())
 	})
 })
 
-func BeNonAllocated() types.GomegaMatcher {
+func BeNonAllocatedIP() types.GomegaMatcher {
 	return HaveField("Status", SatisfyAll(
 		HaveField("IPs", BeEmpty()),
 		HaveField("Conditions", ConsistOf(
@@ -111,7 +111,7 @@ func BeNonAllocated() types.GomegaMatcher {
 	))
 }
 
-func BeAllocated() types.GomegaMatcher {
+func BeAllocatedIP() types.GomegaMatcher {
 	return HaveField("Status", SatisfyAll(
 		HaveField("IPs", ConsistOf(Satisfy(func(ip commonv1alpha1.IP) bool {
 			return ip.Is4() && ip.IsValid() && InitialAvailableIPs().Contains(ip.Addr)
