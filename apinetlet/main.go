@@ -149,24 +149,35 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := apinetletclient.IndexPublicIPSpecVirtualIPAllocatorField(ctx, clusterName, apiNetCluster.GetFieldIndexer()); err != nil {
-		setupLog.Error(err, "unable to add field indexer", apinetletclient.PublicIPSpecVirtualIPAllocatorField)
+	if err := apinetletclient.IndexPublicIPVirtualIPControllerField(ctx, apiNetCluster.GetFieldIndexer(), clusterName, scheme); err != nil {
+		setupLog.Error(err, "unable to add field indexer", apinetletclient.PublicIPVirtualIPController)
 		os.Exit(1)
 	}
 
-	if err := apinetletclient.IndexVirtualIPRootAncestorField(ctx, mgr.GetFieldIndexer()); err != nil {
-		setupLog.Error(err, "unable to add field indexer", apinetletclient.VirtualIPRootAncestorUIDField)
+	if err := apinetletclient.IndexNetworkNetworkControllerField(ctx, apiNetCluster.GetFieldIndexer(), clusterName, scheme); err != nil {
+		setupLog.Error(err, "unable to add field indexer", apinetletclient.NetworkNetworkController)
 		os.Exit(1)
 	}
 
 	if err = (&controllers.VirtualIPReconciler{
-		Client:            mgr.GetClient(),
-		APINetClient:      apiNetCluster.GetClient(),
-		ClusterName:       clusterName,
-		PublicIPNamespace: publicIPNamespace,
-		WatchFilterValue:  watchFilterValue,
+		Client:           mgr.GetClient(),
+		APINetClient:     apiNetCluster.GetClient(),
+		ClusterName:      clusterName,
+		APINetNamespace:  publicIPNamespace,
+		WatchFilterValue: watchFilterValue,
 	}).SetupWithManager(mgr, apiNetCluster); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "PublicIP")
+		setupLog.Error(err, "unable to create controller", "controller", "VirtualIP")
+		os.Exit(1)
+	}
+
+	if err = (&controllers.NetworkReconciler{
+		Client:           mgr.GetClient(),
+		APINetClient:     apiNetCluster.GetClient(),
+		ClusterName:      clusterName,
+		APINetNamespace:  publicIPNamespace,
+		WatchFilterValue: watchFilterValue,
+	}).SetupWithManager(mgr, apiNetCluster); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Network")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

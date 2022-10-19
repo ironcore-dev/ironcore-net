@@ -384,6 +384,8 @@ github.com/onmetal/onmetal-api v0.0.13-0.20221014092137-9e1dd12e5436 h1:4scYtI/5
 github.com/onmetal/onmetal-api v0.0.13-0.20221014092137-9e1dd12e5436/go.mod h1:D9RkQhIPgtS/tsyK8aBGFwRcmNSo9UIzkw9P18ad6+s=
 github.com/onmetal/poollet v0.0.0-20221010133017-3a528370fc0e h1:Gzb1mgMtSJEUSolfhBGZXnRk7kR28bzyjO7R/fa3aBI=
 github.com/onmetal/poollet v0.0.0-20221010133017-3a528370fc0e/go.mod h1:Y2XtzNWyvQ4LbmL9ZdG1jyAwo1S6i3u1SnEu0iL2rec=
+github.com/onmetal/poollet v0.0.0-20221018115803-48ff17a52bac h1:zE4jhGP9JPzMQ8wGz/2eRumdxO0WuJXZej9yl88mfv8=
+github.com/onmetal/poollet v0.0.0-20221018115803-48ff17a52bac/go.mod h1:Y2XtzNWyvQ4LbmL9ZdG1jyAwo1S6i3u1SnEu0iL2rec=
 github.com/onsi/ginkgo v0.0.0-20170829012221-11459a886d9c/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.12.1/go.mod h1:zj2OWP4+oCPe1qIXoGWkgMRwljMUYCdkwsT2108oapk=

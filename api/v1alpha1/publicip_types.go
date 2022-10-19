@@ -18,24 +18,11 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 type PublicIPSpec struct {
 	IPFamilies []corev1.IPFamily   `json:"ipFamilies,omitempty"`
 	IPs        []commonv1alpha1.IP `json:"ips,omitempty"`
-
-	AllocatorRef AllocatorRef `json:"allocatorRef"`
-}
-
-type AllocatorRef struct {
-	ClusterName string `json:"clusterName"`
-
-	Group     string    `json:"group"`
-	Resource  string    `json:"resource"`
-	Namespace string    `json:"namespace"`
-	Name      string    `json:"name"`
-	UID       types.UID `json:"uid"`
 }
 
 type PublicIPConditionType string

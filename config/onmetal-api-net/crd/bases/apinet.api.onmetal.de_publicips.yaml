@@ -47,32 +47,6 @@ spec:
             type: object
           spec:
             properties:
-              allocatorRef:
-                properties:
-                  clusterName:
-                    type: string
-                  group:
-                    type: string
-                  name:
-                    type: string
-                  namespace:
-                    type: string
-                  resource:
-                    type: string
-                  uid:
-                    description: UID is a type that holds unique ID values, including
-                      UUIDs.  Because we don't ONLY use UUIDs, this is an alias to
-                      string.  Being a type captures intent and helps make sure that
-                      UIDs and names do not get conflated.
-                    type: string
-                required:
-                - clusterName
-                - group
-                - name
-                - namespace
-                - resource
-                - uid
-                type: object
               ipFamilies:
                 items:
                   description: IPFamily represents the IP Family (IPv4 or IPv6). This
@@ -84,8 +58,6 @@ spec:
                 items:
                   type: string
                 type: array
-            required:
-            - allocatorRef
             type: object
           status:
             properties:

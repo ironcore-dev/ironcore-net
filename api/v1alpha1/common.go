@@ -16,4 +16,6 @@ package v1alpha1
 
 const (
 	ReconcileRequestAnnotation = "reconcile.apinet.api.onmetal.de/requestedAt"
+
+	OnmetalAPINetworkVNIAnnotation = "apinet.api.onmetal.de/vni"
 )

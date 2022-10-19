@@ -15,6 +15,22 @@ rules:
 - apiGroups:
   - networking.api.onmetal.de
   resources:
+  - networks
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - networks/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
   - virtualips
   verbs:
   - get

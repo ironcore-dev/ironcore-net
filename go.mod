@@ -8,7 +8,7 @@ require (
 	github.com/google/addlicense v1.0.0
 	github.com/onmetal/controller-utils v0.6.3
 	github.com/onmetal/onmetal-api v0.0.13-0.20221014092137-9e1dd12e5436
-	github.com/onmetal/poollet v0.0.0-20221010133017-3a528370fc0e
+	github.com/onmetal/poollet v0.0.0-20221018115803-48ff17a52bac
 	github.com/onsi/ginkgo/v2 v2.1.6
 	github.com/onsi/gomega v1.21.1
 	github.com/spf13/pflag v1.0.5

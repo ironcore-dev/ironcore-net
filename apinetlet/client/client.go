@@ -19,40 +19,47 @@ import (
 
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
-	mcmeta "github.com/onmetal/poollet/multicluster/meta"
+	mcclient "github.com/onmetal/poollet/multicluster/client"
+	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-const PublicIPSpecVirtualIPAllocatorField = "public-ip-spec-virtual-ip-allocator"
+const PublicIPVirtualIPController = "public-ip-virtual-ip-controller"
 
-func IndexPublicIPSpecVirtualIPAllocatorField(ctx context.Context, clusterName string, indexer client.FieldIndexer) error {
-	return indexer.IndexField(ctx, &onmetalapinetv1alpha1.PublicIP{}, PublicIPSpecVirtualIPAllocatorField, func(object client.Object) []string {
-		publicIP := object.(*onmetalapinetv1alpha1.PublicIP)
-		allocatorRef := publicIP.Spec.AllocatorRef
-		if allocatorRef.ClusterName != clusterName {
-			return nil
-		}
-
-		if allocatorRef.Group != networkingv1alpha1.SchemeGroupVersion.Group ||
-			allocatorRef.Resource != "virtualips" {
-			return nil
-		}
-
-		allocatorKey := client.ObjectKey{Namespace: allocatorRef.Namespace, Name: allocatorRef.Name}
-		return []string{allocatorKey.String()}
-	})
+func IndexPublicIPVirtualIPControllerField(
+	ctx context.Context,
+	indexer client.FieldIndexer,
+	clusterName string,
+	scheme *runtime.Scheme,
+) error {
+	return mcclient.IndexClusterTypeOwnerReferencesField(
+		ctx,
+		indexer,
+		clusterName,
+		&networkingv1alpha1.VirtualIP{},
+		&onmetalapinetv1alpha1.PublicIP{},
+		PublicIPVirtualIPController,
+		scheme,
+		true,
+	)
 }
 
-const VirtualIPRootAncestorUIDField = "virtual-ip-root-ancestor-uid"
+const NetworkNetworkController = "network-network-controller"
 
-func IndexVirtualIPRootAncestorField(ctx context.Context, indexer client.FieldIndexer) error {
-	return indexer.IndexField(ctx, &networkingv1alpha1.VirtualIP{}, VirtualIPRootAncestorUIDField, func(object client.Object) []string {
-		virtualIP := object.(*networkingv1alpha1.VirtualIP)
-		ancestors := mcmeta.GetAncestors(virtualIP)
-		if len(ancestors) == 0 {
-			return nil
-		}
-
-		return []string{string(ancestors[0].UID)}
-	})
+func IndexNetworkNetworkControllerField(
+	ctx context.Context,
+	indexer client.FieldIndexer,
+	clusterName string,
+	scheme *runtime.Scheme,
+) error {
+	return mcclient.IndexClusterTypeOwnerReferencesField(
+		ctx,
+		indexer,
+		clusterName,
+		&networkingv1alpha1.Network{},
+		&onmetalapinetv1alpha1.Network{},
+		NetworkNetworkController,
+		scheme,
+		true,
+	)
 }

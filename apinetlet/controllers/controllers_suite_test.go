@@ -146,15 +146,22 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		})
 		Expect(err).ToNot(HaveOccurred())
 
-		Expect(apinetletclient.IndexPublicIPSpecVirtualIPAllocatorField(ctx, clusterName, k8sManager.GetFieldIndexer())).To(Succeed())
-		Expect(apinetletclient.IndexVirtualIPRootAncestorField(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+		Expect(apinetletclient.IndexPublicIPVirtualIPControllerField(ctx, k8sManager.GetFieldIndexer(), clusterName, scheme.Scheme)).To(Succeed())
+		Expect(apinetletclient.IndexNetworkNetworkControllerField(ctx, k8sManager.GetFieldIndexer(), clusterName, scheme.Scheme)).To(Succeed())
 
 		// register reconciler here
 		Expect((&VirtualIPReconciler{
-			Client:            k8sManager.GetClient(),
-			APINetClient:      k8sManager.GetClient(),
-			ClusterName:       clusterName,
-			PublicIPNamespace: ns.Name,
+			Client:          k8sManager.GetClient(),
+			APINetClient:    k8sManager.GetClient(),
+			ClusterName:     clusterName,
+			APINetNamespace: ns.Name,
+		}).SetupWithManager(k8sManager, k8sManager)).To(Succeed())
+
+		Expect((&NetworkReconciler{
+			Client:          k8sManager.GetClient(),
+			APINetClient:    k8sManager.GetClient(),
+			ClusterName:     clusterName,
+			APINetNamespace: ns.Name,
 		}).SetupWithManager(k8sManager, k8sManager)).To(Succeed())
 
 		go func() {
