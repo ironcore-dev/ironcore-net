@@ -202,7 +202,7 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 	}); err != nil {
 		return 0, fmt.Errorf("error applying apinet network: %w", err)
 	}
-	log.V(1).Info("Applied public ip")
+	log.V(1).Info("Applied network")
 
 	return apiNetNetwork.Status.VNI, nil
 }
