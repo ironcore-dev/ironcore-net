@@ -17,6 +17,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
@@ -164,18 +165,15 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 		return ctrl.Result{Requeue: true}, nil
 	}
 
-	if network.Status.State == "" {
-		if err := r.patchNetworkPending(ctx, network); err != nil {
-			return ctrl.Result{}, fmt.Errorf("unable to patch network: %w", err)
-		}
-	}
-
 	vni, err := r.applyAPINetNetwork(ctx, log, network)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error getting / applying apinet network: %w", err)
 	}
 	if vni == 0 {
 		log.V(1).Info("APINet network is not yet allocated")
+		if err := r.patchNetworkPending(ctx, network); err != nil {
+			return ctrl.Result{}, fmt.Errorf("unable to patch network: %w", err)
+		}
 		return ctrl.Result{}, nil
 	}
 
@@ -196,6 +194,13 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 			Name:      string(network.UID),
 		},
 	}
+
+	vni, err := strconv.ParseInt(network.Spec.ProviderID, 10, 32)
+	if err == nil {
+		log.V(1).Info("Found valid VNI in network", "vni", vni)
+		apiNetNetwork.Spec.VNI = int32(vni)
+	}
+
 	log.V(1).Info("Applying apinet network")
 	if _, err := brokerclient.BrokerControlledCreateOrPatch(ctx, r.APINetClient, r.ClusterName, network, apiNetNetwork, func() error {
 		return nil

@@ -53,12 +53,6 @@ var _ = Describe("NetworkController", func() {
 		}
 		Eventually(Get(apiNetNetwork)).Should(Succeed())
 
-		By("ensuring the network state is initialized")
-		Eventually(func(g Gomega) {
-			g.Expect(Get(network)).Should(Succeed())
-			g.Expect(network.Status.State).Should(BeEquivalentTo(networkingv1alpha1.NetworkStatePending))
-		})
-
 		By("inspecting the created apinet network")
 		Expect(mcmeta.IsControlledBy(clusterName, network, apiNetNetwork)).To(BeTrue())
 		Expect(apiNetNetwork.Spec).To(Equal(onmetalapinetv1alpha1.NetworkSpec{}))
@@ -73,12 +67,11 @@ var _ = Describe("NetworkController", func() {
 		Expect(k8sClient.Status().Update(ctx, apiNetNetwork)).To(Succeed())
 
 		By("waiting for the network to reflect the allocated vni")
+		Eventually(Object(network)).
+			Should(HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)))
 
-		Eventually(func(g Gomega) {
-			g.Expect(Get(network)).Should(Succeed())
-			g.Expect(network.Status.State).Should(BeEquivalentTo(networkingv1alpha1.NetworkStateAvailable))
-			g.Expect(network.Spec.ProviderID).Should(BeEquivalentTo(strconv.FormatInt(int64(vni), 10)))
-		})
+		Eventually(Object(network)).
+			Should(HaveField("Spec.ProviderID", Equal(strconv.FormatInt(int64(vni), 10))))
 
 		By("deleting the network")
 		Expect(k8sClient.Delete(ctx, network)).To(Succeed())
