@@ -21,11 +21,10 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
-	"github.com/onmetal/controller-utils/metautils"
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
 	apinetletclient "github.com/onmetal/onmetal-api-net/apinetlet/client"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
-	"github.com/onmetal/onmetal-api/util/predicates"
+	"github.com/onmetal/onmetal-api/apiutils/predicates"
 	brokerclient "github.com/onmetal/poollet/broker/client"
 	brokerhandler "github.com/onmetal/poollet/broker/handler"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -135,6 +134,15 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 	return ctrl.Result{Requeue: true}, nil
 }
 
+func (r *NetworkReconciler) patchNetworkState(ctx context.Context, network *networkingv1alpha1.Network, state networkingv1alpha1.NetworkState) error {
+	networkBase := network.DeepCopy()
+	network.Status.State = state
+	if err := r.Status().Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
+		return fmt.Errorf("unable to patch network: %w", err)
+	}
+	return nil
+}
+
 func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
@@ -153,23 +161,23 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 		return ctrl.Result{}, fmt.Errorf("error getting / applying apinet network: %w", err)
 	}
 	if vni == 0 {
-		log.V(1).Info("APINet network is not yet allocated, patching vni annotation")
-		if err := r.patchAnnotationUnallocated(ctx, network); err != nil {
-			return ctrl.Result{}, err
-		}
-		log.V(1).Info("Patched vni annotation")
-		return ctrl.Result{}, nil
+		log.V(1).Info("APINet network is not yet allocated")
+		return ctrl.Result{}, r.patchNetworkState(ctx, network, networkingv1alpha1.NetworkStatePending)
 	}
 
 	log = log.WithValues("VNI", vni)
 	log.V(1).Info("APINet network is allocated")
 
-	log.V(1).Info("Patching network vni annotation")
-	if err := r.patchAnnotationAllocated(ctx, network, vni); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error patching network vni annotation")
+	if network.Spec.ProviderID == "" {
+		networkBase := network.DeepCopy()
+		network.Spec.ProviderID = strconv.Itoa(int(vni))
+		if err := r.Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
+			return ctrl.Result{}, fmt.Errorf("unable to patch network spec: %w", err)
+		}
+		return ctrl.Result{Requeue: true}, nil
 	}
-	log.V(1).Info("Patched network vni annotation to vni")
-	return ctrl.Result{}, nil
+
+	return ctrl.Result{}, r.patchNetworkState(ctx, network, networkingv1alpha1.NetworkStateAvailable)
 }
 
 func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (int32, error) {
@@ -179,34 +187,25 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 			Name:      string(network.UID),
 		},
 	}
+
+	if network.Spec.ProviderID != "" {
+		vni, err := strconv.ParseInt(network.Spec.ProviderID, 10, 32)
+		if err != nil {
+			return 0, fmt.Errorf("unable to parse ProviderID %s: %w", network.Spec.ProviderID, err)
+		}
+
+		apiNetNetwork.Spec.VNI = int32(vni)
+	}
+
 	log.V(1).Info("Applying apinet network")
 	if _, err := brokerclient.BrokerControlledCreateOrPatch(ctx, r.APINetClient, r.ClusterName, network, apiNetNetwork, func() error {
 		return nil
 	}); err != nil {
 		return 0, fmt.Errorf("error applying apinet network: %w", err)
 	}
-	log.V(1).Info("Applied public ip")
+	log.V(1).Info("Applied network")
 
 	return apiNetNetwork.Status.VNI, nil
-}
-
-func (r *NetworkReconciler) patchAnnotationAllocated(ctx context.Context, network *networkingv1alpha1.Network, vni int32) error {
-	base := network.DeepCopy()
-	metautils.SetAnnotation(network, onmetalapinetv1alpha1.OnmetalAPINetworkVNIAnnotation, strconv.FormatInt(int64(vni), 10))
-	if err := r.Patch(ctx, network, client.MergeFrom(base)); err != nil {
-		return fmt.Errorf("error patching network vni annotation: %w", err)
-	}
-	return nil
-}
-
-func (r *NetworkReconciler) patchAnnotationUnallocated(ctx context.Context, network *networkingv1alpha1.Network) error {
-	base := network.DeepCopy()
-
-	delete(network.Annotations, onmetalapinetv1alpha1.OnmetalAPINetworkVNIAnnotation)
-	if err := r.Patch(ctx, network, client.MergeFrom(base)); err != nil {
-		return fmt.Errorf("error patching network vni annotation: %w", err)
-	}
-	return nil
 }
 
 func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluster cluster.Cluster) error {

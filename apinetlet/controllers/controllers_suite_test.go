@@ -27,8 +27,8 @@ import (
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
 	apinetletclient "github.com/onmetal/onmetal-api-net/apinetlet/client"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
-	"github.com/onmetal/onmetal-api/envtestutils"
-	"github.com/onmetal/onmetal-api/envtestutils/apiserver"
+	"github.com/onmetal/onmetal-api/testutils/envtestutils"
+	"github.com/onmetal/onmetal-api/testutils/envtestutils/apiserver"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -108,7 +108,7 @@ var _ = BeforeSuite(func() {
 	SetClient(k8sClient)
 
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
-		MainPath:     "github.com/onmetal/onmetal-api/cmd/apiserver",
+		MainPath:     "github.com/onmetal/onmetal-api/onmetal-apiserver/cmd/apiserver",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		ETCDServers:  []string{testEnv.ControlPlane.Etcd.URL.String()},
 		Host:         testEnvExt.APIServiceInstallOptions.LocalServingHost,

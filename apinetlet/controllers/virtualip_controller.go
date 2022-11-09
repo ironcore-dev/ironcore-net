@@ -24,7 +24,7 @@ import (
 	apinetletclient "github.com/onmetal/onmetal-api-net/apinetlet/client"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
-	"github.com/onmetal/onmetal-api/util/predicates"
+	"github.com/onmetal/onmetal-api/apiutils/predicates"
 	brokerclient "github.com/onmetal/poollet/broker/client"
 	brokerhandler "github.com/onmetal/poollet/broker/handler"
 	corev1 "k8s.io/api/core/v1"
