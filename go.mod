@@ -9,7 +9,7 @@ require (
 	github.com/onmetal/controller-utils v0.6.4
 	github.com/onmetal/onmetal-api v0.0.13-0.20221108081420-eb9d8fab4e95
 	github.com/onmetal/poollet v0.0.0-20221018115803-48ff17a52bac
-	github.com/onsi/ginkgo/v2 v2.4.0
+	github.com/onsi/ginkgo/v2 v2.5.0
 	github.com/onsi/gomega v1.24.0
 	github.com/spf13/pflag v1.0.5
 	go4.org/netipx v0.0.0-20220812043211-3cc044ffd68d
