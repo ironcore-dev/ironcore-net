@@ -17,15 +17,13 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
-	"github.com/onmetal/controller-utils/metautils"
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
 	apinetletclient "github.com/onmetal/onmetal-api-net/apinetlet/client"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
-	"github.com/onmetal/onmetal-api/util/predicates"
+	"github.com/onmetal/onmetal-api/apiutils/predicates"
 	brokerclient "github.com/onmetal/poollet/broker/client"
 	brokerhandler "github.com/onmetal/poollet/broker/handler"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -135,6 +133,24 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 	return ctrl.Result{Requeue: true}, nil
 }
 
+func (r *NetworkReconciler) patchNetworkPending(ctx context.Context, network *networkingv1alpha1.Network) error {
+	networkBase := network.DeepCopy()
+	network.Status.State = networkingv1alpha1.NetworkStatePending
+	return r.Status().Patch(ctx, network, client.MergeFrom(networkBase))
+}
+
+func (r *NetworkReconciler) patchNetworkAvailable(ctx context.Context, network *networkingv1alpha1.Network, vni int32) error {
+	networkBase := network.DeepCopy()
+	network.Spec.ProviderID = fmt.Sprintf("%d", vni)
+	if err := r.Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
+		return err
+	}
+
+	networkBase = network.DeepCopy()
+	network.Status.State = networkingv1alpha1.NetworkStateAvailable
+	return r.Status().Patch(ctx, network, client.MergeFrom(networkBase))
+}
+
 func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
@@ -148,27 +164,28 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 		return ctrl.Result{Requeue: true}, nil
 	}
 
+	if network.Status.State == "" {
+		if err := r.patchNetworkPending(ctx, network); err != nil {
+			return ctrl.Result{}, fmt.Errorf("unable to patch network: %w", err)
+		}
+	}
+
 	vni, err := r.applyAPINetNetwork(ctx, log, network)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error getting / applying apinet network: %w", err)
 	}
 	if vni == 0 {
-		log.V(1).Info("APINet network is not yet allocated, patching vni annotation")
-		if err := r.patchAnnotationUnallocated(ctx, network); err != nil {
-			return ctrl.Result{}, err
-		}
-		log.V(1).Info("Patched vni annotation")
+		log.V(1).Info("APINet network is not yet allocated")
 		return ctrl.Result{}, nil
 	}
 
 	log = log.WithValues("VNI", vni)
 	log.V(1).Info("APINet network is allocated")
 
-	log.V(1).Info("Patching network vni annotation")
-	if err := r.patchAnnotationAllocated(ctx, network, vni); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error patching network vni annotation")
+	if err := r.patchNetworkAvailable(ctx, network, vni); err != nil {
+		return ctrl.Result{}, fmt.Errorf("unable to patch network: %w", err)
 	}
-	log.V(1).Info("Patched network vni annotation to vni")
+
 	return ctrl.Result{}, nil
 }
 
@@ -188,25 +205,6 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 	log.V(1).Info("Applied public ip")
 
 	return apiNetNetwork.Status.VNI, nil
-}
-
-func (r *NetworkReconciler) patchAnnotationAllocated(ctx context.Context, network *networkingv1alpha1.Network, vni int32) error {
-	base := network.DeepCopy()
-	metautils.SetAnnotation(network, onmetalapinetv1alpha1.OnmetalAPINetworkVNIAnnotation, strconv.FormatInt(int64(vni), 10))
-	if err := r.Patch(ctx, network, client.MergeFrom(base)); err != nil {
-		return fmt.Errorf("error patching network vni annotation: %w", err)
-	}
-	return nil
-}
-
-func (r *NetworkReconciler) patchAnnotationUnallocated(ctx context.Context, network *networkingv1alpha1.Network) error {
-	base := network.DeepCopy()
-
-	delete(network.Annotations, onmetalapinetv1alpha1.OnmetalAPINetworkVNIAnnotation)
-	if err := r.Patch(ctx, network, client.MergeFrom(base)); err != nil {
-		return fmt.Errorf("error patching network vni annotation: %w", err)
-	}
-	return nil
 }
 
 func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluster cluster.Cluster) error {
