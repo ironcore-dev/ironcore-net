@@ -134,22 +134,13 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 	return ctrl.Result{Requeue: true}, nil
 }
 
-func (r *NetworkReconciler) patchNetworkPending(ctx context.Context, network *networkingv1alpha1.Network) error {
+func (r *NetworkReconciler) patchNetworkState(ctx context.Context, network *networkingv1alpha1.Network, state networkingv1alpha1.NetworkState) error {
 	networkBase := network.DeepCopy()
-	network.Status.State = networkingv1alpha1.NetworkStatePending
-	return r.Status().Patch(ctx, network, client.MergeFrom(networkBase))
-}
-
-func (r *NetworkReconciler) patchNetworkAvailable(ctx context.Context, network *networkingv1alpha1.Network, vni int32) error {
-	networkBase := network.DeepCopy()
-	network.Spec.ProviderID = fmt.Sprintf("%d", vni)
-	if err := r.Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
-		return err
+	network.Status.State = state
+	if err := r.Status().Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
+		return fmt.Errorf("unable to patch network: %w", err)
 	}
-
-	networkBase = network.DeepCopy()
-	network.Status.State = networkingv1alpha1.NetworkStateAvailable
-	return r.Status().Patch(ctx, network, client.MergeFrom(networkBase))
+	return nil
 }
 
 func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (ctrl.Result, error) {
@@ -171,20 +162,22 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	}
 	if vni == 0 {
 		log.V(1).Info("APINet network is not yet allocated")
-		if err := r.patchNetworkPending(ctx, network); err != nil {
-			return ctrl.Result{}, fmt.Errorf("unable to patch network: %w", err)
-		}
-		return ctrl.Result{}, nil
+		return ctrl.Result{}, r.patchNetworkState(ctx, network, networkingv1alpha1.NetworkStatePending)
 	}
 
 	log = log.WithValues("VNI", vni)
 	log.V(1).Info("APINet network is allocated")
 
-	if err := r.patchNetworkAvailable(ctx, network, vni); err != nil {
-		return ctrl.Result{}, fmt.Errorf("unable to patch network: %w", err)
+	if network.Spec.ProviderID == "" {
+		networkBase := network.DeepCopy()
+		network.Spec.ProviderID = strconv.Itoa(int(vni))
+		if err := r.Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
+			return ctrl.Result{}, fmt.Errorf("unable to patch network spec: %w", err)
+		}
+		return ctrl.Result{Requeue: true}, nil
 	}
 
-	return ctrl.Result{}, nil
+	return ctrl.Result{}, r.patchNetworkState(ctx, network, networkingv1alpha1.NetworkStateAvailable)
 }
 
 func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (int32, error) {
@@ -195,9 +188,12 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 		},
 	}
 
-	vni, err := strconv.ParseInt(network.Spec.ProviderID, 10, 32)
-	if err == nil {
-		log.V(1).Info("Found valid VNI in network", "vni", vni)
+	if network.Spec.ProviderID != "" {
+		vni, err := strconv.ParseInt(network.Spec.ProviderID, 10, 32)
+		if err != nil {
+			return 0, fmt.Errorf("unable to parse ProviderID %s: %w", network.Spec.ProviderID, err)
+		}
+
 		apiNetNetwork.Spec.VNI = int32(vni)
 	}
 

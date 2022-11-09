@@ -68,10 +68,10 @@ var _ = Describe("NetworkController", func() {
 
 		By("waiting for the network to reflect the allocated vni")
 		Eventually(Object(network)).
-			Should(HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)))
-
-		Eventually(Object(network)).
-			Should(HaveField("Spec.ProviderID", Equal(strconv.FormatInt(int64(vni), 10))))
+			Should(SatisfyAll(
+				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
+				HaveField("Spec.ProviderID", Equal(strconv.FormatInt(int64(vni), 10))),
+			))
 
 		By("deleting the network")
 		Expect(k8sClient.Delete(ctx, network)).To(Succeed())
@@ -107,5 +107,33 @@ var _ = Describe("NetworkController", func() {
 
 		By("waiting for the apinet network to be gone")
 		Eventually(Get(apiNetNetwork)).Should(Satisfy(apierrors.IsNotFound))
+	})
+
+	It("should use providerID if configured", func() {
+		By("creating a network with providerId")
+
+		vni := 42
+		network := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "network-",
+			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				ProviderID: strconv.Itoa(vni),
+			},
+		}
+		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("waiting for the corresponding apinet network to be created with correct vni")
+		apiNetNetwork := &onmetalapinetv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      string(network.UID),
+			},
+		}
+
+		Eventually(Object(apiNetNetwork)).
+			Should(HaveField("Spec.VNI", Equal(int32(vni))))
+
 	})
 })
