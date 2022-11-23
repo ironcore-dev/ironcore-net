@@ -1,0 +1,4 @@
+apiVersion: apinet.api.onmetal.de/v1alpha1
+kind: Network
+metadata:
+  name: my-network

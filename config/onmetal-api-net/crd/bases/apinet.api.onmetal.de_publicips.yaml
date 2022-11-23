@@ -16,11 +16,11 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .status.ipFamilies
-      name: IPFamilies
+    - jsonPath: .spec.ipFamily
+      name: IPFamily
       type: string
-    - jsonPath: .status.ips
-      name: IPs
+    - jsonPath: .spec.ip
+      name: IP
       type: string
     - jsonPath: .status.conditions[?(@.type == "Allocated")].reason
       name: State
@@ -47,17 +47,15 @@ spec:
             type: object
           spec:
             properties:
-              ipFamilies:
-                items:
-                  description: IPFamily represents the IP Family (IPv4 or IPv6). This
-                    type is used to express the family of an IP expressed by a type
-                    (e.g. service.spec.ipFamilies).
-                  type: string
-                type: array
-              ips:
-                items:
-                  type: string
-                type: array
+              ip:
+                description: IP is the ip of the public IP. Pointer to distinguish
+                  between unset and explicit zero.
+                type: string
+              ipFamily:
+                description: IPFamily is the ip family of the public ip.
+                type: string
+            required:
+            - ipFamily
             type: object
           status:
             properties:

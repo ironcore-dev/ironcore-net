@@ -38,7 +38,7 @@ var _ = Describe("PublicIPController", func() {
 				GenerateName: "public-ip-",
 			},
 			Spec: onmetalapinetv1alpha1.PublicIPSpec{
-				IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+				IPFamily: corev1.IPv4Protocol,
 			},
 		}
 		Expect(k8sClient.Create(ctx, publicIP)).To(Succeed())
@@ -57,7 +57,7 @@ var _ = Describe("PublicIPController", func() {
 					GenerateName: "block-public-ip-",
 				},
 				Spec: onmetalapinetv1alpha1.PublicIPSpec{
-					IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+					IPFamily: corev1.IPv4Protocol,
 				},
 			}
 			Expect(k8sClient.Create(ctx, publicIP)).To(Succeed())
@@ -74,7 +74,7 @@ var _ = Describe("PublicIPController", func() {
 				GenerateName: "public-ip-",
 			},
 			Spec: onmetalapinetv1alpha1.PublicIPSpec{
-				IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+				IPFamily: corev1.IPv4Protocol,
 			},
 		}
 		Expect(k8sClient.Create(ctx, publicIP)).To(Succeed())
@@ -111,9 +111,9 @@ func BeUnallocatedPublicIP() types.GomegaMatcher {
 
 func BeAllocatedPublicIP() types.GomegaMatcher {
 	return SatisfyAll(
-		HaveField("Spec.IPs", ConsistOf(Satisfy(func(ip onmetalapinetv1alpha1.IP) bool {
-			return ip.Is4() && ip.IsValid() && InitialAvailableIPs().Contains(ip.Addr)
-		}))),
+		HaveField("Spec.IP", Satisfy(func(ip *onmetalapinetv1alpha1.IP) bool {
+			return ip != nil && ip.Is4() && ip.IsValid() && InitialAvailableIPs().Contains(ip.Addr)
+		})),
 		HaveField("Status", SatisfyAll(
 			HaveField("Conditions", ConsistOf(
 				SatisfyAll(

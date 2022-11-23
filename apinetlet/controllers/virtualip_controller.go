@@ -177,7 +177,7 @@ func isAPINetPublicIPAllocated(apiNetPublicIP *onmetalapinetv1alpha1.PublicIP) b
 		return false
 	}
 
-	return len(apiNetPublicIP.Spec.IPs) > 0
+	return apiNetPublicIP.Spec.IP.IsValid()
 }
 
 func (r *VirtualIPReconciler) applyPublicIP(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (netip.Addr, error) {
@@ -196,7 +196,7 @@ func (r *VirtualIPReconciler) applyPublicIP(ctx context.Context, log logr.Logger
 			},
 		},
 		Spec: onmetalapinetv1alpha1.PublicIPSpec{
-			IPFamilies: []corev1.IPFamily{virtualIP.Spec.IPFamily},
+			IPFamily: virtualIP.Spec.IPFamily,
 		},
 	}
 
@@ -212,7 +212,7 @@ func (r *VirtualIPReconciler) applyPublicIP(ctx context.Context, log logr.Logger
 	if !isAPINetPublicIPAllocated(apiNetPublicIP) {
 		return netip.Addr{}, nil
 	}
-	ip := apiNetPublicIP.Spec.IPs[0]
+	ip := apiNetPublicIP.Spec.IP
 	return ip.Addr, nil
 }
 

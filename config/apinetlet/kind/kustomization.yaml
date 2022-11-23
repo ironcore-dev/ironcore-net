@@ -14,5 +14,6 @@ patchesJson6902:
       group: apps
       version: v1
       kind: Deployment
+      namespace: apinetlet-system
       name: apinetlet-controller-manager
-    path: add-api-net-namespace.yaml
+    path: add-manager-args.yaml

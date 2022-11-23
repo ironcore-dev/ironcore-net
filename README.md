@@ -6,7 +6,6 @@
 ## Overview
 
 `onmetal-api-net` is a provider-specific implementation of the onmetal-api network types.
-It features a 'direct' implementation and a 'proxyable' implementation
 
 ## Contributing
 

@@ -57,8 +57,6 @@ func init() {
 	//+kubebuilder:scaffold:scheme
 }
 
-const inClusterNamespacePath = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
-
 func main() {
 	var metricsAddr string
 	var enableLeaderElection bool

@@ -1,0 +1,3 @@
+- op: add
+  path: /spec/template/spec/containers/0/args/-
+  value: --prefixes=10.0.0.0/26,6710:aec9:7c86:625d:1097:8e65:bf5a:e219/64

@@ -20,8 +20,11 @@ import (
 )
 
 type PublicIPSpec struct {
-	IPFamilies []corev1.IPFamily `json:"ipFamilies,omitempty"`
-	IPs        []IP              `json:"ips,omitempty"`
+	// IPFamily is the ip family of the public ip.
+	IPFamily corev1.IPFamily `json:"ipFamily"`
+	// IP is the ip of the public IP.
+	// Pointer to distinguish between unset and explicit zero.
+	IP *IP `json:"ip,omitempty"`
 }
 
 type PublicIPConditionType string
@@ -61,8 +64,8 @@ type PublicIPStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:name="IPFamilies",type=string,JSONPath=`.status.ipFamilies`
-// +kubebuilder:printcolumn:name="IPs",type=string,JSONPath=`.status.ips`
+// +kubebuilder:printcolumn:name="IPFamily",type=string,JSONPath=`.spec.ipFamily`
+// +kubebuilder:printcolumn:name="IP",type=string,JSONPath=`.spec.ip`
 // +kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.conditions[?(@.type == "Allocated")].reason`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=".metadata.creationTimestamp"
 

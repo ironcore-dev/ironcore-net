@@ -63,8 +63,7 @@ var _ = Describe("VirtualIPController", func() {
 			apinetletv1alpha1.VirtualIPUIDLabel:       string(virtualIP.UID),
 		}))
 		Expect(publicIP.Spec).To(Equal(onmetalapinetv1alpha1.PublicIPSpec{
-			IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
-			IPs:        nil,
+			IPFamily: corev1.IPv4Protocol,
 		}))
 
 		By("asserting the virtual ip does not get an ip address")
@@ -72,7 +71,7 @@ var _ = Describe("VirtualIPController", func() {
 
 		By("patching the public ip spec ips")
 		basePublicIP := publicIP.DeepCopy()
-		publicIP.Spec.IPs = []onmetalapinetv1alpha1.IP{onmetalapinetv1alpha1.MustParseIP("10.0.0.1")}
+		publicIP.Spec.IP = onmetalapinetv1alpha1.MustParseNewIP("10.0.0.1")
 		Expect(k8sClient.Patch(ctx, publicIP, client.MergeFrom(basePublicIP))).To(Succeed())
 
 		By("patching the public ip status to allocated")
@@ -109,7 +108,7 @@ var _ = Describe("VirtualIPController", func() {
 				},
 			},
 			Spec: onmetalapinetv1alpha1.PublicIPSpec{
-				IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+				IPFamily: corev1.IPv4Protocol,
 			},
 		}
 		Expect(k8sClient.Create(ctx, publicIP)).To(Succeed())
