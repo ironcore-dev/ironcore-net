@@ -18,11 +18,12 @@ import (
 	"strconv"
 
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	apinetletv1alpha1 "github.com/onmetal/onmetal-api-net/apinetlet/api/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/testutils"
-	mcmeta "github.com/onmetal/poollet/multicluster/meta"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/pointer"
@@ -33,6 +34,7 @@ import (
 var _ = Describe("NetworkController", func() {
 	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
+	const vni int32 = 4
 
 	It("should allocate an apinet network", func() {
 		By("creating a network")
@@ -54,23 +56,38 @@ var _ = Describe("NetworkController", func() {
 		Eventually(Get(apiNetNetwork)).Should(Succeed())
 
 		By("inspecting the created apinet network")
-		Expect(mcmeta.IsControlledBy(clusterName, network, apiNetNetwork)).To(BeTrue())
+		Expect(apiNetNetwork.Labels).To(Equal(map[string]string{
+			apinetletv1alpha1.NetworkNamespaceLabel: network.Namespace,
+			apinetletv1alpha1.NetworkNameLabel:      network.Name,
+			apinetletv1alpha1.NetworkUIDLabel:       string(network.UID),
+		}))
 		Expect(apiNetNetwork.Spec).To(Equal(onmetalapinetv1alpha1.NetworkSpec{}))
 
 		By("asserting the network does not report a vni")
 		Consistently(Object(network)).
-			ShouldNot(HaveField("ObjectMeta.Annotations", HaveKey(onmetalapinetv1alpha1.OnmetalAPINetworkVNIAnnotation)))
+			Should(SatisfyAll(
+				HaveField("Spec.Handle", ""),
+				HaveField("Status.State", Not(Equal(networkingv1alpha1.NetworkStateAvailable))),
+			))
 
-		By("setting the network to allocated")
-		const vni int32 = 4
-		apiNetNetwork.Status.VNI = vni
-		Expect(k8sClient.Status().Update(ctx, apiNetNetwork)).To(Succeed())
+		By("setting the apinet network spec vni")
+		baseAPINetNetwork := apiNetNetwork.DeepCopy()
+		apiNetNetwork.Spec.VNI = pointer.Int32(vni)
+		Expect(k8sClient.Patch(ctx, apiNetNetwork, client.MergeFrom(baseAPINetNetwork))).To(Succeed())
+
+		By("setting the apinet network status to allocated")
+		baseAPINetNetwork = apiNetNetwork.DeepCopy()
+		onmetalapinetv1alpha1.SetNetworkCondition(&apiNetNetwork.Status.Conditions, onmetalapinetv1alpha1.NetworkCondition{
+			Type:   onmetalapinetv1alpha1.NetworkAllocated,
+			Status: corev1.ConditionTrue,
+		})
+		Expect(k8sClient.Status().Patch(ctx, apiNetNetwork, client.MergeFrom(baseAPINetNetwork))).To(Succeed())
 
 		By("waiting for the network to reflect the allocated vni")
 		Eventually(Object(network)).
 			Should(SatisfyAll(
+				HaveField("Spec.Handle", Equal(strconv.FormatInt(int64(vni), 10))),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
-				HaveField("Spec.ProviderID", Equal(strconv.FormatInt(int64(vni), 10))),
 			))
 
 		By("deleting the network")
@@ -89,37 +106,30 @@ var _ = Describe("NetworkController", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "apinet-network-",
+				Labels: map[string]string{
+					apinetletv1alpha1.NetworkNamespaceLabel: ns.Name,
+					apinetletv1alpha1.NetworkNameLabel:      "some-name",
+					apinetletv1alpha1.NetworkUIDLabel:       "some-uid",
+				},
 			},
 			Spec: onmetalapinetv1alpha1.NetworkSpec{},
 		}
-		mcmeta.SetOwnerReferences(apiNetNetwork, []mcmeta.OwnerReference{
-			{
-				ClusterName: clusterName,
-				APIVersion:  networkingv1alpha1.SchemeGroupVersion.String(),
-				Kind:        "Network",
-				Namespace:   ns.Name,
-				Name:        "some-name",
-				UID:         "some-uid",
-				Controller:  pointer.Bool(true),
-			},
-		})
 		Expect(k8sClient.Create(ctx, apiNetNetwork)).To(Succeed())
 
 		By("waiting for the apinet network to be gone")
 		Eventually(Get(apiNetNetwork)).Should(Satisfy(apierrors.IsNotFound))
 	})
 
-	It("should use providerID if configured", func() {
-		By("creating a network with providerId")
-
-		vni := 42
+	It("should use the specified handle as vni if any", func() {
+		By("creating a network with handle")
+		vni := int32(42)
 		network := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "network-",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				ProviderID: strconv.Itoa(vni),
+				Handle: strconv.FormatInt(int64(vni), 10),
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
@@ -132,8 +142,6 @@ var _ = Describe("NetworkController", func() {
 			},
 		}
 
-		Eventually(Object(apiNetNetwork)).
-			Should(HaveField("Spec.VNI", Equal(int32(vni))))
-
+		Eventually(Object(apiNetNetwork)).Should(HaveField("Spec.VNI", Equal(&vni)))
 	})
 })

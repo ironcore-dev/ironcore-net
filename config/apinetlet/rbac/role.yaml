@@ -27,6 +27,15 @@ rules:
   resources:
   - networks/finalizers
   verbs:
+  - patch
+  - update
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - networks/status
+  verbs:
+  - get
+  - patch
   - update
 - apiGroups:
   - networking.api.onmetal.de
@@ -43,6 +52,7 @@ rules:
   resources:
   - virtualips/finalizers
   verbs:
+  - patch
   - update
 - apiGroups:
   - networking.api.onmetal.de

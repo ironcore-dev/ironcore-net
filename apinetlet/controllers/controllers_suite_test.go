@@ -25,8 +25,7 @@ import (
 	"github.com/onmetal/controller-utils/buildutils"
 	"github.com/onmetal/controller-utils/modutils"
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
-	apinetletclient "github.com/onmetal/onmetal-api-net/apinetlet/client"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/testutils/envtestutils"
 	"github.com/onmetal/onmetal-api/testutils/envtestutils/apiserver"
 	. "github.com/onsi/ginkgo/v2"
@@ -59,8 +58,6 @@ const (
 	eventuallyTimeout    = 3 * time.Second
 	consistentlyDuration = 1 * time.Second
 	apiServiceTimeout    = 5 * time.Minute
-
-	clusterName = "test"
 )
 
 func TestControllers(t *testing.T) {
@@ -146,21 +143,16 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		})
 		Expect(err).ToNot(HaveOccurred())
 
-		Expect(apinetletclient.IndexPublicIPVirtualIPControllerField(ctx, k8sManager.GetFieldIndexer(), clusterName, scheme.Scheme)).To(Succeed())
-		Expect(apinetletclient.IndexNetworkNetworkControllerField(ctx, k8sManager.GetFieldIndexer(), clusterName, scheme.Scheme)).To(Succeed())
-
 		// register reconciler here
 		Expect((&VirtualIPReconciler{
 			Client:          k8sManager.GetClient(),
 			APINetClient:    k8sManager.GetClient(),
-			ClusterName:     clusterName,
 			APINetNamespace: ns.Name,
 		}).SetupWithManager(k8sManager, k8sManager)).To(Succeed())
 
 		Expect((&NetworkReconciler{
 			Client:          k8sManager.GetClient(),
 			APINetClient:    k8sManager.GetClient(),
-			ClusterName:     clusterName,
 			APINetNamespace: ns.Name,
 		}).SetupWithManager(k8sManager, k8sManager)).To(Succeed())
 

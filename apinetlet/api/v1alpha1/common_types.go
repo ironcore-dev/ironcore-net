@@ -15,7 +15,13 @@
 package v1alpha1
 
 const (
-	ReconcileRequestAnnotation = "reconcile.apinet.api.onmetal.de/requestedAt"
+	NetworkUIDLabel       = "apinetlet.api.onmetal.de/network-uid"
+	NetworkNamespaceLabel = "apinetlet.api.onmetal.de/network-namespace"
+	NetworkNameLabel      = "apinetlet.api.onmetal.de/network-name"
 
-	OnmetalAPINetworkVNIAnnotation = "apinet.api.onmetal.de/vni"
+	VirtualIPUIDLabel       = "apinetlet.api.onmetal.de/virtualip-uid"
+	VirtualIPNamespaceLabel = "apinetlet.api.onmetal.de/virtualip-namespace"
+	VirtualIPNameLabel      = "apinetlet.api.onmetal.de/virtualip-name"
+
+	FieldOwner = "apinetlet.api.onmetal.de/field-owner"
 )

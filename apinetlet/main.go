@@ -24,10 +24,9 @@ import (
 
 	"github.com/onmetal/controller-utils/configutils"
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
-	apinetletclient "github.com/onmetal/onmetal-api-net/apinetlet/client"
 	"github.com/onmetal/onmetal-api-net/apinetlet/controllers"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/apis/networking/v1alpha1"
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	flag "github.com/spf13/pflag"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
@@ -58,6 +57,8 @@ func init() {
 	//+kubebuilder:scaffold:scheme
 }
 
+const inClusterNamespacePath = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
+
 func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
@@ -65,8 +66,7 @@ func main() {
 
 	var apiNetKubeconfig string
 
-	var clusterName string
-	var publicIPNamespace string
+	var apiNetNamespace string
 
 	var watchNamespace string
 	var watchFilterValue string
@@ -77,9 +77,8 @@ func main() {
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
 
-	flag.StringVar(&clusterName, "cluster-name", clusterName, "Name of the cluster to set in allocation refs.")
 	flag.StringVar(&apiNetKubeconfig, "api-net-kubeconfig", "", "Path pointing to the api-net kubeconfig.")
-	flag.StringVar(&publicIPNamespace, "public-ip-namespace", "", "Namespace to manage public ips in.")
+	flag.StringVar(&apiNetNamespace, "api-net-namespace", "", "api-net cluster namespace to manage all objects in.")
 
 	flag.StringVar(&watchNamespace, "namespace", "", "Namespace that the controller watches to reconcile onmetal-api objects. If unspecified, the controller watches for onmetal-api objects across all namespaces.")
 	flag.StringVar(&watchFilterValue, "watch-filter", "", fmt.Sprintf("label value that the controller watches to reconcile onmetal-api objects. Label key is always %s. If unspecified, the controller watches for all onmetal-api objects", commonv1alpha1.WatchLabel))
@@ -95,13 +94,8 @@ func main() {
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
-	if publicIPNamespace == "" {
-		setupLog.Error(errors.New("must specify --public-ip-namespace"), "Invalid configuration")
-		os.Exit(1)
-	}
-
-	if clusterName == "" {
-		setupLog.Error(errors.New("must specify --cluster-name"), "Invalid configuration")
+	if apiNetNamespace == "" {
+		setupLog.Error(errors.New("must specify --api-net-namespace"), "Invalid configuration")
 		os.Exit(1)
 	}
 
@@ -127,7 +121,7 @@ func main() {
 		Port:                   9443,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       fmt.Sprintf("%s.apinetlet.apinet.api.onmetal.de", clusterName),
+		LeaderElectionID:       "fa89daf5.apinetlet.apinet.api.onmetal.de",
 		LeaderElectionConfig:   apiNetCfg,
 		Namespace:              watchNamespace,
 	})
@@ -138,6 +132,7 @@ func main() {
 
 	apiNetCluster, err := cluster.New(apiNetCfg, func(options *cluster.Options) {
 		options.Scheme = scheme
+		options.Namespace = apiNetNamespace
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to create api net cluster")
@@ -149,21 +144,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := apinetletclient.IndexPublicIPVirtualIPControllerField(ctx, apiNetCluster.GetFieldIndexer(), clusterName, scheme); err != nil {
-		setupLog.Error(err, "unable to add field indexer", apinetletclient.PublicIPVirtualIPController)
-		os.Exit(1)
-	}
-
-	if err := apinetletclient.IndexNetworkNetworkControllerField(ctx, apiNetCluster.GetFieldIndexer(), clusterName, scheme); err != nil {
-		setupLog.Error(err, "unable to add field indexer", apinetletclient.NetworkNetworkController)
-		os.Exit(1)
-	}
-
 	if err = (&controllers.VirtualIPReconciler{
 		Client:           mgr.GetClient(),
 		APINetClient:     apiNetCluster.GetClient(),
-		ClusterName:      clusterName,
-		APINetNamespace:  publicIPNamespace,
+		APINetNamespace:  apiNetNamespace,
 		WatchFilterValue: watchFilterValue,
 	}).SetupWithManager(mgr, apiNetCluster); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "VirtualIP")
@@ -173,8 +157,7 @@ func main() {
 	if err = (&controllers.NetworkReconciler{
 		Client:           mgr.GetClient(),
 		APINetClient:     apiNetCluster.GetClient(),
-		ClusterName:      clusterName,
-		APINetNamespace:  publicIPNamespace,
+		APINetNamespace:  apiNetNamespace,
 		WatchFilterValue: watchFilterValue,
 	}).SetupWithManager(mgr, apiNetCluster); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Network")

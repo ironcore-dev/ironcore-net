@@ -17,9 +17,6 @@ spec:
   versions:
   - additionalPrinterColumns:
     - jsonPath: .spec.vni
-      name: Request
-      type: string
-    - jsonPath: .status.vni
       name: VNI
       type: string
     - jsonPath: .status.conditions[?(@.type == "Allocated")].reason
@@ -48,7 +45,8 @@ spec:
           spec:
             properties:
               vni:
-                description: VNI is the requested network vni.
+                description: VNI is the requested network vni. Pointer to distinguish
+                  between explicitly set and unset.
                 format: int32
                 maximum: 16777215
                 minimum: 0
@@ -57,6 +55,7 @@ spec:
           status:
             properties:
               conditions:
+                description: Conditions are the conditions of a network.
                 items:
                   properties:
                     message:
@@ -72,12 +71,6 @@ spec:
                   - type
                   type: object
                 type: array
-              vni:
-                description: VNI is the allocated network vni.
-                format: int32
-                maximum: 16777215
-                minimum: 0
-                type: integer
             type: object
         type: object
     served: true

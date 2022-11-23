@@ -117,17 +117,17 @@ func (r *NetworkReconciler) allocate(ctx context.Context, network *onmetalapinet
 		}
 	}
 
-	if vni := network.Spec.VNI; vni > 0 {
-		if r.taken.Has(vni) {
-			return 0, fmt.Errorf("vni %d is already taken", vni)
+	if vni := network.Spec.VNI; vni != nil {
+		if r.taken.Has(*vni) {
+			return 0, fmt.Errorf("vni %d is already taken", *vni)
 		}
 
-		r.taken.Insert(vni)
+		r.taken.Insert(*vni)
 		r.allocationsByKey[key] = networkAllocation{
 			UID: network.UID,
-			VNI: vni,
+			VNI: *vni,
 		}
-		return vni, nil
+		return *vni, nil
 	}
 
 	if allVNIsTaken(r.taken, r.MinVNI, r.MaxVNI) {
@@ -206,7 +206,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	log = log.WithValues("VNI", vni)
 	log.V(1).Info("Successfully allocated")
 
-	if network.Spec.VNI == 0 {
+	if network.Spec.VNI == nil {
 		log.V(1).Info("Patching allocated vni into spec")
 		if err := r.patchSpecVNI(ctx, network, vni); err != nil {
 			return ctrl.Result{}, err
@@ -216,7 +216,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	}
 
 	log.V(1).Info("Patching as allocated")
-	if err := r.patchStatusAllocated(ctx, network, vni); err != nil {
+	if err := r.patchStatusAllocated(ctx, network); err != nil {
 		return ctrl.Result{}, err
 	}
 	log.V(1).Info("Patched as allocated")
@@ -227,7 +227,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 
 func (r *NetworkReconciler) patchSpecVNI(ctx context.Context, network *onmetalapinetv1alpha1.Network, vni int32) error {
 	base := network.DeepCopy()
-	network.Spec.VNI = vni
+	network.Spec.VNI = &vni
 	if err := r.Patch(ctx, network, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching spec vni: %w", err)
 	}
@@ -236,7 +236,6 @@ func (r *NetworkReconciler) patchSpecVNI(ctx context.Context, network *onmetalap
 
 func (r *NetworkReconciler) patchStatusPending(ctx context.Context, network *onmetalapinetv1alpha1.Network) error {
 	base := network.DeepCopy()
-	network.Status.VNI = 0
 	onmetalapinetv1alpha1.SetNetworkCondition(&network.Status.Conditions, onmetalapinetv1alpha1.NetworkCondition{
 		Type:    onmetalapinetv1alpha1.NetworkAllocated,
 		Reason:  "Pending",
@@ -249,9 +248,8 @@ func (r *NetworkReconciler) patchStatusPending(ctx context.Context, network *onm
 	return nil
 }
 
-func (r *NetworkReconciler) patchStatusAllocated(ctx context.Context, network *onmetalapinetv1alpha1.Network, vni int32) error {
+func (r *NetworkReconciler) patchStatusAllocated(ctx context.Context, network *onmetalapinetv1alpha1.Network) error {
 	base := network.DeepCopy()
-	network.Status.VNI = vni
 	onmetalapinetv1alpha1.SetNetworkCondition(&network.Status.Conditions, onmetalapinetv1alpha1.NetworkCondition{
 		Type:    onmetalapinetv1alpha1.NetworkAllocated,
 		Reason:  "Allocated",
@@ -292,14 +290,15 @@ func (r *NetworkReconciler) initialize(ctx context.Context) error {
 			continue
 		}
 
-		if r.taken.Has(network.Status.VNI) || network.Status.VNI > r.MaxVNI {
-			return fmt.Errorf("[network %s] cannot allocate vni %d", networkKey, network.Status.VNI)
+		vni := *network.Spec.VNI
+		if r.taken.Has(vni) || vni > r.MaxVNI {
+			return fmt.Errorf("[network %s] cannot allocate vni %d", networkKey, vni)
 		}
 
-		r.taken.Insert(network.Status.VNI)
+		r.taken.Insert(vni)
 		r.allocationsByKey[networkKey] = networkAllocation{
 			UID: network.UID,
-			VNI: network.Status.VNI,
+			VNI: vni,
 		}
 	}
 
@@ -309,6 +308,10 @@ func (r *NetworkReconciler) initialize(ctx context.Context) error {
 func (r *NetworkReconciler) determineReconciliationCandidates(networks []onmetalapinetv1alpha1.Network) []onmetalapinetv1alpha1.Network {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
+
+	if allVNIsTaken(r.taken, r.MinVNI, r.MaxVNI) {
+		return nil
+	}
 
 	var candidates []onmetalapinetv1alpha1.Network
 	for _, network := range networks {
@@ -320,7 +323,7 @@ func (r *NetworkReconciler) determineReconciliationCandidates(networks []onmetal
 			continue
 		}
 
-		if r.taken.Has(network.Spec.VNI) || allVNIsTaken(r.taken, r.MinVNI, r.MaxVNI) {
+		if network.Spec.VNI != nil && r.taken.Has(*network.Spec.VNI) {
 			continue
 		}
 

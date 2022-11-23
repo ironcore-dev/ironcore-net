@@ -74,10 +74,10 @@ var _ = Describe("NetworkController", func() {
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
 
 		By("waiting for the network to be marked as non-allocated")
-		Eventually(Object(network)).Should(BeNonAllocatedNetwork())
+		Eventually(Object(network)).Should(BeUnallocatedNetwork())
 
 		By("asserting it stays that way")
-		Consistently(Object(network)).Should(BeNonAllocatedNetwork())
+		Consistently(Object(network)).Should(BeUnallocatedNetwork())
 
 		By("deleting one of the original networks")
 		Expect(k8sClient.Delete(ctx, &onmetalapinetv1alpha1.Network{
@@ -92,9 +92,8 @@ var _ = Describe("NetworkController", func() {
 	})
 })
 
-func BeNonAllocatedNetwork() types.GomegaMatcher {
+func BeUnallocatedNetwork() types.GomegaMatcher {
 	return HaveField("Status", SatisfyAll(
-		HaveField("VNI", BeZero()),
 		HaveField("Conditions", ConsistOf(
 			SatisfyAll(
 				HaveField("Type", onmetalapinetv1alpha1.NetworkAllocated),
@@ -105,16 +104,18 @@ func BeNonAllocatedNetwork() types.GomegaMatcher {
 }
 
 func BeAllocatedNetwork() types.GomegaMatcher {
-	return HaveField("Status", SatisfyAll(
-		HaveField("Conditions", ConsistOf(
-			SatisfyAll(
-				HaveField("Type", onmetalapinetv1alpha1.NetworkAllocated),
-				HaveField("Status", corev1.ConditionTrue),
-			)),
-		),
-		HaveField("VNI", SatisfyAll(
+	return SatisfyAll(
+		HaveField("Spec.VNI", HaveValue(SatisfyAll(
 			BeNumerically(">=", MinVNI),
 			BeNumerically("<=", MaxVNI),
+		))),
+		HaveField("Status", SatisfyAll(
+			HaveField("Conditions", ConsistOf(
+				SatisfyAll(
+					HaveField("Type", onmetalapinetv1alpha1.NetworkAllocated),
+					HaveField("Status", corev1.ConditionTrue),
+				)),
+			),
 		)),
-	))
+	)
 }

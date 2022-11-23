@@ -7,7 +7,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/google/addlicense v1.0.0
 	github.com/onmetal/controller-utils v0.6.4
-	github.com/onmetal/onmetal-api v0.0.13-0.20221108081420-eb9d8fab4e95
+	github.com/onmetal/onmetal-api v0.0.13-0.20221122151245-ba568ad378e2
 	github.com/onmetal/poollet v0.0.0-20221018115803-48ff17a52bac
 	github.com/onsi/ginkgo/v2 v2.4.0
 	github.com/onsi/gomega v1.24.0

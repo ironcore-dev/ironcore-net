@@ -31,7 +31,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 FROM gcr.io/distroless/static:nonroot AS onmetal-api-net-manager
 WORKDIR /
-COPY --from=builder /workspace/bin/onmetal-api-net-manager .
+COPY --from=builder /workspace/bin/onmetal-api-net-manager /manager
 USER 65532:65532
 
 ENTRYPOINT ["/manager"]
@@ -40,7 +40,7 @@ ENTRYPOINT ["/manager"]
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 FROM gcr.io/distroless/static:nonroot AS apinetlet-manager
 WORKDIR /
-COPY --from=builder /workspace/bin/apinetlet-manager manager
+COPY --from=builder /workspace/bin/apinetlet-manager /manager
 USER 65532:65532
 
 ENTRYPOINT ["/manager"]

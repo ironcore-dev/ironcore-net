@@ -23,7 +23,8 @@ type NetworkSpec struct {
 	// +kubebuilder:validation:Maximum=16777215
 	// +kubebuilder:validation:Minimum=0
 	// VNI is the requested network vni.
-	VNI int32 `json:"vni,omitempty"`
+	// Pointer to distinguish between explicitly set and unset.
+	VNI *int32 `json:"vni,omitempty"`
 }
 
 type NetworkConditionType string
@@ -57,18 +58,13 @@ func SetNetworkCondition(conditions *[]NetworkCondition, condition NetworkCondit
 }
 
 type NetworkStatus struct {
-	// +kubebuilder:validation:Maximum=16777215
-	// +kubebuilder:validation:Minimum=0
-	// VNI is the allocated network vni.
-	VNI int32 `json:"vni,omitempty"`
-
+	// Conditions are the conditions of a network.
 	Conditions []NetworkCondition `json:"conditions,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:name="Request",type=string,JSONPath=`.spec.vni`
-// +kubebuilder:printcolumn:name="VNI",type=string,JSONPath=`.status.vni`
+// +kubebuilder:printcolumn:name="VNI",type=string,JSONPath=`.spec.vni`
 // +kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.conditions[?(@.type == "Allocated")].reason`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=".metadata.creationTimestamp"
 

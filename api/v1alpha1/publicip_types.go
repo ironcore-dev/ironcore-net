@@ -15,14 +15,13 @@
 package v1alpha1
 
 import (
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type PublicIPSpec struct {
-	IPFamilies []corev1.IPFamily   `json:"ipFamilies,omitempty"`
-	IPs        []commonv1alpha1.IP `json:"ips,omitempty"`
+	IPFamilies []corev1.IPFamily `json:"ipFamilies,omitempty"`
+	IPs        []IP              `json:"ips,omitempty"`
 }
 
 type PublicIPConditionType string
@@ -56,13 +55,13 @@ func SetPublicIPCondition(conditions *[]PublicIPCondition, condition PublicIPCon
 }
 
 type PublicIPStatus struct {
-	IPs        []commonv1alpha1.IP `json:"ips,omitempty"`
+	// Conditions are the conditions of a PublicIP.
 	Conditions []PublicIPCondition `json:"conditions,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:name="Request",type=string,JSONPath=`.spec.ips`
+// +kubebuilder:printcolumn:name="IPFamilies",type=string,JSONPath=`.status.ipFamilies`
 // +kubebuilder:printcolumn:name="IPs",type=string,JSONPath=`.status.ips`
 // +kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.conditions[?(@.type == "Allocated")].reason`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=".metadata.creationTimestamp"

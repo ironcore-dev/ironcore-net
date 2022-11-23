@@ -21,7 +21,6 @@ import (
 	"time"
 
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/apis/common/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -37,7 +36,7 @@ func IPFamilyBitLen(ipFamily corev1.IPFamily) uint8 {
 	}
 }
 
-func CommonV1Alpha1IPsToNetIPAddrs(ips []commonv1alpha1.IP) []netip.Addr {
+func APINetV1Alpha1IPsToNetIPAddrs(ips []onmetalapinetv1alpha1.IP) []netip.Addr {
 	res := make([]netip.Addr, len(ips))
 	for i, ip := range ips {
 		res[i] = ip.Addr
@@ -45,10 +44,10 @@ func CommonV1Alpha1IPsToNetIPAddrs(ips []commonv1alpha1.IP) []netip.Addr {
 	return res
 }
 
-func NetIPAddrsToCommonV1Alpha1IPs(addrs []netip.Addr) []commonv1alpha1.IP {
-	res := make([]commonv1alpha1.IP, len(addrs))
+func NetIPAddrsToAPINetV1Alpha1IPs(addrs []netip.Addr) []onmetalapinetv1alpha1.IP {
+	res := make([]onmetalapinetv1alpha1.IP, len(addrs))
 	for i, addr := range addrs {
-		res[i] = commonv1alpha1.IP{Addr: addr}
+		res[i] = onmetalapinetv1alpha1.IP{Addr: addr}
 	}
 	return res
 }

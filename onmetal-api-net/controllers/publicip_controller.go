@@ -244,7 +244,7 @@ func (r *PublicIPReconciler) allocate(ctx context.Context, log logr.Logger, publ
 	log.V(1).Info("Requesting new allocation")
 	return r.allocations.allocate(key, publicIP.UID, publicIPAllocationRequest{
 		ipFamilies: publicIP.Spec.IPFamilies,
-		ips:        CommonV1Alpha1IPsToNetIPAddrs(publicIP.Spec.IPs),
+		ips:        APINetV1Alpha1IPsToNetIPAddrs(publicIP.Spec.IPs),
 	})
 }
 
@@ -296,7 +296,7 @@ func (r *PublicIPReconciler) reconcile(ctx context.Context, log logr.Logger, pub
 	}
 
 	log.V(1).Info("Patching public ip as allocated")
-	if err := r.patchStatusAllocated(ctx, publicIP, ips); err != nil {
+	if err := r.patchStatusAllocated(ctx, publicIP); err != nil {
 		return ctrl.Result{}, err
 	}
 	log.V(1).Info("Patched public ip status")
@@ -307,7 +307,7 @@ func (r *PublicIPReconciler) reconcile(ctx context.Context, log logr.Logger, pub
 
 func (r *PublicIPReconciler) patchPublicIPSpecIPs(ctx context.Context, publicIP *onmetalapinetv1alpha1.PublicIP, ips []netip.Addr) error {
 	base := publicIP.DeepCopy()
-	publicIP.Spec.IPs = NetIPAddrsToCommonV1Alpha1IPs(ips)
+	publicIP.Spec.IPs = NetIPAddrsToAPINetV1Alpha1IPs(ips)
 	if err := r.Patch(ctx, publicIP, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching spec ips: %w", err)
 	}
@@ -316,7 +316,6 @@ func (r *PublicIPReconciler) patchPublicIPSpecIPs(ctx context.Context, publicIP 
 
 func (r *PublicIPReconciler) patchStatusPending(ctx context.Context, publicIP *onmetalapinetv1alpha1.PublicIP) error {
 	base := publicIP.DeepCopy()
-	publicIP.Status.IPs = nil
 	onmetalapinetv1alpha1.SetPublicIPCondition(&publicIP.Status.Conditions, onmetalapinetv1alpha1.PublicIPCondition{
 		Type:    onmetalapinetv1alpha1.PublicIPAllocated,
 		Reason:  "Pending",
@@ -329,9 +328,8 @@ func (r *PublicIPReconciler) patchStatusPending(ctx context.Context, publicIP *o
 	return nil
 }
 
-func (r *PublicIPReconciler) patchStatusAllocated(ctx context.Context, publicIP *onmetalapinetv1alpha1.PublicIP, ips []netip.Addr) error {
+func (r *PublicIPReconciler) patchStatusAllocated(ctx context.Context, publicIP *onmetalapinetv1alpha1.PublicIP) error {
 	base := publicIP.DeepCopy()
-	publicIP.Status.IPs = NetIPAddrsToCommonV1Alpha1IPs(ips)
 	onmetalapinetv1alpha1.SetPublicIPCondition(&publicIP.Status.Conditions, onmetalapinetv1alpha1.PublicIPCondition{
 		Type:    onmetalapinetv1alpha1.PublicIPAllocated,
 		Reason:  "Allocated",
@@ -366,9 +364,10 @@ func (r *PublicIPReconciler) initialize(ctx context.Context) error {
 			continue
 		}
 
+		ips := publicIP.Spec.IPs
 		req := publicIPAllocationRequest{
 			ipFamilies: publicIP.Spec.IPFamilies,
-			ips:        CommonV1Alpha1IPsToNetIPAddrs(publicIP.Status.IPs),
+			ips:        APINetV1Alpha1IPsToNetIPAddrs(ips),
 		}
 		if _, err := r.allocations.allocate(publicIPKey, publicIP.UID, req); err != nil {
 			return fmt.Errorf("[public ip %s] cannot allocate: %w", publicIPKey, err)
@@ -394,7 +393,7 @@ func (r *PublicIPReconciler) determineReconciliationCandidates(publicIPs []onmet
 
 		if r.allocations.canFit(publicIPAllocationRequest{
 			ipFamilies: publicIP.Spec.IPFamilies,
-			ips:        CommonV1Alpha1IPsToNetIPAddrs(publicIP.Spec.IPs),
+			ips:        APINetV1Alpha1IPsToNetIPAddrs(publicIP.Spec.IPs),
 		}) {
 			candidates = append(candidates, publicIP)
 		}
