@@ -15,6 +15,31 @@ rules:
 - apiGroups:
   - networking.api.onmetal.de
   resources:
+  - natgateways
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - natgateways/finalizers
+  verbs:
+  - patch
+  - update
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - natgateways/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
   - networks
   verbs:
   - get

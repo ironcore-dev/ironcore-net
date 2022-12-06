@@ -156,6 +156,12 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 			APINetNamespace: ns.Name,
 		}).SetupWithManager(k8sManager, k8sManager)).To(Succeed())
 
+		Expect((&NatGatewayReconciler{
+			Client:          k8sManager.GetClient(),
+			APINetClient:    k8sManager.GetClient(),
+			APINetNamespace: ns.Name,
+		}).SetupWithManager(k8sManager, k8sManager)).To(Succeed())
+
 		go func() {
 			defer GinkgoRecover()
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")

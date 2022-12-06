@@ -26,7 +26,6 @@ import (
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/apiutils/predicates"
-	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -34,9 +33,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
@@ -170,16 +167,6 @@ func (r *VirtualIPReconciler) reconcile(ctx context.Context, log logr.Logger, vi
 	return ctrl.Result{}, nil
 }
 
-func isAPINetPublicIPAllocated(apiNetPublicIP *onmetalapinetv1alpha1.PublicIP) bool {
-	apiNetPublicIPConditions := apiNetPublicIP.Status.Conditions
-	idx := onmetalapinetv1alpha1.PublicIPConditionIndex(apiNetPublicIP.Status.Conditions, onmetalapinetv1alpha1.PublicIPAllocated)
-	if idx < 0 || apiNetPublicIPConditions[idx].Status != corev1.ConditionTrue {
-		return false
-	}
-
-	return apiNetPublicIP.Spec.IP.IsValid()
-}
-
 func (r *VirtualIPReconciler) applyPublicIP(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (netip.Addr, error) {
 	apiNetPublicIP := &onmetalapinetv1alpha1.PublicIP{
 		TypeMeta: metav1.TypeMeta{
@@ -209,7 +196,7 @@ func (r *VirtualIPReconciler) applyPublicIP(ctx context.Context, log logr.Logger
 	}
 	log.V(1).Info("Applied apinet public ip")
 
-	if !isAPINetPublicIPAllocated(apiNetPublicIP) {
+	if !apiNetPublicIP.IsAllocated() {
 		return netip.Addr{}, nil
 	}
 	ip := apiNetPublicIP.Spec.IP
@@ -232,13 +219,6 @@ func (r *VirtualIPReconciler) patchStatusUnallocated(ctx context.Context, virtua
 		return fmt.Errorf("error patching virtual ip status: %w", err)
 	}
 	return nil
-}
-
-var apiNetPublicIPAllocationChanged = predicate.Funcs{
-	UpdateFunc: func(event event.UpdateEvent) bool {
-		oldAPINetPublicIP, newAPINetPublicIP := event.ObjectOld.(*onmetalapinetv1alpha1.PublicIP), event.ObjectNew.(*onmetalapinetv1alpha1.PublicIP)
-		return isAPINetPublicIPAllocated(oldAPINetPublicIP) != isAPINetPublicIPAllocated(newAPINetPublicIP)
-	},
 }
 
 func (r *VirtualIPReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluster cluster.Cluster) error {
@@ -274,7 +254,7 @@ func (r *VirtualIPReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluster c
 				return []ctrl.Request{{NamespacedName: client.ObjectKey{Namespace: namespace, Name: name}}}
 			}),
 			builder.WithPredicates(
-				apiNetPublicIPAllocationChanged,
+				getApiNetPublicIPAllocationChangedPredicate(),
 			),
 		).
 		Complete(r)
