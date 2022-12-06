@@ -13,6 +13,49 @@ rules:
   - create
   - patch
 - apiGroups:
+  - apinet.api.onmetal.de
+  resources:
+  - publicips
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apinet.api.onmetal.de
+  resources:
+  - publicips/status
+  verbs:
+  - get
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - natgateways
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - natgateways/finalizers
+  verbs:
+  - patch
+  - update
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - natgateways/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - networking.api.onmetal.de
   resources:
   - networks

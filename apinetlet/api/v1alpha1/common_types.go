@@ -23,5 +23,9 @@ const (
 	VirtualIPNamespaceLabel = "apinetlet.api.onmetal.de/virtualip-namespace"
 	VirtualIPNameLabel      = "apinetlet.api.onmetal.de/virtualip-name"
 
+	NATGatewayUIDLabel       = "apinetlet.api.onmetal.de/natgateway-uid"
+	NATGatewayNamespaceLabel = "apinetlet.api.onmetal.de/natgateway-namespace"
+	NATGatewayNameLabel      = "apinetlet.api.onmetal.de/natgateway-name"
+
 	FieldOwner = "apinetlet.api.onmetal.de/field-owner"
 )

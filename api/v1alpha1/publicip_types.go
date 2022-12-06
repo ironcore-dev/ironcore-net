@@ -78,6 +78,16 @@ type PublicIP struct {
 	Status PublicIPStatus `json:"status,omitempty"`
 }
 
+func (ip *PublicIP) IsAllocated() bool {
+	apiNetPublicIPConditions := ip.Status.Conditions
+	idx := PublicIPConditionIndex(ip.Status.Conditions, PublicIPAllocated)
+	if idx < 0 || apiNetPublicIPConditions[idx].Status != corev1.ConditionTrue {
+		return false
+	}
+
+	return ip.Spec.IP.IsValid()
+}
+
 // +kubebuilder:object:root=true
 
 // PublicIPList contains a list of PublicIP.
