@@ -156,7 +156,13 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 			APINetNamespace: ns.Name,
 		}).SetupWithManager(k8sManager, k8sManager)).To(Succeed())
 
-		Expect((&NatGatewayReconciler{
+		Expect((&NATGatewayReconciler{
+			Client:          k8sManager.GetClient(),
+			APINetClient:    k8sManager.GetClient(),
+			APINetNamespace: ns.Name,
+		}).SetupWithManager(k8sManager, k8sManager)).To(Succeed())
+
+		Expect((&LoadBalancerReconciler{
 			Client:          k8sManager.GetClient(),
 			APINetClient:    k8sManager.GetClient(),
 			APINetNamespace: ns.Name,

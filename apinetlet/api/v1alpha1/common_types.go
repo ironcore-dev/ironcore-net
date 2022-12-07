@@ -27,5 +27,9 @@ const (
 	NATGatewayNamespaceLabel = "apinetlet.api.onmetal.de/natgateway-namespace"
 	NATGatewayNameLabel      = "apinetlet.api.onmetal.de/natgateway-name"
 
+	LoadBalancerUIDLabel       = "apinetlet.api.onmetal.de/loadbalancer-uid"
+	LoadBalancerNamespaceLabel = "apinetlet.api.onmetal.de/loadbalancer-namespace"
+	LoadBalancerNameLabel      = "apinetlet.api.onmetal.de/loadbalancer-name"
+
 	FieldOwner = "apinetlet.api.onmetal.de/field-owner"
 )

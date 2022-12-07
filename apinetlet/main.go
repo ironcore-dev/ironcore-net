@@ -161,6 +161,26 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Network")
 		os.Exit(1)
 	}
+
+	if err = (&controllers.NATGatewayReconciler{
+		Client:           mgr.GetClient(),
+		APINetClient:     apiNetCluster.GetClient(),
+		APINetNamespace:  apiNetNamespace,
+		WatchFilterValue: watchFilterValue,
+	}).SetupWithManager(mgr, apiNetCluster); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "NATGateway")
+		os.Exit(1)
+	}
+
+	if err = (&controllers.LoadBalancerReconciler{
+		Client:           mgr.GetClient(),
+		APINetClient:     apiNetCluster.GetClient(),
+		APINetNamespace:  apiNetNamespace,
+		WatchFilterValue: watchFilterValue,
+	}).SetupWithManager(mgr, apiNetCluster); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "LoadBalancer")
+		os.Exit(1)
+	}
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
