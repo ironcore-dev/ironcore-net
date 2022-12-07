@@ -40,10 +40,10 @@ import (
 )
 
 const (
-	natGatewayFinalizer = "apinet.api.onmetal.de/natgateway"
+	loadBalancerFinalizer = "apinet.api.onmetal.de/loadbalancer"
 )
 
-type NATGatewayReconciler struct {
+type LoadBalancerReconciler struct {
 	client.Client
 	APINetClient client.Client
 
@@ -53,35 +53,35 @@ type NATGatewayReconciler struct {
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways/finalizers,verbs=update;patch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=natgateways/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers/finalizers,verbs=update;patch
+//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=apinet.api.onmetal.de,resources=publicips,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=apinet.api.onmetal.de,resources=publicips/status,verbs=get
 
-func (r *NATGatewayReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *LoadBalancerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
-	natGateway := &networkingv1alpha1.NATGateway{}
-	if err := r.Get(ctx, req.NamespacedName, natGateway); err != nil {
+	loadBalancer := &networkingv1alpha1.LoadBalancer{}
+	if err := r.Get(ctx, req.NamespacedName, loadBalancer); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return ctrl.Result{}, fmt.Errorf("error getting nat gateway %s: %w", req.NamespacedName, err)
+			return ctrl.Result{}, fmt.Errorf("error getting load balancer %s: %w", req.NamespacedName, err)
 		}
 
 		return r.deleteGone(ctx, log, req.NamespacedName)
 	}
 
-	return r.reconcileExists(ctx, log, natGateway)
+	return r.reconcileExists(ctx, log, loadBalancer)
 }
 
-func (r *NATGatewayReconciler) deleteGone(ctx context.Context, log logr.Logger, natGatewayKey client.ObjectKey) (ctrl.Result, error) {
+func (r *LoadBalancerReconciler) deleteGone(ctx context.Context, log logr.Logger, virtualIPKey client.ObjectKey) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
 	log.V(1).Info("Deleting any matching apinet public ips")
 	if err := r.APINetClient.DeleteAllOf(ctx, &onmetalapinetv1alpha1.PublicIP{},
 		client.InNamespace(r.APINetNamespace),
 		client.MatchingLabels{
-			apinetletv1alpha1.NATGatewayNamespaceLabel: natGatewayKey.Namespace,
-			apinetletv1alpha1.NATGatewayNameLabel:      natGatewayKey.Name,
+			apinetletv1alpha1.LoadBalancerNamespaceLabel: virtualIPKey.Namespace,
+			apinetletv1alpha1.LoadBalancerNameLabel:      virtualIPKey.Name,
 		},
 	); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error deleting apinet public ips: %w", err)
@@ -91,59 +91,56 @@ func (r *NATGatewayReconciler) deleteGone(ctx context.Context, log logr.Logger, 
 	return ctrl.Result{}, nil
 }
 
-func (r *NATGatewayReconciler) reconcileExists(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (ctrl.Result, error) {
-	log = log.WithValues("UID", natGateway.UID)
-	if !natGateway.DeletionTimestamp.IsZero() {
-		return r.delete(ctx, log, natGateway)
+func (r *LoadBalancerReconciler) reconcileExists(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) (ctrl.Result, error) {
+	log = log.WithValues("UID", loadBalancer.UID)
+	if !loadBalancer.DeletionTimestamp.IsZero() {
+		return r.delete(ctx, log, loadBalancer)
 	}
-	return r.reconcile(ctx, log, natGateway)
+	return r.reconcile(ctx, log, loadBalancer)
 }
 
-func (r *NATGatewayReconciler) delete(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (ctrl.Result, error) {
+func (r *LoadBalancerReconciler) delete(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) (ctrl.Result, error) {
 	log.V(1).Info("Delete")
 
-	if !controllerutil.ContainsFinalizer(natGateway, natGatewayFinalizer) {
+	if !controllerutil.ContainsFinalizer(loadBalancer, loadBalancerFinalizer) {
 		log.V(1).Info("No finalizer present, nothing to do")
 		return ctrl.Result{}, nil
 	}
 
 	var count int
-	for _, ipFamily := range natGateway.Spec.IPFamilies {
-		for _, ip := range natGateway.Spec.IPs {
-			if err := r.APINetClient.Delete(ctx, &onmetalapinetv1alpha1.PublicIP{
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: r.APINetNamespace,
-					Name:      fmt.Sprintf("%s-%s-%s", natGateway.UID, ip.Name, strings.ToLower(string(ipFamily))),
-				},
-			}); err != nil {
-				if !apierrors.IsNotFound(err) {
-					return ctrl.Result{}, fmt.Errorf("error deleting target public ip: %w", err)
-				}
-				count++
-
+	for _, ipFamily := range loadBalancer.Spec.IPFamilies {
+		if err := r.APINetClient.Delete(ctx, &onmetalapinetv1alpha1.PublicIP{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: r.APINetNamespace,
+				Name:      fmt.Sprintf("%s-%s", loadBalancer.UID, strings.ToLower(string(ipFamily))),
+			},
+		}); err != nil {
+			if !apierrors.IsNotFound(err) {
+				return ctrl.Result{}, fmt.Errorf("error deleting target public ip: %w", err)
 			}
+			count++
 
 		}
 	}
 
-	if count < len(natGateway.Spec.IPs)*len(natGateway.Spec.IPFamilies) {
+	if count < len(loadBalancer.Spec.IPFamilies) {
 		log.V(1).Info("Target public ip is not yet gone, requeueing")
 		return ctrl.Result{Requeue: true}, nil
 	}
 
 	log.V(1).Info("Target public ip is gone, removing finalizer")
-	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, natGateway, natGatewayFinalizer); err != nil {
+	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, loadBalancer, loadBalancerFinalizer); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
 	}
 	log.V(1).Info("Removed finalizer")
 	return ctrl.Result{}, nil
 }
 
-func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (ctrl.Result, error) {
+func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
 	log.V(1).Info("Ensuring finalizer")
-	modified, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, natGateway, natGatewayFinalizer)
+	modified, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, loadBalancer, loadBalancerFinalizer)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error ensuring finalizer: %w", err)
 	}
@@ -152,20 +149,33 @@ func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 		return ctrl.Result{Requeue: true}, nil
 	}
 
-	ips, err := r.applyPublicIPs(ctx, log, natGateway)
+	ips, err := r.applyPublicIPs(ctx, log, loadBalancer)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error getting / applying public ip: %w", err)
 	}
 
-	if err := r.patchStatus(ctx, log, natGateway, ips); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error patching nat gateway status")
+	if err := r.patchStatus(ctx, log, loadBalancer, ips); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error patching load balancer status")
 	}
 
-	log.V(1).Info("Patched nat gateway status")
+	log.V(1).Info("Patched load balancer status")
 	return ctrl.Result{}, nil
 }
 
-func (r *NATGatewayReconciler) applyPublicIP(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway, ipName string, ipFamily corev1.IPFamily) (netip.Addr, error) {
+func (r *LoadBalancerReconciler) applyPublicIPs(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) ([]netip.Addr, error) {
+	var ips []netip.Addr
+	for _, ipFamily := range loadBalancer.Spec.IPFamilies {
+		apiNetPublicIP, err := r.applyPublicIP(ctx, log, loadBalancer, ipFamily)
+		if err != nil {
+			return nil, err
+		}
+
+		ips = append(ips, apiNetPublicIP)
+	}
+	return ips, nil
+}
+
+func (r *LoadBalancerReconciler) applyPublicIP(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer, ipFamily corev1.IPFamily) (netip.Addr, error) {
 	apiNetPublicIP := &onmetalapinetv1alpha1.PublicIP{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: onmetalapinetv1alpha1.GroupVersion.String(),
@@ -173,11 +183,11 @@ func (r *NATGatewayReconciler) applyPublicIP(ctx context.Context, log logr.Logge
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: r.APINetNamespace,
-			Name:      fmt.Sprintf("%s-%s-%s", natGateway.UID, ipName, strings.ToLower(string(ipFamily))),
+			Name:      fmt.Sprintf("%s-%s", loadBalancer.UID, strings.ToLower(string(ipFamily))),
 			Labels: map[string]string{
-				apinetletv1alpha1.NATGatewayNamespaceLabel: natGateway.Namespace,
-				apinetletv1alpha1.NATGatewayNameLabel:      natGateway.Name,
-				apinetletv1alpha1.NATGatewayUIDLabel:       string(natGateway.UID),
+				apinetletv1alpha1.LoadBalancerNamespaceLabel: loadBalancer.Namespace,
+				apinetletv1alpha1.LoadBalancerNameLabel:      loadBalancer.Name,
+				apinetletv1alpha1.LoadBalancerUIDLabel:       string(loadBalancer.UID),
 			},
 		},
 		Spec: onmetalapinetv1alpha1.PublicIPSpec{
@@ -185,7 +195,7 @@ func (r *NATGatewayReconciler) applyPublicIP(ctx context.Context, log logr.Logge
 		},
 	}
 
-	log.V(1).Info("Applying apinet public ip", "ipName", ipName, "ipFamily", ipFamily)
+	log.V(1).Info("Applying apinet public ip", "ipFamily", ipFamily)
 	if err := r.APINetClient.Patch(ctx, apiNetPublicIP, client.Apply,
 		client.FieldOwner(apinetletv1alpha1.FieldOwner),
 		client.ForceOwnership,
@@ -201,48 +211,31 @@ func (r *NATGatewayReconciler) applyPublicIP(ctx context.Context, log logr.Logge
 	return ip.Addr, nil
 }
 
-func (r *NATGatewayReconciler) applyPublicIPs(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (map[string]netip.Addr, error) {
-	ips := map[string]netip.Addr{}
-	for _, ipFamily := range natGateway.Spec.IPFamilies {
-		for _, ip := range natGateway.Spec.IPs {
-			apiNetPublicIP, err := r.applyPublicIP(ctx, log, natGateway, ip.Name, ipFamily)
-			if err != nil {
-				return nil, err
-			}
-			ips[ip.Name] = apiNetPublicIP
-		}
-	}
-	return ips, nil
-}
+func (r *LoadBalancerReconciler) patchStatus(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer, ips []netip.Addr) error {
+	base := loadBalancer.DeepCopy()
+	loadBalancer.Status.IPs = []commonv1alpha1.IP{}
 
-func (r *NATGatewayReconciler) patchStatus(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway, ips map[string]netip.Addr) error {
-	base := natGateway.DeepCopy()
-	natGateway.Status.IPs = []networkingv1alpha1.NATGatewayIPStatus{}
-
-	for ipName, ip := range ips {
+	for _, ip := range ips {
 		if !ip.IsValid() {
-			log.V(2).Info("Public ip is not yet allocated", "ipName", ipName)
+			log.V(2).Info("Public ip is not yet allocated", "ip", ip.String())
 			continue
 		}
 
-		log.V(2).Info("Public ip is allocated", "ipName", ipName)
-		natGateway.Status.IPs = append(natGateway.Status.IPs, networkingv1alpha1.NATGatewayIPStatus{
-			Name: ipName,
-			IP: commonv1alpha1.IP{
-				Addr: ip,
-			},
+		log.V(2).Info("Public ip is allocated", "ip", ip.String())
+		loadBalancer.Status.IPs = append(loadBalancer.Status.IPs, commonv1alpha1.IP{
+			Addr: ip,
 		})
 	}
 
-	return r.Status().Patch(ctx, natGateway, client.MergeFrom(base))
+	return r.Status().Patch(ctx, loadBalancer, client.MergeFrom(base))
 }
 
-func (r *NATGatewayReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluster cluster.Cluster) error {
-	log := ctrl.Log.WithName("natgateway").WithName("setup")
+func (r *LoadBalancerReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluster cluster.Cluster) error {
+	log := ctrl.Log.WithName("loadbalancer").WithName("setup")
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
-			&networkingv1alpha1.NATGateway{},
+			&networkingv1alpha1.LoadBalancer{},
 			builder.WithPredicates(
 				predicates.ResourceHasFilterLabel(log, r.WatchFilterValue),
 				predicates.ResourceIsNotExternallyManaged(log),
@@ -257,12 +250,12 @@ func (r *NATGatewayReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluster 
 					return nil
 				}
 
-				namespace, ok := apiNetPublicIP.Labels[apinetletv1alpha1.NATGatewayNamespaceLabel]
+				namespace, ok := apiNetPublicIP.Labels[apinetletv1alpha1.LoadBalancerNamespaceLabel]
 				if !ok {
 					return nil
 				}
 
-				name, ok := apiNetPublicIP.Labels[apinetletv1alpha1.NATGatewayNameLabel]
+				name, ok := apiNetPublicIP.Labels[apinetletv1alpha1.LoadBalancerNameLabel]
 				if !ok {
 					return nil
 				}

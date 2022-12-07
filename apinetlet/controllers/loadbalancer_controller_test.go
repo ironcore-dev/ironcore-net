@@ -32,7 +32,7 @@ import (
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
-var _ = Describe("NATGatewayController", func() {
+var _ = Describe("LoadBalancerController", func() {
 	ctx := testutils.SetupContext()
 	ns := SetupTest(ctx)
 
@@ -46,51 +46,45 @@ var _ = Describe("NATGatewayController", func() {
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
 
-		ipName := "ip"
 		ipFamily := corev1.IPv4Protocol
 
-		By("creating a nat gateway")
-		natGateway := &networkingv1alpha1.NATGateway{
+		By("creating a load balancer")
+		loadBalancer := &networkingv1alpha1.LoadBalancer{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
-				GenerateName: "nat-gateway-",
+				GenerateName: "load-balancer-",
 			},
-			Spec: networkingv1alpha1.NATGatewaySpec{
-				Type: networkingv1alpha1.NATGatewayTypePublic,
+			Spec: networkingv1alpha1.LoadBalancerSpec{
+				Type: networkingv1alpha1.LoadBalancerTypePublic,
 				IPFamilies: []corev1.IPFamily{
 					ipFamily,
 				},
 				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
-				IPs: []networkingv1alpha1.NATGatewayIP{
-					{
-						Name: ipName,
-					},
-				},
 			},
 		}
-		Expect(k8sClient.Create(ctx, natGateway)).To(Succeed())
+		Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())
 
 		By("waiting for the corresponding public ip to be created")
 		publicIP := &onmetalapinetv1alpha1.PublicIP{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: ns.Name,
-				Name:      fmt.Sprintf("%s-%s-%s", natGateway.UID, ipName, strings.ToLower(string(ipFamily))),
+				Name:      fmt.Sprintf("%s-%s", loadBalancer.UID, strings.ToLower(string(ipFamily))),
 			},
 		}
 		Eventually(Get(publicIP)).Should(Succeed())
 
 		By("inspecting the created public ip")
 		Expect(publicIP.Labels).To(Equal(map[string]string{
-			apinetletv1alpha1.NATGatewayNamespaceLabel: natGateway.Namespace,
-			apinetletv1alpha1.NATGatewayNameLabel:      natGateway.Name,
-			apinetletv1alpha1.NATGatewayUIDLabel:       string(natGateway.UID),
+			apinetletv1alpha1.LoadBalancerNamespaceLabel: loadBalancer.Namespace,
+			apinetletv1alpha1.LoadBalancerNameLabel:      loadBalancer.Name,
+			apinetletv1alpha1.LoadBalancerUIDLabel:       string(loadBalancer.UID),
 		}))
 		Expect(publicIP.Spec).To(Equal(onmetalapinetv1alpha1.PublicIPSpec{
 			IPFamily: ipFamily,
 		}))
 
-		By("asserting the nat gateway does not get an ip address")
-		Consistently(Object(natGateway)).Should(HaveField("Status.IPs", BeNil()))
+		By("asserting the load balancer does not get an ip address")
+		Consistently(Object(loadBalancer)).Should(HaveField("Status.IPs", BeNil()))
 
 		By("patching the public ip spec ips")
 		basePublicIP := publicIP.DeepCopy()
@@ -105,33 +99,30 @@ var _ = Describe("NATGatewayController", func() {
 		})
 		Expect(k8sClient.Status().Patch(ctx, publicIP, client.MergeFrom(basePublicIP))).To(Succeed())
 
-		By("checking that nat gateway contains ip")
-		Eventually(Object(natGateway)).Should(HaveField("Status.IPs",
-			ContainElement(networkingv1alpha1.NATGatewayIPStatus{
-				Name: ipName,
-				IP:   *commonv1alpha1.MustParseNewIP("10.0.0.1"),
-			}),
+		By("checking that load balancer contains ip")
+		Eventually(Object(loadBalancer)).Should(HaveField("Status.IPs",
+			ContainElement(*commonv1alpha1.MustParseNewIP("10.0.0.1")),
 		))
 
-		By("requesting one more ip")
-		natGatewayBase := natGateway.DeepCopy()
-		natGateway.Spec.IPs = append(natGateway.Spec.IPs, networkingv1alpha1.NATGatewayIP{
-			Name: ipName + "-2",
-		})
-		Expect(k8sClient.Patch(ctx, natGateway, client.MergeFrom(natGatewayBase))).To(Succeed())
+		ipFamily2 := corev1.IPv6Protocol
+
+		By("requesting further ip by adding another protocol")
+		loadBalancerBase := loadBalancer.DeepCopy()
+		loadBalancer.Spec.IPFamilies = append(loadBalancer.Spec.IPFamilies, ipFamily2)
+		Expect(k8sClient.Patch(ctx, loadBalancer, client.MergeFrom(loadBalancerBase))).To(Succeed())
 
 		By("waiting for the corresponding public ip to be created")
 		publicIP2 := &onmetalapinetv1alpha1.PublicIP{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: ns.Name,
-				Name:      fmt.Sprintf("%s-%s-%s", natGateway.UID, ipName+"-2", strings.ToLower(string(ipFamily))),
+				Name:      fmt.Sprintf("%s-%s", loadBalancer.UID, strings.ToLower(string(ipFamily2))),
 			},
 		}
 		Eventually(Get(publicIP2)).Should(Succeed())
 
 		By("patching the second public ip spec ips")
 		basePublicIP2 := publicIP2.DeepCopy()
-		publicIP2.Spec.IP = onmetalapinetv1alpha1.MustParseNewIP("10.0.0.2")
+		publicIP2.Spec.IP = onmetalapinetv1alpha1.MustParseNewIP("::ffff:a00:2")
 		Expect(k8sClient.Patch(ctx, publicIP2, client.MergeFrom(basePublicIP2))).To(Succeed())
 
 		By("patching the second public ip status to allocated")
@@ -142,24 +133,19 @@ var _ = Describe("NATGatewayController", func() {
 		})
 		Expect(k8sClient.Status().Patch(ctx, publicIP2, client.MergeFrom(basePublicIP2))).To(Succeed())
 
-		By("checking that nat gateway contains ip")
-		Eventually(Object(natGateway)).Should(HaveField("Status.IPs",
+		By("checking that load balancer contains ips")
+		Eventually(Object(loadBalancer)).Should(HaveField("Status.IPs",
 			ContainElements(
-				networkingv1alpha1.NATGatewayIPStatus{
-					Name: ipName,
-					IP:   *commonv1alpha1.MustParseNewIP("10.0.0.1"),
-				},
-				networkingv1alpha1.NATGatewayIPStatus{
-					Name: ipName + "-2",
-					IP:   *commonv1alpha1.MustParseNewIP("10.0.0.2"),
-				}),
+				*commonv1alpha1.MustParseNewIP("10.0.0.1"),
+				*commonv1alpha1.MustParseNewIP("::ffff:a00:2"),
+			),
 		))
 
-		By("deleting the nat gateway")
-		Expect(k8sClient.Delete(ctx, natGateway)).To(Succeed())
+		By("deleting the load balancer")
+		Expect(k8sClient.Delete(ctx, loadBalancer)).To(Succeed())
 
 		By("waiting for it to be gone")
-		Eventually(Get(natGateway)).Should(Satisfy(apierrors.IsNotFound))
+		Eventually(Get(loadBalancer)).Should(Satisfy(apierrors.IsNotFound))
 
 		By("asserting the corresponding public ips are gone as well")
 		Expect(k8sClient.Get(ctx, client.ObjectKeyFromObject(publicIP), publicIP)).To(Satisfy(apierrors.IsNotFound))
@@ -173,9 +159,9 @@ var _ = Describe("NATGatewayController", func() {
 				Namespace:    ns.Name,
 				GenerateName: "public-ip-",
 				Labels: map[string]string{
-					apinetletv1alpha1.NATGatewayNamespaceLabel: ns.Name,
-					apinetletv1alpha1.NATGatewayNameLabel:      "some-name",
-					apinetletv1alpha1.NATGatewayUIDLabel:       "some-uid",
+					apinetletv1alpha1.LoadBalancerNamespaceLabel: ns.Name,
+					apinetletv1alpha1.LoadBalancerNameLabel:      "some-name",
+					apinetletv1alpha1.LoadBalancerUIDLabel:       "some-uid",
 				},
 			},
 			Spec: onmetalapinetv1alpha1.PublicIPSpec{
