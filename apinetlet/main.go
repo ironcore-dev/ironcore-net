@@ -120,7 +120,6 @@ func main() {
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "fa89daf5.apinetlet.apinet.api.onmetal.de",
-		LeaderElectionConfig:   apiNetCfg,
 		Namespace:              watchNamespace,
 	})
 	if err != nil {
