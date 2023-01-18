@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/go-logr/logr v1.2.3
 	github.com/golang/mock v1.6.0
-	github.com/google/addlicense v1.0.0
+	github.com/google/addlicense v1.1.1
 	github.com/onmetal/controller-utils v0.6.4
 	github.com/onmetal/onmetal-api v0.0.13-0.20221122151245-ba568ad378e2
 	github.com/onsi/ginkgo/v2 v2.4.0
