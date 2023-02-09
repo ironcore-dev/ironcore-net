@@ -25,7 +25,7 @@ import (
 	apinetletv1alpha1 "github.com/onmetal/onmetal-api-net/apinetlet/api/v1alpha1"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	"github.com/onmetal/onmetal-api/apiutils/predicates"
+	"github.com/onmetal/onmetal-api/utils/predicates"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"

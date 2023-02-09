@@ -26,8 +26,8 @@ import (
 	"github.com/onmetal/controller-utils/modutils"
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	"github.com/onmetal/onmetal-api/testutils/envtestutils"
-	"github.com/onmetal/onmetal-api/testutils/envtestutils/apiserver"
+	envtestutils "github.com/onmetal/onmetal-api/utils/envtest"
+	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -61,8 +61,6 @@ const (
 )
 
 func TestControllers(t *testing.T) {
-	_, reporterConfig := GinkgoConfiguration()
-	reporterConfig.SlowSpecThreshold = 10 * time.Second
 	SetDefaultConsistentlyPollingInterval(pollingInterval)
 	SetDefaultEventuallyPollingInterval(pollingInterval)
 	SetDefaultEventuallyTimeout(eventuallyTimeout)
@@ -105,7 +103,7 @@ var _ = BeforeSuite(func() {
 	SetClient(k8sClient)
 
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
-		MainPath:     "github.com/onmetal/onmetal-api/onmetal-apiserver/cmd/apiserver",
+		MainPath:     "github.com/onmetal/onmetal-api/cmd/onmetal-apiserver",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		ETCDServers:  []string{testEnv.ControlPlane.Etcd.URL.String()},
 		Host:         testEnvExt.APIServiceInstallOptions.LocalServingHost,
