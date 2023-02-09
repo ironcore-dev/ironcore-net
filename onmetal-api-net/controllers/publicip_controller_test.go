@@ -16,7 +16,7 @@ package controllers
 
 import (
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
-	"github.com/onmetal/onmetal-api/testutils"
+	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
@@ -27,7 +27,7 @@ import (
 )
 
 var _ = Describe("PublicIPController", func() {
-	ctx := testutils.SetupContext()
+	ctx := SetupContext()
 	ns := SetupTest(ctx)
 
 	It("should allocate a public ip", func() {

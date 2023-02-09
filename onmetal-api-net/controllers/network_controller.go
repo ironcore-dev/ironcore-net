@@ -21,11 +21,11 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
-	"github.com/onmetal/controller-utils/set"
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -55,7 +55,7 @@ type NetworkReconciler struct {
 	MaxVNI int32
 
 	allocationsByKey map[client.ObjectKey]networkAllocation
-	taken            set.Set[int32]
+	taken            sets.Set[int32]
 	released         chan struct{}
 }
 
@@ -275,7 +275,7 @@ func (r *NetworkReconciler) initialize(ctx context.Context) error {
 		return fmt.Errorf("max vni %d has to be >= min vni %d", r.MaxVNI, r.MinVNI)
 	}
 
-	r.taken = set.New[int32]()
+	r.taken = sets.New[int32]()
 	r.allocationsByKey = make(map[client.ObjectKey]networkAllocation)
 	r.released = make(chan struct{}, 1024)
 
@@ -332,7 +332,7 @@ func (r *NetworkReconciler) determineReconciliationCandidates(networks []onmetal
 	return candidates
 }
 
-func allVNIsTaken(taken set.Set[int32], minVNI, maxVNI int32) bool {
+func allVNIsTaken(taken sets.Set[int32], minVNI, maxVNI int32) bool {
 	return int32(taken.Len()) == (maxVNI-minVNI)+1
 }
 
