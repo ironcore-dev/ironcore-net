@@ -1,9 +1,8 @@
----
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
-  creationTimestamp: null
-  name: apinetlet-role
+  namespace: system
+  name: apinet-role
 rules:
 - apiGroups:
   - apinet.api.onmetal.de
