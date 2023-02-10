@@ -3,8 +3,7 @@ kind: Kustomization
 
 resources:
   - ../default
-  - ../apinet-rbac
-  - role_binding.yaml
+  - apinet-rbac
 
 patchesStrategicMerge:
   - patch-controller.yaml
