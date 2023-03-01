@@ -24,9 +24,11 @@ import (
 
 	"github.com/onmetal/controller-utils/configutils"
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
+	apinetletconfig "github.com/onmetal/onmetal-api-net/apinetlet/client/config"
 	"github.com/onmetal/onmetal-api-net/apinetlet/controllers"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	"github.com/onmetal/onmetal-api/utils/client/config"
 	flag "github.com/spf13/pflag"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
@@ -48,6 +50,16 @@ var (
 	setupLog = ctrl.Log.WithName("setup")
 )
 
+const (
+	apiNetFlagPrefix                        = "api-net-"
+	apiNetKubeconfigFlagName                = apiNetFlagPrefix + config.KubeconfigFlagName
+	apiNetKubeconfigSecretNameFlagName      = apiNetFlagPrefix + config.KubeconfigSecretNameFlagName
+	apiNetKubeconfigSecretNamespaceFlagName = apiNetFlagPrefix + config.KubeconfigSecretNamespaceFlagName
+	apiNetBootstrapKubeconfigFlagName       = apiNetFlagPrefix + config.BootstrapKubeconfigFlagName
+	apiNetRotateCertificatesFlagName        = apiNetFlagPrefix + config.RotateCertificatesFlagName
+	apiNetEgressSelectorConfigFlagName      = apiNetFlagPrefix + config.EgressSelectorConfigFlagName
+)
+
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
@@ -63,6 +75,11 @@ func main() {
 	var probeAddr string
 
 	var apiNetKubeconfig string
+	var apiNetKubeconfigSecretName string
+	var apiNetKubeconfigSecretNamespace string
+	var apiNetBootstrapKubeconfig string
+	var apiNetRotateCertificates bool
+	var apiNetEgressSelectorConfig string
 
 	var apiNetNamespace string
 
@@ -75,7 +92,13 @@ func main() {
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
 
-	flag.StringVar(&apiNetKubeconfig, "api-net-kubeconfig", "", "Path pointing to the api-net kubeconfig.")
+	flag.StringVar(&apiNetKubeconfig, apiNetKubeconfigFlagName, "", "Paths to a kubeconfig. Only required if out-of-cluster.")
+	flag.StringVar(&apiNetKubeconfigSecretName, apiNetKubeconfigSecretNameFlagName, "", "Name of a kubeconfig secret to use.")
+	flag.StringVar(&apiNetKubeconfigSecretNamespace, apiNetKubeconfigSecretNamespaceFlagName, "", "Namespace of the kubeconfig secret to use. If empty, use in-cluster namespace.")
+	flag.StringVar(&apiNetBootstrapKubeconfig, apiNetBootstrapKubeconfigFlagName, "", "Path to a bootstrap kubeconfig.")
+	flag.BoolVar(&apiNetRotateCertificates, apiNetRotateCertificatesFlagName, false, "Whether to use automatic certificate / config rotation.")
+	flag.StringVar(&apiNetEgressSelectorConfig, apiNetEgressSelectorConfigFlagName, "", "Path pointing to an egress selector config to use.")
+
 	flag.StringVar(&apiNetNamespace, "api-net-namespace", "", "api-net cluster namespace to manage all objects in.")
 
 	flag.StringVar(&watchNamespace, "namespace", "", "Namespace that the controller watches to reconcile onmetal-api objects. If unspecified, the controller watches for onmetal-api objects across all namespaces.")
@@ -107,7 +130,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	apiNetCfg, err := configutils.GetConfig(configutils.Kubeconfig(apiNetKubeconfig))
+	apiNetCfg, apiNetCfgCtrl, err := apinetletconfig.GetConfig(ctx, &config.GetConfigOptions{
+		Kubeconfig:                apiNetKubeconfig,
+		KubeconfigSecretName:      apiNetKubeconfigSecretName,
+		KubeconfigSecretNamespace: apiNetKubeconfigSecretNamespace,
+		BootstrapKubeconfig:       apiNetBootstrapKubeconfig,
+		RotateCertificates:        apiNetRotateCertificates,
+		EgressSelectorConfig:      apiNetEgressSelectorConfig,
+	})
 	if err != nil {
 		setupLog.Error(err, "unable to load api net kubeconfig")
 		os.Exit(1)
@@ -124,6 +154,10 @@ func main() {
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
+		os.Exit(1)
+	}
+	if err := config.SetupControllerWithManager(mgr, apiNetCfgCtrl); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "APINetConfig")
 		os.Exit(1)
 	}
 
