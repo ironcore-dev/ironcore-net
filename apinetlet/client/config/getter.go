@@ -26,7 +26,7 @@ import (
 )
 
 var (
-	Getter = config.NewGetterOrDie(config.GetterOptions{
+	APINetGetter = config.NewGetterOrDie(config.GetterOptions{
 		Name:       "apinetlet",
 		SignerName: certificatesv1.KubeAPIServerClientSignerName,
 		Template: &x509.CertificateRequest{
@@ -39,5 +39,5 @@ var (
 		NetworkContext: egressselector.ControlPlane.AsNetworkContext(),
 	})
 
-	GetConfig = Getter.GetConfig
+	APINetGetConfig = APINetGetter.GetConfig
 )
