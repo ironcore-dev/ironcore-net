@@ -51,13 +51,7 @@ var (
 )
 
 const (
-	apiNetFlagPrefix                        = "api-net-"
-	apiNetKubeconfigFlagName                = apiNetFlagPrefix + config.KubeconfigFlagName
-	apiNetKubeconfigSecretNameFlagName      = apiNetFlagPrefix + config.KubeconfigSecretNameFlagName
-	apiNetKubeconfigSecretNamespaceFlagName = apiNetFlagPrefix + config.KubeconfigSecretNamespaceFlagName
-	apiNetBootstrapKubeconfigFlagName       = apiNetFlagPrefix + config.BootstrapKubeconfigFlagName
-	apiNetRotateCertificatesFlagName        = apiNetFlagPrefix + config.RotateCertificatesFlagName
-	apiNetEgressSelectorConfigFlagName      = apiNetFlagPrefix + config.EgressSelectorConfigFlagName
+	apiNetFlagPrefix = "api-net-"
 )
 
 func init() {
@@ -74,12 +68,7 @@ func main() {
 	var enableLeaderElection bool
 	var probeAddr string
 
-	var apiNetKubeconfig string
-	var apiNetKubeconfigSecretName string
-	var apiNetKubeconfigSecretNamespace string
-	var apiNetBootstrapKubeconfig string
-	var apiNetRotateCertificates bool
-	var apiNetEgressSelectorConfig string
+	var apiNetGetConfigOptions config.GetConfigOptions
 
 	var apiNetNamespace string
 
@@ -92,12 +81,7 @@ func main() {
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
 
-	flag.StringVar(&apiNetKubeconfig, apiNetKubeconfigFlagName, "", "Paths to a kubeconfig. Only required if out-of-cluster.")
-	flag.StringVar(&apiNetKubeconfigSecretName, apiNetKubeconfigSecretNameFlagName, "", "Name of a kubeconfig secret to use.")
-	flag.StringVar(&apiNetKubeconfigSecretNamespace, apiNetKubeconfigSecretNamespaceFlagName, "", "Namespace of the kubeconfig secret to use. If empty, use in-cluster namespace.")
-	flag.StringVar(&apiNetBootstrapKubeconfig, apiNetBootstrapKubeconfigFlagName, "", "Path to a bootstrap kubeconfig.")
-	flag.BoolVar(&apiNetRotateCertificates, apiNetRotateCertificatesFlagName, false, "Whether to use automatic certificate / config rotation.")
-	flag.StringVar(&apiNetEgressSelectorConfig, apiNetEgressSelectorConfigFlagName, "", "Path pointing to an egress selector config to use.")
+	apiNetGetConfigOptions.BindFlags(flag.CommandLine, config.WithNamePrefix(apiNetFlagPrefix))
 
 	flag.StringVar(&apiNetNamespace, "api-net-namespace", "", "api-net cluster namespace to manage all objects in.")
 
@@ -130,14 +114,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	apiNetCfg, apiNetCfgCtrl, err := apinetletconfig.GetConfig(ctx, &config.GetConfigOptions{
-		Kubeconfig:                apiNetKubeconfig,
-		KubeconfigSecretName:      apiNetKubeconfigSecretName,
-		KubeconfigSecretNamespace: apiNetKubeconfigSecretNamespace,
-		BootstrapKubeconfig:       apiNetBootstrapKubeconfig,
-		RotateCertificates:        apiNetRotateCertificates,
-		EgressSelectorConfig:      apiNetEgressSelectorConfig,
-	})
+	apiNetCfg, apiNetCfgCtrl, err := apinetletconfig.APINetGetConfig(ctx, &apiNetGetConfigOptions)
 	if err != nil {
 		setupLog.Error(err, "unable to load api net kubeconfig")
 		os.Exit(1)
