@@ -1,0 +1,31 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: apinet.api.onmetal.de:system:apinetlets
+rules:
+- apiGroups:
+    - apinet.api.onmetal.de
+  resources:
+    - networks
+  verbs:
+    - get
+    - list
+    - patch
+    - update
+    - watch
+    - create
+    - delete
+- apiGroups:
+    - apinet.api.onmetal.de
+  resources:
+    - publicips
+  verbs:
+    - get
+    - list
+    - patch
+    - update
+    - watch
+    - create
+    - delete

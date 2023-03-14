@@ -16,7 +16,6 @@ package controllers
 
 import (
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
@@ -27,10 +26,9 @@ import (
 )
 
 var _ = Describe("NetworkController", func() {
-	ctx := SetupContext()
-	ns := SetupTest(ctx)
+	ns := SetupTest()
 
-	It("should allocate a vni", func() {
+	It("should allocate a vni", func(ctx SpecContext) {
 		By("creating a network")
 		network := &onmetalapinetv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
@@ -45,7 +43,7 @@ var _ = Describe("NetworkController", func() {
 		Eventually(Object(network)).Should(BeAllocatedNetwork())
 	})
 
-	It("should mark networks as pending if they can't be allocated and allocate them as soon as there's space", func() {
+	It("should mark networks as pending if they can't be allocated and allocate them as soon as there's space", func(ctx SpecContext) {
 		By("creating networks until we run out of vnis")
 		networkKeys := make([]client.ObjectKey, NoOfVNIs)
 		for i := 0; i < NoOfVNIs; i++ {

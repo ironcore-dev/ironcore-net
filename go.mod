@@ -10,6 +10,7 @@ require (
 	github.com/onsi/gomega v1.27.3
 	github.com/spf13/pflag v1.0.5
 	go4.org/netipx v0.0.0-20220812043211-3cc044ffd68d
+	golang.org/x/exp v0.0.0-20221212164502-fae10dda9338
 	k8s.io/api v0.26.2
 	k8s.io/apimachinery v0.26.2
 	k8s.io/apiserver v0.26.2

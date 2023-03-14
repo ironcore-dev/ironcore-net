@@ -16,7 +16,6 @@ package controllers
 
 import (
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
@@ -27,10 +26,9 @@ import (
 )
 
 var _ = Describe("PublicIPController", func() {
-	ctx := SetupContext()
-	ns := SetupTest(ctx)
+	ns := SetupTest()
 
-	It("should allocate a public ip", func() {
+	It("should allocate a public ip", func(ctx SpecContext) {
 		By("creating a public ip")
 		publicIP := &onmetalapinetv1alpha1.PublicIP{
 			ObjectMeta: metav1.ObjectMeta{
@@ -47,7 +45,7 @@ var _ = Describe("PublicIPController", func() {
 		Eventually(Object(publicIP)).Should(BeAllocatedPublicIP())
 	})
 
-	It("should mark public ips as pending if they can't be allocated and allocate them as soon as there's space", func() {
+	It("should mark public ips as pending if they can't be allocated and allocate them as soon as there's space", func(ctx SpecContext) {
 		By("creating public ips until we run out of addresses")
 		publicIPKeys := make([]client.ObjectKey, NoOfIPv4Addresses)
 		for i := 0; i < NoOfIPv4Addresses; i++ {
