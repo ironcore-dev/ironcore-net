@@ -25,6 +25,7 @@ import (
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
 	netflag "github.com/onmetal/onmetal-api-net/flag"
 	"github.com/onmetal/onmetal-api-net/onmetal-api-net/controllers"
+	onmetalapinet "github.com/onmetal/onmetal-api-net/onmetal-api-net/controllers/certificate/onmetal-api-net"
 	flag "github.com/spf13/pflag"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -125,6 +126,14 @@ func main() {
 		MaxVNI:        maxVNI,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "PublicIP")
+		os.Exit(1)
+	}
+
+	if err = (&controllers.CertificateApprovalReconciler{
+		Client:      mgr.GetClient(),
+		Recognizers: onmetalapinet.Recognizers,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "CertificateApproval")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

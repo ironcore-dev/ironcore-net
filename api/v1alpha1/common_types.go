@@ -24,7 +24,18 @@ import (
 
 const (
 	ReconcileRequestAnnotation = "reconcile.apinet.api.onmetal.de/requestedAt"
+
+	// APINetletsGroup is the system rbac group all apinetlets are in.
+	APINetletsGroup = "apinet.api.onmetal.de:system:apinetlets"
+
+	// APINetletUserNamePrefix is the prefix all apinetlet users should have.
+	APINetletUserNamePrefix = "apinet.api.onmetal.de:system:apinetlet:"
 )
+
+// APINetletCommonName constructs the common name for a certificate of an apinetlet user.
+func APINetletCommonName(name string) string {
+	return APINetletUserNamePrefix + name
+}
 
 // IP is an IP address.
 // +kubebuilder:validation:Type=string

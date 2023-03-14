@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/onmetal/controller-utils/configutils"
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
 	apinetletconfig "github.com/onmetal/onmetal-api-net/apinetlet/client/config"
 	"github.com/onmetal/onmetal-api-net/apinetlet/controllers"
@@ -68,6 +67,7 @@ func main() {
 	var enableLeaderElection bool
 	var probeAddr string
 
+	var configOptions config.GetConfigOptions
 	var apiNetGetConfigOptions config.GetConfigOptions
 
 	var apiNetNamespace string
@@ -81,6 +81,7 @@ func main() {
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
 
+	configOptions.BindFlags(flag.CommandLine)
 	apiNetGetConfigOptions.BindFlags(flag.CommandLine, config.WithNamePrefix(apiNetFlagPrefix))
 
 	flag.StringVar(&apiNetNamespace, "api-net-namespace", "", "api-net cluster namespace to manage all objects in.")
@@ -91,8 +92,9 @@ func main() {
 	opts := zap.Options{
 		Development: true,
 	}
-	opts.BindFlags(goflag.CommandLine)
-	flag.CommandLine.AddGoFlagSet(goflag.CommandLine)
+	goFlags := goflag.NewFlagSet(os.Args[0], goflag.ExitOnError)
+	opts.BindFlags(goFlags)
+	flag.CommandLine.AddGoFlagSet(goFlags)
 	flag.Parse()
 
 	ctx := ctrl.SetupSignalHandler()
@@ -108,13 +110,14 @@ func main() {
 		setupLog.Info("Watching onmetal-api objects only in namespace for reconciliation", "namespace", watchNamespace)
 	}
 
-	cfg, err := configutils.GetConfig()
+	cfg, cfgCtrl, err := apinetletconfig.GetConfig(ctx, &configOptions)
 	if err != nil {
 		setupLog.Error(err, "unable to load kubeconfig")
 		os.Exit(1)
 	}
 
-	apiNetCfg, apiNetCfgCtrl, err := apinetletconfig.APINetGetConfig(ctx, &apiNetGetConfigOptions)
+	apiNetGetter := apinetletconfig.NewAPINetGetterOrDie(apiNetNamespace)
+	apiNetCfg, apiNetCfgCtrl, err := apiNetGetter.GetConfig(ctx, &apiNetGetConfigOptions)
 	if err != nil {
 		setupLog.Error(err, "unable to load api net kubeconfig")
 		os.Exit(1)
@@ -131,6 +134,10 @@ func main() {
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
+		os.Exit(1)
+	}
+	if err := config.SetupControllerWithManager(mgr, cfgCtrl); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Config")
 		os.Exit(1)
 	}
 	if err := config.SetupControllerWithManager(mgr, apiNetCfgCtrl); err != nil {

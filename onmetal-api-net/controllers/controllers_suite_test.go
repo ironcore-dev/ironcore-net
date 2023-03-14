@@ -24,6 +24,7 @@ import (
 	"time"
 
 	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
+	onmetalapinet "github.com/onmetal/onmetal-api-net/onmetal-api-net/controllers/certificate/onmetal-api-net"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go4.org/netipx"
@@ -37,7 +38,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
-	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -81,7 +81,7 @@ const (
 )
 
 var _ = BeforeSuite(func() {
-	logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
+	logf.SetLogger(GinkgoLogr)
 
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
@@ -94,6 +94,7 @@ var _ = BeforeSuite(func() {
 	cfg, err = testEnv.Start()
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
+	DeferCleanup(testEnv.Stop)
 
 	err = onmetalapinetv1alpha1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
@@ -105,20 +106,47 @@ var _ = BeforeSuite(func() {
 	Expect(k8sClient).NotTo(BeNil())
 
 	SetClient(k8sClient)
+
+	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
+		Scheme:             scheme.Scheme,
+		Host:               "127.0.0.1",
+		MetricsBindAddress: "0",
+	})
+	Expect(err).ToNot(HaveOccurred())
+
+	// register reconciler here
+	Expect((&PublicIPReconciler{
+		EventRecorder:       &record.FakeRecorder{},
+		Client:              k8sManager.GetClient(),
+		APIReader:           k8sManager.GetAPIReader(),
+		InitialAvailableIPs: InitialAvailableIPs(),
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	Expect((&NetworkReconciler{
+		EventRecorder: &record.FakeRecorder{},
+		Client:        k8sManager.GetClient(),
+		APIReader:     k8sManager.GetAPIReader(),
+		MinVNI:        MinVNI,
+		MaxVNI:        MaxVNI,
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	Expect((&CertificateApprovalReconciler{
+		Client:      k8sManager.GetClient(),
+		Recognizers: onmetalapinet.Recognizers,
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
+	mgrCtx, cancel := context.WithCancel(context.Background())
+	DeferCleanup(cancel)
+	go func() {
+		defer GinkgoRecover()
+		Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
+	}()
 })
 
-var _ = AfterSuite(func() {
-	By("tearing down the test environment")
-	err := testEnv.Stop()
-	Expect(err).NotTo(HaveOccurred())
-})
-
-func SetupTest(ctx context.Context) *corev1.Namespace {
+func SetupTest() *corev1.Namespace {
 	ns := &corev1.Namespace{}
 
-	BeforeEach(func() {
-		mgrCtx, cancel := context.WithCancel(ctx)
-		DeferCleanup(cancel)
+	BeforeEach(func(ctx SpecContext) {
 
 		*ns = corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
@@ -127,39 +155,11 @@ func SetupTest(ctx context.Context) *corev1.Namespace {
 		}
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
 
-		DeferCleanup(func() {
+		DeferCleanup(func(ctx context.Context) {
 			Expect(k8sClient.DeleteAllOf(ctx, &onmetalapinetv1alpha1.Network{}, client.InNamespace(ns.Name))).To(Succeed(), "failed to delete networks")
 			Expect(k8sClient.DeleteAllOf(ctx, &onmetalapinetv1alpha1.PublicIP{}, client.InNamespace(ns.Name))).To(Succeed(), "failed to delete public ips")
 			Expect(k8sClient.Delete(ctx, ns)).To(Succeed(), "failed to delete test namespace")
 		})
-
-		k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
-			Scheme:             scheme.Scheme,
-			Host:               "127.0.0.1",
-			MetricsBindAddress: "0",
-		})
-		Expect(err).ToNot(HaveOccurred())
-
-		// register reconciler here
-		Expect((&PublicIPReconciler{
-			EventRecorder:       &record.FakeRecorder{},
-			Client:              k8sManager.GetClient(),
-			APIReader:           k8sManager.GetAPIReader(),
-			InitialAvailableIPs: InitialAvailableIPs(),
-		}).SetupWithManager(k8sManager)).To(Succeed())
-
-		Expect((&NetworkReconciler{
-			EventRecorder: &record.FakeRecorder{},
-			Client:        k8sManager.GetClient(),
-			APIReader:     k8sManager.GetAPIReader(),
-			MinVNI:        MinVNI,
-			MaxVNI:        MaxVNI,
-		}).SetupWithManager(k8sManager)).To(Succeed())
-
-		go func() {
-			defer GinkgoRecover()
-			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
-		}()
 	})
 
 	return ns

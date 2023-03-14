@@ -17,16 +17,21 @@ package config
 import (
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"os"
 
+	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	utilcertificate "github.com/onmetal/onmetal-api/utils/certificate"
 	"github.com/onmetal/onmetal-api/utils/client/config"
 	certificatesv1 "k8s.io/api/certificates/v1"
 	"k8s.io/apiserver/pkg/server/egressselector"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
+var log = ctrl.Log.WithName("client").WithName("config")
+
 var (
-	APINetGetter = config.NewGetterOrDie(config.GetterOptions{
+	Getter = config.NewGetterOrDie(config.GetterOptions{
 		Name:       "apinetlet",
 		SignerName: certificatesv1.KubeAPIServerClientSignerName,
 		Template: &x509.CertificateRequest{
@@ -39,5 +44,30 @@ var (
 		NetworkContext: egressselector.ControlPlane.AsNetworkContext(),
 	})
 
-	APINetGetConfig = APINetGetter.GetConfig
+	GetConfig      = Getter.GetConfig
+	GetConfigOrDie = Getter.GetConfigOrDie
 )
+
+func NewAPINetGetter(namespace string) (*config.Getter, error) {
+	return config.NewGetter(config.GetterOptions{
+		Name:       "apinetlet",
+		SignerName: certificatesv1.KubeAPIServerClientSignerName,
+		Template: &x509.CertificateRequest{
+			Subject: pkix.Name{
+				CommonName:   onmetalapinetv1alpha1.APINetletCommonName(namespace),
+				Organization: []string{onmetalapinetv1alpha1.APINetletsGroup},
+			},
+		},
+		GetUsages:      utilcertificate.DefaultKubeAPIServerClientGetUsages,
+		NetworkContext: egressselector.ControlPlane.AsNetworkContext(),
+	})
+}
+
+func NewAPINetGetterOrDie(namespace string) *config.Getter {
+	getter, err := NewAPINetGetter(namespace)
+	if err != nil {
+		log.Error(err, "Error creating getter")
+		os.Exit(1)
+	}
+	return getter
+}

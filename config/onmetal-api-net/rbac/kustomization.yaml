@@ -16,3 +16,8 @@ resources:
 - auth_proxy_role.yaml
 - auth_proxy_role_binding.yaml
 - auth_proxy_client_clusterrole.yaml
+# APINetlet (bootstrapper) roles
+- apinetlet_role.yaml
+- apinetlet_rolebinding.yaml
+- apinetlet_bootstrapper_role.yaml
+- apinetlet_bootstrapper_rolebinding.yaml
