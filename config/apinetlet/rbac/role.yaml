@@ -42,6 +42,21 @@ rules:
   verbs:
   - get
 - apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests/apinetletclient
+  verbs:
+  - create
+- apiGroups:
   - networking.api.onmetal.de
   resources:
   - loadbalancers
