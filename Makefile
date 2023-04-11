@@ -2,6 +2,7 @@
 # Image URL to use all building/pushing image targets
 ONMETAL_API_NET_IMG ?= onmetal-api-net:latest
 APINETLET_IMG ?= apinetlet:latest
+METALNETLET_IMG ?= metalnetlet:latest
 KIND_CLUSTER_NAME ?= kind
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
@@ -13,6 +14,8 @@ GOBIN=$(shell go env GOPATH)/bin
 else
 GOBIN=$(shell go env GOBIN)
 endif
+
+SSH_KEY ?= ${HOME}/.ssh/id_rsa
 
 # Setting SHELL to bash allows bash commands to be executed by recipes.
 # This is a requirement for 'setup-envtest.sh' in the test target.
@@ -48,6 +51,7 @@ manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and Cust
 
 	# apinetlet
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role paths="./apinetlet/..." output:rbac:artifacts:config=config/apinetlet/rbac
+	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role paths="./metalnetlet/..." output:rbac:artifacts:config=config/metalnetlet/rbac
 
 	# poollet system roles
 	cp config/apinetlet/apinet-rbac/role.yaml config/onmetal-api-net/rbac/apinetlet_role.yaml
@@ -93,8 +97,12 @@ build-onmetal-api-net: generate fmt addlicense lint ## Build onmetal-api-net bin
 build-apinetlet: generate fmt addlicense lint ## Build apinetlet.
 	go build -o bin/apinetlet ./apinetlet/main.go
 
+.PHONY: build-metalnetlet
+build-metalnetlet: generate fmt addlicense lint ## Build metalnetlet.
+	go build -o bin/metalnetlet ./metalnetlet/main.go
+
 .PHONY: build
-build: build-onmetal-api-net build-apinetlet ## Build onmetal-api-net and apinetlet.
+build: build-onmetal-api-net build-apinetlet build-metalnetlet ## Build onmetal-api-net, apinetlet, metalnetlet.
 
 .PHONY: run-onmetal-api-net
 run-onmetal-api-net: manifests generate fmt lint ## Run a onmetal-api-net from your host.
@@ -104,16 +112,24 @@ run-onmetal-api-net: manifests generate fmt lint ## Run a onmetal-api-net from y
 run-apinetlet: manifests generate fmt lint ## Run apinetlet from your host.
 	go run ./apinetlet/main.go
 
+.PHONY: run-metalnetlet
+run-metalnetlet: manifests generate fmt lint ## Run metalnetlet from your host.
+	go run ./metalnetlet/main.go
+
 .PHONY: docker-build-onmetal-api-net
 docker-build-onmetal-api-net: ## Build onmetal-api-net image with the manager.
-	docker build --target onmetal-api-net-manager -t ${ONMETAL_API_NET_IMG} .
+	docker build --ssh default=${SSH_KEY} --target onmetal-api-net-manager -t ${ONMETAL_API_NET_IMG} .
 
 .PHONY: docker-build-apinetlet
 docker-build-apinetlet: ## Build apinetlet image with the manager.
-	docker build --target apinetlet-manager -t ${APINETLET_IMG} .
+	docker build --ssh default=${SSH_KEY} --target apinetlet-manager -t ${APINETLET_IMG} .
+
+.PHONY: docker-build-metalnetlet
+docker-build-metalnetlet: ## Build metalnetlet image with the manager.
+	docker build --ssh default=${SSH_KEY} --target metalnetlet-manager -t ${METALNETLET_IMG} .
 
 .PHONY: docker-build
-docker-build: docker-build-onmetal-api-net docker-build-apinetlet
+docker-build: docker-build-onmetal-api-net docker-build-apinetlet docker-build-metalnetlet ## Build docker images.
 
 .PHONY: docker-push-onmetal-api-net
 docker-push-onmetal-api-net: ## Push onmetal-api-net image.
@@ -123,8 +139,12 @@ docker-push-onmetal-api-net: ## Push onmetal-api-net image.
 docker-push-apinetlet: ## Push apinetlet image.
 	docker push ${APINETLET_IMG}
 
+.PHONY: docker-push-metalnetlet
+docker-push-metalnetlet: ## Push metalnetlet image.
+	docker push ${METALNETLET_IMG}
+
 .PHONY: docker-push
-docker-push: docker-push-onmetal-api-net docker-build-apinetlet ## Push onmetal-api-net and apinetlet image.
+docker-push: docker-push-onmetal-api-net docker-build-apinetlet docker-build-metalnetlet ## Push onmetal-api-net, apinetlet, metalnetlet image.
 
 ##@ Deployment
 
@@ -144,11 +164,19 @@ install-apinetlet: manifests ## Install apinetlet CRDs into the K8s cluster spec
 uninstall-apinetlet: manifests ## Uninstall apinetlet CRDs from the K8s cluster specified in ~/.kube/config.
 	kubectl delete-k config/apinetlet/crd
 
+.PHONY: install-metalnetlet
+install-metalnetlet: manifests ## Install metalnetlet CRDs into the K8s cluster specified in ~/.kube/config.
+	kubectl apply -k config/metalnetlet/crd
+
+.PHONY: uninstall-metalnetlet
+uninstall-metalnetlet: manifests ## Uninstall metalnetlet CRDs from the K8s cluster specified in ~/.kube/config.
+	kubectl delete-k config/metalnetlet/crd
+
 .PHONY: install
-install: install-onmetal-api-net install-apinetlet ## Uninstall onmetal-api-net and apinetlet.
+install: install-onmetal-api-net install-apinetlet install-metalnetlet ## Uninstall onmetal-api-net, apinetlet, metalnetlet.
 
 .PHONY: uninstall
-uninstall: uninstall-onmetal-api-net uninstall-apinetlet ## Uninstall onmetal-api-net and apinetlet.
+uninstall: uninstall-onmetal-api-net uninstall-apinetlet uninstall-metalnetlet ## Uninstall onmetal-api-net, apinetlet, metalnetlet.
 
 .PHONY: deploy-onmetal-api-net
 deploy-onmetal-api-net: manifests kustomize ## Deploy onmetal-api-net controller to the K8s cluster specified in ~/.kube/config.
@@ -160,8 +188,13 @@ deploy-apinetlet: manifests kustomize ## Deploy apinetlet controller to the K8s 
 	cd config/apinetlet/manager && $(KUSTOMIZE) edit set image controller=${APINETLET_IMG}
 	kubectl apply -k config/apinetlet/default
 
+.PHONY: deploy-metalnetlet
+deploy-metalnetlet: manifests kustomize ## Deploy metalnetlet controller to the K8s cluster specified in ~/.kube/config.
+	cd config/metalnetlet/manager && $(KUSTOMIZE) edit set image controller=${METALNETLET_IMG}
+	kubectl apply -k config/metalnetlet/default
+
 .PHONY: deploy
-deploy: deploy-onmetal-api-net deploy-apinetlet
+deploy: deploy-onmetal-api-net deploy-apinetlet deploy-metalnetlet ## Deploy onmetal-api-net, apinetlet, metalnetlet
 
 .PHONY: undeploy-onmetal-api-net
 undeploy-onmetal-api-net: ## Undeploy onmetal-api-net controller from the K8s cluster specified in ~/.kube/config.
@@ -171,8 +204,12 @@ undeploy-onmetal-api-net: ## Undeploy onmetal-api-net controller from the K8s cl
 undeploy-apinetlet: ## Undeploy apinetlet controller from the K8s cluster specified in ~/.kube/config.
 	kubectl delete -k config/apinetlet
 
+.PHONY: undeploy-metalnetlet
+undeploy-metalnetlet: ## Undeploy metalnetlet controller from the K8s cluster specified in ~/.kube/config.
+	kubectl delete -k config/metalnetlet
+
 .PHONY: undeploy
-undeploy: undeploy-onmetal-api-net undeploy-apinetlet ## Undeploy onmetal-api-net and apinetlet controller from the K8s cluster specified in ~/.kube/config.
+undeploy: undeploy-onmetal-api-net undeploy-apinetlet undeploy-metalnetlet ## Undeploy onmetal-api-net, apinetlet, metalnetlet controller from the K8s cluster specified in ~/.kube/config.
 
 ##@ Kind Deployment plumbing
 
@@ -184,8 +221,12 @@ kind-load-onmetal-api-net: docker-build-onmetal-api-net ## Load onmetal-api-net 
 kind-load-apinetlet: docker-build-apinetlet ## Load apinetlet image to kind cluster.
 	kind load docker-image --name ${KIND_CLUSTER_NAME} ${APINETLET_IMG}
 
+.PHONY: kind-load-metalnetlet
+kind-load-metalnetlet: docker-build-metalnetlet ## Load metalnetlet image to kind cluster.
+	kind load docker-image --name ${KIND_CLUSTER_NAME} ${METALNETLET_IMG}
+
 .PHONY: kind-load
-kind-load: kind-load-onmetal-api-net kind-load-apinetlet ## Load onmetal-api-net and apinetlet image to kind cluster.
+kind-load: kind-load-onmetal-api-net kind-load-apinetlet kind-load-metalnetlet ## Load onmetal-api-net, apinetlet, metalnetlet image to kind cluster.
 
 .PHONY: kind-restart-onmetal-api-net
 kind-restart-onmetal-api-net: ## Restarts the onmetal-api-net controller manager.
@@ -195,8 +236,12 @@ kind-restart-onmetal-api-net: ## Restarts the onmetal-api-net controller manager
 kind-restart-apinetlet: ## Restarts the apinetlet controller manager.
 	kubectl -n apinetlet-system delete rs -l control-plane=controller-manager
 
+.PHONY: kind-restart-metalnetlet
+kind-restart-metalnetlet: ## Restarts the metalnetlet controller manager.
+	kubectl -n metalnetlet-system delete rs -l control-plane=controller-manager
+
 .PHONY: kind-restart
-kind-restart: kind-restart-onmetal-api-net kind-restart-apinetlet ## Restarts the onmetal-api-net and apinetlet controller manager.
+kind-restart: kind-restart-onmetal-api-net kind-restart-apinetlet kind-restart-metalnetlet ## Restarts the onmetal-api-net, apinetlet, metalnetlet controller manager.
 
 .PHONY: kind-build-load-restart-onmetal-api-net
 kind-build-load-restart-onmetal-api-net: docker-build-onmetal-api-net kind-load-onmetal-api-net kind-restart-onmetal-api-net ## Build, load and restart onmetal-api-net.
@@ -204,8 +249,11 @@ kind-build-load-restart-onmetal-api-net: docker-build-onmetal-api-net kind-load-
 .PHONY: kind-build-load-restart-apinetlet
 kind-build-load-restart-apinetlet: docker-build-apinetlet kind-load-apinetlet kind-restart-apinetlet ## Build, load and restart apinetlet.
 
+.PHONY: kind-build-load-restart-metalnetlet
+kind-build-load-restart-metalnetlet: docker-build-metalnetlet kind-load-metalnetlet kind-restart-metalnetlet ## Build, load and restart metalnetlet.
+
 .PHONY: kind-build-load-restart
-kind-build-load-restart: kind-build-load-restart-onmetal-api-net kind-build-load-restart-apinetlet
+kind-build-load-restart: kind-build-load-restart-onmetal-api-net kind-build-load-restart-apinetlet kind-build-load-restart-metalnetlet
 
 .PHONY: kind-apply-onmetal-api-net
 kind-apply-onmetal-api-net: manifests ## Apply onmetal-api-net to the cluster specified in ~/.kube/config.
@@ -215,8 +263,12 @@ kind-apply-onmetal-api-net: manifests ## Apply onmetal-api-net to the cluster sp
 kind-apply-apinetlet: manifests ## Apply apinetlet to the cluster specified in ~/.kube/config.
 	kubectl apply -k config/apinetlet/kind
 
+.PHONY: kind-apply-metalnetlet
+kind-apply-metalnetlet: manifests ## Apply metalnetlet to the cluster specified in ~/.kube/config.
+	kubectl apply -k config/metalnetlet/kind
+
 .PHONY: kind-apply
-kind-apply: kind-apply-onmetal-api-net kind-apply-apinetlet  ## Apply onmetal-api-net apinetlet to the cluster specified in ~/.kube/config.
+kind-apply: kind-apply-onmetal-api-net kind-apply-apinetlet kind-apply-metalnetlet ## Apply onmetal-api-net, apinetlet, metalnetlet to the cluster specified in ~/.kube/config.
 
 .PHONY: kind-deploy
 kind-deploy: kind-build-load-restart kind-apply ## Build, load and restart onmetal-api-net and apinetlet and apply them.
@@ -229,8 +281,12 @@ kind-delete-onmetal-api-net: ## Delete onmetal-api-net from the cluster specifie
 kind-delete-apinetlet: ## Delete apinetlet from the cluster specified in ~/.kube/config.
 	kubectl delete -k config/apinetlet/kind
 
+.PHONY: kind-delete-metalnetlet
+kind-delete-metalnetlet: ## Delete metalnetlet from the cluster specified in ~/.kube/config.
+	kubectl delete -k config/metalnetlet/kind
+
 .PHONY: kind-delete
-kind-delete: kind-delete-onmetal-api-net kind-delete-apinetlet ## Delete onmetal-api-net and apinetlet from the cluster specified in ~/.kube/config.
+kind-delete: kind-delete-onmetal-api-net kind-delete-apinetlet kind-delete-metalnetlet ## Delete onmetal-api-net, apinetlet, metalnetlet from the cluster specified in ~/.kube/config.
 
 ##@ Tools
 
