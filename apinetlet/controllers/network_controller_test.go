@@ -90,6 +90,21 @@ var _ = Describe("NetworkController", func() {
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
 			))
 
+		By("adding a peering status to the network")
+		baseNetwork := network.DeepCopy()
+		network.Status.Peerings = []networkingv1alpha1.NetworkPeeringStatus{
+			{
+				Name:          "my-peering",
+				Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
+				NetworkHandle: "400",
+			},
+		}
+		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
+
+		By("waiting for the apinet network to report the peered vni")
+		Eventually(Object(apiNetNetwork)).
+			Should(HaveField("Spec.PeerVNIs", []int32{400}))
+
 		By("deleting the network")
 		Expect(k8sClient.Delete(ctx, network)).To(Succeed())
 

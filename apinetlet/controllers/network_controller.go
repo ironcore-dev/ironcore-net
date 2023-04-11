@@ -28,6 +28,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -205,6 +206,21 @@ func isAPINetNetworkAllocated(apiNetNetwork *onmetalapinetv1alpha1.Network) bool
 }
 
 func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (*int32, error) {
+	var vni *int32
+	if handle := network.Spec.Handle; handle != "" {
+		v, err := strconv.ParseInt(handle, 10, 32)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing network handle %s: %w", handle, err)
+		}
+
+		vni = pointer.Int32(int32(v))
+	}
+
+	peerVNIs, err := r.extractPeerVNIs(network)
+	if err != nil {
+		return nil, err
+	}
+
 	apiNetNetwork := &onmetalapinetv1alpha1.Network{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: onmetalapinetv1alpha1.GroupVersion.String(),
@@ -219,15 +235,10 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 				apinetletv1alpha1.NetworkUIDLabel:       string(network.UID),
 			},
 		},
-	}
-
-	if handle := network.Spec.Handle; handle != "" {
-		vni, err := strconv.ParseInt(handle, 10, 32)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing network handle %s: %w", handle, err)
-		}
-
-		apiNetNetwork.Spec.VNI = pointer.Int32(int32(vni))
+		Spec: onmetalapinetv1alpha1.NetworkSpec{
+			VNI:      vni,
+			PeerVNIs: peerVNIs,
+		},
 	}
 
 	log.V(1).Info("Applying apinet network")
@@ -243,6 +254,24 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 		return nil, nil
 	}
 	return apiNetNetwork.Spec.VNI, nil
+}
+
+func (r *NetworkReconciler) extractPeerVNIs(network *networkingv1alpha1.Network) ([]int32, error) {
+	peerVNIs := sets.New[int32]()
+	for _, peering := range network.Status.Peerings {
+		if peering.Phase != networkingv1alpha1.NetworkPeeringPhaseBound {
+			continue
+		}
+
+		peerVNI, err := strconv.ParseInt(peering.NetworkHandle, 10, 32)
+		if err != nil {
+			return nil, fmt.Errorf("invalid peer network handle %q: %w", peering.NetworkHandle, err)
+		}
+
+		peerVNIs.Insert(int32(peerVNI))
+	}
+
+	return sets.List(peerVNIs), nil
 }
 
 var apiNetNetworkAllocationChanged = predicate.Funcs{
