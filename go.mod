@@ -3,7 +3,7 @@ module github.com/onmetal/onmetal-api-net
 go 1.20
 
 require (
-	github.com/go-logr/logr v1.2.3
+	github.com/go-logr/logr v1.2.4
 	github.com/onmetal/controller-utils v0.7.0
 	github.com/onmetal/onmetal-api v0.1.0
 	github.com/onsi/ginkgo/v2 v2.9.2
