@@ -45,7 +45,15 @@ help: ## Display this help.
 .PHONY: manifests
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role crd paths="./api/...;./onmetal-api-net/..." output:crd:artifacts:config=config/onmetal-api-net/crd/bases output:rbac:artifacts:config=config/onmetal-api-net/rbac
+
+	# apinetlet
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role paths="./apinetlet/..." output:rbac:artifacts:config=config/apinetlet/rbac
+
+	# poollet system roles
+	cp config/apinetlet/apinet-rbac/role.yaml config/onmetal-api-net/rbac/apinetlet_role.yaml
+	./hack/replace.sh config/onmetal-api-net/rbac/apinetlet_role.yaml 's/apinet-role/apinet.api.onmetal.de:system:apinetlets/g'
+	./hack/replace.sh config/onmetal-api-net/rbac/apinetlet_role.yaml 's/Role/ClusterRole/g'
+	./hack/replace.sh config/onmetal-api-net/rbac/apinetlet_role.yaml '/namespace: system/d'
 
 .PHONY: generate
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
