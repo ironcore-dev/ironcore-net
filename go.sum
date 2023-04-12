@@ -253,8 +253,8 @@ github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRW
 github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
 github.com/onmetal/controller-utils v0.7.0 h1:EHLPb/XimNas1VkeZZLP4g31aSz+ipiwvwWhklaQob0=
 github.com/onmetal/controller-utils v0.7.0/go.mod h1:91KV/s0VaB8PC+hqsxo6OBsAhi3ICFgIFLv/36V0ng8=
-github.com/onmetal/onmetal-api v0.1.1-0.20230411121339-eb0957464d11 h1:Q48DM7Nr67urjs5sDltEMkQASuVjIPw6Lgtn8GIEHfA=
-github.com/onmetal/onmetal-api v0.1.1-0.20230411121339-eb0957464d11/go.mod h1:mql3gEgyCDeqkQbeM62C/FRuCwXSfBVsvg/FiBczN6M=
+github.com/onmetal/onmetal-api v0.1.1 h1:8YEtQBsxQzb+MKvbFypuYp/x8AZ96mN4NCx8bRxHvFA=
+github.com/onmetal/onmetal-api v0.1.1/go.mod h1:mql3gEgyCDeqkQbeM62C/FRuCwXSfBVsvg/FiBczN6M=
 github.com/onsi/ginkgo/v2 v2.9.2 h1:BA2GMJOtfGAfagzYtrAlufIP0lq6QERkFmHLMLPwFSU=
 github.com/onsi/ginkgo/v2 v2.9.2/go.mod h1:WHcJJG2dIlcCqVfBAwUCrJxSPFb6v4azBwgxeMeDuts=
 github.com/onsi/gomega v1.27.6 h1:ENqfyGeS5AX/rlXDd/ETokDz93u0YufY1Pgxuy/PvWE=

@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/go-logr/logr v1.2.4
 	github.com/onmetal/controller-utils v0.7.0
-	github.com/onmetal/onmetal-api v0.1.1-0.20230411121339-eb0957464d11
+	github.com/onmetal/onmetal-api v0.1.1
 	github.com/onsi/ginkgo/v2 v2.9.2
 	github.com/onsi/gomega v1.27.6
 	github.com/spf13/pflag v1.0.5
