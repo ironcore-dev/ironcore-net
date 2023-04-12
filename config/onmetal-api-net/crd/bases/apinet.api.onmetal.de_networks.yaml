@@ -44,6 +44,12 @@ spec:
             type: object
           spec:
             properties:
+              peerVNIs:
+                description: PeerVNIs are VNIs to peer with.
+                items:
+                  format: int32
+                  type: integer
+                type: array
               vni:
                 description: VNI is the requested network vni. Pointer to distinguish
                   between explicitly set and unset.

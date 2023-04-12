@@ -25,6 +25,8 @@ type NetworkSpec struct {
 	// VNI is the requested network vni.
 	// Pointer to distinguish between explicitly set and unset.
 	VNI *int32 `json:"vni,omitempty"`
+	// PeerVNIs are VNIs to peer with.
+	PeerVNIs []int32 `json:"peerVNIs,omitempty"`
 }
 
 type NetworkConditionType string
