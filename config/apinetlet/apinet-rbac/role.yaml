@@ -16,6 +16,7 @@ rules:
   - watch
   - create
   - delete
+  - deletecollection
 - apiGroups:
   - apinet.api.onmetal.de
   resources:
@@ -28,3 +29,4 @@ rules:
   - watch
   - create
   - delete
+  - deletecollection
