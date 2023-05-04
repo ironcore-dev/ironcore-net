@@ -255,8 +255,8 @@ github.com/onmetal/controller-utils v0.7.0 h1:EHLPb/XimNas1VkeZZLP4g31aSz+ipiwvw
 github.com/onmetal/controller-utils v0.7.0/go.mod h1:91KV/s0VaB8PC+hqsxo6OBsAhi3ICFgIFLv/36V0ng8=
 github.com/onmetal/onmetal-api v0.1.1 h1:8YEtQBsxQzb+MKvbFypuYp/x8AZ96mN4NCx8bRxHvFA=
 github.com/onmetal/onmetal-api v0.1.1/go.mod h1:mql3gEgyCDeqkQbeM62C/FRuCwXSfBVsvg/FiBczN6M=
-github.com/onsi/ginkgo/v2 v2.9.3 h1:5X2vl/isiKqkrOYjiaGgp3JQOcLV59g5o5SuTMqCcxU=
-github.com/onsi/ginkgo/v2 v2.9.3/go.mod h1:gCQYp2Q+kSoIj7ykSVb9nskRSsR6PUj4AiLywzIhbKM=
+github.com/onsi/ginkgo/v2 v2.9.4 h1:xR7vG4IXt5RWx6FfIjyAtsoMAtnc3C/rFXBBd2AjZwE=
+github.com/onsi/ginkgo/v2 v2.9.4/go.mod h1:gCQYp2Q+kSoIj7ykSVb9nskRSsR6PUj4AiLywzIhbKM=
 github.com/onsi/gomega v1.27.6 h1:ENqfyGeS5AX/rlXDd/ETokDz93u0YufY1Pgxuy/PvWE=
 github.com/onsi/gomega v1.27.6/go.mod h1:PIQNjfQwkP3aQAH7lf7j87O/5FiNr+ZR8+ipb+qQlhg=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
