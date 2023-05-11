@@ -173,4 +173,35 @@ var _ = Describe("LoadBalancerController", func() {
 		By("waiting for the public ip to be gone")
 		Eventually(Get(publicIP)).Should(Satisfy(apierrors.IsNotFound))
 	})
+
+	It("should not allocate public IPs for internal load balancers", func() {
+		By("creating a network")
+		network := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "network-",
+			},
+		}
+		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("creating an internal load balancer")
+		loadBalancer := &networkingv1alpha1.LoadBalancer{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "internal-lb-",
+			},
+			Spec: networkingv1alpha1.LoadBalancerSpec{
+				Type:       networkingv1alpha1.LoadBalancerTypeInternal,
+				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+				IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+				IPs: []networkingv1alpha1.IPSource{
+					{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())
+
+		By("asserting it does not get a public IP")
+		Consistently(Object(loadBalancer)).Should(HaveField("Status.IPs", BeEmpty()))
+	})
 })
