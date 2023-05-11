@@ -36,6 +36,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
@@ -230,6 +231,11 @@ func (r *LoadBalancerReconciler) patchStatus(ctx context.Context, log logr.Logge
 	return r.Status().Patch(ctx, loadBalancer, client.MergeFrom(base))
 }
 
+var isLoadBalancerTypePublic = predicate.NewPredicateFuncs(func(obj client.Object) bool {
+	loadBalancer := obj.(*networkingv1alpha1.LoadBalancer)
+	return loadBalancer.Spec.Type == networkingv1alpha1.LoadBalancerTypePublic
+})
+
 func (r *LoadBalancerReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluster cluster.Cluster) error {
 	log := ctrl.Log.WithName("loadbalancer").WithName("setup")
 
@@ -239,6 +245,7 @@ func (r *LoadBalancerReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluste
 			builder.WithPredicates(
 				predicates.ResourceHasFilterLabel(log, r.WatchFilterValue),
 				predicates.ResourceIsNotExternallyManaged(log),
+				isLoadBalancerTypePublic,
 			),
 		).
 		Watches(
