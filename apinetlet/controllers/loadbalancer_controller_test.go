@@ -18,11 +18,6 @@ import (
 	"fmt"
 	"strings"
 
-	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
-	apinetletv1alpha1 "github.com/onmetal/onmetal-api-net/apinetlet/api/v1alpha1"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -30,6 +25,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
+
+	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
+	apinetletv1alpha1 "github.com/onmetal/onmetal-api-net/apinetlet/api/v1alpha1"
+	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	. "github.com/onmetal/onmetal-api/utils/testing"
 )
 
 var _ = Describe("LoadBalancerController", func() {
@@ -48,7 +50,7 @@ var _ = Describe("LoadBalancerController", func() {
 
 		ipFamily := corev1.IPv4Protocol
 
-		By("creating a load balancer")
+		By("creating external load balancer")
 		loadBalancer := &networkingv1alpha1.LoadBalancer{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -174,7 +176,7 @@ var _ = Describe("LoadBalancerController", func() {
 		Eventually(Get(publicIP)).Should(Satisfy(apierrors.IsNotFound))
 	})
 
-	It("should not allocate public IPs for internal load balancers", func() {
+	It("should allocate prefix IPs for internal load balancers", func() {
 		By("creating a network")
 		network := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
@@ -183,6 +185,19 @@ var _ = Describe("LoadBalancerController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("creating a prefix")
+		rootPrefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "lb-",
+			},
+			Spec: ipamv1alpha1.PrefixSpec{
+				IPFamily: corev1.IPv4Protocol,
+				Prefix:   commonv1alpha1.MustParseNewIPPrefix("10.0.0.0/24"),
+			},
+		}
+		Expect(k8sClient.Create(ctx, rootPrefix)).To(Succeed())
 
 		By("creating an internal load balancer")
 		loadBalancer := &networkingv1alpha1.LoadBalancer{
@@ -195,13 +210,55 @@ var _ = Describe("LoadBalancerController", func() {
 				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
 				IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
 				IPs: []networkingv1alpha1.IPSource{
-					{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")},
+					{
+						Ephemeral: &networkingv1alpha1.EphemeralPrefixSource{
+							PrefixTemplate: &ipamv1alpha1.PrefixTemplateSpec{
+								Spec: ipamv1alpha1.PrefixSpec{
+									IPFamily:  corev1.IPv4Protocol,
+									ParentRef: &corev1.LocalObjectReference{Name: rootPrefix.Name},
+									Prefix:    commonv1alpha1.MustParseNewIPPrefix("10.0.0.1/32"),
+								},
+							},
+						},
+					},
 				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())
 
-		By("asserting it does not get a public IP")
-		Consistently(Object(loadBalancer)).Should(HaveField("Status.IPs", BeEmpty()))
+		By("waiting for the prefix to be created with the correct ips and become ready")
+		prefixKey := client.ObjectKey{Namespace: ns.Name, Name: fmt.Sprintf("%s-%s", loadBalancer.UID, strings.ToLower(string(corev1.IPv4Protocol)))}
+		Eventually(func(g Gomega) {
+			prefix := &ipamv1alpha1.Prefix{}
+			err := k8sClient.Get(ctx, prefixKey, prefix)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			g.Expect(err).NotTo(HaveOccurred())
+
+			g.Expect(metav1.IsControlledBy(prefix, loadBalancer)).To(BeTrue(), "ephemeral prefix is not controlled by load balancer: %#v", prefix)
+			g.Expect(prefix.Spec).To(Equal(ipamv1alpha1.PrefixSpec{
+				IPFamily:  corev1.IPv4Protocol,
+				ParentRef: &corev1.LocalObjectReference{Name: rootPrefix.Name},
+				Prefix:    commonv1alpha1.MustParseNewIPPrefix("10.0.0.1/32"),
+			}))
+
+			By("patching the prefix status to Allocated")
+			basePrefix := prefix.DeepCopy()
+			prefix.Status.Phase = ipamv1alpha1.PrefixPhaseAllocated
+			Expect(k8sClient.Patch(ctx, prefix, client.MergeFrom(basePrefix))).To(Succeed())
+
+			err = k8sClient.Get(ctx, prefixKey, prefix)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			g.Expect(err).NotTo(HaveOccurred())
+			g.Expect(prefix.Status.Phase).To(Equal(ipamv1alpha1.PrefixPhaseAllocated))
+		}).Should(Succeed())
+
+		By("asserting it get's a private IP")
+		Eventually(Object(loadBalancer)).Should(HaveField("Status.IPs", ContainElements(*commonv1alpha1.MustParseNewIP("10.0.0.1"))))
+
+		By("deleting the load balancer")
+		Expect(k8sClient.Delete(ctx, loadBalancer)).To(Succeed())
+
+		By("waiting for it to be gone")
+		Eventually(Get(loadBalancer)).Should(Satisfy(apierrors.IsNotFound))
 	})
 })

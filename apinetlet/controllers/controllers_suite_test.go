@@ -22,12 +22,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/onmetal/controller-utils/buildutils"
-	"github.com/onmetal/controller-utils/modutils"
-	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	envtestutils "github.com/onmetal/onmetal-api/utils/envtest"
-	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -40,6 +34,14 @@ import (
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+
+	"github.com/onmetal/controller-utils/buildutils"
+	"github.com/onmetal/controller-utils/modutils"
+	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	envtestutils "github.com/onmetal/onmetal-api/utils/envtest"
+	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -95,6 +97,7 @@ var _ = BeforeSuite(func() {
 
 	Expect(networkingv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 	Expect(onmetalapinetv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
+	Expect(ipamv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 
 	// Init package-level k8sClient
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})

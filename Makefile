@@ -82,6 +82,7 @@ ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 .PHONY: test
 test: envtest generate fmt check-license ## Run tests.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./... -coverprofile cover.out
+	go mod tidy
 
 ##@ Build
 
