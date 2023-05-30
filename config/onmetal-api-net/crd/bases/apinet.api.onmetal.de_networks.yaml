@@ -3,8 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.11.3
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.12.0
   name: networks.apinet.api.onmetal.de
 spec:
   group: apinet.api.onmetal.de
@@ -44,12 +43,6 @@ spec:
             type: object
           spec:
             properties:
-              peerVNIs:
-                description: PeerVNIs are VNIs to peer with.
-                items:
-                  format: int32
-                  type: integer
-                type: array
               vni:
                 description: VNI is the requested network vni. Pointer to distinguish
                   between explicitly set and unset.

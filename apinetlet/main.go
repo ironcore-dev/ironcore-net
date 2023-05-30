@@ -147,7 +147,7 @@ func main() {
 
 	apiNetCluster, err := cluster.New(apiNetCfg, func(options *cluster.Options) {
 		options.Scheme = scheme
-		options.Namespace = apiNetNamespace
+		options.Cache.Namespaces = []string{apiNetNamespace}
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to create api net cluster")

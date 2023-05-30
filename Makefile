@@ -6,7 +6,7 @@ METALNETLET_IMG ?= metalnetlet:latest
 KIND_CLUSTER_NAME ?= kind
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION = 1.26.1
+ENVTEST_K8S_VERSION = 1.27.1
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -304,7 +304,7 @@ GOIMPORTS ?= $(LOCALBIN)/goimports
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.0.0
-CONTROLLER_TOOLS_VERSION ?= v0.11.3
+CONTROLLER_TOOLS_VERSION ?= v0.12.0
 ADDLICENSE_VERSION ?= v1.1.0
 GOIMPORTS_VERSION ?= v0.5.0
 

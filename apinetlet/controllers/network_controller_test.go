@@ -66,7 +66,7 @@ var _ = Describe("NetworkController", func() {
 		By("asserting the network does not report a vni")
 		Consistently(Object(network)).
 			Should(SatisfyAll(
-				HaveField("Spec.Handle", ""),
+				HaveField("Spec.ProviderID", ""),
 				HaveField("Status.State", Not(Equal(networkingv1alpha1.NetworkStateAvailable))),
 			))
 
@@ -86,24 +86,9 @@ var _ = Describe("NetworkController", func() {
 		By("waiting for the network to reflect the allocated vni")
 		Eventually(Object(network)).
 			Should(SatisfyAll(
-				HaveField("Spec.Handle", Equal(strconv.FormatInt(int64(vni), 10))),
+				HaveField("Spec.ProviderID", Equal(strconv.FormatInt(int64(vni), 10))),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
 			))
-
-		By("adding a peering status to the network")
-		baseNetwork := network.DeepCopy()
-		network.Status.Peerings = []networkingv1alpha1.NetworkPeeringStatus{
-			{
-				Name:          "my-peering",
-				Phase:         networkingv1alpha1.NetworkPeeringPhaseBound,
-				NetworkHandle: "400",
-			},
-		}
-		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
-
-		By("waiting for the apinet network to report the peered vni")
-		Eventually(Object(apiNetNetwork)).
-			Should(HaveField("Spec.PeerVNIs", []int32{400}))
 
 		By("deleting the network")
 		Expect(k8sClient.Delete(ctx, network)).To(Succeed())
@@ -135,8 +120,8 @@ var _ = Describe("NetworkController", func() {
 		Eventually(Get(apiNetNetwork)).Should(Satisfy(apierrors.IsNotFound))
 	})
 
-	It("should use the specified handle as vni if any", func() {
-		By("creating a network with handle")
+	It("should use the specified provider ID as vni if any", func() {
+		By("creating a network with provider ID")
 		vni := int32(42)
 		network := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
@@ -144,7 +129,7 @@ var _ = Describe("NetworkController", func() {
 				GenerateName: "network-",
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
-				Handle: strconv.FormatInt(int64(vni), 10),
+				ProviderID: strconv.FormatInt(int64(vni), 10),
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())

@@ -248,9 +248,9 @@ func (r *LoadBalancerReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluste
 				isLoadBalancerTypePublic,
 			),
 		).
-		Watches(
-			source.NewKindWithCache(&onmetalapinetv1alpha1.PublicIP{}, apiNetCluster.GetCache()),
-			handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+		WatchesRawSource(
+			source.Kind(apiNetCluster.GetCache(), &onmetalapinetv1alpha1.PublicIP{}),
+			handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 				apiNetPublicIP := obj.(*onmetalapinetv1alpha1.PublicIP)
 
 				if apiNetPublicIP.Namespace != r.APINetNamespace {
