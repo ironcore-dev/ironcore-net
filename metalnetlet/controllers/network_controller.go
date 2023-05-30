@@ -174,8 +174,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 			},
 		},
 		Spec: metalnetv1alpha1.NetworkSpec{
-			ID:        vni,
-			PeeredIDs: network.Spec.PeerVNIs,
+			ID: vni,
 		},
 	}
 	if err := r.MetalnetCluster.GetClient().Patch(ctx, metalnetNetwork, client.Apply, metalnetNetworkFieldOwner); err != nil {
@@ -188,7 +187,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 }
 
 func (r *NetworkReconciler) enqueueNetworkUsingNetworkLabels() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		metalnetNetwork := obj.(*metalnetv1alpha1.Network)
 		networkNamespace, networkName := metalnetNetwork.Labels[networkNamespaceLabel], metalnetNetwork.Labels[networkNameLabel]
 		if networkNamespace == "" || networkName == "" {
@@ -217,8 +216,8 @@ func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			&v1alpha1.Network{},
 			builder.WithPredicates(networkHasVNI),
 		).
-		Watches(
-			source.NewKindWithCache(&metalnetv1alpha1.Network{}, r.MetalnetCluster.GetCache()),
+		WatchesRawSource(
+			source.Kind(r.MetalnetCluster.GetCache(), &metalnetv1alpha1.Network{}),
 			r.enqueueNetworkUsingNetworkLabels(),
 		).
 		Complete(r)

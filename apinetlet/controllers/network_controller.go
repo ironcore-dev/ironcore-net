@@ -28,7 +28,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -167,13 +166,13 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	log = log.WithValues("VNI", *vni)
 	log.V(1).Info("APINet network is allocated")
 
-	if network.Spec.Handle == "" {
-		log.V(1).Info("Setting network handle")
-		if err := r.setNetworkHandle(ctx, network, *vni); err != nil {
-			return ctrl.Result{}, fmt.Errorf("error setting network handle: %w", err)
+	if network.Spec.ProviderID == "" {
+		log.V(1).Info("Setting network provider id")
+		if err := r.setNetworkProviderID(ctx, network, *vni); err != nil {
+			return ctrl.Result{}, fmt.Errorf("error setting network provider id: %w", err)
 		}
 
-		log.V(1).Info("Set network handle, requeueing")
+		log.V(1).Info("Set network provider id, requeueing")
 		return ctrl.Result{Requeue: true}, nil
 	}
 
@@ -186,9 +185,9 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	return ctrl.Result{}, nil
 }
 
-func (r *NetworkReconciler) setNetworkHandle(ctx context.Context, network *networkingv1alpha1.Network, vni int32) error {
+func (r *NetworkReconciler) setNetworkProviderID(ctx context.Context, network *networkingv1alpha1.Network, vni int32) error {
 	networkBase := network.DeepCopy()
-	network.Spec.Handle = strconv.FormatInt(int64(vni), 10)
+	network.Spec.ProviderID = strconv.FormatInt(int64(vni), 10)
 	if err := r.Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
 		return fmt.Errorf("unable to patch network: %w", err)
 	}
@@ -207,18 +206,13 @@ func isAPINetNetworkAllocated(apiNetNetwork *onmetalapinetv1alpha1.Network) bool
 
 func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (*int32, error) {
 	var vni *int32
-	if handle := network.Spec.Handle; handle != "" {
-		v, err := strconv.ParseInt(handle, 10, 32)
+	if providerID := network.Spec.ProviderID; providerID != "" {
+		v, err := strconv.ParseInt(providerID, 10, 32)
 		if err != nil {
-			return nil, fmt.Errorf("error parsing network handle %s: %w", handle, err)
+			return nil, fmt.Errorf("error parsing network provider id %s: %w", providerID, err)
 		}
 
 		vni = pointer.Int32(int32(v))
-	}
-
-	peerVNIs, err := r.extractPeerVNIs(network)
-	if err != nil {
-		return nil, err
 	}
 
 	apiNetNetwork := &onmetalapinetv1alpha1.Network{
@@ -236,8 +230,7 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 			},
 		},
 		Spec: onmetalapinetv1alpha1.NetworkSpec{
-			VNI:      vni,
-			PeerVNIs: peerVNIs,
+			VNI: vni,
 		},
 	}
 
@@ -254,24 +247,6 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 		return nil, nil
 	}
 	return apiNetNetwork.Spec.VNI, nil
-}
-
-func (r *NetworkReconciler) extractPeerVNIs(network *networkingv1alpha1.Network) ([]int32, error) {
-	peerVNIs := sets.New[int32]()
-	for _, peering := range network.Status.Peerings {
-		if peering.Phase != networkingv1alpha1.NetworkPeeringPhaseBound {
-			continue
-		}
-
-		peerVNI, err := strconv.ParseInt(peering.NetworkHandle, 10, 32)
-		if err != nil {
-			return nil, fmt.Errorf("invalid peer network handle %q: %w", peering.NetworkHandle, err)
-		}
-
-		peerVNIs.Insert(int32(peerVNI))
-	}
-
-	return sets.List(peerVNIs), nil
 }
 
 var apiNetNetworkAllocationChanged = predicate.Funcs{
@@ -292,9 +267,9 @@ func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluster clu
 				predicates.ResourceIsNotExternallyManaged(log),
 			),
 		).
-		Watches(
-			source.NewKindWithCache(&onmetalapinetv1alpha1.Network{}, apiNetCluster.GetCache()),
-			handler.EnqueueRequestsFromMapFunc(func(obj client.Object) []ctrl.Request {
+		WatchesRawSource(
+			source.Kind(apiNetCluster.GetCache(), &onmetalapinetv1alpha1.Network{}),
+			handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 				apiNetNetwork := obj.(*onmetalapinetv1alpha1.Network)
 
 				if apiNetNetwork.Namespace != r.APINetNamespace {
