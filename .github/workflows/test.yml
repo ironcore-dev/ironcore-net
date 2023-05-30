@@ -16,4 +16,8 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version-file: 'go.mod'
+      - uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+      - run: ./hack/setup-git-redirect.sh
       - run: make test

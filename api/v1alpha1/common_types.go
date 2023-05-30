@@ -30,11 +30,22 @@ const (
 
 	// APINetletUserNamePrefix is the prefix all apinetlet users should have.
 	APINetletUserNamePrefix = "apinet.api.onmetal.de:system:apinetlet:"
+
+	// MetalnetletsGroup is the system rbac group all metalnetlets are in.
+	MetalnetletsGroup = "apinet.api.onmetal.de:system:metalnetlets"
+
+	// MetalnetletUserNamePrefix is the prefix all metalnetlet users should have.
+	MetalnetletUserNamePrefix = "apinet.api.onmetal.de:system:metalnetlet:"
 )
 
 // APINetletCommonName constructs the common name for a certificate of an apinetlet user.
 func APINetletCommonName(name string) string {
 	return APINetletUserNamePrefix + name
+}
+
+// MetalnetletCommonName constructs the common name for a certificate of a metalnetlet user.
+func MetalnetletCommonName(name string) string {
+	return MetalnetletUserNamePrefix + name
 }
 
 // IP is an IP address.

@@ -1,0 +1,26 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: system
+  name: metalnet-role
+rules:
+- apiGroups:
+  - networking.metalnet.onmetal.de
+  resources:
+  - networks
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+  - create
+  - delete
+  - deletecollection
+- apiGroups:
+  - networking.metalnet.onmetal.de
+  resources:
+  - networks/finalizers
+  verbs:
+  - patch
+  - update

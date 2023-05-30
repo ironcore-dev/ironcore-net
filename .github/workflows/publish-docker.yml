@@ -28,10 +28,15 @@ jobs:
             target: onmetal-api-net-manager
           - name: apinetlet
             target: apinetlet-manager
+          - name: metalnetlet
+            target: metalnetlet-manager
     if: ${{ github.event.label.name == 'ok-to-image' }} || ${{ github.event.label.name == 'ok-to-🐳' }} || ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.BOT_PRIVATE_KEY }}
       - uses: docker/metadata-action@v4
         id: meta
         with:
@@ -77,3 +82,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           target: ${{ matrix.image.target }}
+          ssh: |
+            default=${{ env.SSH_AUTH_SOCK }}

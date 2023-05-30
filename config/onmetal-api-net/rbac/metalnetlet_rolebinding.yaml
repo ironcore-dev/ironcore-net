@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: apinet.api.onmetal.de:system:metalnetlets
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: apinet.api.onmetal.de:system:metalnetlets
+subjects:
+  - kind: Group
+    name: apinet.api.onmetal.de:system:metalnetlets
+    apiGroup: rbac.authorization.k8s.io
