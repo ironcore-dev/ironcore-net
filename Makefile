@@ -13,6 +13,7 @@ GOBIN=$(shell go env GOPATH)/bin
 else
 GOBIN=$(shell go env GOBIN)
 endif
+BUILDARGS ?=
 
 # Setting SHELL to bash allows bash commands to be executed by recipes.
 # This is a requirement for 'setup-envtest.sh' in the test target.
@@ -106,11 +107,11 @@ run-apinetlet: manifests generate fmt lint ## Run apinetlet from your host.
 
 .PHONY: docker-build-onmetal-api-net
 docker-build-onmetal-api-net: ## Build onmetal-api-net image with the manager.
-	docker build --target onmetal-api-net-manager -t ${ONMETAL_API_NET_IMG} .
+	docker build $(BUILDARGS) --target onmetal-api-net-manager -t ${ONMETAL_API_NET_IMG} .
 
 .PHONY: docker-build-apinetlet
 docker-build-apinetlet: ## Build apinetlet image with the manager.
-	docker build --target apinetlet-manager -t ${APINETLET_IMG} .
+	docker build $(BUILDARGS) --target apinetlet-manager -t ${APINETLET_IMG} .
 
 .PHONY: docker-build
 docker-build: docker-build-onmetal-api-net docker-build-apinetlet
