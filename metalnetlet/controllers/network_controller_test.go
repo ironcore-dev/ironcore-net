@@ -16,17 +16,19 @@ package controllers
 
 import (
 	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/api/v1alpha1"
+	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
+	"github.com/onmetal/onmetal-api-net/networkid"
+	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
 var _ = Describe("NetworkController", func() {
-	ns := SetupTest()
+	ns := SetupNamespace(&k8sClient)
+	metalnetNs := SetupNamespace(&k8sClient)
+	SetupTest(metalnetNs)
 
 	It("should create a metalnet network for a network", func(ctx SpecContext) {
 		By("creating a network")
@@ -35,32 +37,25 @@ var _ = Describe("NetworkController", func() {
 				Namespace:    ns.Name,
 				GenerateName: "network-",
 			},
-			Spec: v1alpha1.NetworkSpec{
-				VNI: pointer.Int32(300),
-			},
+			Spec: v1alpha1.NetworkSpec{},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
 
-		By("patching the network to be available")
-		baseNetwork := network.DeepCopy()
-		network.Status.Conditions = []v1alpha1.NetworkCondition{
-			{
-				Type:    v1alpha1.NetworkAllocated,
-				Status:  corev1.ConditionTrue,
-				Reason:  "Allocated",
-				Message: "The network has been allocated.",
-			},
-		}
-		Expect(k8sClient.Status().Patch(ctx, network, client.MergeFrom(baseNetwork))).Should(Succeed())
+		By("parsing the VNI")
+		vni, err := networkid.ParseVNI(network.Spec.ID)
+		Expect(err).NotTo(HaveOccurred())
 
 		By("waiting for the metalnet network to be created")
-		metalnetNetwork := &metalnetv1alpha1.Network{}
-		metalnetNetworkKey := client.ObjectKey{Name: "network-300"}
-		Eventually(func(g Gomega) {
-			g.Expect(k8sClient.Get(ctx, metalnetNetworkKey, metalnetNetwork)).To(Succeed())
-			g.Expect(metalnetNetwork.Spec).To(Equal(metalnetv1alpha1.NetworkSpec{
-				ID: 300,
-			}))
-		}).Should(Succeed())
+		metalnetNetwork := &metalnetv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: metalnetNs.Name,
+				Name:      string(network.UID),
+			},
+		}
+		Eventually(Object(metalnetNetwork)).Should(SatisfyAll(
+			HaveField("Spec", metalnetv1alpha1.NetworkSpec{
+				ID: vni,
+			}),
+		))
 	})
 })

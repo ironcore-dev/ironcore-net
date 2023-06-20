@@ -13,9 +13,14 @@ severity:
   default-severity: error
 
 linters-settings:
+  misspell:
+    ignore-words:
+    - strat
   revive:
     severity: error
     rules:
-      - name: exported
-      - name: if-return
-        disabled: true
+    - name: exported
+      arguments:
+      - disableStutteringCheck
+    - name: if-return
+      disabled: true

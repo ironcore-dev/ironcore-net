@@ -17,26 +17,31 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"net/netip"
 	"strings"
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
-	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
-	apinetletv1alpha1 "github.com/onmetal/onmetal-api-net/apinetlet/api/v1alpha1"
+	apinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
+	"github.com/onmetal/onmetal-api-net/apimachinery/api/net"
+	apinetletclient "github.com/onmetal/onmetal-api-net/apinetlet/client"
+	apinetlethandler "github.com/onmetal/onmetal-api-net/apinetlet/handler"
+	"github.com/onmetal/onmetal-api-net/apinetlet/provider"
+	apinetv1alpha1ac "github.com/onmetal/onmetal-api-net/client-go/applyconfigurations/core/v1alpha1"
+	"github.com/onmetal/onmetal-api-net/client-go/onmetalapinet"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/utils/predicates"
+	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/cluster"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
@@ -46,7 +51,8 @@ const (
 
 type LoadBalancerReconciler struct {
 	client.Client
-	APINetClient client.Client
+	APINetClient    client.Client
+	APINetInterface onmetalapinet.Interface
 
 	APINetNamespace string
 
@@ -57,8 +63,10 @@ type LoadBalancerReconciler struct {
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers/finalizers,verbs=update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=loadbalancers/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=apinet.api.onmetal.de,resources=publicips,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=apinet.api.onmetal.de,resources=publicips/status,verbs=get
+//+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefix,verbs=get;list;watch
+
+//+cluster=apinet:kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch;create;update;patch;delete;deletecollection
+//+cluster=apinet:kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=loadbalancerroutings,verbs=get;list;watch;create;update;patch;delete;deletecollection
 
 func (r *LoadBalancerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -74,26 +82,22 @@ func (r *LoadBalancerReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	return r.reconcileExists(ctx, log, loadBalancer)
 }
 
-func (r *LoadBalancerReconciler) deleteGone(ctx context.Context, log logr.Logger, virtualIPKey client.ObjectKey) (ctrl.Result, error) {
+func (r *LoadBalancerReconciler) deleteGone(ctx context.Context, log logr.Logger, loadBalancerKey client.ObjectKey) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
 	log.V(1).Info("Deleting any matching apinet public ips")
-	if err := r.APINetClient.DeleteAllOf(ctx, &onmetalapinetv1alpha1.PublicIP{},
+	if err := r.APINetClient.DeleteAllOf(ctx, &apinetv1alpha1.LoadBalancer{},
 		client.InNamespace(r.APINetNamespace),
-		client.MatchingLabels{
-			apinetletv1alpha1.LoadBalancerNamespaceLabel: virtualIPKey.Namespace,
-			apinetletv1alpha1.LoadBalancerNameLabel:      virtualIPKey.Name,
-		},
+		apinetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), loadBalancerKey, &networkingv1alpha1.LoadBalancer{}),
 	); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error deleting apinet public ips: %w", err)
 	}
 
-	log.V(1).Info("Issued delete for any leftover apinet public ip")
+	log.V(1).Info("Issued delete for any leftover APINet public ip")
 	return ctrl.Result{}, nil
 }
 
 func (r *LoadBalancerReconciler) reconcileExists(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) (ctrl.Result, error) {
-	log = log.WithValues("UID", loadBalancer.UID)
 	if !loadBalancer.DeletionTimestamp.IsZero() {
 		return r.delete(ctx, log, loadBalancer)
 	}
@@ -108,33 +112,27 @@ func (r *LoadBalancerReconciler) delete(ctx context.Context, log logr.Logger, lo
 		return ctrl.Result{}, nil
 	}
 
-	var count int
-	for _, ipFamily := range loadBalancer.Spec.IPFamilies {
-		if err := r.APINetClient.Delete(ctx, &onmetalapinetv1alpha1.PublicIP{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: r.APINetNamespace,
-				Name:      fmt.Sprintf("%s-%s", loadBalancer.UID, strings.ToLower(string(ipFamily))),
-			},
-		}); err != nil {
-			if !apierrors.IsNotFound(err) {
-				return ctrl.Result{}, fmt.Errorf("error deleting target public ip: %w", err)
-			}
-			count++
-
+	apiNetLoadBalancer := &apinetv1alpha1.LoadBalancer{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: r.APINetNamespace,
+			Name:      string(loadBalancer.UID),
+		},
+	}
+	if err := r.APINetClient.Delete(ctx, apiNetLoadBalancer); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return ctrl.Result{}, fmt.Errorf("error deleting apinet load balancer: %w", err)
 		}
+
+		log.V(1).Info("APINet load balancer is gone, removing finalizer")
+		if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, loadBalancer, loadBalancerFinalizer); err != nil {
+			return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
+		}
+		log.V(1).Info("Deleted")
+		return ctrl.Result{}, nil
 	}
 
-	if count < len(loadBalancer.Spec.IPFamilies) {
-		log.V(1).Info("Target public ip is not yet gone, requeueing")
-		return ctrl.Result{Requeue: true}, nil
-	}
-
-	log.V(1).Info("Target public ip is gone, removing finalizer")
-	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, loadBalancer, loadBalancerFinalizer); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
-	}
-	log.V(1).Info("Removed finalizer")
-	return ctrl.Result{}, nil
+	log.V(1).Info("Issued APINet load balancer deletion")
+	return ctrl.Result{Requeue: true}, nil
 }
 
 func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) (ctrl.Result, error) {
@@ -150,93 +148,192 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 		return ctrl.Result{Requeue: true}, nil
 	}
 
-	ips, err := r.applyPublicIPs(ctx, log, loadBalancer)
+	networkKey := client.ObjectKey{Namespace: loadBalancer.Namespace, Name: loadBalancer.Spec.NetworkRef.Name}
+	apiNetNetworkName, err := getAPINetNetworkName(ctx, r.Client, networkKey)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error getting / applying public ip: %w", err)
+		return ctrl.Result{}, err
+	}
+	if apiNetNetworkName == "" {
+		log.V(1).Info("APINet network is not ready")
+		return ctrl.Result{}, nil
 	}
 
-	if err := r.patchStatus(ctx, log, loadBalancer, ips); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error patching load balancer status")
+	log.V(1).Info("Applying APINet load balancer")
+	apiNetLoadBalancer, err := r.applyAPINetLoadBalancer(ctx, loadBalancer, apiNetNetworkName)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error applying apinet load balancer: %w", err)
+	}
+
+	log.V(1).Info("Manage APINet load balancer routing")
+	if err := r.manageAPINetLoadBalancerRouting(ctx, loadBalancer, apiNetLoadBalancer); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	actualIPs := apiNetIPsToIPs(apiNetLoadBalancer.Status.IPs)
+	if !slices.Equal(actualIPs, loadBalancer.Status.IPs) {
+		log.V(1).Info("Updating load balancer status IPs")
+		if err := r.updateLoadBalancerIPs(ctx, loadBalancer, actualIPs); err != nil {
+			return ctrl.Result{}, fmt.Errorf("error patching load balancer status")
+		}
 	}
 
 	log.V(1).Info("Patched load balancer status")
 	return ctrl.Result{}, nil
 }
 
-func (r *LoadBalancerReconciler) applyPublicIPs(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer) ([]netip.Addr, error) {
-	var ips []netip.Addr
-	for _, ipFamily := range loadBalancer.Spec.IPFamilies {
-		apiNetPublicIP, err := r.applyPublicIP(ctx, log, loadBalancer, ipFamily)
-		if err != nil {
-			return nil, err
+func (r *LoadBalancerReconciler) manageAPINetLoadBalancerRouting(
+	ctx context.Context,
+	loadBalancer *networkingv1alpha1.LoadBalancer,
+	apiNetLoadBalancer *apinetv1alpha1.LoadBalancer,
+) error {
+	loadBalancerRouting := &networkingv1alpha1.LoadBalancerRouting{}
+	if err := r.Get(ctx, client.ObjectKeyFromObject(loadBalancer), loadBalancerRouting); client.IgnoreNotFound(err) != nil {
+		return fmt.Errorf("error getting load balancer routing: %w", err)
+	}
+
+	apiNetDsts := make([]apinetv1alpha1.LoadBalancerDestination, 0)
+	for _, dst := range loadBalancerRouting.Destinations {
+		var apiNetTargetRef *apinetv1alpha1.LoadBalancerTargetRef
+		if targetRef := dst.TargetRef; targetRef != nil {
+			_, name, node, uid, err := provider.ParseNetworkInterfaceID(targetRef.ProviderID)
+			if err == nil {
+				apiNetTargetRef = &apinetv1alpha1.LoadBalancerTargetRef{
+					UID:  uid,
+					Name: name,
+					NodeRef: corev1.LocalObjectReference{
+						Name: node,
+					},
+				}
+			}
 		}
 
-		ips = append(ips, apiNetPublicIP)
+		apiNetDsts = append(apiNetDsts, apinetv1alpha1.LoadBalancerDestination{
+			IP:        ipToAPINetIP(dst.IP),
+			TargetRef: apiNetTargetRef,
+		})
+	}
+
+	apiNetLoadBalancerRouting := &apinetv1alpha1.LoadBalancerRouting{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: apinetv1alpha1.SchemeGroupVersion.String(),
+			Kind:       "LoadBalancerRouting",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: r.APINetNamespace,
+			Name:      apiNetLoadBalancer.Name,
+			Labels:    apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), loadBalancer),
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apiNetLoadBalancer, apinetv1alpha1.SchemeGroupVersion.WithKind("LoadBalancer")),
+			},
+		},
+		Destinations: apiNetDsts,
+	}
+	if err := r.APINetClient.Patch(ctx, apiNetLoadBalancerRouting, client.Apply, fieldOwner, client.ForceOwnership); err != nil {
+		return fmt.Errorf("error applying apinet load balancer routing: %w", err)
+	}
+	return nil
+}
+
+func (r *LoadBalancerReconciler) getPublicLoadBalancerAPINetIPs(
+	loadBalancer *networkingv1alpha1.LoadBalancer,
+) []*apinetv1alpha1ac.LoadBalancerIPApplyConfiguration {
+	res := make([]*apinetv1alpha1ac.LoadBalancerIPApplyConfiguration, len(loadBalancer.Spec.IPFamilies))
+	for i, ipFamily := range loadBalancer.Spec.IPFamilies {
+		res[i] = apinetv1alpha1ac.LoadBalancerIP().
+			WithName(strings.ToLower(string(ipFamily))).
+			WithIPFamily(ipFamily)
+	}
+	return res
+}
+
+func (r *LoadBalancerReconciler) getInternalLoadBalancerAPINetIPs(
+	ctx context.Context,
+	loadBalancer *networkingv1alpha1.LoadBalancer,
+) ([]*apinetv1alpha1ac.LoadBalancerIPApplyConfiguration, error) {
+	var ips []*apinetv1alpha1ac.LoadBalancerIPApplyConfiguration
+	for i, ip := range loadBalancer.Spec.IPs {
+		switch {
+		case ip.Value != nil:
+			ips = append(ips,
+				apinetv1alpha1ac.LoadBalancerIP().
+					WithName(fmt.Sprintf("ip-%d", i)).
+					WithIPFamily(ip.Value.Family()).
+					WithIP(net.IP{Addr: ip.Value.Addr}),
+			)
+		case ip.Ephemeral != nil:
+			prefix := &ipamv1alpha1.Prefix{}
+			prefixName := networkingv1alpha1.LoadBalancerIPIPAMPrefixName(loadBalancer.Name, i)
+			prefixKey := client.ObjectKey{Namespace: loadBalancer.Namespace, Name: prefixName}
+			if err := r.Get(ctx, prefixKey, prefix); err != nil {
+				if !apierrors.IsNotFound(err) {
+					return nil, fmt.Errorf("error getting prefix %s: %w", prefixName, err)
+				}
+
+				continue
+			}
+
+			if !metav1.IsControlledBy(prefix, loadBalancer) {
+				// Don't use a prefix that is not controlled by the load balancer.
+				continue
+			}
+
+			if !isPrefixAllocated(prefix) {
+				continue
+			}
+
+			ips = append(ips,
+				apinetv1alpha1ac.LoadBalancerIP().
+					WithName(fmt.Sprintf("ip-%d", i)).
+					WithIPFamily(prefix.Spec.IPFamily).
+					WithIP(net.IP{Addr: prefix.Spec.Prefix.IP().Addr}),
+			)
+		}
 	}
 	return ips, nil
 }
 
-func (r *LoadBalancerReconciler) applyPublicIP(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer, ipFamily corev1.IPFamily) (netip.Addr, error) {
-	apiNetPublicIP := &onmetalapinetv1alpha1.PublicIP{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: onmetalapinetv1alpha1.GroupVersion.String(),
-			Kind:       "PublicIP",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: r.APINetNamespace,
-			Name:      fmt.Sprintf("%s-%s", loadBalancer.UID, strings.ToLower(string(ipFamily))),
-			Labels: map[string]string{
-				apinetletv1alpha1.LoadBalancerNamespaceLabel: loadBalancer.Namespace,
-				apinetletv1alpha1.LoadBalancerNameLabel:      loadBalancer.Name,
-				apinetletv1alpha1.LoadBalancerUIDLabel:       string(loadBalancer.UID),
-			},
-		},
-		Spec: onmetalapinetv1alpha1.PublicIPSpec{
-			IPFamily: ipFamily,
-		},
+func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, apiNetNetworkName string) (*apinetv1alpha1.LoadBalancer, error) {
+	apiNetLoadBalancerType, err := loadBalancerTypeToAPINetLoadBalancerType(loadBalancer.Spec.Type)
+	if err != nil {
+		return nil, err
 	}
 
-	log.V(1).Info("Applying apinet public ip", "ipFamily", ipFamily)
-	if err := r.APINetClient.Patch(ctx, apiNetPublicIP, client.Apply,
-		client.FieldOwner(apinetletv1alpha1.FieldOwner),
-		client.ForceOwnership,
-	); err != nil {
-		return netip.Addr{}, fmt.Errorf("error applying apinet public ip: %w", err)
+	var ips []*apinetv1alpha1ac.LoadBalancerIPApplyConfiguration
+	switch loadBalancer.Spec.Type {
+	case networkingv1alpha1.LoadBalancerTypeInternal:
+		ips, err = r.getInternalLoadBalancerAPINetIPs(ctx, loadBalancer)
+		if err != nil {
+			return nil, err
+		}
+	case networkingv1alpha1.LoadBalancerTypePublic:
+		ips = r.getPublicLoadBalancerAPINetIPs(loadBalancer)
 	}
-	log.V(1).Info("Applied apinet public ip")
 
-	if !apiNetPublicIP.IsAllocated() {
-		return netip.Addr{}, nil
+	apiNetLoadBalancerApplyCfg :=
+		apinetv1alpha1ac.LoadBalancer(string(loadBalancer.UID), r.APINetNamespace).
+			WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), loadBalancer)).
+			WithSpec(apinetv1alpha1ac.LoadBalancerSpec().
+				WithType(apiNetLoadBalancerType).
+				WithNetworkRef(corev1.LocalObjectReference{Name: apiNetNetworkName}).
+				WithIPs(ips...).
+				WithPorts(loadBalancerPortsToAPINetLoadBalancerPortConfigs(loadBalancer.Spec.Ports)...),
+			)
+	apiNetLoadBalancer, err := r.APINetInterface.CoreV1alpha1().
+		LoadBalancers(r.APINetNamespace).
+		Apply(ctx, apiNetLoadBalancerApplyCfg, metav1.ApplyOptions{FieldManager: string(fieldOwner), Force: true})
+	if err != nil {
+		return nil, fmt.Errorf("error applying apinet load balancer: %w", err)
 	}
-	ip := apiNetPublicIP.Spec.IP
-	return ip.Addr, nil
+	return apiNetLoadBalancer, nil
 }
 
-func (r *LoadBalancerReconciler) patchStatus(ctx context.Context, log logr.Logger, loadBalancer *networkingv1alpha1.LoadBalancer, ips []netip.Addr) error {
+func (r *LoadBalancerReconciler) updateLoadBalancerIPs(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, ips []commonv1alpha1.IP) error {
 	base := loadBalancer.DeepCopy()
-	loadBalancer.Status.IPs = []commonv1alpha1.IP{}
-
-	for _, ip := range ips {
-		if !ip.IsValid() {
-			log.V(2).Info("Public ip is not yet allocated", "ip", ip.String())
-			continue
-		}
-
-		log.V(2).Info("Public ip is allocated", "ip", ip.String())
-		loadBalancer.Status.IPs = append(loadBalancer.Status.IPs, commonv1alpha1.IP{
-			Addr: ip,
-		})
-	}
-
+	loadBalancer.Status.IPs = ips
 	return r.Status().Patch(ctx, loadBalancer, client.MergeFrom(base))
 }
 
-var isLoadBalancerTypePublic = predicate.NewPredicateFuncs(func(obj client.Object) bool {
-	loadBalancer := obj.(*networkingv1alpha1.LoadBalancer)
-	return loadBalancer.Spec.Type == networkingv1alpha1.LoadBalancerTypePublic
-})
-
-func (r *LoadBalancerReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluster cluster.Cluster) error {
+func (r *LoadBalancerReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache cache.Cache) error {
 	log := ctrl.Log.WithName("loadbalancer").WithName("setup")
 
 	return ctrl.NewControllerManagedBy(mgr).
@@ -245,33 +342,16 @@ func (r *LoadBalancerReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluste
 			builder.WithPredicates(
 				predicates.ResourceHasFilterLabel(log, r.WatchFilterValue),
 				predicates.ResourceIsNotExternallyManaged(log),
-				isLoadBalancerTypePublic,
 			),
 		).
 		WatchesRawSource(
-			source.Kind(apiNetCluster.GetCache(), &onmetalapinetv1alpha1.PublicIP{}),
-			handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
-				apiNetPublicIP := obj.(*onmetalapinetv1alpha1.PublicIP)
-
-				if apiNetPublicIP.Namespace != r.APINetNamespace {
-					return nil
-				}
-
-				namespace, ok := apiNetPublicIP.Labels[apinetletv1alpha1.LoadBalancerNamespaceLabel]
-				if !ok {
-					return nil
-				}
-
-				name, ok := apiNetPublicIP.Labels[apinetletv1alpha1.LoadBalancerNameLabel]
-				if !ok {
-					return nil
-				}
-
-				return []ctrl.Request{{NamespacedName: client.ObjectKey{Namespace: namespace, Name: name}}}
-			}),
-			builder.WithPredicates(
-				getApiNetPublicIPAllocationChangedPredicate(),
-			),
+			source.Kind(apiNetCache, &apinetv1alpha1.LoadBalancer{}),
+			apinetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.LoadBalancer{}),
+		).
+		Owns(&ipamv1alpha1.Prefix{}).
+		Watches(
+			&networkingv1alpha1.LoadBalancerRouting{},
+			&handler.EnqueueRequestForObject{},
 		).
 		Complete(r)
 }

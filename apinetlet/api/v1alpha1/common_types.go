@@ -14,22 +14,19 @@
 
 package v1alpha1
 
-const (
-	NetworkUIDLabel       = "apinetlet.api.onmetal.de/network-uid"
-	NetworkNamespaceLabel = "apinetlet.api.onmetal.de/network-namespace"
-	NetworkNameLabel      = "apinetlet.api.onmetal.de/network-name"
-
-	VirtualIPUIDLabel       = "apinetlet.api.onmetal.de/virtualip-uid"
-	VirtualIPNamespaceLabel = "apinetlet.api.onmetal.de/virtualip-namespace"
-	VirtualIPNameLabel      = "apinetlet.api.onmetal.de/virtualip-name"
-
-	NATGatewayUIDLabel       = "apinetlet.api.onmetal.de/natgateway-uid"
-	NATGatewayNamespaceLabel = "apinetlet.api.onmetal.de/natgateway-namespace"
-	NATGatewayNameLabel      = "apinetlet.api.onmetal.de/natgateway-name"
-
-	LoadBalancerUIDLabel       = "apinetlet.api.onmetal.de/loadbalancer-uid"
-	LoadBalancerNamespaceLabel = "apinetlet.api.onmetal.de/loadbalancer-namespace"
-	LoadBalancerNameLabel      = "apinetlet.api.onmetal.de/loadbalancer-name"
-
-	FieldOwner = "apinetlet.api.onmetal.de/field-owner"
+import (
+	"fmt"
+	"strings"
 )
+
+func SourceNameLabel(kind string) string {
+	return fmt.Sprintf("apinetlet.api.onmetal.de/%s-name", strings.ToLower(kind))
+}
+
+func SourceNamespaceLabel(kind string) string {
+	return fmt.Sprintf("apinetlet.api.onmetal.de/%s-namespace", strings.ToLower(kind))
+}
+
+func SourceUIDLabel(kind string) string {
+	return fmt.Sprintf("apinetlet.api.onmetal.de/%s-uid", strings.ToLower(kind))
+}

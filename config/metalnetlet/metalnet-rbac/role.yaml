@@ -1,26 +1,55 @@
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
+  creationTimestamp: null
   namespace: system
   name: metalnet-role
 rules:
 - apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - networking.metalnet.onmetal.de
   resources:
-  - networks
+  - loadbalancers
   verbs:
+  - create
+  - delete
+  - deletecollection
   - get
   - list
   - patch
   - update
   - watch
-  - create
-  - delete
-  - deletecollection
 - apiGroups:
   - networking.metalnet.onmetal.de
   resources:
-  - networks/finalizers
+  - networkinterfaces
   verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
   - patch
   - update
+  - watch
+- apiGroups:
+  - networking.metalnet.onmetal.de
+  resources:
+  - networks
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch

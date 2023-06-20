@@ -21,8 +21,11 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
-	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
-	apinetletv1alpha1 "github.com/onmetal/onmetal-api-net/apinetlet/api/v1alpha1"
+	apinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
+	apinetletclient "github.com/onmetal/onmetal-api-net/apinetlet/client"
+	"github.com/onmetal/onmetal-api-net/apinetlet/handler"
+	apinetv1alpha1ac "github.com/onmetal/onmetal-api-net/client-go/applyconfigurations/core/v1alpha1"
+	"github.com/onmetal/onmetal-api-net/client-go/onmetalapinet"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/utils/predicates"
@@ -30,10 +33,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/cluster"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
@@ -43,7 +45,8 @@ const (
 
 type VirtualIPReconciler struct {
 	client.Client
-	APINetClient client.Client
+	APINetClient    client.Client
+	APINetInterface onmetalapinet.Interface
 
 	APINetNamespace string
 
@@ -54,8 +57,8 @@ type VirtualIPReconciler struct {
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips/finalizers,verbs=update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=apinet.api.onmetal.de,resources=publicips,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=apinet.api.onmetal.de,resources=publicips/status,verbs=get
+
+//+cluster=apinet:kubebuilder:rbac:groups=apinet.api.onmetal.de,resources=ips,verbs=get;list;watch;create;update;patch;delete;deletecollection
 
 func (r *VirtualIPReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -74,18 +77,15 @@ func (r *VirtualIPReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 func (r *VirtualIPReconciler) deleteGone(ctx context.Context, log logr.Logger, virtualIPKey client.ObjectKey) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
-	log.V(1).Info("Deleting any matching apinet public ips")
-	if err := r.APINetClient.DeleteAllOf(ctx, &onmetalapinetv1alpha1.PublicIP{},
+	log.V(1).Info("Deleting any matching APINet ips")
+	if err := r.APINetClient.DeleteAllOf(ctx, &apinetv1alpha1.IP{},
 		client.InNamespace(r.APINetNamespace),
-		client.MatchingLabels{
-			apinetletv1alpha1.VirtualIPNamespaceLabel: virtualIPKey.Namespace,
-			apinetletv1alpha1.VirtualIPNameLabel:      virtualIPKey.Name,
-		},
+		apinetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), virtualIPKey, &networkingv1alpha1.VirtualIP{}),
 	); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error deleting apinet public ips: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error deleting apinet ips: %w", err)
 	}
 
-	log.V(1).Info("Issued delete for any leftover apinet public ip")
+	log.V(1).Info("Issued delete for any leftover APINet ips")
 	return ctrl.Result{}, nil
 }
 
@@ -109,18 +109,19 @@ func (r *VirtualIPReconciler) delete(ctx context.Context, log logr.Logger, virtu
 		return ctrl.Result{}, nil
 	}
 
-	log.V(1).Info("Deleting target public ip if any")
-	if err := r.APINetClient.Delete(ctx, &onmetalapinetv1alpha1.PublicIP{
+	log.V(1).Info("Deleting target APINet IP if any")
+	apiNetIP := &apinetv1alpha1.IP{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: r.APINetNamespace,
 			Name:      string(virtualIP.UID),
 		},
-	}); err != nil {
+	}
+	if err := r.APINetClient.Delete(ctx, apiNetIP); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return ctrl.Result{}, fmt.Errorf("error deleting target public ip: %w", err)
+			return ctrl.Result{}, fmt.Errorf("error deleting target apinet ip: %w", err)
 		}
 
-		log.V(1).Info("Target public ip is gone, removing finalizer")
+		log.V(1).Info("Target APINet ip is gone, removing finalizer")
 		if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, virtualIP, virtualIPFinalizer); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
 		}
@@ -128,7 +129,7 @@ func (r *VirtualIPReconciler) delete(ctx context.Context, log logr.Logger, virtu
 		return ctrl.Result{}, nil
 	}
 
-	log.V(1).Info("Target public ip is not yet gone, requeueing")
+	log.V(1).Info("Target APINet ip is not yet gone, requeueing")
 	return ctrl.Result{Requeue: true}, nil
 }
 
@@ -145,23 +146,16 @@ func (r *VirtualIPReconciler) reconcile(ctx context.Context, log logr.Logger, vi
 		return ctrl.Result{Requeue: true}, nil
 	}
 
-	ip, err := r.applyPublicIP(ctx, log, virtualIP)
+	ip, err := r.applyIP(ctx, log, virtualIP)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error getting / applying public ip: %w", err)
-	}
-	if !ip.IsValid() {
-		log.V(1).Info("Public ip is not yet allocated, patching status")
-		if err := r.patchStatusUnallocated(ctx, virtualIP); err != nil {
-			return ctrl.Result{}, err
+		if virtualIP.Status.IP == nil {
+			if err := r.patchStatusUnallocated(ctx, virtualIP); err != nil {
+				log.Error(err, "Error patching virtual IP status")
+			}
 		}
-		log.V(1).Info("Patched virtual ip status")
-		return ctrl.Result{}, nil
+		return ctrl.Result{}, fmt.Errorf("error applying apinet ip: %w", err)
 	}
 
-	log = log.WithValues("IP", ip)
-	log.V(1).Info("Public ip is allocated")
-
-	log.V(1).Info("Patching virtual ip status ip allocated")
 	if err := r.patchStatusAllocated(ctx, virtualIP, ip); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error patching virtual ip status")
 	}
@@ -169,46 +163,31 @@ func (r *VirtualIPReconciler) reconcile(ctx context.Context, log logr.Logger, vi
 	return ctrl.Result{}, nil
 }
 
-func (r *VirtualIPReconciler) applyPublicIP(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (netip.Addr, error) {
-	apiNetPublicIP := &onmetalapinetv1alpha1.PublicIP{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: onmetalapinetv1alpha1.GroupVersion.String(),
-			Kind:       "PublicIP",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: r.APINetNamespace,
-			Name:      string(virtualIP.UID),
-			Labels: map[string]string{
-				apinetletv1alpha1.VirtualIPNamespaceLabel: virtualIP.Namespace,
-				apinetletv1alpha1.VirtualIPNameLabel:      virtualIP.Name,
-				apinetletv1alpha1.VirtualIPUIDLabel:       string(virtualIP.UID),
-			},
-		},
-		Spec: onmetalapinetv1alpha1.PublicIPSpec{
-			IPFamily: virtualIP.Spec.IPFamily,
-		},
+func (r *VirtualIPReconciler) applyIP(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (netip.Addr, error) {
+	apiNetIPApplyCfg :=
+		apinetv1alpha1ac.IP(string(virtualIP.UID), r.APINetNamespace).
+			WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), virtualIP)).
+			WithSpec(apinetv1alpha1ac.IPSpec().
+				WithType(apinetv1alpha1.IPTypePublic).
+				WithIPFamily(virtualIP.Spec.IPFamily),
+			)
+
+	apiNetIP, err := r.APINetInterface.CoreV1alpha1().
+		IPs(r.APINetNamespace).
+		Apply(ctx, apiNetIPApplyCfg, metav1.ApplyOptions{FieldManager: string(fieldOwner), Force: true})
+	if err != nil {
+		return netip.Addr{}, fmt.Errorf("error applying apinet IP: %w", err)
 	}
 
-	log.V(1).Info("Applying apinet public ip")
-	if err := r.APINetClient.Patch(ctx, apiNetPublicIP, client.Apply,
-		client.FieldOwner(apinetletv1alpha1.FieldOwner),
-		client.ForceOwnership,
-	); err != nil {
-		return netip.Addr{}, fmt.Errorf("error applying apinet public ip: %w", err)
-	}
-	log.V(1).Info("Applied apinet public ip")
-
-	if !apiNetPublicIP.IsAllocated() {
-		return netip.Addr{}, nil
-	}
-	ip := apiNetPublicIP.Spec.IP
+	log.V(1).Info("Applied APINet ip")
+	ip := apiNetIP.Spec.IP
 	return ip.Addr, nil
 }
 
 func (r *VirtualIPReconciler) patchStatusAllocated(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIP, addr netip.Addr) error {
 	base := virtualIP.DeepCopy()
 	virtualIP.Status.IP = &commonv1alpha1.IP{Addr: addr}
-	if err := r.Status().Patch(ctx, virtualIP, client.MergeFrom(base)); err != nil {
+	if err := r.Status().Patch(ctx, virtualIP, client.StrategicMergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching virtual ip status: %w", err)
 	}
 	return nil
@@ -223,7 +202,7 @@ func (r *VirtualIPReconciler) patchStatusUnallocated(ctx context.Context, virtua
 	return nil
 }
 
-func (r *VirtualIPReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluster cluster.Cluster) error {
+func (r *VirtualIPReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache cache.Cache) error {
 	log := ctrl.Log.WithName("virtualip").WithName("setup")
 
 	return ctrl.NewControllerManagedBy(mgr).
@@ -235,29 +214,8 @@ func (r *VirtualIPReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCluster c
 			),
 		).
 		WatchesRawSource(
-			source.Kind(apiNetCluster.GetCache(), &onmetalapinetv1alpha1.PublicIP{}),
-			handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
-				apiNetPublicIP := obj.(*onmetalapinetv1alpha1.PublicIP)
-
-				if apiNetPublicIP.Namespace != r.APINetNamespace {
-					return nil
-				}
-
-				namespace, ok := apiNetPublicIP.Labels[apinetletv1alpha1.VirtualIPNamespaceLabel]
-				if !ok {
-					return nil
-				}
-
-				name, ok := apiNetPublicIP.Labels[apinetletv1alpha1.VirtualIPNameLabel]
-				if !ok {
-					return nil
-				}
-
-				return []ctrl.Request{{NamespacedName: client.ObjectKey{Namespace: namespace, Name: name}}}
-			}),
-			builder.WithPredicates(
-				getApiNetPublicIPAllocationChangedPredicate(),
-			),
+			source.Kind(apiNetCache, &apinetv1alpha1.IP{}),
+			handler.EnqueueRequestForSource(r.Scheme(), mgr.GetRESTMapper(), &networkingv1alpha1.VirtualIP{}),
 		).
 		Complete(r)
 }

@@ -19,7 +19,7 @@ import (
 	"crypto/x509/pkix"
 	"os"
 
-	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
+	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	utilcertificate "github.com/onmetal/onmetal-api/utils/certificate"
 	"github.com/onmetal/onmetal-api/utils/client/config"
