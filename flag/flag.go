@@ -17,11 +17,11 @@ package flag
 import (
 	"bytes"
 	"encoding/csv"
-	"flag"
 	"io"
 	"net/netip"
 	"strings"
 
+	"github.com/spf13/pflag"
 	"go4.org/netipx"
 )
 
@@ -97,8 +97,8 @@ func (v *ipPrefixesVar) String() string {
 	return "[" + out + "]"
 }
 
-func IPPrefixesVar(p *[]netip.Prefix, name string, value []netip.Prefix, usage string) {
-	flag.Var(newIPPrefixesVar(value, p), name, usage)
+func IPPrefixesVar(fs *pflag.FlagSet, p *[]netip.Prefix, name string, value []netip.Prefix, usage string) {
+	fs.Var(newIPPrefixesVar(value, p), name, usage)
 }
 
 func IPSetFromPrefixes(prefixes []netip.Prefix) (*netipx.IPSet, error) {

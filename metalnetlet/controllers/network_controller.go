@@ -21,49 +21,33 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/onmetal/controller-utils/clientutils"
 	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/api/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/apiutils"
+	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
+	metalnetletclient "github.com/onmetal/onmetal-api-net/metalnetlet/client"
+	metalnetlethandler "github.com/onmetal/onmetal-api-net/metalnetlet/handler"
+	"github.com/onmetal/onmetal-api-net/networkid"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/builder"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/cluster"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
-const (
-	metalnetNetworkFieldOwner = client.FieldOwner("metalnetlet.apinet.onmetal.de/field-owner")
-	networkNamespaceLabel     = "metalnetlet.apinet.onmetal.de/network-namespace"
-	networkNameLabel          = "metalnetlet.apinet.onmetal.de/network-name"
-	networkUIDLabel           = "metalnet.apinet.onmetal.de/network-uid"
-)
-
-func finalizer(name string) string {
-	return fmt.Sprintf("%s.metalnetlet.apinet.onmetal.de/network", name)
-}
-
-func getNetworkVNI(network *v1alpha1.Network) (int32, bool) {
-	if !apiutils.IsNetworkAllocated(network) {
-		return 0, false
-	}
-	vni := network.Spec.VNI
-	if vni == nil {
-		return 0, false
-	}
-	return *vni, true
-}
-
 type NetworkReconciler struct {
 	client.Client
-	MetalnetCluster cluster.Cluster
-	Name            string
+	MetalnetClient client.Client
+
+	PartitionName string
+
+	MetalnetNamespace string
 }
 
-//+kubebuilder:rbac:groups=apinet.api.onmetal.de,resources=networks,verbs=get;list;watch
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
+//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=networks,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=networks/finalizers,verbs=update;patch
+
+//+cluster=metalnet:kubebuilder:rbac:groups=networking.metalnet.onmetal.de,resources=networks,verbs=get;list;watch;create;update;patch;delete;deletecollection
 
 func (r *NetworkReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -82,11 +66,9 @@ func (r *NetworkReconciler) deleteGone(ctx context.Context, log logr.Logger, net
 	log.V(1).Info("Delete gone")
 
 	log.V(1).Info("Deleting all metalnet networks that match the network label")
-	if err := r.MetalnetCluster.GetClient().DeleteAllOf(ctx, &metalnetv1alpha1.Network{},
-		client.MatchingLabels{
-			networkNamespaceLabel: networkKey.Namespace,
-			networkNameLabel:      networkKey.Name,
-		},
+	if err := r.MetalnetClient.DeleteAllOf(ctx, &metalnetv1alpha1.Network{},
+		client.InNamespace(r.MetalnetNamespace),
+		metalnetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), networkKey, &v1alpha1.Network{}),
 	); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error deleting metalnet networks matching network label: %w", err)
 	}
@@ -105,22 +87,21 @@ func (r *NetworkReconciler) reconcileExists(ctx context.Context, log logr.Logger
 func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network *v1alpha1.Network) (ctrl.Result, error) {
 	log.V(1).Info("Delete")
 
-	if !controllerutil.ContainsFinalizer(network, finalizer(r.Name)) {
+	if !controllerutil.ContainsFinalizer(network, PartitionFinalizer(r.PartitionName)) {
 		log.V(1).Info("No finalizer present, nothing to do")
 		return ctrl.Result{}, nil
 	}
 
 	log.V(1).Info("Finalizer present, cleaning up")
 
-	vni := *network.Spec.VNI
-
 	log.V(1).Info("Deleting metalnet network if present")
 	metalnetNetwork := &metalnetv1alpha1.Network{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: fmt.Sprintf("network-%d", vni),
+			Namespace: r.MetalnetNamespace,
+			Name:      string(network.UID),
 		},
 	}
-	err := r.MetalnetCluster.GetClient().Delete(ctx, metalnetNetwork)
+	err := r.MetalnetClient.Delete(ctx, metalnetNetwork)
 	if err != nil && !apierrors.IsNotFound(err) {
 		return ctrl.Result{}, fmt.Errorf("error deleting metalnet network: %w", err)
 	}
@@ -130,7 +111,7 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 	}
 
 	log.V(1).Info("Metalnet network is gone, removing finalizer")
-	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, network, finalizer(r.Name)); err != nil {
+	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, network, PartitionFinalizer(r.PartitionName)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
 	}
 	log.V(1).Info("Removed finalizer")
@@ -142,14 +123,14 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, network *v1alpha1.Network) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
-	vni, ok := getNetworkVNI(network)
-	if !ok {
-		log.V(1).Info("Network is not yet allocated")
+	vni, err := networkid.ParseVNI(network.Spec.ID)
+	if err != nil {
+		log.Error(err, "Network has invalid ID", "ID", network.Spec.ID)
 		return ctrl.Result{}, nil
 	}
 
 	log.V(1).Info("Ensuring finalizer")
-	modified, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, network, finalizer(r.Name))
+	modified, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, network, PartitionFinalizer(r.PartitionName))
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error ensuring finalizer: %w", err)
 	}
@@ -166,18 +147,15 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 			Kind:       "Network",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: fmt.Sprintf("network-%d", vni),
-			Labels: map[string]string{
-				networkNamespaceLabel: network.Namespace,
-				networkNameLabel:      network.Name,
-				networkUIDLabel:       string(network.UID),
-			},
+			Namespace: r.MetalnetNamespace,
+			Name:      string(network.UID),
+			Labels:    metalnetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), network),
 		},
 		Spec: metalnetv1alpha1.NetworkSpec{
 			ID: vni,
 		},
 	}
-	if err := r.MetalnetCluster.GetClient().Patch(ctx, metalnetNetwork, client.Apply, metalnetNetworkFieldOwner); err != nil {
+	if err := r.MetalnetClient.Patch(ctx, metalnetNetwork, client.Apply, MetalnetFieldOwner, client.ForceOwnership); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying network: %w", err)
 	}
 	log.V(1).Info("Applied metalnet network")
@@ -186,39 +164,14 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	return ctrl.Result{}, nil
 }
 
-func (r *NetworkReconciler) enqueueNetworkUsingNetworkLabels() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
-		metalnetNetwork := obj.(*metalnetv1alpha1.Network)
-		networkNamespace, networkName := metalnetNetwork.Labels[networkNamespaceLabel], metalnetNetwork.Labels[networkNameLabel]
-		if networkNamespace == "" || networkName == "" {
-			return nil
-		}
-		return []ctrl.Request{
-			{
-				NamespacedName: client.ObjectKey{
-					Namespace: networkNamespace,
-					Name:      networkName,
-				},
-			},
-		}
-	})
-}
-
-var networkHasVNI = predicate.NewPredicateFuncs(func(obj client.Object) bool {
-	network := obj.(*v1alpha1.Network)
-	_, ok := getNetworkVNI(network)
-	return ok
-})
-
-func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, metalnetCache cache.Cache) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
 			&v1alpha1.Network{},
-			builder.WithPredicates(networkHasVNI),
 		).
 		WatchesRawSource(
-			source.Kind(r.MetalnetCluster.GetCache(), &metalnetv1alpha1.Network{}),
-			r.enqueueNetworkUsingNetworkLabels(),
+			source.Kind(metalnetCache, &metalnetv1alpha1.Network{}),
+			metalnetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &v1alpha1.Network{}),
 		).
 		Complete(r)
 }

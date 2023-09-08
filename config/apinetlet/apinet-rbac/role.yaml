@@ -1,32 +1,96 @@
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
+  creationTimestamp: null
   namespace: system
   name: apinet-role
 rules:
 - apiGroups:
   - apinet.api.onmetal.de
   resources:
+  - ips
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - loadbalancerroutings
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - loadbalancers
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - natgatewayautoscalers
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - natgateways
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - networkinterfaces
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
   - networks
   verbs:
+  - create
+  - delete
+  - deletecollection
   - get
   - list
   - patch
   - update
   - watch
-  - create
-  - delete
-  - deletecollection
-- apiGroups:
-  - apinet.api.onmetal.de
-  resources:
-  - publicips
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-  - create
-  - delete
-  - deletecollection

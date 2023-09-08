@@ -15,16 +15,52 @@
 package controllers
 
 import (
-	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/v1alpha1"
-	"sigs.k8s.io/controller-runtime/pkg/event"
+	"context"
+	"fmt"
+
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
-func getApiNetPublicIPAllocationChangedPredicate() predicate.Funcs {
-	return predicate.Funcs{
-		UpdateFunc: func(event event.UpdateEvent) bool {
-			oldAPINetPublicIP, newAPINetPublicIP := event.ObjectOld.(*onmetalapinetv1alpha1.PublicIP), event.ObjectNew.(*onmetalapinetv1alpha1.PublicIP)
-			return oldAPINetPublicIP.IsAllocated() != newAPINetPublicIP.IsAllocated()
-		},
+const fieldOwner = client.FieldOwner("api.onmetal.de/apinetlet")
+
+func getAPINetNetworkName(ctx context.Context, c client.Client, networkKey client.ObjectKey) (string, error) {
+	network := &networkingv1alpha1.Network{}
+	if err := c.Get(ctx, networkKey, network); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return "", fmt.Errorf("error getting network %s for nat gateway: %w", networkKey.Name, err)
+		}
+		return "", nil
 	}
+	return string(network.UID), nil
+}
+
+func isPrefixAllocated(prefix *ipamv1alpha1.Prefix) bool {
+	return prefix.Status.Phase == ipamv1alpha1.PrefixPhaseAllocated
+}
+
+type asNonDeletingObject struct {
+	client.Object
+}
+
+func (o asNonDeletingObject) GetDeletionTimestamp() *metav1.Time {
+	return nil
+}
+
+func virtualIPClaimedPredicate() predicate.Predicate {
+	return predicate.NewPredicateFuncs(func(obj client.Object) bool {
+		vip := obj.(*networkingv1alpha1.VirtualIP)
+		return vip.Spec.TargetRef != nil
+	})
+}
+
+func virtualIPFreePredicate() predicate.Predicate {
+	return predicate.NewPredicateFuncs(func(obj client.Object) bool {
+		vip := obj.(*networkingv1alpha1.VirtualIP)
+		return vip.Spec.TargetRef == nil
+	})
 }

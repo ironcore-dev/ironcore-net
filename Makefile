@@ -46,22 +46,35 @@ help: ## Display this help.
 ##@ Development
 
 .PHONY: manifests
-manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
-	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role crd paths="./api/...;./onmetal-api-net/..." output:crd:artifacts:config=config/onmetal-api-net/crd/bases output:rbac:artifacts:config=config/onmetal-api-net/rbac
+manifests: controller-gen ## Generate rbac objects.
+	# onmetal-api-net
+	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./internal/controllers/..." output:rbac:artifacts:config=config/onmetal-api-net/rbac
 
 	# apinetlet
-	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role paths="./apinetlet/..." output:rbac:artifacts:config=config/apinetlet/rbac
-	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role paths="./metalnetlet/..." output:rbac:artifacts:config=config/metalnetlet/rbac
+	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./apinetlet/controllers/..." output:rbac:artifacts:config=config/apinetlet/rbac
+	CONTROLLER_GEN=$(CONTROLLER_GEN) ./hack/cluster-controller-gen.sh cluster=apinet rbac:roleName=apinet-role paths="./apinetlet/controllers/..." output:rbac:artifacts:config=config/apinetlet/apinet-rbac
 
-	# poollet system roles
-	cp config/apinetlet/apinet-rbac/role.yaml config/onmetal-api-net/rbac/apinetlet_role.yaml
-	./hack/replace.sh config/onmetal-api-net/rbac/apinetlet_role.yaml 's/apinet-role/apinet.api.onmetal.de:system:apinetlets/g'
-	./hack/replace.sh config/onmetal-api-net/rbac/apinetlet_role.yaml 's/Role/ClusterRole/g'
-	./hack/replace.sh config/onmetal-api-net/rbac/apinetlet_role.yaml '/namespace: system/d'
+	# metalnetlet
+	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./metalnetlet/controllers/..." output:rbac:artifacts:config=config/metalnetlet/rbac
+	CONTROLLER_GEN=$(CONTROLLER_GEN) ./hack/cluster-controller-gen.sh cluster=metalnet rbac:roleName=metalnet-role paths="./metalnetlet/controllers/..." output:rbac:artifacts:config=config/metalnetlet/metalnet-rbac
+
+	# Promote *let roles.
+	./hack/promote-let-role.sh config/apinetlet/apinet-rbac/role.yaml config/onmetal-api-net/rbac/apinetlet_role.yaml apinet.api.onmetal.de:system:apinetlets
+	./hack/promote-let-role.sh config/metalnetlet/metalnet-rbac/role.yaml config/onmetal-api-net/rbac/metalnetlet_role.yaml apinet.api.onmetal.de:system:metalnetlet
 
 .PHONY: generate
-generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
-	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
+generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen defaulter-gen conversion-gen openapi-gen applyconfiguration-gen
+	VGOPATH=$(VGOPATH) \
+	MODELS_SCHEMA=$(MODELS_SCHEMA) \
+	DEEPCOPY_GEN=$(DEEPCOPY_GEN) \
+	CLIENT_GEN=$(CLIENT_GEN) \
+	LISTER_GEN=$(LISTER_GEN) \
+	INFORMER_GEN=$(INFORMER_GEN) \
+	DEFAULTER_GEN=$(DEFAULTER_GEN) \
+	CONVERSION_GEN=$(CONVERSION_GEN) \
+	OPENAPI_GEN=$(OPENAPI_GEN) \
+	APPLYCONFIGURATION_GEN=$(APPLYCONFIGURATION_GEN) \
+	./hack/update-codegen.sh
 
 .PHONY: add-license
 add-license: addlicense ## Add license headers to all go files.
@@ -79,8 +92,16 @@ check-license: addlicense ## Check that every file has a license header present.
 lint: ## Run golangci-lint against code.
 	golangci-lint run ./...
 
+.PHONY: clean
+clean: ## Clean any artifacts that can be regenerated.
+	rm -rf client-go/applyconfigurations
+	rm -rf client-go/informers
+	rm -rf client-go/listers
+	rm -rf client-go/onmetalapi
+	rm -rf client-go/openapi
+
 .PHONY: check
-check: manifests generate add-license fmt lint test ## Lint and run tests.
+check: generate manifests add-license fmt lint test ## Lint and run tests.
 
 ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 .PHONY: test
@@ -299,12 +320,28 @@ $(LOCALBIN):
 KUSTOMIZE ?= $(LOCALBIN)/kustomize
 CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 ENVTEST ?= $(LOCALBIN)/setup-envtest
+OPENAPI_EXTRACTOR ?= $(LOCALBIN)/openapi-extractor
+DEEPCOPY_GEN ?= $(LOCALBIN)/deepcopy-gen
+CLIENT_GEN ?= $(LOCALBIN)/client-gen
+LISTER_GEN ?= $(LOCALBIN)/lister-gen
+INFORMER_GEN ?= $(LOCALBIN)/informer-gen
+DEFAULTER_GEN ?= $(LOCALBIN)/defaulter-gen
+CONVERSION_GEN ?= $(LOCALBIN)/conversion-gen
+OPENAPI_GEN ?= $(LOCALBIN)/openapi-gen
+APPLYCONFIGURATION_GEN ?= $(LOCALBIN)/applyconfiguration-gen
+VGOPATH ?= $(LOCALBIN)/vgopath
+GEN_CRD_API_REFERENCE_DOCS ?= $(LOCALBIN)/gen-crd-api-reference-docs
 ADDLICENSE ?= $(LOCALBIN)/addlicense
+MODELS_SCHEMA ?= $(LOCALBIN)/models-schema
 GOIMPORTS ?= $(LOCALBIN)/goimports
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.0.0
-CONTROLLER_TOOLS_VERSION ?= v0.12.0
+CODE_GENERATOR_VERSION ?= v0.27.2
+VGOPATH_VERSION ?= v0.1.1
+CONTROLLER_TOOLS_VERSION ?= v0.11.3
+VGOPATH_VERSION ?= v0.0.2
+GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.0
 GOIMPORTS_VERSION ?= v0.5.0
 
@@ -318,20 +355,86 @@ $(KUSTOMIZE): $(LOCALBIN)
 	fi
 	test -s $(LOCALBIN)/kustomize || { curl -Ss $(KUSTOMIZE_INSTALL_SCRIPT) | bash -s -- $(subst v,,$(KUSTOMIZE_VERSION)) $(LOCALBIN); }
 
+.PHONY: controller-gen
+controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessary.
+$(CONTROLLER_GEN): $(LOCALBIN)
+	test -s $(LOCALBIN)/controller-gen && $(LOCALBIN)/controller-gen --version | grep -q $(CONTROLLER_TOOLS_VERSION) || \
+	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
+
+.PHONY: deepcopy-gen
+deepcopy-gen: $(DEEPCOPY_GEN) ## Download deepcopy-gen locally if necessary.
+$(DEEPCOPY_GEN): $(LOCALBIN)
+	test -s $(LOCALBIN)/deepcopy-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/deepcopy-gen@$(CODE_GENERATOR_VERSION)
+
+.PHONY: client-gen
+client-gen: $(CLIENT_GEN) ## Download client-gen locally if necessary.
+$(CLIENT_GEN): $(LOCALBIN)
+	test -s $(LOCALBIN)/client-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/client-gen@$(CODE_GENERATOR_VERSION)
+
+.PHONY: lister-gen
+lister-gen: $(LISTER_GEN) ## Download lister-gen locally if necessary.
+$(LISTER_GEN): $(LOCALBIN)
+	test -s $(LOCALBIN)/lister-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/lister-gen@$(CODE_GENERATOR_VERSION)
+
+.PHONY: informer-gen
+informer-gen: $(INFORMER_GEN) ## Download informer-gen locally if necessary.
+$(INFORMER_GEN): $(LOCALBIN)
+	test -s $(LOCALBIN)/informer-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/informer-gen@$(CODE_GENERATOR_VERSION)
+
+.PHONY: defaulter-gen
+defaulter-gen: $(DEFAULTER_GEN) ## Download defaulter-gen locally if necessary.
+$(DEFAULTER_GEN): $(LOCALBIN)
+	test -s $(LOCALBIN)/defaulter-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/defaulter-gen@$(CODE_GENERATOR_VERSION)
+
+.PHONY: conversion-gen
+conversion-gen: $(CONVERSION_GEN) ## Download conversion-gen locally if necessary.
+$(CONVERSION_GEN): $(LOCALBIN)
+	test -s $(LOCALBIN)/conversion-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/conversion-gen@$(CODE_GENERATOR_VERSION)
+
+.PHONY: openapi-gen
+openapi-gen: $(OPENAPI_GEN) ## Download openapi-gen locally if necessary.
+$(OPENAPI_GEN): $(LOCALBIN)
+	test -s $(LOCALBIN)/openapi-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/openapi-gen@$(CODE_GENERATOR_VERSION)
+
+.PHONY: applyconfiguration-gen
+applyconfiguration-gen: $(APPLYCONFIGURATION_GEN) ## Download applyconfiguration-gen locally if necessary.
+$(APPLYCONFIGURATION_GEN): $(LOCALBIN)
+	test -s $(LOCALBIN)/applyconfiguration-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/applyconfiguration-gen@$(CODE_GENERATOR_VERSION)
+
+.PHONY: vgopath
+vgopath: $(VGOPATH) ## Download vgopath locally if necessary.
+.PHONY: $(VGOPATH)
+$(VGOPATH): $(LOCALBIN)
+	@if test -x $(LOCALBIN)/vgopath && ! $(LOCALBIN)/vgopath version | grep -q $(VGOPATH_VERSION); then \
+		echo "$(LOCALBIN)/vgopath version is not expected $(VGOPATH_VERSION). Removing it before installing."; \
+		rm -rf $(LOCALBIN)/vgopath; \
+	fi
+	test -s $(LOCALBIN)/vgopath || GOBIN=$(LOCALBIN) go install github.com/onmetal/vgopath@$(VGOPATH_VERSION)
+
+.PHONY: envtest
+envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
+$(ENVTEST): $(LOCALBIN)
+	test -s $(LOCALBIN)/setup-envtest || GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
+
+.PHONY: openapi-extractor
+openapi-extractor: $(OPENAPI_EXTRACTOR) ## Download openapi-extractor locally if necessary.
+$(OPENAPI_EXTRACTOR): $(LOCALBIN)
+	test -s $(LOCALBIN)/openapi-extractor || GOBIN=$(LOCALBIN) go install github.com/onmetal/openapi-extractor/cmd/openapi-extractor@latest
+
+.PHONY: gen-crd-api-reference-docs
+gen-crd-api-reference-docs: $(GEN_CRD_API_REFERENCE_DOCS) ## Download gen-crd-api-reference-docs locally if necessary.
+$(GEN_CRD_API_REFERENCE_DOCS): $(LOCALBIN)
+	test -s $(LOCALBIN)/gen-crd-api-reference-docs || GOBIN=$(LOCALBIN) go install github.com/ahmetb/gen-crd-api-reference-docs@$(GEN_CRD_API_REFERENCE_DOCS_VERSION)
+
 .PHONY: addlicense
 addlicense: $(ADDLICENSE) ## Download addlicense locally if necessary.
 $(ADDLICENSE): $(LOCALBIN)
 	test -s $(LOCALBIN)/addlicense || GOBIN=$(LOCALBIN) go install github.com/google/addlicense@$(ADDLICENSE_VERSION)
 
-.PHONY: controller-gen
-controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessary.
-$(CONTROLLER_GEN): $(LOCALBIN)
-	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
-
-.PHONY: envtest
-envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
-$(ENVTEST): $(LOCALBIN)
-	GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
+.PHONY: models-schema
+models-schema: $(MODELS_SCHEMA) ## Install models-schema locally if necessary.
+$(MODELS_SCHEMA): $(LOCALBIN)
+	test -s $(LOCALBIN)/models-schema || GOBIN=$(LOCALBIN) go install github.com/onmetal/onmetal-api-net/models-schema
 
 .PHONY: goimports
 goimports: $(GOIMPORTS) ## Download goimports locally if necessary.

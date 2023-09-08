@@ -2,6 +2,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
+  creationTimestamp: null
   name: manager-role
 rules:
 - apiGroups:
@@ -22,24 +23,6 @@ rules:
   - patch
   - update
   - watch
-- apiGroups:
-  - apinet.api.onmetal.de
-  resources:
-  - publicips
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - apinet.api.onmetal.de
-  resources:
-  - publicips/status
-  verbs:
-  - get
 - apiGroups:
   - authentication.k8s.io
   resources:
@@ -67,6 +50,14 @@ rules:
   - certificatesigningrequests/apinetletclient
   verbs:
   - create
+- apiGroups:
+  - ipam.api.onmetal.de
+  resources:
+  - prefix
+  verbs:
+  - get
+  - list
+  - watch
 - apiGroups:
   - networking.api.onmetal.de
   resources:
@@ -113,6 +104,31 @@ rules:
   - networking.api.onmetal.de
   resources:
   - natgateways/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - networkinterfaces
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - networkinterfaces/finalizers
+  verbs:
+  - patch
+  - update
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - networkinterfaces/status
   verbs:
   - get
   - patch

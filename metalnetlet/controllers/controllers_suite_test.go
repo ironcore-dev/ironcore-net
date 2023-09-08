@@ -18,12 +18,18 @@ package controllers
 
 import (
 	"context"
+	"net/netip"
 	"path/filepath"
 	"testing"
 	"time"
 
+	"github.com/onmetal/controller-utils/buildutils"
+	"github.com/onmetal/controller-utils/modutils"
 	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/api/v1alpha1"
+	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
+	utilsenvtest "github.com/onmetal/onmetal-api/utils/envtest"
+	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
+	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -41,18 +47,22 @@ import (
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
-var cfg *rest.Config
-var k8sClient client.Client
-var testEnv *envtest.Environment
+var (
+	cfg        *rest.Config
+	k8sClient  client.Client
+	testEnv    *envtest.Environment
+	testEnvExt *utilsenvtest.EnvironmentExtensions
+)
 
 const (
 	pollingInterval      = 50 * time.Millisecond
 	eventuallyTimeout    = 3 * time.Second
 	consistentlyDuration = 1 * time.Second
+	apiServiceTimeout    = 1 * time.Minute
 )
 
 const (
-	metalnetletName = "test-metalnetlet"
+	partitionName = "test-metalnetlet"
 )
 
 func TestControllers(t *testing.T) {
@@ -66,24 +76,31 @@ func TestControllers(t *testing.T) {
 	RunSpecs(t, "Controller Suite")
 }
 
+func PrefixV4() netip.Prefix {
+	return netip.MustParsePrefix("10.0.0.0/24")
+}
+
 var _ = BeforeSuite(func() {
 	logf.SetLogger(GinkgoLogr)
+
+	var err error
 
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
 		CRDDirectoryPaths: []string{
-			filepath.Join("..", "..", "config", "onmetal-api-net", "crd", "bases"),
-			filepath.Join("testdata", "metalnet-crds"),
+			filepath.Join(modutils.Dir("github.com/onmetal/metalnet", "config", "crd", "bases")),
 		},
 		ErrorIfCRDPathMissing: true,
 	}
+	testEnvExt = &utilsenvtest.EnvironmentExtensions{
+		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "config", "apiserver", "apiservice", "bases")},
+		ErrorIfAPIServicePathIsMissing: true,
+	}
 
-	var err error
-	// cfg is defined in this file globally.
-	cfg, err = testEnv.Start()
+	cfg, err = utilsenvtest.StartWithExtensions(testEnv, testEnvExt)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
-	DeferCleanup(testEnv.Stop)
+	DeferCleanup(utilsenvtest.StopWithExtensions, testEnv, testEnvExt)
 
 	Expect(v1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
 	Expect(metalnetv1alpha1.AddToScheme(scheme.Scheme)).To(Succeed())
@@ -96,44 +113,88 @@ var _ = BeforeSuite(func() {
 
 	SetClient(k8sClient)
 
-	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
-		Scheme:             scheme.Scheme,
-		Host:               "127.0.0.1",
-		MetricsBindAddress: "0",
+	apiSrv, err := apiserver.New(cfg, apiserver.Options{
+		MainPath:     "github.com/onmetal/onmetal-api-net/cmd/apiserver",
+		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
+		ETCDServers:  []string{testEnv.ControlPlane.Etcd.URL.String()},
+		Host:         testEnvExt.APIServiceInstallOptions.LocalServingHost,
+		Port:         testEnvExt.APIServiceInstallOptions.LocalServingPort,
+		CertDir:      testEnvExt.APIServiceInstallOptions.LocalServingCertDir,
+		Args: apiserver.ProcessArgs{
+			"public-prefix": []string{PrefixV4().String()},
+		},
 	})
-	Expect(err).ToNot(HaveOccurred())
+	Expect(err).NotTo(HaveOccurred())
 
-	// register reconciler here
-	Expect((&NetworkReconciler{
-		Client:          k8sManager.GetClient(),
-		MetalnetCluster: k8sManager,
-		Name:            metalnetletName,
-	}).SetupWithManager(k8sManager)).To(Succeed())
+	Expect(apiSrv.Start()).To(Succeed())
+	DeferCleanup(apiSrv.Stop)
 
-	mgrCtx, cancel := context.WithCancel(context.Background())
-	DeferCleanup(cancel)
-	go func() {
-		defer GinkgoRecover()
-		Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
-	}()
+	Expect(utilsenvtest.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
 })
 
-func SetupTest() *corev1.Namespace {
-	ns := &corev1.Namespace{}
-
+func SetupTest(metalnetNs *corev1.Namespace) {
 	BeforeEach(func(ctx SpecContext) {
+		k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
+			Scheme:             scheme.Scheme,
+			Host:               "127.0.0.1",
+			MetricsBindAddress: "0",
+		})
+		Expect(err).ToNot(HaveOccurred())
 
-		*ns = corev1.Namespace{
+		// register reconciler here
+		Expect((&NetworkReconciler{
+			Client:            k8sManager.GetClient(),
+			MetalnetClient:    k8sManager.GetClient(),
+			PartitionName:     partitionName,
+			MetalnetNamespace: metalnetNs.Name,
+		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
+
+		Expect((&MetalnetNodeReconciler{
+			Client:         k8sManager.GetClient(),
+			MetalnetClient: k8sManager.GetClient(),
+			PartitionName:  partitionName,
+		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
+
+		Expect((&NetworkInterfaceReconciler{
+			Client:            k8sManager.GetClient(),
+			MetalnetClient:    k8sManager.GetClient(),
+			PartitionName:     partitionName,
+			MetalnetNamespace: metalnetNs.Name,
+		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
+
+		Expect((&InstanceReconciler{
+			Client:            k8sManager.GetClient(),
+			MetalnetClient:    k8sManager.GetClient(),
+			PartitionName:     partitionName,
+			MetalnetNamespace: metalnetNs.Name,
+		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
+
+		mgrCtx, cancel := context.WithCancel(context.Background())
+		DeferCleanup(cancel)
+		go func() {
+			defer GinkgoRecover()
+			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
+		}()
+	})
+}
+
+func SetupMetalnetNode() *corev1.Node {
+	return SetupObjectStruct[*corev1.Node](&k8sClient, func(node *corev1.Node) {
+		*node = corev1.Node{
 			ObjectMeta: metav1.ObjectMeta{
-				GenerateName: "testns-",
+				GenerateName: "node-",
 			},
 		}
-		Expect(k8sClient.Create(ctx, ns)).To(Succeed(), "failed to create test namespace")
-
-		DeferCleanup(func(ctx context.Context) {
-			Expect(k8sClient.Delete(ctx, ns)).To(Succeed(), "failed to delete test namespace")
-		})
 	})
+}
 
-	return ns
+func SetupNetwork(ns *corev1.Namespace) *v1alpha1.Network {
+	return SetupObjectStruct[*v1alpha1.Network](&k8sClient, func(network *v1alpha1.Network) {
+		*network = v1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "network-",
+			},
+		}
+	})
 }

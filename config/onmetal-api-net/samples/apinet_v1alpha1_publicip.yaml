@@ -1,6 +1,0 @@
-apiVersion: apinet.api.onmetal.de/v1alpha1
-kind: PublicIP
-metadata:
-  name: my-publicip
-spec:
-  ipFamily: IPv4
