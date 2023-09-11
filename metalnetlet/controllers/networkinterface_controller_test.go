@@ -75,6 +75,28 @@ var _ = Describe("NetworkInterfaceController", func() {
 			NodeName:   &metalnetNode.Name,
 		}))
 
+		By("updating the metalnet network interface's status")
+		Eventually(UpdateStatus(metalnetNic, func() {
+			metalnetNic.Status.State = metalnetv1alpha1.NetworkInterfaceStateReady
+			metalnetNic.Status.PCIAddress = &metalnetv1alpha1.PCIAddress{
+				Domain:   "06",
+				Bus:      "0000",
+				Slot:     "3",
+				Function: "00",
+			}
+		})).Should(Succeed())
+
+		By("waiting for the network interface to reflect the status values")
+		Eventually(Object(nic)).Should(HaveField("Status", v1alpha1.NetworkInterfaceStatus{
+			State: v1alpha1.NetworkInterfaceStateReady,
+			PCIAddress: &v1alpha1.PCIAddress{
+				Domain:   "06",
+				Bus:      "0000",
+				Slot:     "3",
+				Function: "00",
+			},
+		}))
+
 		By("deleting the network interface")
 		Expect(k8sClient.Delete(ctx, nic)).To(Succeed())
 

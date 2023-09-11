@@ -233,6 +233,7 @@ func (r *NetworkInterfaceReconciler) updateStatus(
 	metalnetNic *metalnetv1alpha1.NetworkInterface,
 ) error {
 	base := nic.DeepCopy()
+	nic.Status.State = metalnetNetworkInterfaceStateToNetworkInterfaceStatus(metalnetNic.Status.State)
 	if pciAddr := metalnetNic.Status.PCIAddress; pciAddr != nil {
 		nic.Status.PCIAddress = &v1alpha1.PCIAddress{
 			Domain:   pciAddr.Domain,

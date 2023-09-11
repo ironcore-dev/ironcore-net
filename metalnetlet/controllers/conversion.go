@@ -54,6 +54,19 @@ func ipsIPFamilies(ips []net.IP) []corev1.IPFamily {
 	return utilslices.Map(ips, net.IP.Family)
 }
 
+func metalnetNetworkInterfaceStateToNetworkInterfaceStatus(mStatus metalnetv1alpha1.NetworkInterfaceState) v1alpha1.NetworkInterfaceState {
+	switch mStatus {
+	case metalnetv1alpha1.NetworkInterfaceStatePending:
+		return v1alpha1.NetworkInterfaceStatePending
+	case metalnetv1alpha1.NetworkInterfaceStateReady:
+		return v1alpha1.NetworkInterfaceStateReady
+	case metalnetv1alpha1.NetworkInterfaceStateError:
+		return v1alpha1.NetworkInterfaceStateError
+	default:
+		return v1alpha1.NetworkInterfaceStatePending
+	}
+}
+
 func metalnetIPToIP(ip metalnetv1alpha1.IP) net.IP {
 	return net.IP{Addr: ip.Addr}
 }
