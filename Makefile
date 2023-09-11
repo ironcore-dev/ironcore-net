@@ -1,6 +1,7 @@
 
 # Image URL to use all building/pushing image targets
-ONMETAL_API_NET_IMG ?= onmetal-api-net:latest
+APISERVER_IMG ?= apiserver:latest
+CONTROLLER_MANAGER_IMG ?= controller-manager:latest
 APINETLET_IMG ?= apinetlet:latest
 METALNETLET_IMG ?= metalnetlet:latest
 KIND_CLUSTER_NAME ?= kind
@@ -137,9 +138,13 @@ run-apinetlet: manifests generate fmt lint ## Run apinetlet from your host.
 run-metalnetlet: manifests generate fmt lint ## Run metalnetlet from your host.
 	go run ./metalnetlet/main.go
 
-.PHONY: docker-build-onmetal-api-net
-docker-build-onmetal-api-net: ## Build onmetal-api-net image with the manager.
-	docker build --ssh default=${SSH_KEY} --target onmetal-api-net-manager -t ${ONMETAL_API_NET_IMG} .
+.PHONY: docker-build-apiserver
+docker-build-apiserver: ## Build apiserver image.
+	docker build --ssh default=${SSH_KEY} --target apiserver -t ${APISERVER_IMG} .
+
+.PHONY: docker-build-controller-manager
+docker-build-controller-manager: ## Build controller-manager image.
+	docker build --ssh default=${SSH_KEY} --target controller-manager -t ${CONTROLLER_MANAGER_IMG} .
 
 .PHONY: docker-build-apinetlet
 docker-build-apinetlet: ## Build apinetlet image with the manager.
@@ -150,11 +155,15 @@ docker-build-metalnetlet: ## Build metalnetlet image with the manager.
 	docker build --ssh default=${SSH_KEY} --target metalnetlet-manager -t ${METALNETLET_IMG} .
 
 .PHONY: docker-build
-docker-build: docker-build-onmetal-api-net docker-build-apinetlet docker-build-metalnetlet ## Build docker images.
+docker-build: docker-build-apiserver docker-build-controller-manager docker-build-apinetlet docker-build-metalnetlet ## Build docker images.
 
-.PHONY: docker-push-onmetal-api-net
-docker-push-onmetal-api-net: ## Push onmetal-api-net image.
-	docker push ${ONMETAL_API_NET_IMG}
+.PHONY: docker-push-apiserver
+docker-push-apiserver: ## Push apiserver image.
+	docker push ${APISERVER_IMG}
+
+.PHONY: docker-push-controller-manager
+docker-push-controller-manager: ## Push controller-manager image.
+	docker push ${CONTROLLER_MANAGER_IMG}
 
 .PHONY: docker-push-apinetlet
 docker-push-apinetlet: ## Push apinetlet image.
@@ -165,7 +174,7 @@ docker-push-metalnetlet: ## Push metalnetlet image.
 	docker push ${METALNETLET_IMG}
 
 .PHONY: docker-push
-docker-push: docker-push-onmetal-api-net docker-build-apinetlet docker-build-metalnetlet ## Push onmetal-api-net, apinetlet, metalnetlet image.
+docker-push: docker-push-apiserver docker-push-controller-manager docker-push-apinetlet docker-push-metalnetlet ## Push onmetal-api-net, apinetlet, metalnetlet image.
 
 ##@ Deployment
 

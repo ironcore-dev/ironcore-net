@@ -1,5 +1,5 @@
 # Build the manager binary
-FROM --platform=$BUILDPLATFORM golang:1.20 as builder
+FROM --platform=$BUILDPLATFORM golang:1.21 as builder
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
@@ -22,11 +22,14 @@ RUN --mount=type=ssh --mount=type=secret,id=github_pat \
 
 # Copy the go source
 COPY api/ api/
-COPY apiutils/ apiutils/
+COPY apimachinery/ apimachinery/
 COPY apinetlet/ apinetlet/
-COPY flag/ flag/
-COPY onmetal-api-net/ onmetal-api-net/
+COPY client-go/ client-go/
+COPY cmd/ cmd/
+COPY internal/ internal/
 COPY metalnetlet/ metalnetlet/
+COPY networkid/ networkid/
+COPY utils/ utils/
 
 ARG TARGETOS
 ARG TARGETARCH
@@ -36,15 +39,25 @@ RUN mkdir bin
 # Build
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/onmetal-api-net-manager ./onmetal-api-net && \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/apinetlet-manager ./apinetlet && \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/metalnetlet-manager ./metalnetlet
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/apiserver ./cmd/apiserver && \
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/controller-manager ./cmd/controller-manager && \
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/apinetlet-manager ./cmd/apinetlet && \
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/metalnetlet-manager ./cmd/metalnetlet
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM gcr.io/distroless/static:nonroot AS onmetal-api-net-manager
+FROM gcr.io/distroless/static:nonroot AS apiserver
 WORKDIR /
-COPY --from=builder /workspace/bin/onmetal-api-net-manager /manager
+COPY --from=builder /workspace/bin/apiserver /apiserver
+USER 65532:65532
+
+ENTRYPOINT ["/apiserver"]
+
+# Use distroless as minimal base image to package the manager binary
+# Refer to https://github.com/GoogleContainerTools/distroless for more details
+FROM gcr.io/distroless/static:nonroot AS controller-manager
+WORKDIR /
+COPY --from=builder /workspace/bin/controller-manager /manager
 USER 65532:65532
 
 ENTRYPOINT ["/manager"]
