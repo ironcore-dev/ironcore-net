@@ -24,8 +24,10 @@ jobs:
     strategy:
       matrix:
         image:
-          - name: onmetal-api-net
-            target: onmetal-api-net-manager
+          - name: apiserver
+            target: apiserver
+          - name: controller-manager
+            target: controller-manager
           - name: apinetlet
             target: apinetlet-manager
           - name: metalnetlet
