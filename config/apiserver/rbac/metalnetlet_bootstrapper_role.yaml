@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: storage.api.onmetal.de:system:bucketpools-bootstrapper
+  name: apinet.api.onmetal.de:system:metalnetlets-bootstrapper
 rules:
   - apiGroups:
       - certificates.k8s.io
@@ -15,6 +15,6 @@ rules:
   - apiGroups:
       - certificates.k8s.io
     resources:
-      - certificatesigningrequests/bucketpoolclient
+      - certificatesigningrequests/metalnetletclient
     verbs:
       - create
