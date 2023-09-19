@@ -395,15 +395,15 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.api.core.v1.LocalObjectReference
       default: {}
-    - name: nodeSelector
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
     - name: ports
       type:
         list:
           elementType:
             namedType: com.github.onmetal.onmetal-api-net.api.core.v1alpha1.LoadBalancerPort
           elementRelationship: atomic
+    - name: selector
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
     - name: template
       type:
         namedType: com.github.onmetal.onmetal-api-net.api.core.v1alpha1.InstanceTemplate

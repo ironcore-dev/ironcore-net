@@ -19,4 +19,8 @@ const (
 
 	IPFamilyLabel = "apinet.api.onmetal.de/ip-family"
 	IPIPLabel     = "apinet.api.onmetal.de/ip"
+
+	TopologyLabelPrefix    = "topology.core.apinet.api.onmetal.de/"
+	TopologyPartitionLabel = TopologyLabelPrefix + "partition"
+	TopologyZoneLabel      = TopologyLabelPrefix + "zone"
 )

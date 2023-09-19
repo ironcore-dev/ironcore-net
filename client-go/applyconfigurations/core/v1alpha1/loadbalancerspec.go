@@ -30,7 +30,7 @@ type LoadBalancerSpecApplyConfiguration struct {
 	NetworkRef *v1.LocalObjectReference                `json:"networkRef,omitempty"`
 	IPs        []LoadBalancerIPApplyConfiguration      `json:"ips,omitempty"`
 	Ports      []LoadBalancerPortApplyConfiguration    `json:"ports,omitempty"`
-	Selector   *metav1.LabelSelectorApplyConfiguration `json:"nodeSelector,omitempty"`
+	Selector   *metav1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
 	Template   *InstanceTemplateApplyConfiguration     `json:"template,omitempty"`
 }
 

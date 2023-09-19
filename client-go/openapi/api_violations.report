@@ -150,7 +150,6 @@ API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1al
 API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,InstanceStatus,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,LoadBalancerRouting,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,LoadBalancerSpec,IPs
-API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,LoadBalancerSpec,Selector
 API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,LoadBalancerStatus,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,NATGatewaySpec,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,NATTable,IPs

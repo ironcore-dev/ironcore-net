@@ -45,7 +45,7 @@ type LoadBalancerSpec struct {
 	Ports []LoadBalancerPort `json:"ports,omitempty"`
 
 	// Selector selects all Instance that are managed by this daemon set.
-	Selector *metav1.LabelSelector `json:"nodeSelector,omitempty"`
+	Selector *metav1.LabelSelector `json:"selector,omitempty"`
 
 	// Template is the instance template.
 	Template InstanceTemplate `json:"template"`

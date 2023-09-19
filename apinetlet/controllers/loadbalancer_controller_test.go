@@ -65,6 +65,25 @@ var _ = Describe("LoadBalancerController", func() {
 					"IPFamily": Equal(corev1.IPv4Protocol),
 					"Name":     Equal("ipv4"),
 				})),
+				"Selector": Equal(&metav1.LabelSelector{
+					MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+				}),
+				"Template": Equal(v1alpha1.InstanceTemplate{
+					Spec: v1alpha1.InstanceSpec{
+						Affinity: &v1alpha1.Affinity{
+							InstanceAntiAffinity: &v1alpha1.InstanceAntiAffinity{
+								RequiredDuringSchedulingIgnoredDuringExecution: []v1alpha1.InstanceAffinityTerm{
+									{
+										LabelSelector: &metav1.LabelSelector{
+											MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+										},
+										TopologyKey: v1alpha1.TopologyZoneLabel,
+									},
+								},
+							},
+						},
+					},
+				}),
 			}))),
 		)
 	})

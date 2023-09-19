@@ -1553,7 +1553,7 @@ func schema_onmetal_api_net_api_core_v1alpha1_LoadBalancerSpec(ref common.Refere
 							},
 						},
 					},
-					"nodeSelector": {
+					"selector": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Selector selects all Instance that are managed by this daemon set.",
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),

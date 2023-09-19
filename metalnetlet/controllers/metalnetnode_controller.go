@@ -22,6 +22,7 @@ import (
 	"github.com/onmetal/controller-utils/clientutils"
 	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
 	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
+	"github.com/onmetal/onmetal-api/utils/maps"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -41,6 +42,7 @@ type MetalnetNodeReconciler struct {
 	client.Client
 	MetalnetClient client.Client
 	PartitionName  string
+	NodeLabels     map[string]string
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
@@ -135,6 +137,9 @@ func (r *MetalnetNodeReconciler) reconcile(ctx context.Context, log logr.Logger,
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name: PartitionNodeName(r.PartitionName, metalnetNode.Name),
+			Labels: maps.AppendMap(map[string]string{
+				v1alpha1.TopologyPartitionLabel: r.PartitionName,
+			}, r.NodeLabels),
 		},
 	}
 	if err := r.Patch(ctx, node, client.Apply, PartitionFieldOwner(r.PartitionName), client.ForceOwnership); err != nil {
