@@ -109,6 +109,14 @@ ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 test: envtest generate fmt check-license ## Run tests.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./... -coverprofile cover.out
 
+.PHONY: openapi-extractor
+extract-openapi: envtest openapi-extractor
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" $(OPENAPI_EXTRACTOR) \
+		--apiserver-package="github.com/onmetal/onmetal-api-net/cmd/apiserver" \
+		--apiserver-build-opts=mod \
+		--apiservices="./config/apiserver/apiservice/bases" \
+		--output="./gen"
+
 ##@ Build
 
 .PHONY: build-onmetal-api-net
