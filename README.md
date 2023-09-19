@@ -5,7 +5,23 @@
 
 ## Overview
 
-`onmetal-api-net` is a provider-specific implementation of the onmetal-api network types.
+`onmetal-api-net` provides networking functions across multiple
+peers.
+
+`onmetal-api-net` conceptually consists of a control-plane and
+`Node`s. The API of `onmetal-api-net` is realized by an aggregated API
+server. The `controller-manager` reconciles state of these objects.
+The `scheduler` (currently built into the `controller-manager`)
+assigns functions to `Node`s.
+
+A `Node` is currently implemented via `metalnetlet`, an agent
+using a `metalnet` cluster run the payload functions on. A
+`metalnetlet` creates `Node` objects corresponding to all
+`Node`s inside the `metalnet` custer.
+
+The integration to `onmetal-api` is realized via the `apinetlet`,
+an agent using an `onmetal-api-net` cluster to realize `onmetal-api`
+objects like `LoadBalancer`s, `VirtualIP`s and more.
 
 ## Contributing
 

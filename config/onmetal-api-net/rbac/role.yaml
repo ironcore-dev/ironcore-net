@@ -1,0 +1,190 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests/approval
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - certificates.k8s.io
+  resourceNames:
+  - kubernetes.io/kube-apiserver-client
+  resources:
+  - signers
+  verbs:
+  - approve
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - daemonsets
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - daemonsets/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - instances
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - ip
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - ipaddress
+  verbs:
+  - delete
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - loadbalancers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - loadbalancers/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - natgateway
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - natgateway/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - natgatewayautoscalers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - natgatewayautoscalers/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - natgateways
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - nattable
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - networkids
+  verbs:
+  - delete
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - networkinterfaces
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - networks
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
