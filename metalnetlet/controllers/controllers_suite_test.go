@@ -65,6 +65,12 @@ const (
 	partitionName = "test-metalnetlet"
 )
 
+var (
+	nodeLabels = map[string]string{
+		"the": "node",
+	}
+)
+
 func TestControllers(t *testing.T) {
 	SetDefaultConsistentlyPollingInterval(pollingInterval)
 	SetDefaultEventuallyPollingInterval(pollingInterval)
@@ -153,6 +159,7 @@ func SetupTest(metalnetNs *corev1.Namespace) {
 			Client:         k8sManager.GetClient(),
 			MetalnetClient: k8sManager.GetClient(),
 			PartitionName:  partitionName,
+			NodeLabels:     nodeLabels,
 		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
 
 		Expect((&NetworkInterfaceReconciler{

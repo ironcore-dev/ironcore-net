@@ -27,6 +27,7 @@ import (
 	apinetlethandler "github.com/onmetal/onmetal-api-net/apinetlet/handler"
 	"github.com/onmetal/onmetal-api-net/apinetlet/provider"
 	apinetv1alpha1ac "github.com/onmetal/onmetal-api-net/client-go/applyconfigurations/core/v1alpha1"
+	metav1ac "github.com/onmetal/onmetal-api-net/client-go/applyconfigurations/meta/v1"
 	"github.com/onmetal/onmetal-api-net/client-go/onmetalapinet"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
@@ -316,7 +317,20 @@ func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, lo
 				WithType(apiNetLoadBalancerType).
 				WithNetworkRef(corev1.LocalObjectReference{Name: apiNetNetworkName}).
 				WithIPs(ips...).
-				WithPorts(loadBalancerPortsToAPINetLoadBalancerPortConfigs(loadBalancer.Spec.Ports)...),
+				WithPorts(loadBalancerPortsToAPINetLoadBalancerPortConfigs(loadBalancer.Spec.Ports)...).
+				WithSelector(metav1ac.LabelSelector().WithMatchLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), loadBalancer))).
+				WithTemplate(
+					apinetv1alpha1ac.InstanceTemplate().
+						WithSpec(apinetv1alpha1ac.InstanceSpec().
+							WithAffinity(apinetv1alpha1ac.Affinity().
+								WithInstanceAntiAffinity(apinetv1alpha1ac.InstanceAntiAffinity().WithRequiredDuringSchedulingIgnoredDuringExecution(
+									apinetv1alpha1ac.InstanceAffinityTerm().
+										WithTopologyKey(apinetv1alpha1.TopologyZoneLabel).
+										WithLabelSelector(metav1ac.LabelSelector().WithMatchLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), loadBalancer))),
+								)),
+							),
+						),
+				),
 			)
 	apiNetLoadBalancer, err := r.APINetInterface.CoreV1alpha1().
 		LoadBalancers(r.APINetNamespace).

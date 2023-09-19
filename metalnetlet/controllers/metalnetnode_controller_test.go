@@ -40,7 +40,10 @@ var _ = Describe("MetalnetNodeController", func() {
 				Name: PartitionNodeName(partitionName, metalnetNode.Name),
 			},
 		}
-		Eventually(Get(node)).Should(Succeed())
+		Eventually(Object(node)).Should(HaveField("Labels", map[string]string{
+			"the":                           "node",
+			v1alpha1.TopologyPartitionLabel: partitionName,
+		}))
 
 		By("deleting the metalnet node")
 		Expect(k8sClient.Delete(ctx, metalnetNode)).To(Succeed())

@@ -60,6 +60,7 @@ func init() {
 
 func main() {
 	var name string
+	var nodeLabels map[string]string
 
 	var metricsAddr string
 	var enableLeaderElection bool
@@ -70,6 +71,7 @@ func main() {
 	var metalnetNamespace string
 
 	flag.StringVar(&name, "name", "", "The name of the partition the metalnetlet represents (required).")
+	flag.StringToStringVar(&nodeLabels, "node-label", nodeLabels, "Additional labels to add to the nodes.")
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
@@ -154,6 +156,7 @@ func main() {
 		Client:         mgr.GetClient(),
 		MetalnetClient: metalnetCluster.GetClient(),
 		PartitionName:  name,
+		NodeLabels:     nodeLabels,
 	}).SetupWithManager(mgr, metalnetCluster.GetCache()); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "MetalnetNode")
 		os.Exit(1)
