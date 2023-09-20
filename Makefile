@@ -53,15 +53,15 @@ manifests: controller-gen ## Generate rbac objects.
 
 	# apinetlet
 	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./apinetlet/controllers/..." output:rbac:artifacts:config=config/apinetlet/rbac
-	CONTROLLER_GEN=$(CONTROLLER_GEN) ./hack/cluster-controller-gen.sh cluster=apinet rbac:roleName=apinet-role paths="./apinetlet/controllers/..." output:rbac:artifacts:config=config/apinetlet/apinet-rbac
+	CONTROLLER_GEN=$(CONTROLLER_GEN) ./hack/cluster-controller-gen.sh cluster=apinet namespace=system rbac:roleName=apinet-role paths="./apinetlet/controllers/..." output:rbac:artifacts:config=config/apinetlet/apinet-rbac
 
 	# metalnetlet
-	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./metalnetlet/controllers/..." output:rbac:artifacts:config=config/metalnetlet/rbac
-	CONTROLLER_GEN=$(CONTROLLER_GEN) ./hack/cluster-controller-gen.sh cluster=metalnet rbac:roleName=metalnet-role paths="./metalnetlet/controllers/..." output:rbac:artifacts:config=config/metalnetlet/metalnet-rbac
+	CONTROLLER_GEN=$(CONTROLLER_GEN) ./hack/cluster-controller-gen.sh cluster=metalnet rbac:roleName=metalnet-role paths="./metalnetlet/controllers/..." output:rbac:artifacts:config=config/metalnetlet/rbac
+	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./metalnetlet/controllers/..." output:rbac:artifacts:config=config/metalnetlet/apinet-rbac
 
 	# Promote *let roles.
 	./hack/promote-let-role.sh config/apinetlet/apinet-rbac/role.yaml config/apiserver/rbac/apinetlet_role.yaml apinet.api.onmetal.de:system:apinetlets
-	./hack/promote-let-role.sh config/metalnetlet/metalnet-rbac/role.yaml config/apiserver/rbac/metalnetlet_role.yaml apinet.api.onmetal.de:system:metalnetlet
+	./hack/promote-let-role.sh config/metalnetlet/apinet-rbac/role.yaml config/apiserver/rbac/metalnetlet_role.yaml apinet.api.onmetal.de:system:metalnetlets
 
 .PHONY: generate
 generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen defaulter-gen conversion-gen openapi-gen applyconfiguration-gen

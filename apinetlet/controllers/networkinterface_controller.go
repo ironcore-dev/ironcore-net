@@ -66,7 +66,7 @@ type NetworkInterfaceReconciler struct {
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces/finalizers,verbs=update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefix,verbs=get;list;watch
+//+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefixes,verbs=get;list;watch
 
 //+cluster=apinet:kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;update;patch
 

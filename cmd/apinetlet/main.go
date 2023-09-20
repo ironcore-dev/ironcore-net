@@ -27,6 +27,7 @@ import (
 	"github.com/onmetal/onmetal-api-net/apinetlet/controllers"
 	"github.com/onmetal/onmetal-api-net/client-go/onmetalapinet"
 	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
+	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	"github.com/onmetal/onmetal-api/utils/client/config"
 	flag "github.com/spf13/pflag"
@@ -58,6 +59,7 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(networkingv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(ipamv1alpha1.AddToScheme(scheme))
 	utilruntime.Must(onmetalapinetv1alpha1.AddToScheme(scheme))
 
 	//+kubebuilder:scaffold:scheme

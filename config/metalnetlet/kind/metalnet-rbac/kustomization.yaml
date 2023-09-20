@@ -5,7 +5,7 @@ namespace: metalnetlet-system
 namePrefix: metalnetlet-
 
 resources:
-  - ../../metalnet-rbac
+  - ../../apinet-rbac
 
 patches:
   - patch: |

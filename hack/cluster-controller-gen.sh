@@ -4,13 +4,18 @@ set -euo pipefail
 
 CONTROLLER_GEN=${CONTROLLER_GEN:-"controller-gen"}
 
-declare cluster rbac paths output
+declare cluster namespace rbac paths output
 
 while [[ $# -gt 0 ]]; do
   case $1 in
   cluster*)
     cluster="$1"
     cluster="${cluster#cluster=}"
+    shift
+    ;;
+  namespace*)
+    namespace="$1"
+    namespace="${namespace#namespace=}"
     shift
     ;;
   rbac*)
@@ -47,5 +52,9 @@ echo "module extracted" > "$tmp_dir/go.mod"
 grep -rh "//+cluster=$cluster" "$paths" | sed -e "s/cluster=$cluster://" >> "$combined"
 
 "$CONTROLLER_GEN" "$rbac" "paths=$tmp_dir" "output:rbac:artifacts:config=$output"
-sed -i 's/ClusterRole/Role/g' "$output/role.yaml"
-sed -i '/creationTimestamp: null/a\  namespace: system' "$output/role.yaml"
+
+namespace="${namespace:-}"
+if [[ "$namespace" != "" ]]; then
+  sed -i 's/ClusterRole/Role/g' "$output/role.yaml"
+  sed -i '/creationTimestamp: null/a\  namespace: '"$namespace"'' "$output/role.yaml"
+fi

@@ -3,168 +3,52 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   creationTimestamp: null
-  name: manager-role
+  name: metalnet-role
 rules:
 - apiGroups:
   - ""
   resources:
-  - events
-  verbs:
-  - create
-  - patch
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - authentication.k8s.io
-  resources:
-  - tokenreviews
-  verbs:
-  - create
-- apiGroups:
-  - authorization.k8s.io
-  resources:
-  - subjectaccessreviews
-  verbs:
-  - create
-- apiGroups:
-  - certificates.k8s.io
-  resources:
-  - certificatesigningrequests
-  verbs:
-  - create
-  - get
-  - list
-  - watch
-- apiGroups:
-  - certificates.k8s.io
-  resources:
-  - certificatesigningrequests/metalnetletclient
-  verbs:
-  - create
-- apiGroups:
-  - core.apinet.api.onmetal.de
-  resources:
-  - instances
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - core.apinet.api.onmetal.de
-  resources:
-  - instances/finalizers
-  verbs:
-  - patch
-  - update
-- apiGroups:
-  - core.apinet.api.onmetal.de
-  resources:
-  - instances/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - core.apinet.api.onmetal.de
-  resources:
-  - loadbalancerroutings
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - core.apinet.api.onmetal.de
-  resources:
-  - natgateways
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - core.apinet.api.onmetal.de
-  resources:
-  - nattables
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - core.apinet.api.onmetal.de
-  resources:
-  - networkinterfaces
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - core.apinet.api.onmetal.de
-  resources:
-  - networkinterfaces/finalizers
-  verbs:
-  - patch
-  - update
-- apiGroups:
-  - core.apinet.api.onmetal.de
-  resources:
-  - networkinterfaces/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - core.apinet.api.onmetal.de
-  resources:
-  - networks
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - core.apinet.api.onmetal.de
-  resources:
-  - networks/finalizers
-  verbs:
-  - patch
-  - update
-- apiGroups:
-  - core.apinet.api.onmetal.de
-  resources:
   - nodes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.metalnet.onmetal.de
+  resources:
+  - loadbalancers
   verbs:
   - create
   - delete
+  - deletecollection
   - get
   - list
   - patch
   - update
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - networking.metalnet.onmetal.de
   resources:
-  - nodes/finalizers
+  - networkinterfaces
   verbs:
-  - patch
-  - update
-- apiGroups:
-  - core.apinet.api.onmetal.de
-  resources:
-  - nodes/status
-  verbs:
+  - create
+  - delete
+  - deletecollection
   - get
+  - list
   - patch
   - update
+  - watch
+- apiGroups:
+  - networking.metalnet.onmetal.de
+  resources:
+  - networks
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch

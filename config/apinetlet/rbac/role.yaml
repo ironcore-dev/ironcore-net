@@ -13,47 +13,17 @@ rules:
   - create
   - patch
 - apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - authentication.k8s.io
-  resources:
-  - tokenreviews
-  verbs:
-  - create
-- apiGroups:
-  - authorization.k8s.io
-  resources:
-  - subjectaccessreviews
-  verbs:
-  - create
-- apiGroups:
-  - certificates.k8s.io
-  resources:
-  - certificatesigningrequests
-  verbs:
-  - create
-  - get
-  - list
-  - watch
-- apiGroups:
-  - certificates.k8s.io
-  resources:
-  - certificatesigningrequests/apinetletclient
-  verbs:
-  - create
-- apiGroups:
   - ipam.api.onmetal.de
   resources:
-  - prefix
+  - prefixes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.api.onmetal.de
+  resources:
+  - loadbalancerroutings
   verbs:
   - get
   - list

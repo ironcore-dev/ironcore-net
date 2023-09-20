@@ -8,5 +8,5 @@ NAME="$3"
 
 cp "$INPUT_ROLE" "$OUTPUT_CLUSTER_ROLE"
 sed -i "s/name: .*/name: $NAME/g" "$OUTPUT_CLUSTER_ROLE"
-sed -i 's/Role/ClusterRole/g' "$OUTPUT_CLUSTER_ROLE"
+sed -i 's/\(Cluster\)\?Role/ClusterRole/g' "$OUTPUT_CLUSTER_ROLE"
 sed -i '/namespace: system/d' "$OUTPUT_CLUSTER_ROLE"

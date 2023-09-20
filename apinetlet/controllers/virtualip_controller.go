@@ -58,7 +58,7 @@ type VirtualIPReconciler struct {
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips/finalizers,verbs=update;patch
 //+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips/status,verbs=get;update;patch
 
-//+cluster=apinet:kubebuilder:rbac:groups=apinet.api.onmetal.de,resources=ips,verbs=get;list;watch;create;update;patch;delete;deletecollection
+//+cluster=apinet:kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=ips,verbs=get;list;watch;create;update;patch;delete;deletecollection
 
 func (r *VirtualIPReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

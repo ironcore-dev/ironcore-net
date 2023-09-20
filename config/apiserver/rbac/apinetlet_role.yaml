@@ -6,7 +6,45 @@ metadata:
   name: apinet.api.onmetal.de:system:apinetlets
 rules:
 - apiGroups:
-  - apinet.api.onmetal.de
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests/apinetletclient
+  verbs:
+  - create
+- apiGroups:
+  - core.apinet.api.onmetal.de
   resources:
   - ips
   verbs:
