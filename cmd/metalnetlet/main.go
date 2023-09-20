@@ -119,6 +119,7 @@ func main() {
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "bf12dae0.metalnetlet.apinet.api.onmetal.de",
+		LeaderElectionConfig:   metalnetCfg,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
