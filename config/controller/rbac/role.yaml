@@ -70,17 +70,17 @@ rules:
 - apiGroups:
   - core.apinet.api.onmetal.de
   resources:
-  - ip
+  - ipaddresses
   verbs:
+  - delete
   - get
   - list
   - watch
 - apiGroups:
   - core.apinet.api.onmetal.de
   resources:
-  - ipaddress
+  - ips
   verbs:
-  - delete
   - get
   - list
   - watch
@@ -96,22 +96,6 @@ rules:
   - core.apinet.api.onmetal.de
   resources:
   - loadbalancers/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - core.apinet.api.onmetal.de
-  resources:
-  - natgateway
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - core.apinet.api.onmetal.de
-  resources:
-  - natgateway/status
   verbs:
   - get
   - patch
@@ -145,7 +129,15 @@ rules:
 - apiGroups:
   - core.apinet.api.onmetal.de
   resources:
-  - nattable
+  - natgateways/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
+  - nattables
   verbs:
   - create
   - get

@@ -38,8 +38,8 @@ type IPAddressGCReconciler struct {
 	AbsenceCache *lru.Cache
 }
 
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=ipaddress,verbs=get;list;watch;delete
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=ip,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=ipaddresses,verbs=get;list;watch;delete
+//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=ips,verbs=get;list;watch
 
 func (r *IPAddressGCReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

@@ -41,9 +41,9 @@ type NATGatewayReconciler struct {
 	record.EventRecorder
 }
 
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=natgateway,verbs=get;list;watch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=natgateway/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=nattable,verbs=get;list;watch;create;update;patch
+//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=natgateways,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=natgateways/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=nattables,verbs=get;list;watch;create;update;patch
 //+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;patch;update
 
 func (r *NATGatewayReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
