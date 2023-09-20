@@ -31,7 +31,7 @@ spec:
         - /manager
         args:
         - --leader-elect
-        image: onmetal-api-net:latest
+        image: controller:latest
         name: manager
         securityContext:
           allowPrivilegeEscalation: false
