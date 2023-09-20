@@ -17,7 +17,7 @@ package controllers
 // Additional required RBAC rules
 
 // Rules required for kubeconfig-rotation
-//+cluster=apinet:kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch
+//+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch
 //+cluster=apinet:kubebuilder:rbac:groups=certificates.k8s.io,resources=certificatesigningrequests,verbs=create;get;list;watch
 //+cluster=apinet:kubebuilder:rbac:groups=certificates.k8s.io,resources=certificatesigningrequests/apinetletclient,verbs=create
 

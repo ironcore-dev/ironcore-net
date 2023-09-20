@@ -6,17 +6,6 @@ metadata:
   name: apinet.api.onmetal.de:system:apinetlets
 rules:
 - apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
   - authentication.k8s.io
   resources:
   - tokenreviews
