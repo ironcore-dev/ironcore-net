@@ -56,7 +56,7 @@ manifests: controller-gen ## Generate rbac objects.
 	CONTROLLER_GEN=$(CONTROLLER_GEN) ./hack/cluster-controller-gen.sh cluster=apinet namespace=system rbac:roleName=apinet-role paths="./apinetlet/controllers/..." output:rbac:artifacts:config=config/apinetlet/apinet-rbac
 
 	# metalnetlet
-	CONTROLLER_GEN=$(CONTROLLER_GEN) ./hack/cluster-controller-gen.sh cluster=metalnet rbac:roleName=metalnet-role paths="./metalnetlet/controllers/..." output:rbac:artifacts:config=config/metalnetlet/rbac
+	CONTROLLER_GEN=$(CONTROLLER_GEN) ./hack/cluster-controller-gen.sh cluster=metalnet rbac:roleName=manager-role paths="./metalnetlet/controllers/..." output:rbac:artifacts:config=config/metalnetlet/rbac
 	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./metalnetlet/controllers/..." output:rbac:artifacts:config=config/metalnetlet/apinet-rbac
 
 	# Promote *let roles.
