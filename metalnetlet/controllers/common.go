@@ -43,11 +43,11 @@ func PartitionFinalizer(partitionName string) string {
 }
 
 func PartitionNodeName(partitionName, metalnetNodeName string) string {
-	return fmt.Sprintf("%s-%s", string(partitionName), metalnetNodeName)
+	return fmt.Sprintf("%s.%s", partitionName, metalnetNodeName)
 }
 
 func ParseNodeName(partitionName, nodeName string) (string, error) {
-	prefix := partitionName + "-"
+	prefix := partitionName + "."
 	if !strings.HasPrefix(nodeName, prefix) {
 		return "", fmt.Errorf("node name %q does not belong to partition %s", nodeName, partitionName)
 	}

@@ -20,10 +20,12 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
+var ValidateNodeName = validation.NameIsDNSSubdomain
+
 func ValidateNode(node *core.Node) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, validation.ValidateObjectMetaAccessor(node, false, validation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, validation.ValidateObjectMetaAccessor(node, false, ValidateNodeName, field.NewPath("metadata"))...)
 
 	return allErrs
 }
