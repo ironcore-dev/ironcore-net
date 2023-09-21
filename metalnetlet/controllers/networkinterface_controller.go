@@ -72,7 +72,7 @@ func (r *NetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		log.V(1).Info("Deleting all matching metalnet network interfaces")
 		exists, err := metalnetletclient.DeleteAllOfAndAnyExists(ctx, r.MetalnetClient, &metalnetv1alpha1.NetworkInterface{},
 			client.InNamespace(r.MetalnetNamespace),
-			metalnetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), req.NamespacedName, &metalnetv1alpha1.NetworkInterface{}),
+			metalnetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), req.NamespacedName, &v1alpha1.NetworkInterface{}),
 		)
 		if err != nil {
 			return ctrl.Result{}, fmt.Errorf("error deleting matching metalnet network interfaces: %w", err)
