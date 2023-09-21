@@ -54,6 +54,9 @@ func ValidateIPAddressUpdate(newIPAddress, oldIPAddress *core.IPAddress) field.E
 func ValidateIPAddressSpecUpdate(newSpec, oldSpec *core.IPAddressSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
+	if newSpec.IP != oldSpec.IP {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("ip"), newSpec.IP, validation.FieldImmutableErrorMsg))
+	}
 	allErrs = append(allErrs, validation.ValidateImmutableField(newSpec.ClaimRef, oldSpec.ClaimRef, fldPath.Child("clamRef"))...)
 
 	return allErrs

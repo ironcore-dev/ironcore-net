@@ -15,8 +15,13 @@
 package validation
 
 import (
+	"fmt"
+	"slices"
+
 	"github.com/onmetal/onmetal-api-net/internal/apis/core"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/validation"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -34,6 +39,39 @@ func ValidateNetworkInterfaceSpec(spec *core.NetworkInterfaceSpec, fldPath *fiel
 
 	if spec.NodeRef.Name == "" {
 		allErrs = append(allErrs, field.Required(fldPath.Child("nodeRef", "name"), "must specify target node"))
+	}
+
+	seenInternalIPFamilies := sets.New[corev1.IPFamily]()
+	for i, ip := range spec.IPs {
+		fldPath := field.NewPath("ips").Index(i)
+		if !ip.IsValid() {
+			allErrs = append(allErrs, field.Invalid(fldPath, ip, "must specify valid IP"))
+		} else if seenInternalIPFamilies.Has(ip.Family()) {
+			allErrs = append(allErrs, field.Invalid(fldPath, ip, fmt.Sprintf("cannot have multiple internal IPs of family %s", ip.Family())))
+		} else {
+			seenInternalIPFamilies.Insert(ip.Family())
+		}
+	}
+
+	seenExternalIPFamilies := sets.New[corev1.IPFamily]()
+	for i, ip := range spec.PublicIPs {
+		fldPath := fldPath.Child("publicIPs").Index(i)
+		allErrs = append(allErrs, ValidateIPFamily(ip.IPFamily, fldPath.Child("ipFamily"))...)
+		if seenExternalIPFamilies.Has(ip.IPFamily) {
+			allErrs = append(allErrs, field.Forbidden(fldPath, fmt.Sprintf("cannot have multiple external IPs of family %s", ip.IPFamily)))
+		} else {
+			seenExternalIPFamilies.Insert(ip.IPFamily)
+		}
+	}
+
+	for i, nat := range spec.NATs {
+		fldPath := fldPath.Child("nats").Index(i)
+		allErrs = append(allErrs, ValidateIPFamily(nat.IPFamily, fldPath.Child("ipFamily"))...)
+		if seenExternalIPFamilies.Has(nat.IPFamily) {
+			allErrs = append(allErrs, field.Forbidden(fldPath, fmt.Sprintf("cannot have nat for already present external IP family %s", nat.IPFamily)))
+		} else {
+			seenExternalIPFamilies.Insert(nat.IPFamily)
+		}
 	}
 
 	return allErrs
@@ -54,6 +92,9 @@ func ValidateNetworkInterfaceSpecUpdate(newSpec, oldSpec *core.NetworkInterfaceS
 
 	allErrs = append(allErrs, validation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
 	allErrs = append(allErrs, validation.ValidateImmutableField(newSpec.NodeRef, oldSpec.NodeRef, fldPath.Child("nodeRef"))...)
+	if !slices.Equal(newSpec.IPs, oldSpec.IPs) {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("ips"), newSpec.IPs, validation.FieldImmutableErrorMsg))
+	}
 
 	return allErrs
 }
