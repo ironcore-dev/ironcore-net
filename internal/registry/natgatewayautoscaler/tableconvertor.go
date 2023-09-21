@@ -16,6 +16,7 @@ package natgatewayautoscaler
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/onmetal/onmetal-api-net/internal/apis/core"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -31,6 +32,8 @@ var (
 
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
+		{Name: "NATGateway", Type: "string", Description: "The target NAT gateway"},
+		{Name: "PublicIPs", Type: "string", Description: "The min / max public IPs of the NAT gateway"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
@@ -55,10 +58,11 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 	var err error
 	tab.Rows, err = table.MetaToTableRow(obj, func(obj runtime.Object, m metav1.Object, name, age string) (cells []interface{}, err error) {
-		natGatewayAutoscaler := obj.(*core.NATGatewayAutoscaler)
-		_ = natGatewayAutoscaler
+		autoscaler := obj.(*core.NATGatewayAutoscaler)
 
 		cells = append(cells, name)
+		cells = append(cells, autoscaler.Spec.NATGatewayRef.Name)
+		cells = append(cells, fmt.Sprintf("%d/%d", autoscaler.Spec.MinPublicIPs, autoscaler.Spec.MaxPublicIPs))
 		cells = append(cells, age)
 
 		return cells, nil

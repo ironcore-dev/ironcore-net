@@ -16,12 +16,15 @@ package ipaddress
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/onmetal/onmetal-api-net/internal/apis/core"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/meta/table"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/klog/v2"
 )
 
 type convertor struct{}
@@ -31,12 +34,19 @@ var (
 
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
+		{Name: "ClaimRef", Type: "string", Description: "The claiming entity"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
 
 func newTableConvertor() *convertor {
 	return &convertor{}
+}
+
+func formatClaimRef(claimRef core.IPAddressClaimRef) string {
+	gr := schema.GroupResource{Group: claimRef.Group, Resource: claimRef.Resource}
+	ref := klog.KRef(claimRef.Namespace, claimRef.Name)
+	return fmt.Sprintf("%s %s", gr, ref)
 }
 
 func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tableOptions runtime.Object) (*metav1.Table, error) {
@@ -56,9 +66,9 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 	var err error
 	tab.Rows, err = table.MetaToTableRow(obj, func(obj runtime.Object, m metav1.Object, name, age string) (cells []interface{}, err error) {
 		ipAddress := obj.(*core.IPAddress)
-		_ = ipAddress
 
 		cells = append(cells, name)
+		cells = append(cells, formatClaimRef(ipAddress.Spec.ClaimRef))
 		cells = append(cells, age)
 
 		return cells, nil
