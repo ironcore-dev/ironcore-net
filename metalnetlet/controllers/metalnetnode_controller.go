@@ -50,7 +50,8 @@ type MetalnetNodeReconciler struct {
 //+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=nodes/finalizers,verbs=update;patch
 //+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=nodes/status,verbs=get;update;patch
 
-//+cluster=metalnet:kubebuilder:rbac:groups="",resources=nodes,verbs=get;list;watch
+//+cluster=metalnet:kubebuilder:rbac:groups="",resources=nodes,verbs=get;list;watch;update;patch
+//+cluster=metalnet:kubebuilder:rbac:groups="",resources=nodes/finalizers,verbs=update;patch
 
 // Reconcile ensures that the node is in the expected state.
 func (r *MetalnetNodeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
