@@ -8,5 +8,5 @@ spec:
   service:
     namespace: system
     name: apiserver-service
-  groupPriorityMinimum: 2000
-  versionPriority: 100
+  groupPriorityMinimum: 1900
+  versionPriority: 90

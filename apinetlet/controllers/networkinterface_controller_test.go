@@ -62,6 +62,7 @@ var _ = Describe("NetworkInterfaceController", func() {
 			Spec: apinetv1alpha1.NetworkInterfaceSpec{
 				NetworkRef: corev1.LocalObjectReference{Name: apiNetNetwork.Name},
 				IPs:        []net.IP{net.MustParseIP("192.168.178.1")},
+				NodeRef:    corev1.LocalObjectReference{Name: "my-node"},
 			},
 		}
 		Expect(k8sClient.Create(ctx, apiNetNic)).To(Succeed())

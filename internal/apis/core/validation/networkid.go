@@ -45,6 +45,15 @@ func ValidateNetworkIDUpdate(newNetworkID, oldNetworkID *core.NetworkID) field.E
 
 	allErrs = append(allErrs, validation.ValidateObjectMetaAccessorUpdate(newNetworkID, oldNetworkID, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, ValidateNetworkID(newNetworkID)...)
+	allErrs = append(allErrs, ValidateNetworkIDSpecUpdate(&newNetworkID.Spec, &oldNetworkID.Spec, field.NewPath("spec"))...)
+
+	return allErrs
+}
+
+func ValidateNetworkIDSpecUpdate(newSpec, oldSpec *core.NetworkIDSpec, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	allErrs = append(allErrs, validation.ValidateImmutableField(newSpec.ClaimRef, oldSpec.ClaimRef, fldPath.Child("claimRef"))...)
 
 	return allErrs
 }

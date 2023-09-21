@@ -24,6 +24,17 @@ func ValidateNetworkInterface(networkInterface *core.NetworkInterface) field.Err
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, validation.ValidateObjectMetaAccessor(networkInterface, true, validation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, ValidateNetworkInterfaceSpec(&networkInterface.Spec, field.NewPath("spec"))...)
+
+	return allErrs
+}
+
+func ValidateNetworkInterfaceSpec(spec *core.NetworkInterfaceSpec, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	if spec.NodeRef.Name == "" {
+		allErrs = append(allErrs, field.Required(fldPath.Child("nodeRef", "name"), "must specify target node"))
+	}
 
 	return allErrs
 }
@@ -33,6 +44,16 @@ func ValidateNetworkInterfaceUpdate(newNetworkInterface, oldNetworkInterface *co
 
 	allErrs = append(allErrs, validation.ValidateObjectMetaAccessorUpdate(newNetworkInterface, oldNetworkInterface, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, ValidateNetworkInterface(newNetworkInterface)...)
+	allErrs = append(allErrs, ValidateNetworkInterfaceSpecUpdate(&newNetworkInterface.Spec, &oldNetworkInterface.Spec, field.NewPath("spec"))...)
+
+	return allErrs
+}
+
+func ValidateNetworkInterfaceSpecUpdate(newSpec, oldSpec *core.NetworkInterfaceSpec, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	allErrs = append(allErrs, validation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
+	allErrs = append(allErrs, validation.ValidateImmutableField(newSpec.NodeRef, oldSpec.NodeRef, fldPath.Child("nodeRef"))...)
 
 	return allErrs
 }
