@@ -76,6 +76,7 @@ var _ = Describe("Core", func() {
 					GenerateName: "ip-",
 				},
 				Spec: v1alpha1.IPSpec{
+					Type:     v1alpha1.IPTypePublic,
 					IPFamily: corev1.IPv4Protocol,
 				},
 			}
@@ -259,6 +260,7 @@ var _ = Describe("Core", func() {
 							IPFamily: corev1.IPv4Protocol,
 						},
 					},
+					NodeRef: corev1.LocalObjectReference{Name: "my-node"},
 				},
 			}
 			Expect(k8sClient.Create(ctx, networkInterface)).To(Succeed())
