@@ -31,6 +31,7 @@ var (
 
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
+		{Name: "ID", Type: "string", Description: "The ID of the network"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
@@ -56,9 +57,9 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 	var err error
 	tab.Rows, err = table.MetaToTableRow(obj, func(obj runtime.Object, m metav1.Object, name, age string) (cells []interface{}, err error) {
 		network := obj.(*core.Network)
-		_ = network
 
 		cells = append(cells, name)
+		cells = append(cells, network.Spec.ID)
 		cells = append(cells, age)
 
 		return cells, nil

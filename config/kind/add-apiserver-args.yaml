@@ -1,0 +1,6 @@
+- op: add
+  path: /spec/template/spec/containers/0/args/-
+  value: "--public-prefix=10.0.0.0/24"
+- op: add
+  path: /spec/template/spec/containers/0/args/-
+  value: "--public-prefix=fdef:273d:a18c:ca25::/64"

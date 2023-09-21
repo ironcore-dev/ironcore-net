@@ -64,6 +64,7 @@ func (r *IPAddressGCReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	}
 
 	log.V(1).Info("IP address claimer does not exist, releasing IP address")
+	fmt.Println("RELEASING THE SHIT OUT OF IT")
 	if err := r.Delete(ctx, addr); client.IgnoreNotFound(err) != nil {
 		return ctrl.Result{}, fmt.Errorf("error deleting IP address: %w", err)
 	}
@@ -105,7 +106,7 @@ func (r *IPAddressGCReconciler) ipAddressClaimerExists(ctx context.Context, addr
 	}
 	claimerKey := client.ObjectKey{Name: claimRef.Name}
 	if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
-		claimerKey.Namespace = addr.Namespace
+		claimerKey.Namespace = claimRef.Namespace
 	}
 
 	if err := r.APIReader.Get(ctx, claimerKey, claimer); err != nil {
