@@ -28,3 +28,15 @@ func SetDefaults_IPSpec(spec *v1alpha1.IPSpec) {
 		spec.IPFamily = spec.IP.Family()
 	}
 }
+
+func SetDefaults_NetworkInterfacePublicIP(ip *v1alpha1.NetworkInterfacePublicIP) {
+	if ip.IPFamily == "" && ip.IP.IsValid() {
+		ip.IPFamily = ip.IP.Family()
+	}
+}
+
+func SetDefaults_LoadBalancerIP(ip *v1alpha1.LoadBalancerIP) {
+	if ip.IPFamily == "" && ip.IP.IsValid() {
+		ip.IPFamily = ip.IP.Family()
+	}
+}
