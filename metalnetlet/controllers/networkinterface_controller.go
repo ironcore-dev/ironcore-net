@@ -117,7 +117,7 @@ func (r *NetworkInterfaceReconciler) delete(ctx context.Context, log logr.Logger
 		log.V(1).Info("Any matching metalnet network interface deleted")
 
 		log.V(1).Info("Removing finalizer")
-		if err := clientutils.PatchRemoveFinalizer(ctx, r.MetalnetClient, nic, PartitionFinalizer(r.PartitionName)); err != nil {
+		if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, nic, PartitionFinalizer(r.PartitionName)); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
 		}
 		log.V(1).Info("Finalizer removed")
