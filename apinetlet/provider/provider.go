@@ -39,7 +39,7 @@ func ParseNetworkInterfaceID(id string) (namespace, name, node string, uid types
 	name = parts[1]
 	node = parts[2]
 	uid = types.UID(parts[3])
-	if allErrs := validation.NameIsDNSLabel(node, false); len(allErrs) != 0 {
+	if allErrs := validation.NameIsDNSSubdomain(node, false); len(allErrs) != 0 {
 		return "", "", "", "", fmt.Errorf("node is not a dns label: %v", allErrs)
 	}
 

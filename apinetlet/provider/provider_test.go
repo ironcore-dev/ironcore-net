@@ -24,7 +24,7 @@ import (
 var _ = Describe("Provider", func() {
 	const (
 		namespace = "namespace"
-		node      = "node"
+		node      = "node.dns.subdomain"
 		name      = "name"
 		uid       = types.UID("2c24a85c-b55d-44b8-bf6e-1872ecfef5db")
 	)
