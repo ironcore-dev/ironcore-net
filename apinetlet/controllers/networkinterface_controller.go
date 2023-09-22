@@ -269,19 +269,30 @@ func (r *NetworkInterfaceReconciler) getVirtualIPsForNetworkInterface(ctx contex
 	return vips, errors.Join(errs...)
 }
 
-func (r *NetworkInterfaceReconciler) networkInterfaceAPINetNetworkInterfaceSelector(nic *networkingv1alpha1.NetworkInterface) claimmanager.Selector {
-	_, _, _, nicUID, err := provider.ParseNetworkInterfaceID(nic.Spec.ProviderID)
+func (r *NetworkInterfaceReconciler) networkInterfaceAPINetNetworkInterfaceSelector(log logr.Logger, nic *networkingv1alpha1.NetworkInterface) claimmanager.Selector {
+	namespace, name, node, uid, err := provider.ParseNetworkInterfaceID(nic.Spec.ProviderID)
 	if err != nil {
+		log.V(1).Info("Error parsing network interface id", "error", err)
 		return claimmanager.NothingSelector()
 	}
 
+	log.V(1).Info("Parsed network interface ID",
+		"apiNetNetworkInterfaceNamespace", namespace,
+		"apiNetNetworkInterfaceName", name,
+		"apiNetNetworkInterfaceNode", node,
+		"apiNetNetworkInterfaceUID", uid,
+	)
 	return claimmanager.SelectorFunc(func(obj client.Object) bool {
 		apiNetNic := obj.(*apinetv1alpha1.NetworkInterface)
-		return apiNetNic.UID == nicUID
+		return apiNetNic.UID == uid
 	})
 }
 
-func (r *NetworkInterfaceReconciler) getAPINetNetworkInterfaceForNetworkInterface(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) (*apinetv1alpha1.NetworkInterface, error) {
+func (r *NetworkInterfaceReconciler) getAPINetNetworkInterfaceForNetworkInterface(
+	ctx context.Context,
+	log logr.Logger,
+	nic *networkingv1alpha1.NetworkInterface,
+) (*apinetv1alpha1.NetworkInterface, error) {
 	apiNetNicList := &apinetv1alpha1.NetworkInterfaceList{}
 	if err := r.APINetClient.List(ctx, apiNetNicList,
 		client.InNamespace(r.APINetNamespace),
@@ -290,7 +301,7 @@ func (r *NetworkInterfaceReconciler) getAPINetNetworkInterfaceForNetworkInterfac
 	}
 
 	var (
-		sel            = r.networkInterfaceAPINetNetworkInterfaceSelector(nic)
+		sel            = r.networkInterfaceAPINetNetworkInterfaceSelector(log, nic)
 		claimMgr       = claimmanager.New(nic, sel, &apiNetNetworkInterfaceClaimStrategy{r.Client})
 		foundAPINetNic *apinetv1alpha1.NetworkInterface
 		errs           []error
@@ -414,7 +425,7 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 
 	var errs []error
 
-	apiNetNic, err := r.getAPINetNetworkInterfaceForNetworkInterface(ctx, nic)
+	apiNetNic, err := r.getAPINetNetworkInterfaceForNetworkInterface(ctx, log, nic)
 	if err != nil {
 		errs = append(errs, err)
 	}
