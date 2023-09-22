@@ -260,7 +260,7 @@ func (r *NetworkInterfaceReconciler) deleteMatchingMetalnetNetworkInterface(ctx 
 			Name:      string(nic.UID),
 		},
 	}
-	if err := r.Delete(ctx, metalnetNic); err != nil {
+	if err := r.MetalnetClient.Delete(ctx, metalnetNic); err != nil {
 		if !apierrors.IsNotFound(err) {
 			return false, fmt.Errorf("error deleting metalnet network interface %s: %w", metalnetNic.Name, err)
 		}

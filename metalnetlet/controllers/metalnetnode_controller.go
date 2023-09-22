@@ -106,7 +106,7 @@ func (r *MetalnetNodeReconciler) delete(ctx context.Context, log logr.Logger, me
 		}
 
 		log.V(1).Info("Any corresponding node is gone, removing finalizer")
-		if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, metalnetNode, metalnetNodeFinalizer); err != nil {
+		if err := clientutils.PatchRemoveFinalizer(ctx, r.MetalnetClient, metalnetNode, metalnetNodeFinalizer); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
 		}
 		log.V(1).Info("Deleted")

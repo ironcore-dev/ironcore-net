@@ -178,7 +178,7 @@ func (r *InstanceReconciler) manageMetalnetLoadBalancers(
 			continue
 		}
 
-		if err := r.Delete(ctx, &metalnetLoadBalancer); client.IgnoreNotFound(err) != nil {
+		if err := r.MetalnetClient.Delete(ctx, &metalnetLoadBalancer); client.IgnoreNotFound(err) != nil {
 			errs = append(errs, err)
 			continue
 		}
@@ -205,7 +205,7 @@ func (r *InstanceReconciler) manageMetalnetLoadBalancers(
 			Spec: metalnetLoadBalancerSpec,
 		}
 		createMetalnetLoadBalancer := metalnetLoadBalancer.DeepCopy()
-		if err := r.Create(ctx, metalnetLoadBalancer); err != nil {
+		if err := r.MetalnetClient.Create(ctx, metalnetLoadBalancer); err != nil {
 			if !apierrors.IsAlreadyExists(err) {
 				errs = append(errs, err)
 				continue
@@ -213,7 +213,7 @@ func (r *InstanceReconciler) manageMetalnetLoadBalancers(
 
 			// We may end up hitting this due to a slow cache or a fast resync of the load balancer instance.
 			metalnetLoadBalancerKey := client.ObjectKey{Namespace: r.MetalnetNamespace, Name: metalnetLoadBalancerName}
-			if err := r.Get(ctx, metalnetLoadBalancerKey, metalnetLoadBalancer); err != nil {
+			if err := r.MetalnetClient.Get(ctx, metalnetLoadBalancerKey, metalnetLoadBalancer); err != nil {
 				errs = append(errs, err)
 				continue
 			}
