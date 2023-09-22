@@ -129,7 +129,7 @@ func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceAPINetNetworkInterfa
 	}
 
 	var (
-		strat    = &apiNetNetworkInterfaceClaimStrategy{r.Client}
+		strat    = &apiNetNetworkInterfaceClaimStrategy{r.APINetClient}
 		claimMgr = claimmanager.New(asNonDeletingObject{nic}, claimmanager.NothingSelector(), strat)
 		errs     []error
 	)
@@ -302,7 +302,7 @@ func (r *NetworkInterfaceReconciler) getAPINetNetworkInterfaceForNetworkInterfac
 
 	var (
 		sel            = r.networkInterfaceAPINetNetworkInterfaceSelector(log, nic)
-		claimMgr       = claimmanager.New(nic, sel, &apiNetNetworkInterfaceClaimStrategy{r.Client})
+		claimMgr       = claimmanager.New(nic, sel, &apiNetNetworkInterfaceClaimStrategy{r.APINetClient})
 		foundAPINetNic *apinetv1alpha1.NetworkInterface
 		errs           []error
 	)
