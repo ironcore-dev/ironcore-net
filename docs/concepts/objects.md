@@ -168,3 +168,21 @@ on the amount of target `NetworkInterface`s.
 A `NATGateway` always tries to claim all `NetworkInterface`s inside
 its network that don't have a public IP of the IP family the `NATGateway`
 has. The claim is depicted by the `NetworkInterface`'s `spec.natGateways`.
+
+Example manifest:
+
+```yaml
+apiVersion: core.apinet.api.onmetal.de/v1alpha1
+kind: NATGateway
+metadata:
+  namespace: default
+  name: my-nat-gateway
+spec:
+  networkRef:
+    name: my-network
+  ipFamily: IPv4
+  ips:
+  - name: ip-1
+    ip: 10.0.0.3
+  portsPerNetworkInterface: 1024
+```
