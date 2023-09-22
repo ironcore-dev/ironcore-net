@@ -55,6 +55,7 @@ type NetworkInterfaceReconciler struct {
 //+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=networkinterfaces/finalizers,verbs=update;patch
 //+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=networkinterfaces/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=loadbalancerroutings,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch
 //+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=nattables,verbs=get;list;watch
 //+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=natgateways,verbs=get;list;watch
 
@@ -422,40 +423,66 @@ func (r *NetworkInterfaceReconciler) enqueueByNATTable() handler.EventHandler {
 	})
 }
 
+func (r *NetworkInterfaceReconciler) reconcileRequestsByLoadBalancerRouting(
+	ctx context.Context,
+	log logr.Logger,
+	loadBalancerRouting *v1alpha1.LoadBalancerRouting,
+) []ctrl.Request {
+	nicList := &v1alpha1.NetworkInterfaceList{}
+	if err := r.List(ctx, nicList,
+		client.InNamespace(loadBalancerRouting.Namespace),
+	); err != nil {
+		log.Error(err, "Error listing network interfaces")
+		return nil
+	}
+
+	metalnetNodeList := &corev1.NodeList{}
+	if err := r.MetalnetClient.List(ctx, metalnetNodeList); err != nil {
+		log.Error(err, "Error listing metalnet nodes")
+		return nil
+	}
+
+	dstIPs := utilslices.ToSetFunc(loadBalancerRouting.Destinations,
+		func(dst v1alpha1.LoadBalancerDestination) net.IP { return dst.IP },
+	)
+
+	var reqs []ctrl.Request
+	for _, nic := range nicList.Items {
+		if _, err := ParseNodeName(r.PartitionName, nic.Spec.NodeRef.Name); err != nil {
+			continue
+		}
+
+		if dstIPs.HasAny(nic.Spec.IPs...) {
+			reqs = append(reqs, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&nic)})
+		}
+	}
+	return reqs
+}
+
 func (r *NetworkInterfaceReconciler) enqueueByLoadBalancerRouting() handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		loadBalancerRouting := obj.(*v1alpha1.LoadBalancerRouting)
 		log := ctrl.LoggerFrom(ctx)
 
-		nicList := &v1alpha1.NetworkInterfaceList{}
-		if err := r.List(ctx, nicList,
-			client.InNamespace(loadBalancerRouting.Namespace),
-		); err != nil {
-			log.Error(err, "Error listing network interfaces")
+		return r.reconcileRequestsByLoadBalancerRouting(ctx, log, loadBalancerRouting)
+	})
+}
+
+func (r *NetworkInterfaceReconciler) enqueueByLoadBalancer() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
+		loadBalancer := obj.(*v1alpha1.LoadBalancer)
+		log := ctrl.LoggerFrom(ctx)
+
+		loadBalancerKey := client.ObjectKeyFromObject(loadBalancer)
+		loadBalancerRouting := &v1alpha1.LoadBalancerRouting{}
+		if err := r.Get(ctx, loadBalancerKey, loadBalancerRouting); err != nil {
+			if !apierrors.IsNotFound(err) {
+				log.Error(err, "Error getting load balancer routing")
+			}
 			return nil
 		}
 
-		metalnetNodeList := &corev1.NodeList{}
-		if err := r.MetalnetClient.List(ctx, metalnetNodeList); err != nil {
-			log.Error(err, "Error listing metalnet nodes")
-			return nil
-		}
-
-		dstIPs := utilslices.ToSetFunc(loadBalancerRouting.Destinations,
-			func(dst v1alpha1.LoadBalancerDestination) net.IP { return dst.IP },
-		)
-
-		var reqs []ctrl.Request
-		for _, nic := range nicList.Items {
-			if _, err := ParseNodeName(r.PartitionName, nic.Spec.NodeRef.Name); err != nil {
-				continue
-			}
-
-			if dstIPs.HasAny(nic.Spec.IPs...) {
-				reqs = append(reqs, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&nic)})
-			}
-		}
-		return reqs
+		return r.reconcileRequestsByLoadBalancerRouting(ctx, log, loadBalancerRouting)
 	})
 }
 
@@ -494,6 +521,10 @@ func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager, metalnet
 		Watches(
 			&v1alpha1.NATTable{},
 			r.enqueueByNATTable(),
+		).
+		Watches(
+			&v1alpha1.LoadBalancer{},
+			r.enqueueByLoadBalancer(),
 		).
 		Watches(
 			&v1alpha1.LoadBalancerRouting{},
