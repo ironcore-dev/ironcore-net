@@ -47,6 +47,11 @@ var _ = Describe("LoadBalancerController", func() {
 				Selector: &metav1.LabelSelector{
 					MatchLabels: map[string]string{"foo": "bar"},
 				},
+				Template: v1alpha1.InstanceTemplate{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: map[string]string{"foo": "bar"},
+					},
+				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())
@@ -64,6 +69,9 @@ var _ = Describe("LoadBalancerController", func() {
 				MatchLabels: map[string]string{"foo": "bar"},
 			},
 			Template: v1alpha1.InstanceTemplate{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{"foo": "bar"},
+				},
 				Spec: v1alpha1.InstanceSpec{
 					Type:             v1alpha1.InstanceTypeLoadBalancer,
 					LoadBalancerType: v1alpha1.LoadBalancerTypePublic,

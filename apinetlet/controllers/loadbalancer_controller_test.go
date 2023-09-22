@@ -69,6 +69,9 @@ var _ = Describe("LoadBalancerController", func() {
 					MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
 				}),
 				"Template": Equal(v1alpha1.InstanceTemplate{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+					},
 					Spec: v1alpha1.InstanceSpec{
 						Affinity: &v1alpha1.Affinity{
 							InstanceAntiAffinity: &v1alpha1.InstanceAntiAffinity{

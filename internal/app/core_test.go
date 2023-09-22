@@ -124,6 +124,14 @@ var _ = Describe("Core", func() {
 							IPFamily: corev1.IPv4Protocol,
 						},
 					},
+					Selector: &metav1.LabelSelector{
+						MatchLabels: map[string]string{"foo": "bar"},
+					},
+					Template: v1alpha1.InstanceTemplate{
+						ObjectMeta: metav1.ObjectMeta{
+							Labels: map[string]string{"foo": "bar"},
+						},
+					},
 				},
 			}
 			Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())

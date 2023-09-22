@@ -64,7 +64,6 @@ func (r *IPAddressGCReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	}
 
 	log.V(1).Info("IP address claimer does not exist, releasing IP address")
-	fmt.Println("RELEASING THE SHIT OUT OF IT")
 	if err := r.Delete(ctx, addr); client.IgnoreNotFound(err) != nil {
 		return ctrl.Result{}, fmt.Errorf("error deleting IP address: %w", err)
 	}

@@ -246,7 +246,7 @@ func (r *DaemonSetReconciler) manage(
 
 	instsToDelete = append(instsToDelete, r.getUnscheduledInstancesWithoutNode(nodes, nodeToDaemonInsts)...)
 
-	if err := r.syncNodes(ctx, ds, instsToDelete, nodesNeedingDaemonInsts, hash); err != nil {
+	if err := r.syncNodes(ctx, log, ds, instsToDelete, nodesNeedingDaemonInsts, hash); err != nil {
 		return err
 	}
 
@@ -281,6 +281,7 @@ func (r *DaemonSetReconciler) createInstance(
 
 func (r *DaemonSetReconciler) syncNodes(
 	ctx context.Context,
+	log logr.Logger,
 	ds *v1alpha1.DaemonSet,
 	instsToDelete []string,
 	nodesNeedingDaemonInsts []string,
@@ -293,6 +294,10 @@ func (r *DaemonSetReconciler) syncNodes(
 	r.Expectations.ExpectCreationsAndDeletions(ctrlKey,
 		expectations.ObjectKeysFromNames(ds.Namespace, createNames),
 		expectations.ObjectKeysFromNames(ds.Namespace, instsToDelete),
+	)
+	log.V(1).Info("Expecting creations / deletions",
+		"createNames", createNames,
+		"deleteInstances", instsToDelete,
 	)
 
 	var errs []error
