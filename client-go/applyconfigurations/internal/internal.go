@@ -418,12 +418,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: collisionCount
       type:
         scalar: numeric
-    - name: ips
-      type:
-        list:
-          elementType:
-            namedType: com.github.onmetal.onmetal-api-net.apimachinery.api.net.IP
-          elementRelationship: atomic
 - name: com.github.onmetal.onmetal-api-net.api.core.v1alpha1.LoadBalancerTargetRef
   map:
     fields:

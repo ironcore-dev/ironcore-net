@@ -1588,25 +1588,9 @@ func schema_onmetal_api_net_api_core_v1alpha1_LoadBalancerStatus(ref common.Refe
 							Format:      "int32",
 						},
 					},
-					"ips": {
-						SchemaProps: spec.SchemaProps{
-							Description: "IPs are the IPs used currently by the load balancer.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api-net/apimachinery/api/net.IP"),
-									},
-								},
-							},
-						},
-					},
 				},
 			},
 		},
-		Dependencies: []string{
-			"github.com/onmetal/onmetal-api-net/apimachinery/api/net.IP"},
 	}
 }
 

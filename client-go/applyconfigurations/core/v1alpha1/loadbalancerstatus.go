@@ -17,15 +17,10 @@
 
 package v1alpha1
 
-import (
-	net "github.com/onmetal/onmetal-api-net/apimachinery/api/net"
-)
-
 // LoadBalancerStatusApplyConfiguration represents an declarative configuration of the LoadBalancerStatus type for use
 // with apply.
 type LoadBalancerStatusApplyConfiguration struct {
-	CollisionCount *int32   `json:"collisionCount,omitempty"`
-	IPs            []net.IP `json:"ips,omitempty"`
+	CollisionCount *int32 `json:"collisionCount,omitempty"`
 }
 
 // LoadBalancerStatusApplyConfiguration constructs an declarative configuration of the LoadBalancerStatus type for use with
@@ -39,15 +34,5 @@ func LoadBalancerStatus() *LoadBalancerStatusApplyConfiguration {
 // If called multiple times, the CollisionCount field is set to the value of the last call.
 func (b *LoadBalancerStatusApplyConfiguration) WithCollisionCount(value int32) *LoadBalancerStatusApplyConfiguration {
 	b.CollisionCount = &value
-	return b
-}
-
-// WithIPs adds the given value to the IPs field in the declarative configuration
-// and returns the receiver, so that objects can be build by chaining "With" function invocations.
-// If called multiple times, values provided by each call will be appended to the IPs field.
-func (b *LoadBalancerStatusApplyConfiguration) WithIPs(values ...net.IP) *LoadBalancerStatusApplyConfiguration {
-	for i := range values {
-		b.IPs = append(b.IPs, values[i])
-	}
 	return b
 }

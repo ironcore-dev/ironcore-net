@@ -1475,7 +1475,6 @@ func Convert_core_LoadBalancerSpec_To_v1alpha1_LoadBalancerSpec(in *core.LoadBal
 
 func autoConvert_v1alpha1_LoadBalancerStatus_To_core_LoadBalancerStatus(in *v1alpha1.LoadBalancerStatus, out *core.LoadBalancerStatus, s conversion.Scope) error {
 	out.CollisionCount = (*int32)(unsafe.Pointer(in.CollisionCount))
-	out.IPs = *(*[]net.IP)(unsafe.Pointer(&in.IPs))
 	return nil
 }
 
@@ -1486,7 +1485,6 @@ func Convert_v1alpha1_LoadBalancerStatus_To_core_LoadBalancerStatus(in *v1alpha1
 
 func autoConvert_core_LoadBalancerStatus_To_v1alpha1_LoadBalancerStatus(in *core.LoadBalancerStatus, out *v1alpha1.LoadBalancerStatus, s conversion.Scope) error {
 	out.CollisionCount = (*int32)(unsafe.Pointer(in.CollisionCount))
-	out.IPs = *(*[]net.IP)(unsafe.Pointer(&in.IPs))
 	return nil
 }
 

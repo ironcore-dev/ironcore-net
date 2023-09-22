@@ -76,8 +76,6 @@ type LoadBalancerPort struct {
 type LoadBalancerStatus struct {
 	// CollisionCount is used to construct names for IP addresses for the load balancer.
 	CollisionCount *int32 `json:"collisionCount,omitempty"`
-	// IPs are the IPs used currently by the load balancer.
-	IPs []net.IP `json:"ips,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

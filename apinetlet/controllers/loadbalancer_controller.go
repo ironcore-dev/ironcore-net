@@ -171,7 +171,7 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 		return ctrl.Result{}, err
 	}
 
-	actualIPs := apiNetIPsToIPs(apiNetLoadBalancer.Status.IPs)
+	actualIPs := apiNetIPsToIPs(apinetv1alpha1.GetLoadBalancerIPs(apiNetLoadBalancer))
 	if !slices.Equal(actualIPs, loadBalancer.Status.IPs) {
 		log.V(1).Info("Updating load balancer status IPs")
 		if err := r.updateLoadBalancerIPs(ctx, loadBalancer, actualIPs); err != nil {

@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/onmetal/onmetal-api-net/internal/apis/core"
+	"github.com/onmetal/onmetal-api/utils/generic"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/meta/table"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -62,7 +63,7 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 		cells = append(cells, name)
 		cells = append(cells, autoscaler.Spec.NATGatewayRef.Name)
-		cells = append(cells, fmt.Sprintf("%d/%d", autoscaler.Spec.MinPublicIPs, autoscaler.Spec.MaxPublicIPs))
+		cells = append(cells, fmt.Sprintf("%d/%d", generic.DerefZero(autoscaler.Spec.MinPublicIPs), generic.DerefZero(autoscaler.Spec.MaxPublicIPs)))
 		cells = append(cells, age)
 
 		return cells, nil

@@ -7,7 +7,6 @@ API rule violation: list_type_missing,github.com/onmetal/onmetal-api-net/api/cor
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,LoadBalancerRouting,IPs
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,LoadBalancerSpec,IPs
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,LoadBalancerSpec,Ports
-API rule violation: list_type_missing,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,LoadBalancerStatus,IPs
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,NATGatewaySpec,IPs
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,NATIP,Sections
 API rule violation: list_type_missing,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,NATTable,IPs
@@ -150,7 +149,6 @@ API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1al
 API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,InstanceStatus,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,LoadBalancerRouting,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,LoadBalancerSpec,IPs
-API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,LoadBalancerStatus,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,NATGatewaySpec,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,NATTable,IPs
 API rule violation: names_match,github.com/onmetal/onmetal-api-net/api/core/v1alpha1,NetworkInterfaceSpec,IPs

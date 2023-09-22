@@ -809,13 +809,6 @@ func (in *LoadBalancerStatus) DeepCopyInto(out *LoadBalancerStatus) {
 		*out = new(int32)
 		**out = **in
 	}
-	if in.IPs != nil {
-		in, out := &in.IPs, &out.IPs
-		*out = make([]net.IP, len(*in))
-		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
-		}
-	}
 	return
 }
 

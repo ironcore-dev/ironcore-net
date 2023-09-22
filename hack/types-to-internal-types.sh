@@ -29,3 +29,5 @@ sed-all 's/v1alpha1/core/g'
 sed-all '/metav1\.AddToGroupVersion\(scheme, SchemeGroupVersion\)/d'
 
 sed-single "register.go" '/metav1 "k8s.io\/apimachinery\/pkg\/apis\/meta\/v1"/d'
+
+goimports -w "$INTERNAL_API_DIR"
