@@ -6,3 +6,5 @@
   of a `Network` object.
 * [`IP` lifecycle](ip-lifecycle.md) describes the lifecycle
   of an `IP` object.
+* [`onmetal-api` integration](onmetal-api-integration.md) describes how
+  `onmetal-api-net` can be integrated with `onmetal-api`.
