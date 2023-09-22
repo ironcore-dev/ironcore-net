@@ -29,9 +29,6 @@ type LoadBalancerRouting struct {
 	metav1.TypeMeta
 	metav1.ObjectMeta
 
-	// IPs are the IPs the routing is for.
-	IPs []net.IP
-
 	Destinations []LoadBalancerDestination
 }
 

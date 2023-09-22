@@ -19,7 +19,6 @@ package v1alpha1
 
 import (
 	corev1alpha1 "github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	net "github.com/onmetal/onmetal-api-net/apimachinery/api/net"
 	internal "github.com/onmetal/onmetal-api-net/client-go/applyconfigurations/internal"
 	v1 "github.com/onmetal/onmetal-api-net/client-go/applyconfigurations/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -32,7 +31,6 @@ import (
 type LoadBalancerRoutingApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	IPs                              []net.IP                                    `json:"ips,omitempty"`
 	Destinations                     []LoadBalancerDestinationApplyConfiguration `json:"destinations,omitempty"`
 }
 
@@ -239,16 +237,6 @@ func (b *LoadBalancerRoutingApplyConfiguration) ensureObjectMetaApplyConfigurati
 	if b.ObjectMetaApplyConfiguration == nil {
 		b.ObjectMetaApplyConfiguration = &v1.ObjectMetaApplyConfiguration{}
 	}
-}
-
-// WithIPs adds the given value to the IPs field in the declarative configuration
-// and returns the receiver, so that objects can be build by chaining "With" function invocations.
-// If called multiple times, values provided by each call will be appended to the IPs field.
-func (b *LoadBalancerRoutingApplyConfiguration) WithIPs(values ...net.IP) *LoadBalancerRoutingApplyConfiguration {
-	for i := range values {
-		b.IPs = append(b.IPs, values[i])
-	}
-	return b
 }
 
 // WithDestinations adds the given value to the Destinations field in the declarative configuration

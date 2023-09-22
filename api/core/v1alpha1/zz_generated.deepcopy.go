@@ -696,13 +696,6 @@ func (in *LoadBalancerRouting) DeepCopyInto(out *LoadBalancerRouting) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
-	if in.IPs != nil {
-		in, out := &in.IPs, &out.IPs
-		*out = make([]net.IP, len(*in))
-		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
-		}
-	}
 	if in.Destinations != nil {
 		in, out := &in.Destinations, &out.Destinations
 		*out = make([]LoadBalancerDestination, len(*in))

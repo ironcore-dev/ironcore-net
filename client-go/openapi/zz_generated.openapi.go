@@ -1414,20 +1414,6 @@ func schema_onmetal_api_net_api_core_v1alpha1_LoadBalancerRouting(ref common.Ref
 							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
 						},
 					},
-					"ips": {
-						SchemaProps: spec.SchemaProps{
-							Description: "IPs are the IPs the routing is for.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/onmetal/onmetal-api-net/apimachinery/api/net.IP"),
-									},
-								},
-							},
-						},
-					},
 					"destinations": {
 						SchemaProps: spec.SchemaProps{
 							Type: []string{"array"},
@@ -1445,7 +1431,7 @@ func schema_onmetal_api_net_api_core_v1alpha1_LoadBalancerRouting(ref common.Ref
 			},
 		},
 		Dependencies: []string{
-			"github.com/onmetal/onmetal-api-net/api/core/v1alpha1.LoadBalancerDestination", "github.com/onmetal/onmetal-api-net/apimachinery/api/net.IP", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/onmetal/onmetal-api-net/api/core/v1alpha1.LoadBalancerDestination", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 

@@ -367,12 +367,6 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: com.github.onmetal.onmetal-api-net.api.core.v1alpha1.LoadBalancerDestination
           elementRelationship: atomic
-    - name: ips
-      type:
-        list:
-          elementType:
-            namedType: com.github.onmetal.onmetal-api-net.apimachinery.api.net.IP
-          elementRelationship: atomic
     - name: kind
       type:
         scalar: string

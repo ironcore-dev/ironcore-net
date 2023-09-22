@@ -15,6 +15,8 @@
 package controllers
 
 import (
+	"net/netip"
+
 	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
 	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
 	"github.com/onmetal/onmetal-api-net/apimachinery/api/net"
@@ -58,6 +60,45 @@ var _ = Describe("NetworkInterfaceController", func() {
 		}
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
 
+		By("creating a load balancer")
+		loadBalancer := &v1alpha1.LoadBalancer{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "lb-",
+			},
+			Spec: v1alpha1.LoadBalancerSpec{
+				Type:       v1alpha1.LoadBalancerTypePublic,
+				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+				IPs:        []v1alpha1.LoadBalancerIP{{IPFamily: corev1.IPv4Protocol, Name: "ip-1"}},
+				Selector:   &metav1.LabelSelector{MatchLabels: map[string]string{"foo": "bar"}},
+				Template: v1alpha1.InstanceTemplate{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: map[string]string{"foo": "bar"},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())
+
+		By("creating a load balancer routing")
+		loadBalancerRouting := &v1alpha1.LoadBalancerRouting{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      loadBalancer.Name,
+			},
+			Destinations: []v1alpha1.LoadBalancerDestination{
+				{
+					IP: net.MustParseIP("10.0.0.1"),
+					TargetRef: &v1alpha1.LoadBalancerTargetRef{
+						UID:     nic.UID,
+						Name:    nic.Name,
+						NodeRef: corev1.LocalObjectReference{Name: PartitionNodeName(partitionName, metalnetNode.Name)},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, loadBalancerRouting)).To(Succeed())
+
 		By("waiting for the network interface to have a finalizer")
 		Eventually(Object(nic)).Should(HaveField("Finalizers", []string{PartitionFinalizer(partitionName)}))
 
@@ -72,7 +113,10 @@ var _ = Describe("NetworkInterfaceController", func() {
 			NetworkRef: corev1.LocalObjectReference{Name: string(network.UID)},
 			IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
 			IPs:        []metalnetv1alpha1.IP{metalnetv1alpha1.MustParseIP("10.0.0.1")},
-			NodeName:   &metalnetNode.Name,
+			LoadBalancerTargets: []metalnetv1alpha1.IPPrefix{
+				{Prefix: netip.PrefixFrom(loadBalancer.Spec.IPs[0].IP.Addr, 32)},
+			},
+			NodeName: &metalnetNode.Name,
 		}))
 
 		By("updating the metalnet network interface's status")

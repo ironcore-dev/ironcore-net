@@ -1395,7 +1395,6 @@ func Convert_core_LoadBalancerPort_To_v1alpha1_LoadBalancerPort(in *core.LoadBal
 
 func autoConvert_v1alpha1_LoadBalancerRouting_To_core_LoadBalancerRouting(in *v1alpha1.LoadBalancerRouting, out *core.LoadBalancerRouting, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.IPs = *(*[]net.IP)(unsafe.Pointer(&in.IPs))
 	out.Destinations = *(*[]core.LoadBalancerDestination)(unsafe.Pointer(&in.Destinations))
 	return nil
 }
@@ -1407,7 +1406,6 @@ func Convert_v1alpha1_LoadBalancerRouting_To_core_LoadBalancerRouting(in *v1alph
 
 func autoConvert_core_LoadBalancerRouting_To_v1alpha1_LoadBalancerRouting(in *core.LoadBalancerRouting, out *v1alpha1.LoadBalancerRouting, s conversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.IPs = *(*[]net.IP)(unsafe.Pointer(&in.IPs))
 	out.Destinations = *(*[]v1alpha1.LoadBalancerDestination)(unsafe.Pointer(&in.Destinations))
 	return nil
 }

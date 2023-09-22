@@ -29,9 +29,6 @@ type LoadBalancerRouting struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// IPs are the IPs the routing is for.
-	IPs []net.IP `json:"ips,omitempty"`
-
 	Destinations []LoadBalancerDestination `json:"destinations,omitempty"`
 }
 

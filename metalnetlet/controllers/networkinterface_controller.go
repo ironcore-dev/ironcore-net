@@ -156,7 +156,13 @@ func (r *NetworkInterfaceReconciler) getLoadBalancerTargetsForNetworkInterface(c
 			},
 		)
 		if hasDst {
-			ipSet.Insert(lbRouting.IPs...)
+			loadBalancer := &v1alpha1.LoadBalancer{}
+			loadBalancerKey := client.ObjectKeyFromObject(&lbRouting)
+			if err := r.Get(ctx, loadBalancerKey, loadBalancer); client.IgnoreNotFound(err) != nil {
+				return nil, err
+			}
+
+			ipSet.Insert(v1alpha1.GetLoadBalancerIPs(loadBalancer)...)
 		}
 	}
 
