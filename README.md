@@ -23,6 +23,9 @@ The integration to `onmetal-api` is realized via the `apinetlet`,
 an agent using an `onmetal-api-net` cluster to realize `onmetal-api`
 objects like `LoadBalancer`s, `VirtualIP`s and more.
 
+Documentation about the concepts of `onmetal-api-net` can be found
+in the [`concepts` directory](docs/concepts).
+
 ## Contributing
 
 We'd love to get feedback from you. Please report bugs, suggestions or post questions by opening a GitHub issue.
