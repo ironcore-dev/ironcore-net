@@ -207,6 +207,11 @@ func (r *SchedulerReconciler) filterNodesByInstanceAntiAffinity(
 		return nil, err
 	}
 
+	log.V(1).Info("InstanceAntiAffinity",
+		"existingAntiAffinityCounts", existingAntiAffinityCounts,
+		"incomingAntiAffinityCounts", incomingAntiAffinityCounts,
+	)
+
 	var filtered []*scheduler.ContainerInfo
 	for _, n := range nodes {
 		if !satisfyInstanceAntiAffinity(inst, incomingAntiAffinityCounts, n) {

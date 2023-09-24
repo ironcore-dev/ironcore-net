@@ -20,6 +20,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -31,14 +32,27 @@ type LoadBalancerReconciler struct {
 
 //+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch
 //+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=loadbalancers/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=loadbalancerroutings,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=daemonsets,verbs=get;list;watch;create;update;patch
 
 func (r *LoadBalancerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
 	loadBalancer := &v1alpha1.LoadBalancer{}
 	if err := r.Get(ctx, req.NamespacedName, loadBalancer); err != nil {
-		return ctrl.Result{}, client.IgnoreNotFound(err)
+		if !apierrors.IsNotFound(err) {
+			return ctrl.Result{}, err
+		}
+
+		loadBalancerRouting := &v1alpha1.LoadBalancerRouting{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: req.Namespace,
+				Name:      req.Name,
+			},
+		}
+		if err := r.Delete(ctx, loadBalancerRouting); client.IgnoreNotFound(err) != nil {
+			return ctrl.Result{}, fmt.Errorf("error deleting load balancer routing: %w", err)
+		}
+		return ctrl.Result{}, nil
 	}
 
 	return r.reconcileExists(ctx, log, loadBalancer)
