@@ -25,6 +25,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
@@ -206,11 +207,6 @@ func (r *SchedulerReconciler) filterNodesByInstanceAntiAffinity(
 	if err != nil {
 		return nil, err
 	}
-
-	log.V(1).Info("InstanceAntiAffinity",
-		"existingAntiAffinityCounts", existingAntiAffinityCounts,
-		"incomingAntiAffinityCounts", incomingAntiAffinityCounts,
-	)
 
 	var filtered []*scheduler.ContainerInfo
 	for _, n := range nodes {
@@ -450,11 +446,20 @@ func (r *SchedulerReconciler) getNodesForInstance(
 		r.filterNodesByTopology,
 	}
 
-	var err error
+	// Initialize matching nodes with all available nodes.
+	matchingNodes := sets.New(nodes...)
 	for _, filter := range filters {
-		nodes, err = filter(log, inst, nodes)
+		res, err := filter(log, inst, nodes)
 		if err != nil {
 			return nil, err
+		}
+
+		// Intersect with the intermediate result to see what nodes are
+		// still matching.
+		matchingNodes = matchingNodes.Intersection(sets.New(res...))
+		if matchingNodes.Len() == 0 {
+			// Short circuit in case no node matches.
+			return nil, nil
 		}
 	}
 

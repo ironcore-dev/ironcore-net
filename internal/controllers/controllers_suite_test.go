@@ -50,6 +50,7 @@ import (
 var (
 	cfg            *rest.Config
 	k8sClient      client.Client
+	mgrClient      client.Client
 	testEnv        *envtest.Environment
 	testEnvExt     *utilsenvtest.EnvironmentExtensions
 	schedulerCache *scheduler.Cache
@@ -125,6 +126,8 @@ var _ = BeforeSuite(func() {
 		MetricsBindAddress: "0",
 	})
 	Expect(err).ToNot(HaveOccurred())
+
+	mgrClient = k8sManager.GetClient()
 
 	Expect((&IPAddressGCReconciler{
 		Client:       k8sManager.GetClient(),

@@ -87,6 +87,18 @@ rules:
 - apiGroups:
   - core.apinet.api.onmetal.de
   resources:
+  - loadbalancerroutings
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.apinet.api.onmetal.de
+  resources:
   - loadbalancers
   verbs:
   - get
@@ -140,6 +152,7 @@ rules:
   - nattables
   verbs:
   - create
+  - delete
   - get
   - list
   - patch

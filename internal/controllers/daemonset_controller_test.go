@@ -29,6 +29,10 @@ import (
 var _ = Describe("DaemonSetController", func() {
 	ns := SetupNamespace(&k8sClient)
 	network := SetupNetwork(ns)
+	BeforeEach(func() {
+		Eventually(New(mgrClient).ObjectList(&v1alpha1.NodeList{})).
+			Should(HaveField("Items", BeEmpty()))
+	})
 	node1, node2 := SetupNode(), SetupNode()
 
 	It("should correctly manage the daemon set instances", func(ctx SpecContext) {
