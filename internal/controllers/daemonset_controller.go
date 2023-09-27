@@ -185,13 +185,35 @@ func (r *DaemonSetReconciler) instancesShouldBeOnNode(
 ) (nodesNeedingDaemonInsts []string, instsToDelete []string) {
 	_, _ = log, hash
 	shouldRun := r.nodeShouldRunDaemonInstance(node, ds)
-	_, exists := nodeToDaemonInsts[node.Name]
+	insts, exists := nodeToDaemonInsts[node.Name]
 
 	switch {
 	case shouldRun && !exists:
 		// If a daemon instance is supposed to be running on a node but isn't, create one.
 		nodesNeedingDaemonInsts = append(nodesNeedingDaemonInsts, node.Name)
-		// TODO: Add cases handling deletion of instances that should not be on a node anymore.
+	case shouldRun:
+		var filtered []*v1alpha1.Instance
+		for _, inst := range insts {
+			if !inst.DeletionTimestamp.IsZero() {
+				continue
+			}
+			filtered = append(filtered, inst)
+		}
+		if len(filtered) == 0 {
+			nodesNeedingDaemonInsts = append(nodesNeedingDaemonInsts, node.Name)
+		} else if len(filtered) > 1 {
+			// Delete any unnecessary instance, keeping the oldest ones.
+			slices.SortFunc(filtered, func(a, b *v1alpha1.Instance) bool {
+				return a.CreationTimestamp.Compare(b.CreationTimestamp.Time) < 0
+			})
+			for _, inst := range filtered[1:] {
+				instsToDelete = append(instsToDelete, inst.Name)
+			}
+		}
+	case !shouldRun:
+		for _, inst := range insts {
+			instsToDelete = append(instsToDelete, inst.Name)
+		}
 	}
 
 	return nodesNeedingDaemonInsts, instsToDelete

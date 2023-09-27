@@ -150,6 +150,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err = (&controllers.NetworkInterfaceNATReleaseReconciler{
+		Client:       mgr.GetClient(),
+		APIReader:    mgr.GetAPIReader(),
+		AbsenceCache: lru.New(500),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "NetworkInterfaceNATRelease")
+	}
+
 	schedulerCache := scheduler.NewCache(
 		mgr.GetLogger().WithName("scheduler").WithName("cache"),
 		scheduler.DefaultCacheStrategy,

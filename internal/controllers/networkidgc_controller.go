@@ -117,6 +117,10 @@ func (r *NetworkIDGCReconciler) networkIDClaimerExists(ctx context.Context, netw
 		r.AbsenceCache.Add(claimRef.UID, nil)
 		return false, nil
 	}
+	if claimRef.UID != claimer.UID {
+		r.AbsenceCache.Add(claimRef.UID, nil)
+		return false, nil
+	}
 	return true, nil
 }
 

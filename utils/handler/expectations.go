@@ -107,6 +107,7 @@ func (o *observeExpectationsForController) delete(obj client.Object) {
 		return
 	}
 
+	observeExpectationsForControllerLog.V(4).Info("Deletion observed")
 	o.expectations.DeletionObserved(*ctrlKey, client.ObjectKeyFromObject(obj))
 }
 
@@ -124,6 +125,7 @@ func (o *observeExpectationsForController) add(obj client.Object) {
 	if ctrlKey == nil {
 		return
 	}
+	observeExpectationsForControllerLog.V(4).Info("Creation observed")
 	o.expectations.CreationObserved(*ctrlKey, client.ObjectKeyFromObject(obj))
 }
 

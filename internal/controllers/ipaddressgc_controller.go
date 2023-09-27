@@ -116,6 +116,10 @@ func (r *IPAddressGCReconciler) ipAddressClaimerExists(ctx context.Context, addr
 		r.AbsenceCache.Add(claimRef.UID, nil)
 		return false, nil
 	}
+	if claimRef.UID != claimer.UID {
+		r.AbsenceCache.Add(claimRef.UID, nil)
+		return false, nil
+	}
 	return true, nil
 }
 
