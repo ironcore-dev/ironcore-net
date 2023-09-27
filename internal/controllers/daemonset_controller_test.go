@@ -100,5 +100,18 @@ var _ = Describe("DaemonSetController", func() {
 		Eventually(ObjectList(&v1alpha1.InstanceList{},
 			client.InNamespace(ns.Name),
 		)).Should(HaveField("Items", HaveEach(HaveField("Spec.IPs", []net.IP{net.MustParseIP("192.168.178.1")}))))
+
+		By("deleting the instances")
+		Expect(k8sClient.DeleteAllOf(ctx, &v1alpha1.Instance{}, client.InNamespace(ns.Name))).To(Succeed())
+
+		By("waiting for new instances to be created again")
+		Eventually(ObjectList(&v1alpha1.InstanceList{},
+			client.InNamespace(ns.Name),
+		)).Should(HaveField("Items", SatisfyAll(
+			ContainElements(
+				HaveField("DeletionTimestamp", BeNil()),
+				HaveField("DeletionTimestamp", BeNil()),
+			)),
+		))
 	})
 })

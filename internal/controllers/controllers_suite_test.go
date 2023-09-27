@@ -173,6 +173,12 @@ var _ = BeforeSuite(func() {
 		Cache:         schedulerCache,
 	}).SetupWithManager(k8sManager)).To(Succeed())
 
+	Expect((&NetworkInterfaceNATReleaseReconciler{
+		Client:       k8sManager.GetClient(),
+		APIReader:    k8sManager.GetAPIReader(),
+		AbsenceCache: lru.New(100),
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
 	mgrCtx, cancel := context.WithCancel(context.Background())
 	DeferCleanup(cancel)
 	go func() {

@@ -23,6 +23,7 @@ import (
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
@@ -62,5 +63,40 @@ var _ = Describe("LoadBalancerInstanceController", func() {
 			HaveField("Spec.IP", metalnetv1alpha1.MustParseIP("10.0.0.1")),
 			HaveField("Spec.IP", metalnetv1alpha1.MustParseIP("10.0.0.2")),
 		)))
+	})
+
+	It("should recreate the metalnet load balancer if it gets deleted", func(ctx SpecContext) {
+		By("creating a load balancer instance")
+		inst := &v1alpha1.Instance{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "lb-",
+			},
+			Spec: v1alpha1.InstanceSpec{
+				Type:             v1alpha1.InstanceTypeLoadBalancer,
+				LoadBalancerType: v1alpha1.LoadBalancerTypePublic,
+				NetworkRef:       corev1.LocalObjectReference{Name: network.Name},
+				IPs:              []net.IP{net.MustParseIP("10.0.0.1")},
+				NodeRef: &corev1.LocalObjectReference{
+					Name: PartitionNodeName(partitionName, metalnetNode.Name),
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, inst)).To(Succeed())
+
+		By("waiting for the metalnet load balancer to appear")
+		metalnetLoadBalancerList := &metalnetv1alpha1.LoadBalancerList{}
+		Eventually(ObjectList(metalnetLoadBalancerList, client.InNamespace(metalnetNs.Name))).
+			Should(HaveField("Items", HaveLen(1)))
+
+		By("deleting the metalnet load balancer")
+		metalnetLoadBalancer := metalnetLoadBalancerList.Items[0].DeepCopy()
+		Expect(k8sClient.Delete(ctx, metalnetLoadBalancer)).To(Succeed())
+
+		By("waiting for a new metalnet load balancer to be created")
+		Eventually(ObjectList(metalnetLoadBalancerList, client.InNamespace(metalnetNs.Name))).
+			Should(HaveField("Items", ContainElement(
+				HaveField("UID", Not(Equal(metalnetLoadBalancer.UID))),
+			)))
 	})
 })

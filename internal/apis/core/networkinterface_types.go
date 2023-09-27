@@ -128,6 +128,15 @@ func GetNetworkInterfaceNATClaimer(nic *NetworkInterface, ipFamily corev1.IPFami
 	return nil
 }
 
+func IsNetworkInterfaceNATClaimedBy(nic *NetworkInterface, claimer *NATGateway) bool {
+	for _, nat := range nic.Spec.NATs {
+		if nat.ClaimRef.UID == claimer.UID {
+			return true
+		}
+	}
+	return false
+}
+
 func GetNetworkInterfacePublicIPs(nic *NetworkInterface) []net.IP {
 	res := make([]net.IP, len(nic.Spec.PublicIPs))
 	for i, publicIP := range nic.Spec.PublicIPs {

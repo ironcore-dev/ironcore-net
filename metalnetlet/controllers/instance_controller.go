@@ -133,12 +133,12 @@ func (r *InstanceReconciler) delete(ctx context.Context, log logr.Logger, loadBa
 
 func (r *InstanceReconciler) getMetalnetLoadBalancersForLoadBalancerInstance(
 	ctx context.Context,
-	loadBalancerInstance *v1alpha1.Instance,
+	inst *v1alpha1.Instance,
 ) ([]metalnetv1alpha1.LoadBalancer, error) {
 	metalnetLoadBalancerList := &metalnetv1alpha1.LoadBalancerList{}
 	if err := r.MetalnetClient.List(ctx, metalnetLoadBalancerList,
 		client.InNamespace(r.MetalnetNamespace),
-		metalnetletclient.MatchingSourceLabels(r.Scheme(), r.RESTMapper(), loadBalancerInstance),
+		metalnetletclient.MatchingSourceLabels(r.Scheme(), r.RESTMapper(), inst),
 	); err != nil {
 		return nil, fmt.Errorf("error listing metalnet load balancer instances: %w", err)
 	}
@@ -172,6 +172,10 @@ func (r *InstanceReconciler) manageMetalnetLoadBalancers(
 		errs           []error
 	)
 	for _, metalnetLoadBalancer := range metalnetLoadBalancers {
+		if !metalnetLoadBalancer.DeletionTimestamp.IsZero() {
+			continue
+		}
+
 		ip := metalnetIPToIP(metalnetLoadBalancer.Spec.IP)
 		if unsatisfiedIPs.Has(ip) {
 			unsatisfiedIPs.Delete(ip)
@@ -218,7 +222,8 @@ func (r *InstanceReconciler) manageMetalnetLoadBalancers(
 				continue
 			}
 
-			if EqualMetalnetLoadBalancers(createMetalnetLoadBalancer, metalnetLoadBalancer) {
+			if metalnetLoadBalancer.DeletionTimestamp.IsZero() &&
+				EqualMetalnetLoadBalancers(createMetalnetLoadBalancer, metalnetLoadBalancer) {
 				continue
 			}
 
@@ -267,20 +272,20 @@ func computeMetalnetLoadBalancerHash(ip net.IP, collisionCount *int32) string {
 	return rand.SafeEncodeString(fmt.Sprint(h.Sum32()))
 }
 
-func (r *InstanceReconciler) reconcile(ctx context.Context, log logr.Logger, loadBalancerInstance *v1alpha1.Instance) (ctrl.Result, error) {
+func (r *InstanceReconciler) reconcile(ctx context.Context, log logr.Logger, inst *v1alpha1.Instance) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
-	metalnetNode, err := GetMetalnetNode(ctx, r.PartitionName, r.MetalnetClient, loadBalancerInstance.Spec.NodeRef.Name)
+	metalnetNode, err := GetMetalnetNode(ctx, r.PartitionName, r.MetalnetClient, inst.Spec.NodeRef.Name)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
 	if metalnetNode == nil || !metalnetNode.DeletionTimestamp.IsZero() {
-		if !controllerutil.ContainsFinalizer(loadBalancerInstance, PartitionFinalizer(r.PartitionName)) {
+		if !controllerutil.ContainsFinalizer(inst, PartitionFinalizer(r.PartitionName)) {
 			log.V(1).Info("Finalizer not present and metalnet node not found / deleting, nothing to do")
 			return ctrl.Result{}, nil
 		}
 
-		anyExists, err := r.deleteMetalnetLoadBalancersByLoadBalancerInstanceAndAnyExists(ctx, loadBalancerInstance)
+		anyExists, err := r.deleteMetalnetLoadBalancersByLoadBalancerInstanceAndAnyExists(ctx, inst)
 		if err != nil {
 			return ctrl.Result{}, err
 		}
@@ -290,7 +295,7 @@ func (r *InstanceReconciler) reconcile(ctx context.Context, log logr.Logger, loa
 		}
 
 		log.V(1).Info("All metalnet load balancers gone, removing finalizer")
-		if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, loadBalancerInstance, PartitionFinalizer(r.PartitionName)); err != nil {
+		if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, inst, PartitionFinalizer(r.PartitionName)); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
 		}
 		log.V(1).Info("Removed finalizer")
@@ -298,7 +303,7 @@ func (r *InstanceReconciler) reconcile(ctx context.Context, log logr.Logger, loa
 	}
 
 	log.V(1).Info("Metalnet node present and not deleting, ensuring finalizer")
-	modified, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, loadBalancerInstance, PartitionFinalizer(r.PartitionName))
+	modified, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, inst, PartitionFinalizer(r.PartitionName))
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -308,7 +313,7 @@ func (r *InstanceReconciler) reconcile(ctx context.Context, log logr.Logger, loa
 	}
 	log.V(1).Info("Finalizer present")
 
-	ok, err := r.manageMetalnetLoadBalancers(ctx, log, loadBalancerInstance, metalnetNode.Name)
+	ok, err := r.manageMetalnetLoadBalancers(ctx, log, inst, metalnetNode.Name)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error managing metalnet load balancers: %w", err)
 	}
@@ -342,7 +347,7 @@ func (r *InstanceReconciler) SetupWithManager(mgr ctrl.Manager, metalnetCache ca
 		).
 		WatchesRawSource(
 			source.Kind(metalnetCache, &metalnetv1alpha1.LoadBalancer{}),
-			utilhandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &v1alpha1.LoadBalancer{}),
+			utilhandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &v1alpha1.Instance{}),
 		).
 		Complete(r)
 }

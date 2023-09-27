@@ -463,7 +463,7 @@ func (r *SchedulerReconciler) getNodesForInstance(
 		}
 	}
 
-	return nodes, nil
+	return matchingNodes.UnsortedList(), nil
 }
 
 func (r *SchedulerReconciler) reconcileExists(
