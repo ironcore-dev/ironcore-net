@@ -30,6 +30,7 @@ import (
 	flag "github.com/spf13/pflag"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -113,9 +114,10 @@ func main() {
 	}
 
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
-		Scheme:                 scheme,
-		MetricsBindAddress:     metricsAddr,
-		Port:                   9443,
+		Scheme: scheme,
+		Metrics: metricsserver.Options{
+			BindAddress: metricsAddr,
+		},
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "bf12dae0.metalnetlet.apinet.api.onmetal.de",

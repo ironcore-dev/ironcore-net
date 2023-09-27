@@ -41,6 +41,7 @@ import (
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -143,8 +144,10 @@ var _ = BeforeSuite(func() {
 func SetupTest(apiNetNamespace *corev1.Namespace) *corev1.Namespace {
 	BeforeEach(func(ctx SpecContext) {
 		k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
-			Scheme:             scheme.Scheme,
-			MetricsBindAddress: "0",
+			Scheme: scheme.Scheme,
+			Metrics: metricsserver.Options{
+				BindAddress: "0",
+			},
 		})
 		Expect(err).ToNot(HaveOccurred())
 

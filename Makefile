@@ -7,7 +7,7 @@ METALNETLET_IMG ?= metalnetlet:latest
 KIND_CLUSTER_NAME ?= kind
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION = 1.27.1
+ENVTEST_K8S_VERSION = 1.28.0
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -361,14 +361,13 @@ MODELS_SCHEMA ?= $(LOCALBIN)/models-schema
 GOIMPORTS ?= $(LOCALBIN)/goimports
 
 ## Tool Versions
-KUSTOMIZE_VERSION ?= v5.0.0
-CODE_GENERATOR_VERSION ?= v0.27.2
+KUSTOMIZE_VERSION ?= v5.1.1
+CODE_GENERATOR_VERSION ?= v0.28.2
 VGOPATH_VERSION ?= v0.1.1
-CONTROLLER_TOOLS_VERSION ?= v0.11.3
-VGOPATH_VERSION ?= v0.0.2
+CONTROLLER_TOOLS_VERSION ?= v0.13.0
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
-ADDLICENSE_VERSION ?= v1.1.0
-GOIMPORTS_VERSION ?= v0.5.0
+ADDLICENSE_VERSION ?= v1.1.1
+GOIMPORTS_VERSION ?= v0.13.0
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize
