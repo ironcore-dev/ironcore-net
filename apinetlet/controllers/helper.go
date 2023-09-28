@@ -21,7 +21,6 @@ import (
 	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
@@ -41,14 +40,6 @@ func getAPINetNetworkName(ctx context.Context, c client.Client, networkKey clien
 
 func isPrefixAllocated(prefix *ipamv1alpha1.Prefix) bool {
 	return prefix.Status.Phase == ipamv1alpha1.PrefixPhaseAllocated
-}
-
-type asNonDeletingObject struct {
-	client.Object
-}
-
-func (o asNonDeletingObject) GetDeletionTimestamp() *metav1.Time {
-	return nil
 }
 
 func virtualIPClaimedPredicate() predicate.Predicate {

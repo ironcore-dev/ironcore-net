@@ -128,9 +128,14 @@ func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceAPINetNetworkInterfa
 		return fmt.Errorf("error listing apinet network interfaces: %w", err)
 	}
 
+	// create a shallow copy of the network interface with the
+	// deletion timestamp removed in order to properly release the api net network interfaces.
+	nonDeletingNic := *nic
+	nonDeletingNic.DeletionTimestamp = nil
+
 	var (
 		strat    = &apiNetNetworkInterfaceClaimStrategy{r.APINetClient}
-		claimMgr = claimmanager.New(asNonDeletingObject{nic}, claimmanager.NothingSelector(), strat)
+		claimMgr = claimmanager.New(&nonDeletingNic, claimmanager.NothingSelector(), strat)
 		errs     []error
 	)
 	for _, apiNetNic := range apiNetNicList.Items {
