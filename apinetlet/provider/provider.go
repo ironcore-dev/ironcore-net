@@ -51,7 +51,7 @@ func ParseNetworkInterfaceID(id string) (namespace, name, node string, uid types
 // onmetal-api-net://<namespace>/<name>/<node>/<uid>
 func GetNetworkInterfaceID(namespace, name, node string, uid types.UID) string {
 	var sb strings.Builder
-	sb.Grow(len(apiNetPrefix) + len(node) + 1 + len(name) + 1 + len(uid))
+	sb.Grow(len(apiNetPrefix) + len(namespace) + 1 + len(name) + 1 + len(node) + 1 + len(uid))
 	sb.WriteString(apiNetPrefix)
 	sb.WriteString(namespace)
 	sb.WriteRune('/')
@@ -67,7 +67,7 @@ func GetNetworkInterfaceID(namespace, name, node string, uid types.UID) string {
 // The format of a network provider ID is as follows:
 // onmetal-api-net://<id>/<name>/<uid>
 func ParseNetworkID(s string) (namespace, name, id string, uid types.UID, err error) {
-	parts := strings.SplitN(strings.TrimPrefix(id, apiNetPrefix), "/", 5)
+	parts := strings.SplitN(strings.TrimPrefix(s, apiNetPrefix), "/", 5)
 	if len(parts) != 4 {
 		return "", "", "", "", fmt.Errorf("invalid provider id %q", id)
 	}
