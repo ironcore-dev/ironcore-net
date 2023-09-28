@@ -50,19 +50,27 @@ var _ = Describe("Provider", func() {
 		})
 	})
 
-	Context("ParseNetworkID", func() {
+	Context("NetworkID", func() {
 		const (
 			id         = "foo"
 			providerID = string("onmetal-api-net://" + namespace + "/" + name + "/" + id + "/" + uid)
 		)
 
-		It("should parse the network id", func() {
-			actualNs, actualName, actualID, actualUID, err := ParseNetworkID(providerID)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(actualNs).To(Equal(namespace))
-			Expect(actualName).To(Equal(name))
-			Expect(actualID).To(Equal(id))
-			Expect(actualUID).To(Equal(uid))
+		Context("ParseNetworkID", func() {
+			It("should parse the network id", func() {
+				actualNs, actualName, actualID, actualUID, err := ParseNetworkID(providerID)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(actualNs).To(Equal(namespace))
+				Expect(actualName).To(Equal(name))
+				Expect(actualID).To(Equal(id))
+				Expect(actualUID).To(Equal(uid))
+			})
+		})
+
+		Context("GetNetworkID", func() {
+			It("should correctly encode the network ID", func() {
+				Expect(GetNetworkID(namespace, name, id, uid)).To(Equal(providerID))
+			})
 		})
 	})
 })
