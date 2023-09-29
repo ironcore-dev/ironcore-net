@@ -129,6 +129,15 @@ func workaroundMetalnetNoIPv6IPToIPs(metalnetVirtualIP *metalnetv1alpha1.IP) []m
 	return []metalnetv1alpha1.IP{*metalnetVirtualIP}
 }
 
+// workaroundMetalnetNoIPv6NATIPToIPs works around the missing public IPv6 support in metalnet by
+// making a slice of the single virtual IP.
+func workaroundMetalnetNoIPv6NATIPToIPs(natDetails *metalnetv1alpha1.NATDetails) []metalnetv1alpha1.IP {
+	if natDetails == nil {
+		return nil
+	}
+	return []metalnetv1alpha1.IP{*natDetails.IP}
+}
+
 // workaroundMetalnetNoIPv6NATDetailsToNATDetailsPointer works around the missing NAT IPv6 support in metalnet by
 // returning only the IPv4 NAT details.
 func workaroundMetalnetNoIPv6NATDetailsToNATDetailsPointer(natDetails []metalnetv1alpha1.NATDetails) *metalnetv1alpha1.NATDetails {
