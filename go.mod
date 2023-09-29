@@ -7,7 +7,7 @@ require (
 	github.com/go-logr/logr v1.2.4
 	github.com/google/uuid v1.3.0
 	github.com/onmetal/controller-utils v0.8.2
-	github.com/onmetal/metalnet v0.1.0
+	github.com/onmetal/metalnet v0.1.8
 	github.com/onmetal/onmetal-api v0.1.2-0.20230925221054-61f5769766f5
 	github.com/onsi/ginkgo/v2 v2.12.1
 	github.com/onsi/gomega v1.27.10

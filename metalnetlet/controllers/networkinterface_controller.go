@@ -252,7 +252,7 @@ func (r *NetworkInterfaceReconciler) updateStatus(
 		nic.Status.PCIAddress = nil
 	}
 	nic.Status.PublicIPs = metalnetIPsToIPs(workaroundMetalnetNoIPv6IPToIPs(metalnetNic.Status.VirtualIP))
-	nic.Status.NATIPs = metalnetIPsToIPs(workaroundMetalnetNoIPv6IPToIPs(metalnetNic.Status.NatIP))
+	nic.Status.NATIPs = metalnetIPsToIPs(workaroundMetalnetNoIPv6NATIPToIPs(metalnetNic.Status.NatIP))
 	nic.Status.Prefixes = metalnetIPPrefixesToIPPrefixes(metalnetNic.Spec.Prefixes)
 	if err := r.Status().Patch(ctx, nic, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching network interface status: %w", err)
