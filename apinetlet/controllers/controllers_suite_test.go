@@ -85,7 +85,7 @@ var _ = BeforeSuite(func() {
 		},
 		ErrorIfAPIServicePathIsMissing: true,
 	}
-	onmetalAPIOpts := testEnvExt.AddAPIServerInstallOptions(envtestutils.APIServerInstallOptions{
+	ironcoreOpts := testEnvExt.AddAPIServerInstallOptions(envtestutils.APIServerInstallOptions{
 		Paths: []string{
 			modutils.Dir("github.com/ironcore-dev/ironcore", "config", "apiserver", "apiservice", "bases"),
 		},
@@ -129,9 +129,9 @@ var _ = BeforeSuite(func() {
 		MainPath:     "github.com/ironcore-dev/ironcore/cmd/ironcore-apiserver",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		ETCDServers:  []string{testEnv.ControlPlane.Etcd.URL.String()},
-		Host:         onmetalAPIOpts.LocalServingHost,
-		Port:         onmetalAPIOpts.LocalServingPort,
-		CertDir:      onmetalAPIOpts.LocalServingCertDir,
+		Host:         ironcoreOpts.LocalServingHost,
+		Port:         ironcoreOpts.LocalServingPort,
+		CertDir:      ironcoreOpts.LocalServingCertDir,
 	})
 	Expect(err).NotTo(HaveOccurred())
 

@@ -23,7 +23,7 @@ import (
 	"github.com/ironcore-dev/controller-utils/configutils"
 	ironcorenetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/internal/controllers"
-	ironcorenet "github.com/ironcore-dev/ironcore-net/internal/controllers/certificate/onmetal-api-net"
+	ironcorenet "github.com/ironcore-dev/ironcore-net/internal/controllers/certificate/ironcore-net"
 	"github.com/ironcore-dev/ironcore-net/internal/controllers/scheduler"
 	"github.com/ironcore-dev/ironcore-net/utils/expectations"
 	flag "github.com/spf13/pflag"

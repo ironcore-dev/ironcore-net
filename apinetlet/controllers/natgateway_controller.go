@@ -183,8 +183,8 @@ func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 		},
 		Spec: v1alpha1.NATGatewayAutoscalerSpec{
 			NATGatewayRef: corev1.LocalObjectReference{Name: apiNetNATGateway.Name},
-			MinPublicIPs:  generic.Pointer[int32](1),  // TODO: Make this configurable via onmetal-api NAT gateway
-			MaxPublicIPs:  generic.Pointer[int32](10), // TODO: Configure depending on onmetal-api NAT gateway
+			MinPublicIPs:  generic.Pointer[int32](1),  // TODO: Make this configurable via ironcore NAT gateway
+			MaxPublicIPs:  generic.Pointer[int32](10), // TODO: Configure depending on ironcore NAT gateway
 		},
 	}
 	_ = ctrl.SetControllerReference(apiNetNATGateway, apiNetNATGatewayAutoscaler, r.Scheme())

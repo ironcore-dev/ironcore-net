@@ -25,7 +25,7 @@ import (
 
 	"github.com/ironcore-dev/controller-utils/buildutils"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	ironcorenet "github.com/ironcore-dev/ironcore-net/internal/controllers/certificate/onmetal-api-net"
+	ironcorenet "github.com/ironcore-dev/ironcore-net/internal/controllers/certificate/ironcore-net"
 	"github.com/ironcore-dev/ironcore-net/internal/controllers/scheduler"
 	"github.com/ironcore-dev/ironcore-net/utils/expectations"
 	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"

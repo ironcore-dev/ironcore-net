@@ -20,8 +20,8 @@ using a `metalnet` cluster run the payload functions on. A
 `metalnetlet` creates `Node` objects corresponding to all
 `Node`s inside the `metalnet` custer.
 
-The integration to `onmetal-api` is realized via the `apinetlet`,
-an agent using an `ironcore-net` cluster to realize `onmetal-api`
+The integration to `ironcore` is realized via the `apinetlet`,
+an agent using an `ironcore-net` cluster to realize `ironcore`
 objects like `LoadBalancer`s, `VirtualIP`s and more.
 
 Documentation about the concepts of `ironcore-net` can be found

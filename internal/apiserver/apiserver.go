@@ -87,8 +87,8 @@ type Config struct {
 	ExtraConfig   ExtraConfig
 }
 
-// OnmetalAPIServer contains state for a Kubernetes cluster master/api server.
-type OnmetalAPIServer struct {
+// IronCoreServer contains state for a Kubernetes cluster master/api server.
+type IronCoreServer struct {
 	GenericAPIServer *genericapiserver.GenericAPIServer
 }
 
@@ -117,8 +117,8 @@ func (cfg *Config) Complete() CompletedConfig {
 	return CompletedConfig{&c}
 }
 
-// New returns a new instance of OnmetalAPIServer from the given config.
-func (c completedConfig) New() (*OnmetalAPIServer, error) {
+// New returns a new instance of IronCoreServer from the given config.
+func (c completedConfig) New() (*IronCoreServer, error) {
 	genericServer, err := c.GenericConfig.New("ironcore-net-apiserver", genericapiserver.NewEmptyDelegate())
 	if err != nil {
 		return nil, err
@@ -165,7 +165,7 @@ func (c completedConfig) New() (*OnmetalAPIServer, error) {
 		return nil, err
 	}
 
-	s := &OnmetalAPIServer{
+	s := &IronCoreServer{
 		GenericAPIServer: genericServer,
 	}
 

@@ -91,8 +91,8 @@ func main() {
 
 	flag.StringVar(&apiNetNamespace, "api-net-namespace", "", "api-net cluster namespace to manage all objects in.")
 
-	flag.StringVar(&watchNamespace, "namespace", "", "Namespace that the controller watches to reconcile onmetal-api objects. If unspecified, the controller watches for onmetal-api objects across all namespaces.")
-	flag.StringVar(&watchFilterValue, "watch-filter", "", fmt.Sprintf("label value that the controller watches to reconcile onmetal-api objects. Label key is always %s. If unspecified, the controller watches for all onmetal-api objects", commonv1alpha1.WatchLabel))
+	flag.StringVar(&watchNamespace, "namespace", "", "Namespace that the controller watches to reconcile ironcore objects. If unspecified, the controller watches for ironcore objects across all namespaces.")
+	flag.StringVar(&watchFilterValue, "watch-filter", "", fmt.Sprintf("label value that the controller watches to reconcile ironcore objects. Label key is always %s. If unspecified, the controller watches for all ironcore objects", commonv1alpha1.WatchLabel))
 
 	opts := zap.Options{
 		Development: true,
@@ -112,7 +112,7 @@ func main() {
 	}
 
 	if watchNamespace != "" {
-		setupLog.Info("Watching onmetal-api objects only in namespace for reconciliation", "namespace", watchNamespace)
+		setupLog.Info("Watching ironcore objects only in namespace for reconciliation", "namespace", watchNamespace)
 	}
 
 	cfg, cfgCtrl, err := apinetletconfig.GetConfig(ctx, &configOptions)

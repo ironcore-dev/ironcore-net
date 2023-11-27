@@ -221,7 +221,7 @@ uninstall: uninstall-ironcore-net uninstall-apinetlet uninstall-metalnetlet ## U
 
 .PHONY: deploy-ironcore-net
 deploy-ironcore-net: manifests kustomize ## Deploy ironcore-net controller to the K8s cluster specified in ~/.kube/config.
-	cd config/ironcore-net/manager && $(KUSTOMIZE) edit set image controller=${ONMETAL_API_NET_IMG}
+	cd config/controller/manager && $(KUSTOMIZE) edit set image controller=${CONTROLLER_MANAGER_IMG}
 	kubectl apply -k config/ironcore-net/default
 
 .PHONY: deploy-apinetlet

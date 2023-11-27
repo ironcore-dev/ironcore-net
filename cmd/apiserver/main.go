@@ -24,8 +24,8 @@ import (
 
 func main() {
 	ctx := server.SetupSignalContext()
-	options := apiserver.NewOnmetalAPINetServerOptions()
-	cmd := apiserver.NewCommandStartOnmetalAPINetServer(ctx, options)
+	options := apiserver.NewIronCoreNetServerOptions()
+	cmd := apiserver.NewCommandStartIronCoreNetServer(ctx, options)
 	code := cli.Run(cmd)
 	os.Exit(code)
 }

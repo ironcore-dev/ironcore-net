@@ -48,7 +48,7 @@ const (
 	defaultMaxVNI = (1 << 24) - 1
 )
 
-type OnmetalAPINetServerOptions struct {
+type IronCoreNetServerOptions struct {
 	RecommendedOptions    *options.RecommendedOptions
 	SharedInformerFactory informers.SharedInformerFactory
 	MinVNI                int32
@@ -56,15 +56,15 @@ type OnmetalAPINetServerOptions struct {
 	PublicPrefix          []netip.Prefix
 }
 
-func (o *OnmetalAPINetServerOptions) AddFlags(fs *pflag.FlagSet) {
+func (o *IronCoreNetServerOptions) AddFlags(fs *pflag.FlagSet) {
 	o.RecommendedOptions.AddFlags(fs)
 	fs.Int32Var(&o.MinVNI, "min-vni", o.MinVNI, "Minimum VNI to allocate")
 	fs.Int32Var(&o.MaxVNI, "max-vni", o.MaxVNI, "Maximum VNI to allocate")
 	netflag.IPPrefixesVar(fs, &o.PublicPrefix, "public-prefix", o.PublicPrefix, "Public prefixes to allocate from")
 }
 
-func NewOnmetalAPINetServerOptions() *OnmetalAPINetServerOptions {
-	o := &OnmetalAPINetServerOptions{
+func NewIronCoreNetServerOptions() *IronCoreNetServerOptions {
+	o := &IronCoreNetServerOptions{
 		RecommendedOptions: options.NewRecommendedOptions(
 			defaultEtcdPathPrefix,
 			apiserver.Codecs.LegacyCodec(v1alpha1.SchemeGroupVersion),
@@ -76,7 +76,7 @@ func NewOnmetalAPINetServerOptions() *OnmetalAPINetServerOptions {
 	return o
 }
 
-func NewCommandStartOnmetalAPINetServer(ctx context.Context, defaults *OnmetalAPINetServerOptions) *cobra.Command {
+func NewCommandStartIronCoreNetServer(ctx context.Context, defaults *IronCoreNetServerOptions) *cobra.Command {
 	o := *defaults
 	cmd := &cobra.Command{
 		Short: "Launch an ironcore-net API server",
@@ -101,17 +101,17 @@ func NewCommandStartOnmetalAPINetServer(ctx context.Context, defaults *OnmetalAP
 	return cmd
 }
 
-func (o *OnmetalAPINetServerOptions) Validate(args []string) error {
+func (o *IronCoreNetServerOptions) Validate(args []string) error {
 	var errs []error
 	errs = append(errs, o.RecommendedOptions.Validate()...)
 	return utilerrors.NewAggregate(errs)
 }
 
-func (o *OnmetalAPINetServerOptions) Complete() error {
+func (o *IronCoreNetServerOptions) Complete() error {
 	return nil
 }
 
-func (o *OnmetalAPINetServerOptions) Config() (*apiserver.Config, error) {
+func (o *IronCoreNetServerOptions) Config() (*apiserver.Config, error) {
 	if err := o.RecommendedOptions.SecureServing.MaybeDefaultWithSelfSignedCerts("localhost", nil, []net.IP{netutils.ParseIPSloppy("127.0.0.1")}); err != nil {
 		return nil, fmt.Errorf("error creating self-signed certificates: %w", err)
 	}
@@ -159,7 +159,7 @@ func (o *OnmetalAPINetServerOptions) Config() (*apiserver.Config, error) {
 	return config, nil
 }
 
-func (o *OnmetalAPINetServerOptions) Run(ctx context.Context) error {
+func (o *IronCoreNetServerOptions) Run(ctx context.Context) error {
 	config, err := o.Config()
 	if err != nil {
 		return err
