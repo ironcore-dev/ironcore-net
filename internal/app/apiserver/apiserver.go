@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,19 +20,20 @@ import (
 	"net"
 	"net/netip"
 
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/client-go/informers"
-	clientset "github.com/onmetal/onmetal-api-net/client-go/onmetalapinet"
-	apinetopenapi "github.com/onmetal/onmetal-api-net/client-go/openapi"
-	"github.com/onmetal/onmetal-api-net/internal/apiserver"
-	netflag "github.com/onmetal/onmetal-api-net/utils/flag"
+	apinetopenapi "github.com/ironcore-dev/ironcore-net/client-go/openapi"
+	"k8s.io/apiserver/pkg/endpoints/openapi"
+
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/client-go/informers"
+	clientset "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
+	"github.com/ironcore-dev/ironcore-net/internal/apiserver"
+	netflag "github.com/ironcore-dev/ironcore-net/utils/flag"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/apiserver/pkg/admission"
-	"k8s.io/apiserver/pkg/endpoints/openapi"
 	"k8s.io/apiserver/pkg/features"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/apiserver/pkg/server/options"
@@ -41,7 +42,7 @@ import (
 )
 
 const (
-	defaultEtcdPathPrefix = "/registry/apinet.onmetal.de"
+	defaultEtcdPathPrefix = "/registry/apinet.ironcore.dev"
 
 	defaultMinVNI = 200
 	defaultMaxVNI = (1 << 24) - 1
@@ -78,8 +79,8 @@ func NewOnmetalAPINetServerOptions() *OnmetalAPINetServerOptions {
 func NewCommandStartOnmetalAPINetServer(ctx context.Context, defaults *OnmetalAPINetServerOptions) *cobra.Command {
 	o := *defaults
 	cmd := &cobra.Command{
-		Short: "Launch an onmetal-api-net API server",
-		Long:  "Launch an onmetal-api-net API server",
+		Short: "Launch an ironcore-net API server",
+		Long:  "Launch an ironcore-net API server",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := o.Complete(); err != nil {
 				return err
@@ -118,12 +119,12 @@ func (o *OnmetalAPINetServerOptions) Config() (*apiserver.Config, error) {
 	o.RecommendedOptions.Etcd.StorageConfig.Paging = utilfeature.DefaultFeatureGate.Enabled(features.APIListChunking)
 
 	o.RecommendedOptions.ExtraAdmissionInitializers = func(c *genericapiserver.RecommendedConfig) ([]admission.PluginInitializer, error) {
-		onmetalAPINetClient, err := clientset.NewForConfig(c.LoopbackClientConfig)
+		ironcoreAPINetClient, err := clientset.NewForConfig(c.LoopbackClientConfig)
 		if err != nil {
 			return nil, err
 		}
 
-		informerFactory := informers.NewSharedInformerFactory(onmetalAPINetClient, c.LoopbackClientConfig.Timeout)
+		informerFactory := informers.NewSharedInformerFactory(ironcoreAPINetClient, c.LoopbackClientConfig.Timeout)
 		o.SharedInformerFactory = informerFactory
 
 		return nil, nil
@@ -132,12 +133,12 @@ func (o *OnmetalAPINetServerOptions) Config() (*apiserver.Config, error) {
 	serverConfig := genericapiserver.NewRecommendedConfig(apiserver.Codecs)
 
 	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(apinetopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(apiserver.Scheme))
-	serverConfig.OpenAPIConfig.Info.Title = "onmetal-api-net"
+	serverConfig.OpenAPIConfig.Info.Title = "ironcore-net"
 	serverConfig.OpenAPIConfig.Info.Version = "0.1"
 
 	if utilfeature.DefaultFeatureGate.Enabled(features.OpenAPIV3) {
 		serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIConfig(apinetopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(apiserver.Scheme))
-		serverConfig.OpenAPIV3Config.Info.Title = "onmetal-api-net"
+		serverConfig.OpenAPIV3Config.Info.Title = "ironcore-net"
 		serverConfig.OpenAPIV3Config.Info.Version = "0.1"
 	}
 
@@ -169,7 +170,7 @@ func (o *OnmetalAPINetServerOptions) Run(ctx context.Context) error {
 		return err
 	}
 
-	server.GenericAPIServer.AddPostStartHookOrDie("start-onmetal-api-net-server-informers", func(context genericapiserver.PostStartHookContext) error {
+	server.GenericAPIServer.AddPostStartHookOrDie("start-ironcore-net-server-informers", func(context genericapiserver.PostStartHookContext) error {
 		config.GenericConfig.SharedInformerFactory.Start(context.StopCh)
 		o.SharedInformerFactory.Start(context.StopCh)
 		return nil

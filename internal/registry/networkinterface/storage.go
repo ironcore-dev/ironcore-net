@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ import (
 	"fmt"
 	"net/netip"
 
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/apimachinery/api/net"
-	"github.com/onmetal/onmetal-api-net/internal/apis/core"
-	"github.com/onmetal/onmetal-api-net/internal/registry/ipallocator"
-	utilslices "github.com/onmetal/onmetal-api/utils/slices"
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
+	"github.com/ironcore-dev/ironcore-net/internal/apis/core"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/ipallocator"
+	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"

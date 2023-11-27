@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -39,8 +39,8 @@ type NetworkIDGCReconciler struct {
 	AbsenceCache *lru.Cache
 }
 
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=networkids,verbs=get;list;watch;delete
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=networks,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networkids,verbs=get;list;watch;delete
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networks,verbs=get;list;watch
 
 func (r *NetworkIDGCReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

@@ -1,6 +1,6 @@
 # `onmetal-api` integration
 
-`onmetal-api-net` controls networking over multiple peers
+`ironcore-net` controls networking over multiple peers
 and intelligently manages functions. It can be operated and
 used independently of `onmetal-api`. The binding to `onmetal-api`
 is only realized via `apinetlet`.
@@ -8,14 +8,14 @@ is only realized via `apinetlet`.
 ## Mapped objects / interaction
 
 The `apinetlet` is a controller that has access to an `onmetal-api`-enabled
-cluster and an `onmetal-api-net`-enabled cluster. It maps objects of
+cluster and an `ironcore-net`-enabled cluster. It maps objects of
 `onmetal-api`'s `networking` group to corresponding entities in
-`onmetal-api-net`, if possible.
+`ironcore-net`, if possible.
 
 ### `Network`
 
-When an `networking.api.onmetal.de/Network` is created, a corresponding
-`core.apinet.api.onmetal.de/Network` is created in the `apinet` cluster.
+When an `networking.ironcore.dev/Network` is created, a corresponding
+`core.apinet.ironcore.dev/Network` is created in the `apinet` cluster.
 The name of the `Network` in the `apinet` cluster is the `uid` of the
 `Network` in the `onmetal-api` cluster.
 
@@ -26,8 +26,8 @@ The provider ID format & parsing can be found in [`provider.go`](../../apinetlet
 
 ### `LoadBalancer`
 
-For a `networking.api.onmetal.de/LoadBalancer` a corresponding
-`core.apinet.api.onmetal.de/LoadBalancer` is created, also having the
+For a `networking.ironcore.dev/LoadBalancer` a corresponding
+`core.apinet.ironcore.dev/LoadBalancer` is created, also having the
 `uid` of the source object as its name.
 
 The `apinet` `LoadBalancer` is configured to have an IP per IP family
@@ -43,8 +43,8 @@ cross-zone.
 
 ### `NATGateway`
 
-For a `networking.api.onmetal.de/NATGateway` a corresponding
-`core.apinet.api.onmetal.de/NATGateway` is created, also having the
+For a `networking.ironcore.dev/NATGateway` a corresponding
+`core.apinet.ironcore.dev/NATGateway` is created, also having the
 `uid` of the source object as its name. Additionally, a
 `NATGatewayAutoscaler` is created, ensuring there are enough public
 IPs available.

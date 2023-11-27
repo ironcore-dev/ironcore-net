@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ import (
 	"crypto/x509/pkix"
 	"os"
 
-	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	utilcertificate "github.com/onmetal/onmetal-api/utils/certificate"
-	"github.com/onmetal/onmetal-api/utils/client/config"
+	ironcorenetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	utilcertificate "github.com/ironcore-dev/ironcore/utils/certificate"
+	"github.com/ironcore-dev/ironcore/utils/client/config"
 	certificatesv1 "k8s.io/api/certificates/v1"
 	"k8s.io/apiserver/pkg/server/egressselector"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -36,7 +36,7 @@ var (
 		SignerName: certificatesv1.KubeAPIServerClientSignerName,
 		Template: &x509.CertificateRequest{
 			Subject: pkix.Name{
-				CommonName:   networkingv1alpha1.NetworkPluginCommonName("onmetal-api-net"),
+				CommonName:   networkingv1alpha1.NetworkPluginCommonName("ironcore-net"),
 				Organization: []string{networkingv1alpha1.NetworkPluginsGroup},
 			},
 		},
@@ -54,8 +54,8 @@ func NewAPINetGetter(namespace string) (*config.Getter, error) {
 		SignerName: certificatesv1.KubeAPIServerClientSignerName,
 		Template: &x509.CertificateRequest{
 			Subject: pkix.Name{
-				CommonName:   onmetalapinetv1alpha1.APINetletCommonName(namespace),
-				Organization: []string{onmetalapinetv1alpha1.APINetletsGroup},
+				CommonName:   ironcorenetv1alpha1.APINetletCommonName(namespace),
+				Organization: []string{ironcorenetv1alpha1.APINetletsGroup},
 			},
 		},
 		GetUsages:      utilcertificate.DefaultKubeAPIServerClientGetUsages,

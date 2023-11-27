@@ -1,7 +1,7 @@
 # Objects
 
-`onmetal-api-net` provides multiple objects to interact with.
-As `onmetal-api-net` is a Kubernetes-API, all objects are written
+`ironcore-net` provides multiple objects to interact with.
+As `ironcore-net` is a Kubernetes-API, all objects are written
 in a declarative fashion, meaning that they represent the desired
 state and will be reconciled to eventually manifest that state in
 the real world.
@@ -16,7 +16,7 @@ IP. When deleting the IP, the corresponding public IP is released
 again.
 
 ```yaml
-apiVersion: core.apinet.api.onmetal.de/v1alpha1
+apiVersion: core.apinet.ironcore.dev/v1alpha1
 kind: IP
 metadata:
   namespace: default
@@ -39,7 +39,7 @@ configured otherwise.
 Example manifest:
 
 ```yaml
-apiVersion: core.apinet.api.onmetal.de/v1alpha1
+apiVersion: core.apinet.ironcore.dev/v1alpha1
 kind: Network
 metadata:
   namespace: default
@@ -72,7 +72,7 @@ and reports its PCI address and state as part of its `status`.
 Example manifest:
 
 ```yaml
-apiVersion: core.apinet.api.onmetal.de/v1alpha1
+apiVersion: core.apinet.ironcore.dev/v1alpha1
 kind: NetworkInterface
 metadata:
   namespace: default
@@ -115,7 +115,7 @@ be a single instance per topology domain.
 Example manifest:
 
 ```yaml
-apiVersion: core.apinet.api.onmetal.de/v1alpha1
+apiVersion: core.apinet.ironcore.dev/v1alpha1
 kind: Instance
 metadata:
   namespace: default
@@ -143,7 +143,7 @@ For now, everytime the IPs of a `LoadBalancer` are updated,
 all its `Instance`s are updated (done by the `DaemonSet` controller).
 
 ```yaml
-apiVersion: core.apinet.api.onmetal.de/v1alpha1
+apiVersion: core.apinet.ironcore.dev/v1alpha1
 kind: LoadBalancer
 metadata:
   namespace: default
@@ -172,7 +172,7 @@ has. The claim is depicted by the `NetworkInterface`'s `spec.natGateways`.
 Example manifest:
 
 ```yaml
-apiVersion: core.apinet.api.onmetal.de/v1alpha1
+apiVersion: core.apinet.ironcore.dev/v1alpha1
 kind: NATGateway
 metadata:
   namespace: default

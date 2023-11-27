@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 by the OnMetal authors.
+ * Copyright (c) 2021 by the IronCore authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 // +k8s:openapi-gen=true
 // +k8s:defaulter-gen=TypeMeta
 // +k8s:protobuf-gen=package
-// +groupName=core.apinet.api.onmetal.de
+// +groupName=core.apinet.ironcore.dev
 
 // Package core is the core version of the API.
-package core // import "github.com/onmetal/onmetal-api-net/api/core/core"
+package core // import "github.com/ironcore-dev/ironcore-net/api/core/core"

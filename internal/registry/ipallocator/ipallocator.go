@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@ import (
 	"net/netip"
 	"time"
 
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	v1alpha1informers "github.com/onmetal/onmetal-api-net/client-go/informers/core/v1alpha1"
-	v1alpha1listers "github.com/onmetal/onmetal-api-net/client-go/listers/core/v1alpha1"
-	v1alpha1client "github.com/onmetal/onmetal-api-net/client-go/onmetalapinet/typed/core/v1alpha1"
-	"github.com/onmetal/onmetal-api/utils/generic"
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	v1alpha1informers "github.com/ironcore-dev/ironcore-net/client-go/informers/core/v1alpha1"
+	v1alpha1client "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/typed/core/v1alpha1"
+	v1alpha1listers "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/generic"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

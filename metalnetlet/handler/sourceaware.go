@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
 package handler
 
 import (
-	utilapi "github.com/onmetal/onmetal-api-net/utils/api"
-	utilhandler "github.com/onmetal/onmetal-api-net/utils/handler"
+	utilapi "github.com/ironcore-dev/ironcore-net/utils/api"
+	utilhandler "github.com/ironcore-dev/ironcore-net/utils/handler"
 )
 
 var (
-	SourceAwareSystem = utilhandler.NewSourceAwareSystem(utilapi.PrefixSourceAwareSystem("metalnetlet.api.onmetal.de/"))
+	SourceAwareSystem = utilhandler.NewSourceAwareSystem(utilapi.PrefixSourceAwareSystem("metalnetlet.ironcore.dev/"))
 
 	EnqueueRequestForSource = SourceAwareSystem.EnqueueRequestForSource
 )

@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@ import (
 )
 
 func SourceNameLabel(kind string) string {
-	return fmt.Sprintf("apinetlet.api.onmetal.de/%s-name", strings.ToLower(kind))
+	return fmt.Sprintf("apinetlet.ironcore.dev/%s-name", strings.ToLower(kind))
 }
 
 func SourceNamespaceLabel(kind string) string {
-	return fmt.Sprintf("apinetlet.api.onmetal.de/%s-namespace", strings.ToLower(kind))
+	return fmt.Sprintf("apinetlet.ironcore.dev/%s-namespace", strings.ToLower(kind))
 }
 
 func SourceUIDLabel(kind string) string {
-	return fmt.Sprintf("apinetlet.api.onmetal.de/%s-uid", strings.ToLower(kind))
+	return fmt.Sprintf("apinetlet.ironcore.dev/%s-uid", strings.ToLower(kind))
 }

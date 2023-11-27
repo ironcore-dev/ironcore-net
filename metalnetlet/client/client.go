@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onmetal/controller-utils/metautils"
+	"github.com/ironcore-dev/controller-utils/metautils"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )

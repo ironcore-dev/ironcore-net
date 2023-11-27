@@ -1,11 +1,11 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: apinet.api.onmetal.de:system:metalnetlets-bootstrapper
+  name: apinet.ironcore.dev:system:metalnetlets-bootstrapper
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: apinet.api.onmetal.de:system:metalnetlets-bootstrapper
+  name: apinet.ironcore.dev:system:metalnetlets-bootstrapper
 subjects:
   - kind: Group
     # Group name has to match bootstrap group pattern \Asystem:bootstrappers:[a-z0-9:-]{0,255}[a-z0-9]\

@@ -23,13 +23,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/onmetal/controller-utils/buildutils"
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	onmetalapinet "github.com/onmetal/onmetal-api-net/internal/controllers/certificate/onmetal-api-net"
-	"github.com/onmetal/onmetal-api-net/internal/controllers/scheduler"
-	"github.com/onmetal/onmetal-api-net/utils/expectations"
-	utilsenvtest "github.com/onmetal/onmetal-api/utils/envtest"
-	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
+	"github.com/ironcore-dev/controller-utils/buildutils"
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	ironcorenet "github.com/ironcore-dev/ironcore-net/internal/controllers/certificate/onmetal-api-net"
+	"github.com/ironcore-dev/ironcore-net/internal/controllers/scheduler"
+	"github.com/ironcore-dev/ironcore-net/utils/expectations"
+	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"
+	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -105,7 +105,7 @@ var _ = BeforeSuite(func() {
 	SetClient(k8sClient)
 
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
-		MainPath:     "github.com/onmetal/onmetal-api-net/cmd/apiserver",
+		MainPath:     "github.com/ironcore-dev/ironcore-net/cmd/apiserver",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		ETCDServers:  []string{testEnv.ControlPlane.Etcd.URL.String()},
 		Host:         testEnvExt.APIServiceInstallOptions.LocalServingHost,
@@ -155,7 +155,7 @@ var _ = BeforeSuite(func() {
 
 	Expect((&CertificateApprovalReconciler{
 		Client:      k8sManager.GetClient(),
-		Recognizers: onmetalapinet.Recognizers,
+		Recognizers: ironcorenet.Recognizers,
 	}).SetupWithManager(k8sManager)).To(Succeed())
 
 	Expect((&NATGatewayAutoscalerReconciler{

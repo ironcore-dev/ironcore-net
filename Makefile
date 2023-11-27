@@ -48,7 +48,7 @@ help: ## Display this help.
 
 .PHONY: manifests
 manifests: controller-gen ## Generate rbac objects.
-	# onmetal-api-net
+	# ironcore-net
 	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./internal/controllers/..." output:rbac:artifacts:config=config/controller/rbac
 
 	# apinetlet
@@ -60,8 +60,8 @@ manifests: controller-gen ## Generate rbac objects.
 	$(CONTROLLER_GEN) rbac:roleName=apinet-role paths="./metalnetlet/controllers/..." output:rbac:artifacts:config=config/metalnetlet/apinet-rbac
 
 	# Promote *let roles.
-	./hack/promote-let-role.sh config/apinetlet/apinet-rbac/role.yaml config/apiserver/rbac/apinetlet_role.yaml apinet.api.onmetal.de:system:apinetlets
-	./hack/promote-let-role.sh config/metalnetlet/apinet-rbac/role.yaml config/apiserver/rbac/metalnetlet_role.yaml apinet.api.onmetal.de:system:metalnetlets
+	./hack/promote-let-role.sh config/apinetlet/apinet-rbac/role.yaml config/apiserver/rbac/apinetlet_role.yaml apinet.ironcore.dev:system:apinetlets
+	./hack/promote-let-role.sh config/metalnetlet/apinet-rbac/role.yaml config/apiserver/rbac/metalnetlet_role.yaml apinet.ironcore.dev:system:metalnetlets
 
 .PHONY: generate
 generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen defaulter-gen conversion-gen openapi-gen applyconfiguration-gen
@@ -79,7 +79,7 @@ generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen 
 
 .PHONY: add-license
 add-license: addlicense ## Add license headers to all go files.
-	find . -name '*.go' -exec $(ADDLICENSE) -c 'OnMetal authors' {} +
+	find . -name '*.go' -exec $(ADDLICENSE) -c 'IronCore authors' {} +
 
 .PHONY: fmt
 fmt: goimports ## Run goimports against code.
@@ -87,18 +87,18 @@ fmt: goimports ## Run goimports against code.
 
 .PHONY: check-license
 check-license: addlicense ## Check that every file has a license header present.
-	find . -name '*.go' -exec $(ADDLICENSE) -check -c 'OnMetal authors' {} +
+	find . -name '*.go' -exec $(ADDLICENSE) -check -c 'IronCore authors' {} +
 
 .PHONY: lint
-lint: ## Run golangci-lint against code.
-	golangci-lint run ./...
+lint: golangci-lint ## Run golangci-lint on the code.
+	$(GOLANGCI_LINT) run ./...
 
 .PHONY: clean
 clean: ## Clean any artifacts that can be regenerated.
 	rm -rf client-go/applyconfigurations
 	rm -rf client-go/informers
 	rm -rf client-go/listers
-	rm -rf client-go/onmetalapi
+	rm -rf client-go/ironcorenet
 	rm -rf client-go/openapi
 
 .PHONY: check
@@ -115,16 +115,16 @@ test-only: envtest ## Only run tests.
 .PHONY: openapi-extractor
 extract-openapi: envtest openapi-extractor
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" $(OPENAPI_EXTRACTOR) \
-		--apiserver-package="github.com/onmetal/onmetal-api-net/cmd/apiserver" \
+		--apiserver-package="github.com/ironcore-dev/ironcore-net/cmd/apiserver" \
 		--apiserver-build-opts=mod \
 		--apiservices="./config/apiserver/apiservice/bases" \
 		--output="./gen"
 
 ##@ Build
 
-.PHONY: build-onmetal-api-net
-build-onmetal-api-net: generate fmt addlicense lint ## Build onmetal-api-net binary.
-	go build -o bin/manager ./onmetal-api-net/main.go
+.PHONY: build-ironcore-net
+build-ironcore-net: generate fmt addlicense lint ## Build ironcore-net binary.
+	go build -o bin/manager ./ironcore-net/main.go
 
 .PHONY: build-apinetlet
 build-apinetlet: generate fmt addlicense lint ## Build apinetlet.
@@ -135,11 +135,11 @@ build-metalnetlet: generate fmt addlicense lint ## Build metalnetlet.
 	go build -o bin/metalnetlet ./metalnetlet/main.go
 
 .PHONY: build
-build: build-onmetal-api-net build-apinetlet build-metalnetlet ## Build onmetal-api-net, apinetlet, metalnetlet.
+build: build-ironcore-net build-apinetlet build-metalnetlet ## Build ironcore-net, apinetlet, metalnetlet.
 
-.PHONY: run-onmetal-api-net
-run-onmetal-api-net: manifests generate fmt lint ## Run a onmetal-api-net from your host.
-	go run ./onmetal-api-net/main.go
+.PHONY: run-ironcore-net
+run-ironcore-net: manifests generate fmt lint ## Run a ironcore-net from your host.
+	go run ./ironcore-net/main.go
 
 .PHONY: run-apinetlet
 run-apinetlet: manifests generate fmt lint ## Run apinetlet from your host.
@@ -185,17 +185,17 @@ docker-push-metalnetlet: ## Push metalnetlet image.
 	docker push ${METALNETLET_IMG}
 
 .PHONY: docker-push
-docker-push: docker-push-apiserver docker-push-controller-manager docker-push-apinetlet docker-push-metalnetlet ## Push onmetal-api-net, apinetlet, metalnetlet image.
+docker-push: docker-push-apiserver docker-push-controller-manager docker-push-apinetlet docker-push-metalnetlet ## Push ironcore-net, apinetlet, metalnetlet image.
 
 ##@ Deployment
 
-.PHONY: install-onmetal-api-net
-install-onmetal-api-net: manifests ## Install onmetal-api-net CRDs into the K8s cluster specified in ~/.kube/config.
-	kubectl apply -k config/onmetal-api-net/crd
+.PHONY: install-ironcore-net
+install-ironcore-net: manifests ## Install ironcore-net CRDs into the K8s cluster specified in ~/.kube/config.
+	kubectl apply -k config/ironcore-net/crd
 
-.PHONY: uninstall-onmetal-api-net
-uninstall-onmetal-api-net: manifests ## Uninstall onmetal-api-net CRDs from the K8s cluster specified in ~/.kube/config.
-	kubectl delete-k config/onmetal-api-net/crd
+.PHONY: uninstall-ironcore-net
+uninstall-ironcore-net: manifests ## Uninstall ironcore-net CRDs from the K8s cluster specified in ~/.kube/config.
+	kubectl delete-k config/ironcore-net/crd
 
 .PHONY: install-apinetlet
 install-apinetlet: manifests ## Install apinetlet CRDs into the K8s cluster specified in ~/.kube/config.
@@ -214,15 +214,15 @@ uninstall-metalnetlet: manifests ## Uninstall metalnetlet CRDs from the K8s clus
 	kubectl delete-k config/metalnetlet/crd
 
 .PHONY: install
-install: install-onmetal-api-net install-apinetlet install-metalnetlet ## Uninstall onmetal-api-net, apinetlet, metalnetlet.
+install: install-ironcore-net install-apinetlet install-metalnetlet ## Uninstall ironcore-net, apinetlet, metalnetlet.
 
 .PHONY: uninstall
-uninstall: uninstall-onmetal-api-net uninstall-apinetlet uninstall-metalnetlet ## Uninstall onmetal-api-net, apinetlet, metalnetlet.
+uninstall: uninstall-ironcore-net uninstall-apinetlet uninstall-metalnetlet ## Uninstall ironcore-net, apinetlet, metalnetlet.
 
-.PHONY: deploy-onmetal-api-net
-deploy-onmetal-api-net: manifests kustomize ## Deploy onmetal-api-net controller to the K8s cluster specified in ~/.kube/config.
-	cd config/onmetal-api-net/manager && $(KUSTOMIZE) edit set image controller=${ONMETAL_API_NET_IMG}
-	kubectl apply -k config/onmetal-api-net/default
+.PHONY: deploy-ironcore-net
+deploy-ironcore-net: manifests kustomize ## Deploy ironcore-net controller to the K8s cluster specified in ~/.kube/config.
+	cd config/ironcore-net/manager && $(KUSTOMIZE) edit set image controller=${ONMETAL_API_NET_IMG}
+	kubectl apply -k config/ironcore-net/default
 
 .PHONY: deploy-apinetlet
 deploy-apinetlet: manifests kustomize ## Deploy apinetlet controller to the K8s cluster specified in ~/.kube/config.
@@ -235,11 +235,11 @@ deploy-metalnetlet: manifests kustomize ## Deploy metalnetlet controller to the 
 	kubectl apply -k config/metalnetlet/default
 
 .PHONY: deploy
-deploy: deploy-onmetal-api-net deploy-apinetlet deploy-metalnetlet ## Deploy onmetal-api-net, apinetlet, metalnetlet
+deploy: deploy-ironcore-net deploy-apinetlet deploy-metalnetlet ## Deploy ironcore-net, apinetlet, metalnetlet
 
-.PHONY: undeploy-onmetal-api-net
-undeploy-onmetal-api-net: ## Undeploy onmetal-api-net controller from the K8s cluster specified in ~/.kube/config.
-	kubectl delete -k config/onmetal-api-net
+.PHONY: undeploy-ironcore-net
+undeploy-ironcore-net: ## Undeploy ironcore-net controller from the K8s cluster specified in ~/.kube/config.
+	kubectl delete -k config/ironcore-net
 
 .PHONY: undeploy-apinetlet
 undeploy-apinetlet: ## Undeploy apinetlet controller from the K8s cluster specified in ~/.kube/config.
@@ -250,7 +250,7 @@ undeploy-metalnetlet: ## Undeploy metalnetlet controller from the K8s cluster sp
 	kubectl delete -k config/metalnetlet
 
 .PHONY: undeploy
-undeploy: undeploy-onmetal-api-net undeploy-apinetlet undeploy-metalnetlet ## Undeploy onmetal-api-net, apinetlet, metalnetlet controller from the K8s cluster specified in ~/.kube/config.
+undeploy: undeploy-ironcore-net undeploy-apinetlet undeploy-metalnetlet ## Undeploy ironcore-net, apinetlet, metalnetlet controller from the K8s cluster specified in ~/.kube/config.
 
 ##@ Kind Deployment plumbing
 
@@ -275,11 +275,11 @@ kind-load: kind-load-apiserver kind-load-controller-manager ## Load apiserver, c
 
 .PHONY: kind-restart-apiserver
 kind-restart-apiserver: ## Restarts the apiserver.
-	kubectl -n onmetal-api-net-system delete rs -l control-plane=apiserver
+	kubectl -n ironcore-net-system delete rs -l control-plane=apiserver
 
 .PHONY: kind-restart-controller-manager
 kind-restart-controller-manager: ## Restarts the controller-manager.
-	kubectl -n onmetal-api-net-system delete rs -l control-plane=controller-manager
+	kubectl -n ironcore-net-system delete rs -l control-plane=controller-manager
 
 .PHONY: kind-restart-apinetlet
 kind-restart-apinetlet: ## Restarts the apinetlet controller manager.
@@ -320,7 +320,7 @@ kind-apply: manifests ## Apply config/kind to the cluster specified in ~/.kube/c
 	kubectl apply -k config/kind
 
 .PHONY: kind-deploy
-kind-deploy: kind-build-load-restart kind-apply ## Build, load and restart onmetal-api-net and apinetlet and apply them.
+kind-deploy: kind-build-load-restart kind-apply ## Build, load and restart ironcore-net and apinetlet and apply them.
 
 .PHONY: kind-delete
 kind-delete: ## Delete config/kind from the cluster specified in ~/.kube/config.
@@ -359,15 +359,17 @@ GEN_CRD_API_REFERENCE_DOCS ?= $(LOCALBIN)/gen-crd-api-reference-docs
 ADDLICENSE ?= $(LOCALBIN)/addlicense
 MODELS_SCHEMA ?= $(LOCALBIN)/models-schema
 GOIMPORTS ?= $(LOCALBIN)/goimports
+GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.1.1
-CODE_GENERATOR_VERSION ?= v0.28.2
-VGOPATH_VERSION ?= v0.1.1
+CODE_GENERATOR_VERSION ?= v0.28.4
+VGOPATH_VERSION ?= v0.1.3
 CONTROLLER_TOOLS_VERSION ?= v0.13.0
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.1
 GOIMPORTS_VERSION ?= v0.13.0
+GOLANGCI_LINT_VERSION ?= v1.55.2
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize
@@ -433,7 +435,7 @@ $(VGOPATH): $(LOCALBIN)
 		echo "$(LOCALBIN)/vgopath version is not expected $(VGOPATH_VERSION). Removing it before installing."; \
 		rm -rf $(LOCALBIN)/vgopath; \
 	fi
-	test -s $(LOCALBIN)/vgopath || GOBIN=$(LOCALBIN) go install github.com/onmetal/vgopath@$(VGOPATH_VERSION)
+	test -s $(LOCALBIN)/vgopath || GOBIN=$(LOCALBIN) go install github.com/ironcore-dev/vgopath@$(VGOPATH_VERSION)
 
 .PHONY: envtest
 envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
@@ -458,9 +460,14 @@ $(ADDLICENSE): $(LOCALBIN)
 .PHONY: models-schema
 models-schema: $(MODELS_SCHEMA) ## Install models-schema locally if necessary.
 $(MODELS_SCHEMA): $(LOCALBIN)
-	test -s $(LOCALBIN)/models-schema || GOBIN=$(LOCALBIN) go install github.com/onmetal/onmetal-api-net/models-schema
+	test -s $(LOCALBIN)/models-schema || GOBIN=$(LOCALBIN) go install github.com/ironcore-dev/ironcore-net/models-schema
 
 .PHONY: goimports
 goimports: $(GOIMPORTS) ## Download goimports locally if necessary.
 $(GOIMPORTS): $(LOCALBIN)
 	test -s $(LOCALBIN)/goimports || GOBIN=$(LOCALBIN) go install golang.org/x/tools/cmd/goimports@$(GOIMPORTS_VERSION)
+
+.PHONY: golangci-lint
+golangci-lint: $(GOLANGCI_LINT) ## Download golangci-lint locally if necessary.
+$(GOLANGCI_LINT): $(LOCALBIN)
+	test -s $(LOCALBIN)/golangci-lint || GOBIN=$(LOCALBIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)

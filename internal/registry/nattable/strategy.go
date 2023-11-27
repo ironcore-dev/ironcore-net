@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onmetal/onmetal-api-net/internal/apis/core"
-	"github.com/onmetal/onmetal-api-net/internal/apis/core/validation"
+	"github.com/ironcore-dev/ironcore-net/internal/apis/core"
+	"github.com/ironcore-dev/ironcore-net/internal/apis/core/validation"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"

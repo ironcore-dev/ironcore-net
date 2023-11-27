@@ -13,6 +13,6 @@ patches:
       group: apps
       version: v1
       kind: Deployment
-      namespace: onmetal-api-net-system
-      name: onmetal-api-net-apiserver
+      namespace: ironcore-net-system
+      name: ironcore-net-apiserver
     path: add-apiserver-args.yaml

@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 package provider_test
 
 import (
-	. "github.com/onmetal/onmetal-api-net/apinetlet/provider"
+	. "github.com/ironcore-dev/ironcore-net/apinetlet/provider"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"k8s.io/apimachinery/pkg/types"
@@ -30,7 +30,7 @@ var _ = Describe("Provider", func() {
 	)
 
 	Context("NetworkInterfaceID", func() {
-		const providerID = string("onmetal-api-net://" + namespace + "/" + name + "/" + node + "/" + uid)
+		const providerID = string("ironcore-net://" + namespace + "/" + name + "/" + node + "/" + uid)
 
 		Describe("GetNetworkInterfaceID", func() {
 			It("should produce a correct network interface ID", func() {
@@ -53,7 +53,7 @@ var _ = Describe("Provider", func() {
 	Context("NetworkID", func() {
 		const (
 			id         = "foo"
-			providerID = string("onmetal-api-net://" + namespace + "/" + name + "/" + id + "/" + uid)
+			providerID = string("ironcore-net://" + namespace + "/" + name + "/" + id + "/" + uid)
 		)
 
 		Context("ParseNetworkID", func() {

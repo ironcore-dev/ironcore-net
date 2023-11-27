@@ -22,14 +22,14 @@ import (
 	"fmt"
 	"os"
 
-	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	apinetletconfig "github.com/onmetal/onmetal-api-net/apinetlet/client/config"
-	"github.com/onmetal/onmetal-api-net/apinetlet/controllers"
-	"github.com/onmetal/onmetal-api-net/client-go/onmetalapinet"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	"github.com/onmetal/onmetal-api/utils/client/config"
+	ironcorenetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apinetletconfig "github.com/ironcore-dev/ironcore-net/apinetlet/client/config"
+	"github.com/ironcore-dev/ironcore-net/apinetlet/controllers"
+	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/client/config"
 	flag "github.com/spf13/pflag"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
@@ -62,7 +62,7 @@ func init() {
 
 	utilruntime.Must(networkingv1alpha1.AddToScheme(scheme))
 	utilruntime.Must(ipamv1alpha1.AddToScheme(scheme))
-	utilruntime.Must(onmetalapinetv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(ironcorenetv1alpha1.AddToScheme(scheme))
 
 	//+kubebuilder:scaffold:scheme
 }
@@ -141,7 +141,7 @@ func main() {
 		},
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "fa89daf5.apinetlet.apinet.api.onmetal.de",
+		LeaderElectionID:       "fa89daf5.apinetlet.apinet.ironcore.dev",
 		Cache: cache.Options{
 			DefaultNamespaces: cacheDefaultNamespaces,
 		},
@@ -170,7 +170,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	apiNetIface, err := onmetalapinet.NewForConfig(apiNetCfg)
+	apiNetIface, err := ironcorenet.NewForConfig(apiNetCfg)
 	if err != nil {
 		setupLog.Error(err, "unable to create api net interface")
 		os.Exit(1)

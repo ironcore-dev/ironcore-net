@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@ import (
 	"hash/fnv"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/controller-utils/clientutils"
+	"github.com/ironcore-dev/controller-utils/clientutils"
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
+	metalnetletclient "github.com/ironcore-dev/ironcore-net/metalnetlet/client"
+	utilhandler "github.com/ironcore-dev/ironcore-net/metalnetlet/handler"
+	"github.com/ironcore-dev/ironcore/utils/generic"
 	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/apimachinery/api/net"
-	metalnetletclient "github.com/onmetal/onmetal-api-net/metalnetlet/client"
-	utilhandler "github.com/onmetal/onmetal-api-net/metalnetlet/handler"
-	"github.com/onmetal/onmetal-api/utils/generic"
 	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -54,10 +54,10 @@ type InstanceReconciler struct {
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=instances,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=instances/finalizers,verbs=update;patch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=instances/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=networks,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=instances,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=instances/finalizers,verbs=update;patch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=instances/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networks,verbs=get;list;watch
 
 //+cluster=metalnet:kubebuilder:rbac:groups=networking.metalnet.onmetal.de,resources=loadbalancers,verbs=get;list;watch;create;update;patch;delete;deletecollection
 

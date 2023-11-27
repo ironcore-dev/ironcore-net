@@ -55,7 +55,7 @@ it will be released.
 Example network interface claiming a dynamic public IP:
 
 ```yaml
-apiVersion: core.apinet.api.onmetal.de/v1alpha1
+apiVersion: core.apinet.ironcore.dev/v1alpha1
 kind: NetworkInterface
 metadata:
   namespace: default

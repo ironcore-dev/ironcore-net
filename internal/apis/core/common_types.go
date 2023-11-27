@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,19 +15,19 @@
 package core
 
 const (
-	ReconcileRequestAnnotation = "reconcile.apinet.api.onmetal.de/requestedAt"
+	ReconcileRequestAnnotation = "reconcile.apinet.ironcore.dev/requestedAt"
 
 	// APINetletsGroup is the system rbac group all apinetlets are in.
-	APINetletsGroup = "apinet.api.onmetal.de:system:apinetlets"
+	APINetletsGroup = "apinet.ironcore.dev:system:apinetlets"
 
 	// APINetletUserNamePrefix is the prefix all apinetlet users should have.
-	APINetletUserNamePrefix = "apinet.api.onmetal.de:system:apinetlet:"
+	APINetletUserNamePrefix = "apinet.ironcore.dev:system:apinetlet:"
 
 	// MetalnetletsGroup is the system rbac group all metalnetlets are in.
-	MetalnetletsGroup = "apinet.api.onmetal.de:system:metalnetlets"
+	MetalnetletsGroup = "apinet.ironcore.dev:system:metalnetlets"
 
 	// MetalnetletUserNamePrefix is the prefix all metalnetlet users should have.
-	MetalnetletUserNamePrefix = "apinet.api.onmetal.de:system:metalnetlet:"
+	MetalnetletUserNamePrefix = "apinet.ironcore.dev:system:metalnetlet:"
 )
 
 // APINetletCommonName constructs the common name for a certificate of an apinetlet user.

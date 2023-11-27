@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package onmetalapinet
+package ironcorenet
 
 import (
 	"crypto/x509"
 	"fmt"
 	"strings"
 
-	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/internal/controllers/certificate/generic"
+	ironcorenetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/internal/controllers/certificate/generic"
 	"golang.org/x/exp/slices"
 	authv1 "k8s.io/api/authorization/v1"
 	certificatesv1 "k8s.io/api/certificates/v1"
@@ -44,8 +44,8 @@ func IsAPINetletClientCert(csr *certificatesv1.CertificateSigningRequest, x509cr
 }
 
 func ValidateAPINetletClientCSR(req *x509.CertificateRequest, usages sets.Set[certificatesv1.KeyUsage]) error {
-	if !slices.Equal([]string{onmetalapinetv1alpha1.APINetletsGroup}, req.Subject.Organization) {
-		return fmt.Errorf("organization is not %s", onmetalapinetv1alpha1.APINetletsGroup)
+	if !slices.Equal([]string{ironcorenetv1alpha1.APINetletsGroup}, req.Subject.Organization) {
+		return fmt.Errorf("organization is not %s", ironcorenetv1alpha1.APINetletsGroup)
 	}
 
 	if len(req.DNSNames) > 0 {
@@ -61,8 +61,8 @@ func ValidateAPINetletClientCSR(req *x509.CertificateRequest, usages sets.Set[ce
 		return fmt.Errorf("uri subject alternative names are not allowed")
 	}
 
-	if !strings.HasPrefix(req.Subject.CommonName, onmetalapinetv1alpha1.APINetletUserNamePrefix) {
-		return fmt.Errorf("subject common name does not begin with %s", onmetalapinetv1alpha1.APINetletUserNamePrefix)
+	if !strings.HasPrefix(req.Subject.CommonName, ironcorenetv1alpha1.APINetletUserNamePrefix) {
+		return fmt.Errorf("subject common name does not begin with %s", ironcorenetv1alpha1.APINetletUserNamePrefix)
 	}
 
 	if !APINetletRequiredUsages.Equal(usages) {

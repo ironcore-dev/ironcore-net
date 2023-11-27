@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
 package controllers
 
 import (
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/networkid"
+	. "github.com/ironcore-dev/ironcore/utils/testing"
 	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/networkid"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
