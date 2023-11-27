@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
 package core
 
 const (
-	ControllerRevisionHashLabel = "apinet.api.onmetal.de/controller-revision-hash"
+	ControllerRevisionHashLabel = "apinet.ironcore.dev/controller-revision-hash"
 
-	IPFamilyLabel = "apinet.api.onmetal.de/ip-family"
-	IPIPLabel     = "apinet.api.onmetal.de/ip"
+	IPFamilyLabel = "apinet.ironcore.dev/ip-family"
+	IPIPLabel     = "apinet.ironcore.dev/ip"
 
-	TopologyLabelPrefix    = "topology.core.apinet.api.onmetal.de/"
+	TopologyLabelPrefix    = "topology.core.apinet.ironcore.dev/"
 	TopologyPartitionLabel = TopologyLabelPrefix + "partition"
 	TopologyZoneLabel      = TopologyLabelPrefix + "zone"
 )

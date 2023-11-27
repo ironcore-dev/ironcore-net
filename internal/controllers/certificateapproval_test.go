@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 
-	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	utilcertificate "github.com/onmetal/onmetal-api/utils/certificate"
+	ironcorenetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	utilcertificate "github.com/ironcore-dev/ironcore/utils/certificate"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	certificatesv1 "k8s.io/api/certificates/v1"
@@ -55,8 +55,8 @@ var _ = Describe("CertificateApprovalController", func() {
 			)
 		},
 		Entry("apinetlet",
-			onmetalapinetv1alpha1.APINetletCommonName("my-apinetlet"),
-			onmetalapinetv1alpha1.APINetletsGroup,
+			ironcorenetv1alpha1.APINetletCommonName("my-apinetlet"),
+			ironcorenetv1alpha1.APINetletsGroup,
 		),
 	)
 })

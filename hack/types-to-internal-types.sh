@@ -24,7 +24,7 @@ sed-all 's/[[:space:]]+`json:[^$]*//g'
 sed-all 's/package v1alpha1/package core/g'
 sed-all 's/Version: "v1alpha1"/Version: runtime.APIVersionInternal/g'
 sed-all 's/Package v1alpha1/Package core/g'
-sed-all 's/github.com\/onmetal\/onmetal-api-net\/api\/v1alpha1/github.com\/onmetal\/onmetal-api-net\/internal\/apis\/core/g'
+sed-all 's/github.com\/ironcore-dev\/ironcore-net\/api\/v1alpha1/github.com\/ironcore-dev\/ironcore-net\/internal\/apis\/core/g'
 sed-all 's/v1alpha1/core/g'
 sed-all '/metav1\.AddToGroupVersion\(scheme, SchemeGroupVersion\)/d'
 

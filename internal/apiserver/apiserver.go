@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,27 +17,27 @@ package apiserver
 import (
 	"net/netip"
 
-	"github.com/onmetal/onmetal-api-net/apimachinery/equality"
-	"github.com/onmetal/onmetal-api-net/client-go/informers"
-	v1alpha1client "github.com/onmetal/onmetal-api-net/client-go/onmetalapinet/typed/core/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/internal/apis/core"
-	"github.com/onmetal/onmetal-api-net/internal/apis/core/install"
-	"github.com/onmetal/onmetal-api-net/internal/registry/daemonset"
-	"github.com/onmetal/onmetal-api-net/internal/registry/instance"
-	"github.com/onmetal/onmetal-api-net/internal/registry/ip"
-	"github.com/onmetal/onmetal-api-net/internal/registry/ip/ipaddressallocator"
-	"github.com/onmetal/onmetal-api-net/internal/registry/ipaddress"
-	"github.com/onmetal/onmetal-api-net/internal/registry/ipallocator"
-	"github.com/onmetal/onmetal-api-net/internal/registry/loadbalancer"
-	"github.com/onmetal/onmetal-api-net/internal/registry/loadbalancerrouting"
-	"github.com/onmetal/onmetal-api-net/internal/registry/natgateway"
-	"github.com/onmetal/onmetal-api-net/internal/registry/natgatewayautoscaler"
-	"github.com/onmetal/onmetal-api-net/internal/registry/nattable"
-	"github.com/onmetal/onmetal-api-net/internal/registry/network"
-	"github.com/onmetal/onmetal-api-net/internal/registry/network/networkidallocator"
-	"github.com/onmetal/onmetal-api-net/internal/registry/networkid"
-	"github.com/onmetal/onmetal-api-net/internal/registry/networkinterface"
-	"github.com/onmetal/onmetal-api-net/internal/registry/node"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/equality"
+	"github.com/ironcore-dev/ironcore-net/client-go/informers"
+	v1alpha1client "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/typed/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/internal/apis/core"
+	"github.com/ironcore-dev/ironcore-net/internal/apis/core/install"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/daemonset"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/instance"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/ip"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/ip/ipaddressallocator"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/ipaddress"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/ipallocator"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/loadbalancer"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/loadbalancerrouting"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/natgateway"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/natgatewayautoscaler"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/nattable"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/network"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/network/networkidallocator"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/networkid"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/networkinterface"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/node"
 	corev1 "k8s.io/api/core/v1"
 	apimachineryequality "k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -87,8 +87,8 @@ type Config struct {
 	ExtraConfig   ExtraConfig
 }
 
-// OnmetalAPIServer contains state for a Kubernetes cluster master/api server.
-type OnmetalAPIServer struct {
+// IronCoreServer contains state for a Kubernetes cluster master/api server.
+type IronCoreServer struct {
 	GenericAPIServer *genericapiserver.GenericAPIServer
 }
 
@@ -117,9 +117,9 @@ func (cfg *Config) Complete() CompletedConfig {
 	return CompletedConfig{&c}
 }
 
-// New returns a new instance of OnmetalAPIServer from the given config.
-func (c completedConfig) New() (*OnmetalAPIServer, error) {
-	genericServer, err := c.GenericConfig.New("onmetal-api-net-apiserver", genericapiserver.NewEmptyDelegate())
+// New returns a new instance of IronCoreServer from the given config.
+func (c completedConfig) New() (*IronCoreServer, error) {
+	genericServer, err := c.GenericConfig.New("ironcore-net-apiserver", genericapiserver.NewEmptyDelegate())
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func (c completedConfig) New() (*OnmetalAPIServer, error) {
 		return nil, err
 	}
 
-	s := &OnmetalAPIServer{
+	s := &IronCoreServer{
 		GenericAPIServer: genericServer,
 	}
 

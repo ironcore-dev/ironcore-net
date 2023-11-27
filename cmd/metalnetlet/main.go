@@ -21,12 +21,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/onmetal/controller-utils/configutils"
+	"github.com/ironcore-dev/controller-utils/configutils"
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	metalnetletconfig "github.com/ironcore-dev/ironcore-net/metalnetlet/client/config"
+	"github.com/ironcore-dev/ironcore-net/metalnetlet/controllers"
+	"github.com/ironcore-dev/ironcore/utils/client/config"
 	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	metalnetletconfig "github.com/onmetal/onmetal-api-net/metalnetlet/client/config"
-	"github.com/onmetal/onmetal-api-net/metalnetlet/controllers"
-	"github.com/onmetal/onmetal-api/utils/client/config"
 	flag "github.com/spf13/pflag"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
@@ -120,7 +120,7 @@ func main() {
 		},
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "bf12dae0.metalnetlet.apinet.api.onmetal.de",
+		LeaderElectionID:       "bf12dae0.metalnetlet.apinet.ironcore.dev",
 		LeaderElectionConfig:   metalnetCfg,
 	})
 	if err != nil {

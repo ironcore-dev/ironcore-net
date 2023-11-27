@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/controller-utils/clientutils"
+	"github.com/ironcore-dev/controller-utils/clientutils"
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
+	metalnetletclient "github.com/ironcore-dev/ironcore-net/metalnetlet/client"
+	utilhandler "github.com/ironcore-dev/ironcore-net/metalnetlet/handler"
+	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/apimachinery/api/net"
-	metalnetletclient "github.com/onmetal/onmetal-api-net/metalnetlet/client"
-	utilhandler "github.com/onmetal/onmetal-api-net/metalnetlet/handler"
-	utilslices "github.com/onmetal/onmetal-api/utils/slices"
 	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -51,13 +51,13 @@ type NetworkInterfaceReconciler struct {
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=networkinterfaces/finalizers,verbs=update;patch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=networkinterfaces/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=loadbalancerroutings,verbs=get;list;watch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=loadbalancers,verbs=get;list;watch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=nattables,verbs=get;list;watch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=natgateways,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networkinterfaces/finalizers,verbs=update;patch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networkinterfaces/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=loadbalancerroutings,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=loadbalancers,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=nattables,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=natgateways,verbs=get;list;watch
 
 //+cluster=metalnet:kubebuilder:rbac:groups=networking.metalnet.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;create;update;patch;delete;deletecollection
 //+cluster=metalnet:kubebuilder:rbac:groups="",resources=nodes,verbs=get;list;watch

@@ -35,7 +35,7 @@ rules:
   verbs:
   - approve
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - daemonsets
   verbs:
@@ -46,7 +46,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - daemonsets/status
   verbs:
@@ -54,7 +54,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - instances
   verbs:
@@ -67,7 +67,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - ipaddresses
   verbs:
@@ -76,7 +76,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - ips
   verbs:
@@ -84,7 +84,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - loadbalancerroutings
   verbs:
@@ -96,7 +96,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - loadbalancers
   verbs:
@@ -104,7 +104,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - loadbalancers/status
   verbs:
@@ -112,7 +112,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - natgatewayautoscalers
   verbs:
@@ -120,7 +120,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - natgatewayautoscalers/status
   verbs:
@@ -128,7 +128,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - natgateways
   verbs:
@@ -138,7 +138,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - natgateways/status
   verbs:
@@ -146,7 +146,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - nattables
   verbs:
@@ -158,7 +158,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - networkids
   verbs:
@@ -167,7 +167,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - networkinterfaces
   verbs:
@@ -177,7 +177,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - networks
   verbs:
@@ -185,7 +185,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - nodes
   verbs:

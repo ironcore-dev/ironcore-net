@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
 package controllers
 
 import (
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/apimachinery/api/net"
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	cclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/onmetal/onmetal-api-net/internal/controllers/scheduler"
-	. "github.com/onmetal/onmetal-api/utils/testing"
+	"github.com/ironcore-dev/ironcore-net/internal/controllers/scheduler"
+	. "github.com/ironcore-dev/ironcore/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -67,7 +67,7 @@ var _ = Describe("Scheduler", func() {
 
 	Context("when nodes with multiple topologies are present", func() {
 		const (
-			zoneKey = "apinet.api.onmetal.de/zone"
+			zoneKey = "apinet.ironcore.dev/zone"
 			zoneA   = "zone-a"
 			zoneB   = "zone-b"
 		)
@@ -127,7 +127,7 @@ var _ = Describe("Scheduler", func() {
 
 	Context("when two nodes in the same topology are present", func() {
 		const (
-			zoneKey = "apinet.api.onmetal.de/zone"
+			zoneKey = "apinet.ironcore.dev/zone"
 			zone    = "the-zone"
 		)
 		var (

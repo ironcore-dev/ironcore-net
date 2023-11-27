@@ -43,7 +43,7 @@ jobs:
         id: meta
         with:
           images: |
-            ghcr.io/${{ github.repository_owner }}/onmetal-api-net/${{ matrix.image.name }}
+            ghcr.io/${{ github.repository_owner }}/ironcore-net/${{ matrix.image.name }}
           tags: |
             type=semver,pattern={{version}}
             type=schedule

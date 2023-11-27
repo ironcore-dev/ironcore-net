@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,21 +20,21 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/controller-utils/clientutils"
-	"github.com/onmetal/controller-utils/metautils"
-	apinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/apimachinery/api/net"
-	apinetletclient "github.com/onmetal/onmetal-api-net/apinetlet/client"
-	apinetlethandler "github.com/onmetal/onmetal-api-net/apinetlet/handler"
-	"github.com/onmetal/onmetal-api-net/apinetlet/provider"
-	utilgeneric "github.com/onmetal/onmetal-api-net/utils/generic"
-	commonv1alpha1 "github.com/onmetal/onmetal-api/api/common/v1alpha1"
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	"github.com/onmetal/onmetal-api/utils/claimmanager"
-	"github.com/onmetal/onmetal-api/utils/generic"
-	"github.com/onmetal/onmetal-api/utils/predicates"
-	utilslices "github.com/onmetal/onmetal-api/utils/slices"
+	"github.com/ironcore-dev/controller-utils/clientutils"
+	"github.com/ironcore-dev/controller-utils/metautils"
+	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
+	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
+	apinetlethandler "github.com/ironcore-dev/ironcore-net/apinetlet/handler"
+	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
+	utilgeneric "github.com/ironcore-dev/ironcore-net/utils/generic"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/claimmanager"
+	"github.com/ironcore-dev/ironcore/utils/generic"
+	"github.com/ironcore-dev/ironcore/utils/predicates"
+	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -50,7 +50,7 @@ import (
 )
 
 const (
-	networkInterfaceFinalizer = "apinet.api.onmetal.de/networkinterface"
+	networkInterfaceFinalizer = "apinet.ironcore.dev/networkinterface"
 )
 
 type NetworkInterfaceReconciler struct {
@@ -62,13 +62,13 @@ type NetworkInterfaceReconciler struct {
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces/finalizers,verbs=update;patch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=networkinterfaces/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=networking.api.onmetal.de,resources=virtualips,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=ipam.api.onmetal.de,resources=prefixes,verbs=get;list;watch
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces/finalizers,verbs=update;patch
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=virtualips,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixes,verbs=get;list;watch
 
-//+cluster=apinet:kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;update;patch
+//+cluster=apinet:kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch;update;patch
 
 func (r *NetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

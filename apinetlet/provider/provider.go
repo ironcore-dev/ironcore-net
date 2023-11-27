@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ import (
 )
 
 const (
-	apiNetPrefix = "onmetal-api-net://"
+	apiNetPrefix = "ironcore-net://"
 )
 
 // ParseNetworkInterfaceID parses network interface provider IDs.
 // The format of a network interface provider id is as follows:
-// onmetal-api-net://<namespace>/<name>/<node>/<uid>
+// ironcore-net://<namespace>/<name>/<node>/<uid>
 func ParseNetworkInterfaceID(id string) (namespace, name, node string, uid types.UID, err error) {
 	parts := strings.SplitN(strings.TrimPrefix(id, apiNetPrefix), "/", 5)
 	if len(parts) != 4 {
@@ -48,7 +48,7 @@ func ParseNetworkInterfaceID(id string) (namespace, name, node string, uid types
 
 // GetNetworkInterfaceID creates a network interface provider ID.
 // The format of a network interface provider id is as follows:
-// onmetal-api-net://<namespace>/<name>/<node>/<uid>
+// ironcore-net://<namespace>/<name>/<node>/<uid>
 func GetNetworkInterfaceID(namespace, name, node string, uid types.UID) string {
 	var sb strings.Builder
 	sb.Grow(len(apiNetPrefix) + len(namespace) + 1 + len(name) + 1 + len(node) + 1 + len(uid))
@@ -65,7 +65,7 @@ func GetNetworkInterfaceID(namespace, name, node string, uid types.UID) string {
 
 // ParseNetworkID parses network provider IDs into the apinet network name.
 // The format of a network provider ID is as follows:
-// onmetal-api-net://<id>/<name>/<uid>
+// ironcore-net://<id>/<name>/<uid>
 func ParseNetworkID(s string) (namespace, name, id string, uid types.UID, err error) {
 	parts := strings.SplitN(strings.TrimPrefix(s, apiNetPrefix), "/", 5)
 	if len(parts) != 4 {
@@ -81,7 +81,7 @@ func ParseNetworkID(s string) (namespace, name, id string, uid types.UID, err er
 
 // GetNetworkID creates a network ID from the given id, name and UID.
 // The format of a network provider ID is as follows:
-// onmetal-api-net://<namespace>/<name>/<id>/<uid>
+// ironcore-net://<namespace>/<name>/<id>/<uid>
 func GetNetworkID(namespace, name, id string, uid types.UID) string {
 	var sb strings.Builder
 	sb.Grow(len(apiNetPrefix) + len(namespace) + 1 + len(id) + 1 + len(name) + 1 + len(uid))

@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/internal/natgateway"
-	utilslices "github.com/onmetal/onmetal-api/utils/slices"
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/internal/natgateway"
+	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	utilrand "k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -34,9 +34,9 @@ const (
 	noOfNATIPGenerateNameChars = 10
 )
 
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=natgatewayautoscalers,verbs=get;list;watch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=natgatewayautoscalers/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=natgateways,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=natgatewayautoscalers,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=natgatewayautoscalers/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=natgateways,verbs=get;list;watch;update;patch
 
 type NATGatewayAutoscalerReconciler struct {
 	client.Client

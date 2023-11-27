@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/controller-utils/clientutils"
+	"github.com/ironcore-dev/controller-utils/clientutils"
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	metalnetletclient "github.com/ironcore-dev/ironcore-net/metalnetlet/client"
+	metalnetlethandler "github.com/ironcore-dev/ironcore-net/metalnetlet/handler"
+	"github.com/ironcore-dev/ironcore-net/networkid"
 	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	metalnetletclient "github.com/onmetal/onmetal-api-net/metalnetlet/client"
-	metalnetlethandler "github.com/onmetal/onmetal-api-net/metalnetlet/handler"
-	"github.com/onmetal/onmetal-api-net/networkid"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -44,8 +44,8 @@ type NetworkReconciler struct {
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=networks,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=networks/finalizers,verbs=update;patch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networks,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networks/finalizers,verbs=update;patch
 
 //+cluster=metalnet:kubebuilder:rbac:groups=networking.metalnet.onmetal.de,resources=networks,verbs=get;list;watch;create;update;patch;delete;deletecollection
 

@@ -23,13 +23,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/onmetal/controller-utils/buildutils"
-	"github.com/onmetal/controller-utils/modutils"
+	"github.com/ironcore-dev/controller-utils/buildutils"
+	"github.com/ironcore-dev/controller-utils/modutils"
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"
+	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
+	. "github.com/ironcore-dev/ironcore/utils/testing"
 	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	utilsenvtest "github.com/onmetal/onmetal-api/utils/envtest"
-	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
-	. "github.com/onmetal/onmetal-api/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -121,7 +121,7 @@ var _ = BeforeSuite(func() {
 	SetClient(k8sClient)
 
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
-		MainPath:     "github.com/onmetal/onmetal-api-net/cmd/apiserver",
+		MainPath:     "github.com/ironcore-dev/ironcore-net/cmd/apiserver",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		ETCDServers:  []string{testEnv.ControlPlane.Etcd.URL.String()},
 		Host:         testEnvExt.APIServiceInstallOptions.LocalServingHost,

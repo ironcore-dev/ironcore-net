@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 package validation_test
 
 import (
-	"github.com/onmetal/onmetal-api-net/apimachinery/api/net"
-	"github.com/onmetal/onmetal-api-net/internal/apis/core"
-	"github.com/onmetal/onmetal-api-net/internal/apis/core/validation"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
+	"github.com/ironcore-dev/ironcore-net/internal/apis/core"
+	"github.com/ironcore-dev/ironcore-net/internal/apis/core/validation"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"

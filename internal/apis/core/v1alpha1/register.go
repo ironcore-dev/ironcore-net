@@ -1,4 +1,4 @@
-// Copyright 2022 OnMetal authors
+// Copyright 2022 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,16 +13,17 @@
 // limitations under the License.
 
 // Package v1alpha1 contains API Schema definitions for the apinet v1alpha1 API group
-// +groupName=core.apinet.api.onmetal.de
+// +groupName=core.apinet.ironcore.dev
+
 package v1alpha1
 
 import (
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 const (
-	GroupName = "core.apinet.api.onmetal.de"
+	GroupName = "core.apinet.ironcore.dev"
 )
 
 var (

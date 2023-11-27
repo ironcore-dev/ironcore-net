@@ -22,14 +22,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/onmetal/controller-utils/buildutils"
-	"github.com/onmetal/controller-utils/modutils"
-	apinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/client-go/onmetalapinet"
-	ipamv1alpha1 "github.com/onmetal/onmetal-api/api/ipam/v1alpha1"
-	networkingv1alpha1 "github.com/onmetal/onmetal-api/api/networking/v1alpha1"
-	envtestutils "github.com/onmetal/onmetal-api/utils/envtest"
-	"github.com/onmetal/onmetal-api/utils/envtest/apiserver"
+	"github.com/ironcore-dev/controller-utils/buildutils"
+	"github.com/ironcore-dev/controller-utils/modutils"
+	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	envtestutils "github.com/ironcore-dev/ironcore/utils/envtest"
+	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -85,9 +85,9 @@ var _ = BeforeSuite(func() {
 		},
 		ErrorIfAPIServicePathIsMissing: true,
 	}
-	onmetalAPIOpts := testEnvExt.AddAPIServerInstallOptions(envtestutils.APIServerInstallOptions{
+	ironcoreOpts := testEnvExt.AddAPIServerInstallOptions(envtestutils.APIServerInstallOptions{
 		Paths: []string{
-			modutils.Dir("github.com/onmetal/onmetal-api", "config", "apiserver", "apiservice", "bases"),
+			modutils.Dir("github.com/ironcore-dev/ironcore", "config", "apiserver", "apiservice", "bases"),
 		},
 		ErrorIfPathMissing: true,
 	})
@@ -110,7 +110,7 @@ var _ = BeforeSuite(func() {
 	SetClient(k8sClient)
 
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
-		MainPath:     "github.com/onmetal/onmetal-api-net/cmd/apiserver",
+		MainPath:     "github.com/ironcore-dev/ironcore-net/cmd/apiserver",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		ETCDServers:  []string{testEnv.ControlPlane.Etcd.URL.String()},
 		Host:         testEnvExt.APIServiceInstallOptions.LocalServingHost,
@@ -125,18 +125,18 @@ var _ = BeforeSuite(func() {
 	Expect(apiSrv.Start()).To(Succeed())
 	DeferCleanup(apiSrv.Stop)
 
-	onmetalAPISrv, err := apiserver.New(cfg, apiserver.Options{
-		MainPath:     "github.com/onmetal/onmetal-api/cmd/onmetal-apiserver",
+	ironcoreAPISrv, err := apiserver.New(cfg, apiserver.Options{
+		MainPath:     "github.com/ironcore-dev/ironcore/cmd/ironcore-apiserver",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		ETCDServers:  []string{testEnv.ControlPlane.Etcd.URL.String()},
-		Host:         onmetalAPIOpts.LocalServingHost,
-		Port:         onmetalAPIOpts.LocalServingPort,
-		CertDir:      onmetalAPIOpts.LocalServingCertDir,
+		Host:         ironcoreOpts.LocalServingHost,
+		Port:         ironcoreOpts.LocalServingPort,
+		CertDir:      ironcoreOpts.LocalServingCertDir,
 	})
 	Expect(err).NotTo(HaveOccurred())
 
-	Expect(onmetalAPISrv.Start()).To(Succeed())
-	DeferCleanup(onmetalAPISrv.Stop)
+	Expect(ironcoreAPISrv.Start()).To(Succeed())
+	DeferCleanup(ironcoreAPISrv.Stop)
 
 	Expect(envtestutils.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
 })
@@ -151,7 +151,7 @@ func SetupTest(apiNetNamespace *corev1.Namespace) *corev1.Namespace {
 		})
 		Expect(err).ToNot(HaveOccurred())
 
-		apiNetInterface := onmetalapinet.NewForConfigOrDie(cfg)
+		apiNetInterface := ironcorenet.NewForConfigOrDie(cfg)
 
 		// register reconciler here
 		Expect((&VirtualIPReconciler{

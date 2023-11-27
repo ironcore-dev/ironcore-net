@@ -2,7 +2,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: apinet.api.onmetal.de:system:metalnetlets
+  name: apinet.ironcore.dev:system:metalnetlets
 rules:
 - apiGroups:
   - ""
@@ -39,7 +39,7 @@ rules:
   verbs:
   - create
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - instances
   verbs:
@@ -49,14 +49,14 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - instances/finalizers
   verbs:
   - patch
   - update
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - instances/status
   verbs:
@@ -64,7 +64,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - loadbalancerroutings
   verbs:
@@ -72,7 +72,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - loadbalancers
   verbs:
@@ -80,7 +80,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - natgateways
   verbs:
@@ -88,7 +88,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - nattables
   verbs:
@@ -96,7 +96,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - networkinterfaces
   verbs:
@@ -106,14 +106,14 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - networkinterfaces/finalizers
   verbs:
   - patch
   - update
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - networkinterfaces/status
   verbs:
@@ -121,7 +121,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - networks
   verbs:
@@ -131,14 +131,14 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - networks/finalizers
   verbs:
   - patch
   - update
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - nodes
   verbs:
@@ -150,14 +150,14 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - nodes/finalizers
   verbs:
   - patch
   - update
 - apiGroups:
-  - core.apinet.api.onmetal.de
+  - core.apinet.ironcore.dev
   resources:
   - nodes/status
   verbs:

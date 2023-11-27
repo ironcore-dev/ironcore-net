@@ -20,12 +20,12 @@ import (
 	goflag "flag"
 	"os"
 
-	"github.com/onmetal/controller-utils/configutils"
-	onmetalapinetv1alpha1 "github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/internal/controllers"
-	onmetalapinet "github.com/onmetal/onmetal-api-net/internal/controllers/certificate/onmetal-api-net"
-	"github.com/onmetal/onmetal-api-net/internal/controllers/scheduler"
-	"github.com/onmetal/onmetal-api-net/utils/expectations"
+	"github.com/ironcore-dev/controller-utils/configutils"
+	ironcorenetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/internal/controllers"
+	ironcorenet "github.com/ironcore-dev/ironcore-net/internal/controllers/certificate/ironcore-net"
+	"github.com/ironcore-dev/ironcore-net/internal/controllers/scheduler"
+	"github.com/ironcore-dev/ironcore-net/utils/expectations"
 	flag "github.com/spf13/pflag"
 	"k8s.io/utils/lru"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
@@ -51,7 +51,7 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
-	utilruntime.Must(onmetalapinetv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(ironcorenetv1alpha1.AddToScheme(scheme))
 
 	//+kubebuilder:scaffold:scheme
 }
@@ -89,7 +89,7 @@ func main() {
 		},
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "ff142330.apinet.api.onmetal.de",
+		LeaderElectionID:       "ff142330.apinet.ironcore.dev",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -98,7 +98,7 @@ func main() {
 
 	if err = (&controllers.CertificateApprovalReconciler{
 		Client:      mgr.GetClient(),
-		Recognizers: onmetalapinet.Recognizers,
+		Recognizers: ironcorenet.Recognizers,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "CertificateApproval")
 		os.Exit(1)

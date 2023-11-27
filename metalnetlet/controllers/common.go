@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -27,11 +27,11 @@ import (
 )
 
 const (
-	MetalnetFieldOwner = client.FieldOwner("metalnetlet.apinet.onmetal.de/controller-manager")
+	MetalnetFieldOwner = client.FieldOwner("metalnetlet.apinet.ironcore.dev/controller-manager")
 
-	PartitionFieldOwnerPrefix = "partition.metalnetlet.apinet.onmetal.de/"
+	PartitionFieldOwnerPrefix = "partition.metalnetlet.apinet.ironcore.dev/"
 
-	PartitionFinalizerPrefix = "partition.metalnetlet.apinet.onmetal.de/"
+	PartitionFinalizerPrefix = "partition.metalnetlet.apinet.ironcore.dev/"
 )
 
 func PartitionFieldOwner(partitionName string) client.FieldOwner {

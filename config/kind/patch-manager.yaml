@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: onmetal-api-net-system
-  name: onmetal-api-net-controller-manager
+  namespace: ironcore-net-system
+  name: ironcore-net-controller-manager
 spec:
   template:
     spec:

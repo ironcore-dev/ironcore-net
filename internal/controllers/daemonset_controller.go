@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/onmetal/controller-utils/metautils"
-	"github.com/onmetal/onmetal-api-net/api/core/v1alpha1"
-	"github.com/onmetal/onmetal-api-net/internal/nodeaffinity"
-	"github.com/onmetal/onmetal-api-net/utils/controller"
-	"github.com/onmetal/onmetal-api-net/utils/expectations"
-	utilhandler "github.com/onmetal/onmetal-api-net/utils/handler"
-	utilslices "github.com/onmetal/onmetal-api/utils/slices"
+	"github.com/ironcore-dev/controller-utils/metautils"
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/internal/nodeaffinity"
+	"github.com/ironcore-dev/ironcore-net/utils/controller"
+	"github.com/ironcore-dev/ironcore-net/utils/expectations"
+	utilhandler "github.com/ironcore-dev/ironcore-net/utils/handler"
+	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -44,10 +44,10 @@ type DaemonSetReconciler struct {
 	Expectations *expectations.Expectations
 }
 
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=daemonsets,verbs=get;list;watch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=daemonsets/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=instances,verbs=get;list;watch;create;update;patch;delete;deletecollection
-//+kubebuilder:rbac:groups=core.apinet.api.onmetal.de,resources=nodes,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=daemonsets,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=daemonsets/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=instances,verbs=get;list;watch;create;update;patch;delete;deletecollection
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=nodes,verbs=get;list;watch
 
 func (r *DaemonSetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)

@@ -1,4 +1,4 @@
-// Copyright 2023 OnMetal authors
+// Copyright 2023 IronCore authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,15 +17,15 @@ package main
 import (
 	"os"
 
-	"github.com/onmetal/onmetal-api-net/internal/app/apiserver"
+	"github.com/ironcore-dev/ironcore-net/internal/app/apiserver"
 	"k8s.io/apiserver/pkg/server"
 	"k8s.io/component-base/cli"
 )
 
 func main() {
 	ctx := server.SetupSignalContext()
-	options := apiserver.NewOnmetalAPINetServerOptions()
-	cmd := apiserver.NewCommandStartOnmetalAPINetServer(ctx, options)
+	options := apiserver.NewIronCoreNetServerOptions()
+	cmd := apiserver.NewCommandStartIronCoreNetServer(ctx, options)
 	code := cli.Run(cmd)
 	os.Exit(code)
 }

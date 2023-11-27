@@ -23,7 +23,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - ipam.api.onmetal.de
+  - ipam.ironcore.dev
   resources:
   - prefixes
   verbs:
@@ -31,7 +31,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - loadbalancerroutings
   verbs:
@@ -39,7 +39,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - loadbalancers
   verbs:
@@ -49,14 +49,14 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - loadbalancers/finalizers
   verbs:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - loadbalancers/status
   verbs:
@@ -64,7 +64,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - natgateways
   verbs:
@@ -74,14 +74,14 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - natgateways/finalizers
   verbs:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - natgateways/status
   verbs:
@@ -89,7 +89,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - networkinterfaces
   verbs:
@@ -99,14 +99,14 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - networkinterfaces/finalizers
   verbs:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - networkinterfaces/status
   verbs:
@@ -114,7 +114,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - networks
   verbs:
@@ -124,14 +124,14 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - networks/finalizers
   verbs:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - networks/status
   verbs:
@@ -139,7 +139,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - virtualips
   verbs:
@@ -149,14 +149,14 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - virtualips/finalizers
   verbs:
   - patch
   - update
 - apiGroups:
-  - networking.api.onmetal.de
+  - networking.ironcore.dev
   resources:
   - virtualips/status
   verbs:
