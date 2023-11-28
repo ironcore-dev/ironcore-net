@@ -1,8 +1,9 @@
 # ironcore-net
 
+[![REUSE status](https://api.reuse.software/badge/github.com/ironcore-dev/ironcore-net)](https://api.reuse.software/info/github.com/ironcore-dev/ironcore-net)
 [![Pull Request Code test](https://github.com/ironcore-dev/ironcore-net/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/ironcore-dev/ironcore-net/actions/workflows/test.yml)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://makeapullrequest.com)
-[![GitHub License](https://img.shields.io/static/v1?label=License&message=Apache-2.0&color=blue&style=flat-square)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://makeapullrequest.com)
+[![GitHub License](https://img.shields.io/static/v1?label=License&message=Apache-2.0&color=blue)](LICENSE)
 
 ## Overview
 

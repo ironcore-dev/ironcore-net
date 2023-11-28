@@ -79,7 +79,7 @@ generate: vgopath models-schema deepcopy-gen client-gen lister-gen informer-gen 
 
 .PHONY: add-license
 add-license: addlicense ## Add license headers to all go files.
-	find . -name '*.go' -exec $(ADDLICENSE) -c 'IronCore authors' {} +
+	find . -name '*.go' -exec $(ADDLICENSE) -f hack/license-header.txt {} +
 
 .PHONY: fmt
 fmt: goimports ## Run goimports against code.
