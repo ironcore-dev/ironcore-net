@@ -14,7 +14,7 @@ import (
 	metalnetletclient "github.com/ironcore-dev/ironcore-net/metalnetlet/client"
 	utilhandler "github.com/ironcore-dev/ironcore-net/metalnetlet/handler"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
-	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
+	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
 	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -48,7 +48,7 @@ type NetworkInterfaceReconciler struct {
 //+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=nattables,verbs=get;list;watch
 //+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=natgateways,verbs=get;list;watch
 
-//+cluster=metalnet:kubebuilder:rbac:groups=networking.metalnet.onmetal.de,resources=networkinterfaces,verbs=get;list;watch;create;update;patch;delete;deletecollection
+//+cluster=metalnet:kubebuilder:rbac:groups=networking.metalnet.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch;create;update;patch;delete;deletecollection
 //+cluster=metalnet:kubebuilder:rbac:groups="",resources=nodes,verbs=get;list;watch
 
 func (r *NetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {

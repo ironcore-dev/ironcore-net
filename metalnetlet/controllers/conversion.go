@@ -11,7 +11,7 @@ import (
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	"github.com/ironcore-dev/ironcore/utils/generic"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
-	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
+	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -98,7 +98,7 @@ func loadBalancerPortsToMetalnetLoadBalancerPorts(ports []v1alpha1.LoadBalancerP
 
 // workaroundMetalnetNoIPv6VirtualIPSupportIPsToIP works around the missing public IPv6 support in metalnet
 // by propagating only IPv4 addresses to metalnet.
-// TODO: Remove this as soon as https://github.com/onmetal/metalnet/issues/53 is resolved.
+// TODO: Remove this as soon as https://github.com/ironcore-dev/metalnet/issues/53 is resolved.
 func workaroundMetalnetNoIPv6VirtualIPSupportIPsToIP(metalnetVirtualIPs []metalnetv1alpha1.IP) *metalnetv1alpha1.IP {
 	for _, metalnetVirtualIP := range metalnetVirtualIPs {
 		if metalnetVirtualIP.Is4() {

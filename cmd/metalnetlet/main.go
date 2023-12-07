@@ -13,7 +13,7 @@ import (
 	metalnetletconfig "github.com/ironcore-dev/ironcore-net/metalnetlet/client/config"
 	"github.com/ironcore-dev/ironcore-net/metalnetlet/controllers"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
-	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
+	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
 	flag "github.com/spf13/pflag"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"

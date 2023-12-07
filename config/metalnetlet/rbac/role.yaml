@@ -40,7 +40,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.metalnet.onmetal.de
+  - networking.metalnet.ironcore.dev
   resources:
   - loadbalancers
   verbs:
@@ -53,7 +53,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.metalnet.onmetal.de
+  - networking.metalnet.ironcore.dev
   resources:
   - networkinterfaces
   verbs:
@@ -66,7 +66,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.metalnet.onmetal.de
+  - networking.metalnet.ironcore.dev
   resources:
   - networks
   verbs:

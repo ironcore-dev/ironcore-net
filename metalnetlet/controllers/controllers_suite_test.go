@@ -16,7 +16,7 @@ import (
 	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"
 	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
 	. "github.com/ironcore-dev/ironcore/utils/testing"
-	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
+	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -82,7 +82,7 @@ var _ = BeforeSuite(func() {
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
 		CRDDirectoryPaths: []string{
-			filepath.Join(modutils.Dir("github.com/onmetal/metalnet", "config", "crd", "bases")),
+			filepath.Join(modutils.Dir("github.com/ironcore-dev/metalnet", "config", "crd", "bases")),
 		},
 		ErrorIfCRDPathMissing: true,
 	}
