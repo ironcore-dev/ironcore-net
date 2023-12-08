@@ -81,5 +81,3 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           target: ${{ matrix.image.target }}
-          ssh: |
-            default=${{ env.SSH_AUTH_SOCK }}
