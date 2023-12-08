@@ -7,7 +7,7 @@ import (
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/networkid"
 	. "github.com/ironcore-dev/ironcore/utils/testing"
-	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
+	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

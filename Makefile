@@ -120,6 +120,10 @@ extract-openapi: envtest openapi-extractor
 		--apiservices="./config/apiserver/apiservice/bases" \
 		--output="./gen"
 
+.PHONY: docs
+docs: gen-crd-api-reference-docs ## Run go generate to generate API reference documentation.
+	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/core/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/core.md
+
 ##@ Build
 
 .PHONY: build-ironcore-net
@@ -445,7 +449,7 @@ $(ENVTEST): $(LOCALBIN)
 .PHONY: openapi-extractor
 openapi-extractor: $(OPENAPI_EXTRACTOR) ## Download openapi-extractor locally if necessary.
 $(OPENAPI_EXTRACTOR): $(LOCALBIN)
-	test -s $(LOCALBIN)/openapi-extractor || GOBIN=$(LOCALBIN) go install github.com/onmetal/openapi-extractor/cmd/openapi-extractor@latest
+	test -s $(LOCALBIN)/openapi-extractor || GOBIN=$(LOCALBIN) go install github.com/ironcore-dev/openapi-extractor/cmd/openapi-extractor@latest
 
 .PHONY: gen-crd-api-reference-docs
 gen-crd-api-reference-docs: $(GEN_CRD_API_REFERENCE_DOCS) ## Download gen-crd-api-reference-docs locally if necessary.

@@ -7,9 +7,9 @@ require (
 	github.com/go-logr/logr v1.3.0
 	github.com/google/uuid v1.3.1
 	github.com/ironcore-dev/controller-utils v0.9.0
-	github.com/ironcore-dev/ironcore v0.1.2-0.20231120151107-b5c3fa09890e
-	github.com/onmetal/metalnet v0.1.8
-	github.com/onsi/ginkgo/v2 v2.13.1
+	github.com/ironcore-dev/ironcore v0.1.2-0.20231130105619-82b2d4e911ad
+	github.com/ironcore-dev/metalnet v0.1.10-0.20231207161641-f9fc9e6e01d7
+	github.com/onsi/ginkgo/v2 v2.13.2
 	github.com/onsi/gomega v1.30.0
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
@@ -92,7 +92,7 @@ require (
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.11.0 // indirect
 	golang.org/x/sync v0.5.0 // indirect
-	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/term v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/time v0.3.0 // indirect

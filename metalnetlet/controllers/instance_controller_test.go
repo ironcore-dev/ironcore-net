@@ -7,7 +7,7 @@ import (
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	. "github.com/ironcore-dev/ironcore/utils/testing"
-	metalnetv1alpha1 "github.com/onmetal/metalnet/api/v1alpha1"
+	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -26,6 +26,7 @@ var _ = Describe("LoadBalancerInstanceController", func() {
 
 	It("should reconcile the metalnet load balancers for the load balancer instance", func(ctx SpecContext) {
 		By("creating a load balancer instance")
+		protocol := corev1.ProtocolTCP
 		inst := &v1alpha1.Instance{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -42,6 +43,12 @@ var _ = Describe("LoadBalancerInstanceController", func() {
 				NodeRef: &corev1.LocalObjectReference{
 					Name: PartitionNodeName(partitionName, metalnetNode.Name),
 				},
+				LoadBalancerPorts: []v1alpha1.LoadBalancerPort{
+					{
+						Protocol: &protocol,
+						Port:     1000,
+					},
+				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, inst)).To(Succeed())
@@ -56,6 +63,7 @@ var _ = Describe("LoadBalancerInstanceController", func() {
 
 	It("should recreate the metalnet load balancer if it gets deleted", func(ctx SpecContext) {
 		By("creating a load balancer instance")
+		protocol := corev1.ProtocolTCP
 		inst := &v1alpha1.Instance{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -68,6 +76,12 @@ var _ = Describe("LoadBalancerInstanceController", func() {
 				IPs:              []net.IP{net.MustParseIP("10.0.0.1")},
 				NodeRef: &corev1.LocalObjectReference{
 					Name: PartitionNodeName(partitionName, metalnetNode.Name),
+				},
+				LoadBalancerPorts: []v1alpha1.LoadBalancerPort{
+					{
+						Protocol: &protocol,
+						Port:     1000,
+					},
 				},
 			},
 		}
