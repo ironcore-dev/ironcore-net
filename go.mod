@@ -8,7 +8,7 @@ require (
 	github.com/google/uuid v1.3.1
 	github.com/ironcore-dev/controller-utils v0.9.0
 	github.com/ironcore-dev/ironcore v0.1.2-0.20231130105619-82b2d4e911ad
-	github.com/ironcore-dev/metalnet v0.1.10-0.20231207161641-f9fc9e6e01d7
+	github.com/ironcore-dev/metalnet v0.3.0
 	github.com/onsi/ginkgo/v2 v2.13.2
 	github.com/onsi/gomega v1.30.0
 	github.com/spf13/cobra v1.8.0
