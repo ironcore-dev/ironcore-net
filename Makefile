@@ -128,30 +128,30 @@ docs: gen-crd-api-reference-docs ## Run go generate to generate API reference do
 
 .PHONY: build-ironcore-net
 build-ironcore-net: generate fmt addlicense lint ## Build ironcore-net binary.
-	go build -o bin/manager ./ironcore-net/main.go
+	go build -o bin/manager ./cmd/apiserver/main.go
 
 .PHONY: build-apinetlet
 build-apinetlet: generate fmt addlicense lint ## Build apinetlet.
-	go build -o bin/apinetlet ./apinetlet/main.go
+	go build -o bin/apinetlet ./cmd/apinetlet/main.go
 
 .PHONY: build-metalnetlet
 build-metalnetlet: generate fmt addlicense lint ## Build metalnetlet.
-	go build -o bin/metalnetlet ./metalnetlet/main.go
+	go build -o bin/metalnetlet ./cmd/metalnetlet/main.go
 
 .PHONY: build
 build: build-ironcore-net build-apinetlet build-metalnetlet ## Build ironcore-net, apinetlet, metalnetlet.
 
 .PHONY: run-ironcore-net
 run-ironcore-net: manifests generate fmt lint ## Run a ironcore-net from your host.
-	go run ./ironcore-net/main.go
+	go run ./cmd/ironcore-net/main.go
 
 .PHONY: run-apinetlet
 run-apinetlet: manifests generate fmt lint ## Run apinetlet from your host.
-	go run ./apinetlet/main.go
+	go run ./cmd/apinetlet/main.go
 
 .PHONY: run-metalnetlet
 run-metalnetlet: manifests generate fmt lint ## Run metalnetlet from your host.
-	go run ./metalnetlet/main.go
+	go run ./cmd/metalnetlet/main.go
 
 .PHONY: docker-build-apiserver
 docker-build-apiserver: ## Build apiserver image.
