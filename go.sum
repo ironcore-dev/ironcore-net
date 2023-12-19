@@ -116,8 +116,8 @@ github.com/ironcore-dev/controller-utils v0.9.0 h1:q8Ljk6UIS6WB0J/k/hVV13umHUn/B
 github.com/ironcore-dev/controller-utils v0.9.0/go.mod h1:06mPYdYCdjGHVz/msCG/MyDjPdOufRkUd4GaTqkzZwg=
 github.com/ironcore-dev/ironcore v0.1.2-0.20231130105619-82b2d4e911ad h1:n7fk+Ep1IodKbJ1umJwYk/HyUGmHeywZsxRGUdVJRHw=
 github.com/ironcore-dev/ironcore v0.1.2-0.20231130105619-82b2d4e911ad/go.mod h1:UPp+izBNxBhgVa0ts6TxhgV9yFkFVy6+d2T9fsi92uY=
-github.com/ironcore-dev/metalnet v0.1.10-0.20231207161641-f9fc9e6e01d7 h1:KwdX+7FvbeqNlv/BcWIaYMWswcf16wtsoZ10zWrbfXY=
-github.com/ironcore-dev/metalnet v0.1.10-0.20231207161641-f9fc9e6e01d7/go.mod h1:X6WrRIuzuLPVTp9Sm4GWFN2Fsk36kpsb9PwnN03ei/0=
+github.com/ironcore-dev/metalnet v0.3.0 h1:DFwUZplNA04yd0G65fjxDc2BF0hUxhWTnsPvmvpFaKc=
+github.com/ironcore-dev/metalnet v0.3.0/go.mod h1:ftrzT6qxwHTmfZxrslIwoXMM+3XGmpHPL2K+u9G5Hgo=
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jonboulle/clockwork v0.2.2 h1:UOGuzwb1PwsrDAObMuhUnj0p5ULPj8V/xJ7Kx9qUBdQ=
 github.com/jonboulle/clockwork v0.2.2/go.mod h1:Pkfl5aHPm1nk2H9h0bjmnJD/BcgbGXUBGnn1kMkgxc8=
