@@ -27,6 +27,7 @@ import (
 	"github.com/ironcore-dev/ironcore-net/internal/registry/networkid"
 	"github.com/ironcore-dev/ironcore-net/internal/registry/networkinterface"
 	"github.com/ironcore-dev/ironcore-net/internal/registry/node"
+	ironcoreserializer "github.com/ironcore-dev/ironcore-net/internal/serializer"
 	corev1 "k8s.io/api/core/v1"
 	apimachineryequality "k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -159,6 +160,13 @@ func (c completedConfig) New() (*IronCoreServer, error) {
 	}
 
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(core.GroupName, Scheme, metav1.ParameterCodec, Codecs)
+	// Since our types don’t implement the Protobuf marshaling interface,
+	// but the default APIServer serializer advertises it by default, a lot
+	// of unexpected things might fail. One example is that deleting an
+	// arbitrary namespace will fail while this APIServer is running (see
+	// https://github.com/kubernetes/kubernetes/issues/86666).
+	apiGroupInfo.NegotiatedSerializer = ironcoreserializer.DefaultSubsetNegotiatedSerializer(Codecs)
+
 	v1alpha1storage := make(map[string]rest.Storage)
 
 	daemonSetStorage, err := daemonset.NewStorage(Scheme, c.GenericConfig.RESTOptionsGetter)
