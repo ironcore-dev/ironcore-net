@@ -30,9 +30,8 @@ func ValidateNetworkSpec(spec *core.NetworkSpec, fldPath *field.Path) field.Erro
 func ValidateNetworkUpdate(newNetwork, oldNetwork *core.Network) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, validation.ValidateObjectMetaAccessorUpdate(newNetwork, oldNetwork, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, ValidateNetwork(newNetwork)...)
-	allErrs = append(allErrs, ValidateNetworkSpecUpdate(&newNetwork.Spec, &oldNetwork.Spec, field.NewPath("spec"))...)
+	_ = newNetwork
+	_ = oldNetwork
 
 	return allErrs
 }
@@ -40,7 +39,9 @@ func ValidateNetworkUpdate(newNetwork, oldNetwork *core.Network) field.ErrorList
 func ValidateNetworkSpecUpdate(newSpec, oldSpec *core.NetworkSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, validation.ValidateImmutableField(newSpec.ID, oldSpec.ID, fldPath.Child("id"))...)
+	_ = newSpec
+	_ = oldSpec
+	_ = fldPath
 
 	return allErrs
 }
@@ -48,7 +49,8 @@ func ValidateNetworkSpecUpdate(newSpec, oldSpec *core.NetworkSpec, fldPath *fiel
 func ValidateNetworkStatusUpdate(newNetwork, oldNetwork *core.Network) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, validation.ValidateObjectMetaAccessorUpdate(newNetwork, oldNetwork, field.NewPath("metadata"))...)
+	_ = newNetwork
+	_ = oldNetwork
 
 	return allErrs
 }
