@@ -26,9 +26,9 @@ func ValidateNetworkInterface(networkInterface *core.NetworkInterface) field.Err
 func ValidateNetworkInterfaceSpec(spec *core.NetworkInterfaceSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	if spec.NodeRef.Name == "" {
-		allErrs = append(allErrs, field.Required(fldPath.Child("nodeRef", "name"), "must specify target node"))
-	}
+	//if spec.NodeRef.Name == "" {
+	//	allErrs = append(allErrs, field.Required(fldPath.Child("nodeRef", "name"), "must specify target node"))
+	//}
 
 	seenInternalIPFamilies := sets.New[corev1.IPFamily]()
 	for i, ip := range spec.IPs {
