@@ -331,6 +331,7 @@ func (r *NetworkInterfaceReconciler) getPrefixesForNetworkInterface(
 	nic *networkingv1alpha1.NetworkInterface,
 ) ([]net.IPPrefix, error) {
 	var res []net.IPPrefix
+	// TODO ask afritzler about the nic.Spec.IPs[i].Ephemeral.PrefixTemplate.Spec.Prefix if this should be searched as well?
 	for idx, prefixSrc := range nic.Spec.Prefixes {
 		switch {
 		case prefixSrc.Value != nil:
@@ -353,6 +354,27 @@ func (r *NetworkInterfaceReconciler) getPrefixesForNetworkInterface(
 			res = append(res, net.IPPrefix{Prefix: ipamPrefix.Spec.Prefix.Prefix})
 		}
 	}
+	for idx, ips := range nic.Spec.IPs {
+		if ips.Ephemeral != nil && ips.Ephemeral.PrefixTemplate != nil {
+			ipamPrefix := &ipamv1alpha1.Prefix{}
+			ipamPrefixKey := client.ObjectKey{Namespace: nic.Namespace, Name: networkingv1alpha1.NetworkInterfaceIPIPAMPrefixName(nic.Name, idx)}
+
+			log.V(1).Info("searching for prefix name " + ipamPrefixKey.Namespace + "/" + ipamPrefixKey.Name)
+			if err := r.Get(ctx, ipamPrefixKey, ipamPrefix); err != nil {
+				if !apierrors.IsNotFound(err) {
+					return nil, err
+				}
+				continue
+			}
+
+			if ipamPrefix.Status.Phase != ipamv1alpha1.PrefixPhaseAllocated {
+				continue
+			}
+
+			res = append(res, net.IPPrefix{Prefix: ipamPrefix.Spec.Prefix.Prefix})
+		}
+	}
+
 	return res, nil
 }
 
