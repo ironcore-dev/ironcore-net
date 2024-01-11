@@ -176,6 +176,7 @@ type apiNetNetworkInterfaceClaimStrategy struct {
 func (s *apiNetNetworkInterfaceClaimStrategy) ClaimState(claimer client.Object, obj client.Object) claimmanager.ClaimState {
 	apiNetNic := obj.(*apinetv1alpha1.NetworkInterface)
 	if data := apinetletclient.SourceObjectDataFromObject(s.Scheme(), s.RESTMapper(), claimer, apiNetNic); data != nil {
+		fmt.Printf("DEBUG ClaimState - name: %s - namespace: %s - uid: %s\n", claimer.GetName(), claimer.GetNamespace(), string(claimer.GetUID()))
 		if data.UID == claimer.GetUID() {
 			return claimmanager.ClaimStateClaimed
 		}

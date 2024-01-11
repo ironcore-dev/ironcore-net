@@ -4,6 +4,7 @@
 package client
 
 import (
+	"fmt"
 	"github.com/ironcore-dev/ironcore-net/utils/api"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/labels"
@@ -247,6 +248,8 @@ func (s *SourceAwareSystem) SourceObjectDataFromObjectE(scheme *runtime.Scheme, 
 	if !ok {
 		return nil, nil
 	}
+
+	fmt.Printf("DEBUG SourceObjectDataFromObjectE - name: %s - namespace: %s - uid: %s\n", name, namespace, uid)
 
 	return &SourceObjectData{
 		Namespace: namespace,
