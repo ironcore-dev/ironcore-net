@@ -317,6 +317,7 @@ func (r *NetworkInterfaceReconciler) getAPINetNetworkInterfaceForNetworkInterfac
 
 func (r *NetworkInterfaceReconciler) getPrefixesForNetworkInterface(
 	ctx context.Context,
+	log logr.Logger,
 	nic *networkingv1alpha1.NetworkInterface,
 ) ([]net.IPPrefix, error) {
 	var res []net.IPPrefix
@@ -327,6 +328,7 @@ func (r *NetworkInterfaceReconciler) getPrefixesForNetworkInterface(
 		case prefixSrc.Ephemeral != nil:
 			ipamPrefix := &ipamv1alpha1.Prefix{}
 			ipamPrefixKey := client.ObjectKey{Namespace: nic.Namespace, Name: networkingv1alpha1.NetworkInterfaceIPIPAMPrefixName(nic.Name, idx)}
+			log.V(1).Info("searching for prefix name " + ipamPrefixKey.Namespace + "/" + ipamPrefixKey.Name)
 			if err := r.Get(ctx, ipamPrefixKey, ipamPrefix); err != nil {
 				if !apierrors.IsNotFound(err) {
 					return nil, err
@@ -429,7 +431,7 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 		errs = append(errs, err)
 	}
 
-	prefixes, err := r.getPrefixesForNetworkInterface(ctx, nic)
+	prefixes, err := r.getPrefixesForNetworkInterface(ctx, log, nic)
 	if err != nil {
 		errs = append(errs, err)
 	}
