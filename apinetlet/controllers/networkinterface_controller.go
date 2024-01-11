@@ -288,6 +288,8 @@ func (r *NetworkInterfaceReconciler) getAPINetNetworkInterfaceForNetworkInterfac
 	log logr.Logger,
 	nic *networkingv1alpha1.NetworkInterface,
 ) (*apinetv1alpha1.NetworkInterface, error) {
+	log.Info("get all api net nics")
+
 	apiNetNicList := &apinetv1alpha1.NetworkInterfaceList{}
 	if err := r.APINetClient.List(ctx, apiNetNicList,
 		client.InNamespace(r.APINetNamespace),
@@ -295,22 +297,29 @@ func (r *NetworkInterfaceReconciler) getAPINetNetworkInterfaceForNetworkInterfac
 		return nil, fmt.Errorf("error listing apinet network interfaces: %w", err)
 	}
 
+	log.Info("set vars")
 	var (
 		sel            = r.networkInterfaceAPINetNetworkInterfaceSelector(log, nic)
 		claimMgr       = claimmanager.New(nic, sel, &apiNetNetworkInterfaceClaimStrategy{r.APINetClient})
 		foundAPINetNic *apinetv1alpha1.NetworkInterface
 		errs           []error
 	)
+
+	log.Info("iterate all nics")
 	for _, apiNetNic := range apiNetNicList.Items {
+		log.Info("call 'Claim'")
 		ok, err := claimMgr.Claim(ctx, &apiNetNic)
 		if err != nil {
+			log.Error(err, "error during 'Claim'")
 			errs = append(errs, err)
 			continue
 		}
 		if !ok {
+			log.Info("not ok")
 			continue
 		}
 
+		log.Info("found nic")
 		foundAPINetNic = generic.Pointer(apiNetNic)
 	}
 	return foundAPINetNic, errors.Join(errs...)
