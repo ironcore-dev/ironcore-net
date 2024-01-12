@@ -176,7 +176,6 @@ type apiNetNetworkInterfaceClaimStrategy struct {
 func (s *apiNetNetworkInterfaceClaimStrategy) ClaimState(claimer client.Object, obj client.Object) claimmanager.ClaimState {
 	apiNetNic := obj.(*apinetv1alpha1.NetworkInterface)
 	if data := apinetletclient.SourceObjectDataFromObject(s.Scheme(), s.RESTMapper(), claimer, apiNetNic); data != nil {
-		fmt.Printf("DEBUG ClaimState - name: %s - namespace: %s - uid: %s\n", claimer.GetName(), claimer.GetNamespace(), string(claimer.GetUID()))
 		if data.UID == claimer.GetUID() {
 			return claimmanager.ClaimStateClaimed
 		}
@@ -288,8 +287,6 @@ func (r *NetworkInterfaceReconciler) getAPINetNetworkInterfaceForNetworkInterfac
 	log logr.Logger,
 	nic *networkingv1alpha1.NetworkInterface,
 ) (*apinetv1alpha1.NetworkInterface, error) {
-	log.Info("get all api net nics")
-
 	apiNetNicList := &apinetv1alpha1.NetworkInterfaceList{}
 	if err := r.APINetClient.List(ctx, apiNetNicList,
 		client.InNamespace(r.APINetNamespace),
@@ -297,29 +294,22 @@ func (r *NetworkInterfaceReconciler) getAPINetNetworkInterfaceForNetworkInterfac
 		return nil, fmt.Errorf("error listing apinet network interfaces: %w", err)
 	}
 
-	log.Info("set vars")
 	var (
 		sel            = r.networkInterfaceAPINetNetworkInterfaceSelector(log, nic)
 		claimMgr       = claimmanager.New(nic, sel, &apiNetNetworkInterfaceClaimStrategy{r.APINetClient})
 		foundAPINetNic *apinetv1alpha1.NetworkInterface
 		errs           []error
 	)
-
-	log.Info("iterate all nics")
 	for _, apiNetNic := range apiNetNicList.Items {
-		log.Info("call 'Claim'")
 		ok, err := claimMgr.Claim(ctx, &apiNetNic)
 		if err != nil {
-			log.Error(err, "error during 'Claim'")
 			errs = append(errs, err)
 			continue
 		}
 		if !ok {
-			log.Info("not ok")
 			continue
 		}
 
-		log.Info("found nic")
 		foundAPINetNic = generic.Pointer(apiNetNic)
 	}
 	return foundAPINetNic, errors.Join(errs...)
@@ -327,19 +317,16 @@ func (r *NetworkInterfaceReconciler) getAPINetNetworkInterfaceForNetworkInterfac
 
 func (r *NetworkInterfaceReconciler) getPrefixesForNetworkInterface(
 	ctx context.Context,
-	log logr.Logger,
 	nic *networkingv1alpha1.NetworkInterface,
 ) ([]net.IPPrefix, error) {
 	var res []net.IPPrefix
-	// TODO ask afritzler about the nic.Spec.IPs[i].Ephemeral.PrefixTemplate.Spec.Prefix if this should be searched as well?
 	for idx, prefixSrc := range nic.Spec.Prefixes {
 		switch {
 		case prefixSrc.Value != nil:
 			res = append(res, net.IPPrefix{Prefix: prefixSrc.Value.Prefix})
 		case prefixSrc.Ephemeral != nil:
 			ipamPrefix := &ipamv1alpha1.Prefix{}
-			ipamPrefixKey := client.ObjectKey{Namespace: nic.Namespace, Name: networkingv1alpha1.NetworkInterfaceIPIPAMPrefixName(nic.Name, idx)}
-			log.V(1).Info("searching for prefix name " + ipamPrefixKey.Namespace + "/" + ipamPrefixKey.Name)
+			ipamPrefixKey := client.ObjectKey{Namespace: nic.Namespace, Name: networkingv1alpha1.NetworkInterfacePrefixIPAMPrefixName(nic.Name, idx)}
 			if err := r.Get(ctx, ipamPrefixKey, ipamPrefix); err != nil {
 				if !apierrors.IsNotFound(err) {
 					return nil, err
@@ -358,8 +345,6 @@ func (r *NetworkInterfaceReconciler) getPrefixesForNetworkInterface(
 		if ips.Ephemeral != nil && ips.Ephemeral.PrefixTemplate != nil {
 			ipamPrefix := &ipamv1alpha1.Prefix{}
 			ipamPrefixKey := client.ObjectKey{Namespace: nic.Namespace, Name: networkingv1alpha1.NetworkInterfaceIPIPAMPrefixName(nic.Name, idx)}
-
-			log.V(1).Info("searching for prefix name " + ipamPrefixKey.Namespace + "/" + ipamPrefixKey.Name)
 			if err := r.Get(ctx, ipamPrefixKey, ipamPrefix); err != nil {
 				if !apierrors.IsNotFound(err) {
 					return nil, err
@@ -463,7 +448,7 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 		errs = append(errs, err)
 	}
 
-	prefixes, err := r.getPrefixesForNetworkInterface(ctx, log, nic)
+	prefixes, err := r.getPrefixesForNetworkInterface(ctx, nic)
 	if err != nil {
 		errs = append(errs, err)
 	}
