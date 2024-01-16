@@ -313,6 +313,9 @@ func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, lo
 					apinetv1alpha1ac.InstanceTemplate().
 						WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), loadBalancer)).
 						WithSpec(apinetv1alpha1ac.InstanceSpec().
+							WithType(apinetv1alpha1.InstanceTypeLoadBalancer).
+							WithLoadBalancerType(apiNetLoadBalancerType).
+							WithNetworkRef(corev1.LocalObjectReference{Name: apiNetNetworkName}).
 							WithAffinity(apinetv1alpha1ac.Affinity().
 								WithInstanceAntiAffinity(apinetv1alpha1ac.InstanceAntiAffinity().WithRequiredDuringSchedulingIgnoredDuringExecution(
 									apinetv1alpha1ac.InstanceAffinityTerm().
