@@ -24,6 +24,7 @@ var (
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
 		{Name: "Network", Type: "string", Description: "The network of the network interface"},
 		{Name: "IPs", Type: "string", Description: "The IPs of the network interface"},
+		{Name: "Prefixes", Type: "string", Description: "The prefixes of the network interface"},
 		{Name: "PublicIPs", Type: "string", Description: "The public IPs of the network interface"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
@@ -49,6 +50,14 @@ func formatPublicIPs(ips []core.NetworkInterfacePublicIP) string {
 	return j.String()
 }
 
+func formatPrefixes(prefixes []net.IPPrefix) string {
+	j := utilstrings.NewJoiner(",")
+	for _, p := range prefixes {
+		j.Add(p.String())
+	}
+	return j.String()
+}
+
 func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tableOptions runtime.Object) (*metav1.Table, error) {
 	tab := &metav1.Table{
 		ColumnDefinitions: headers,
@@ -70,6 +79,7 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		cells = append(cells, name)
 		cells = append(cells, nic.Spec.NetworkRef.Name)
 		cells = append(cells, formatIPs(nic.Spec.IPs))
+		cells = append(cells, formatPrefixes(nic.Spec.Prefixes))
 		cells = append(cells, formatPublicIPs(nic.Spec.PublicIPs))
 		cells = append(cells, age)
 
