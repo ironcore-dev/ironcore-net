@@ -1,7 +1,7 @@
 {
 	"openapi": "3.0.0",
 	"info": {
-		"title": "ironcore-net",
+		"title": "ironcore-net-api",
 		"version": "0.1"
 	},
 	"paths": {
@@ -17,11 +17,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIResourceList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIResourceList"
 								}
@@ -53,16 +48,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSetList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSetList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSetList"
 								}
@@ -131,7 +116,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -205,16 +190,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.InstanceList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.InstanceList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.InstanceList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.InstanceList"
@@ -279,7 +254,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -445,16 +420,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddressList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddressList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddressList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddressList"
@@ -512,18 +477,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
 								}
@@ -543,11 +504,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
@@ -559,11 +515,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
 								}
@@ -717,11 +668,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -741,7 +687,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -761,11 +707,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
 								}
@@ -827,18 +768,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
 								}
@@ -854,11 +791,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
 								}
@@ -940,11 +872,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -956,11 +883,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
@@ -1046,18 +968,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
 								}
@@ -1073,11 +991,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"
 								}
@@ -1111,7 +1024,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -1136,16 +1049,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPList"
 								}
@@ -1214,7 +1117,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -1288,16 +1191,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRoutingList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRoutingList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRoutingList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRoutingList"
@@ -1362,7 +1255,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -1436,16 +1329,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerList"
@@ -1510,7 +1393,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -1676,16 +1559,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSetList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSetList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSetList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSetList"
@@ -1743,18 +1616,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 								}
@@ -1774,11 +1643,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
@@ -1790,11 +1654,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 								}
@@ -1948,11 +1807,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -1982,7 +1836,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -2002,11 +1856,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 								}
@@ -2068,18 +1917,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 								}
@@ -2095,11 +1940,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 								}
@@ -2181,11 +2021,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -2197,11 +2032,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
@@ -2287,18 +2117,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 								}
@@ -2314,11 +2140,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 								}
@@ -2362,7 +2183,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -2382,11 +2203,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 								}
@@ -2448,18 +2264,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 								}
@@ -2475,11 +2287,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 								}
@@ -2565,18 +2372,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 								}
@@ -2592,11 +2395,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.DaemonSet"
 								}
@@ -2640,7 +2438,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -2761,16 +2559,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.InstanceList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.InstanceList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.InstanceList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.InstanceList"
@@ -2828,18 +2616,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 								}
@@ -2859,11 +2643,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
@@ -2875,11 +2654,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 								}
@@ -3033,11 +2807,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -3067,7 +2836,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -3087,11 +2856,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 								}
@@ -3153,18 +2917,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 								}
@@ -3180,11 +2940,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 								}
@@ -3266,11 +3021,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -3282,11 +3032,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
@@ -3372,18 +3117,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 								}
@@ -3399,11 +3140,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 								}
@@ -3447,7 +3183,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -3467,11 +3203,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 								}
@@ -3533,18 +3264,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 								}
@@ -3560,11 +3287,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 								}
@@ -3650,18 +3372,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 								}
@@ -3677,11 +3395,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"
 								}
@@ -3725,7 +3438,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -3846,16 +3559,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPList"
@@ -3913,18 +3616,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
 								}
@@ -3944,11 +3643,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
@@ -3960,11 +3654,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
 								}
@@ -4118,11 +3807,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -4152,7 +3836,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -4172,11 +3856,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
 								}
@@ -4238,18 +3917,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
 								}
@@ -4265,11 +3940,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
 								}
@@ -4351,11 +4021,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -4367,11 +4032,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
@@ -4457,18 +4117,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
 								}
@@ -4484,11 +4140,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"
 								}
@@ -4532,7 +4183,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -4653,16 +4304,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRoutingList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRoutingList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRoutingList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRoutingList"
@@ -4720,18 +4361,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
 								}
@@ -4751,11 +4388,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
@@ -4767,11 +4399,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
 								}
@@ -4925,11 +4552,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -4959,7 +4581,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -4979,11 +4601,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
 								}
@@ -5045,18 +4662,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
 								}
@@ -5072,11 +4685,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
 								}
@@ -5158,11 +4766,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -5174,11 +4777,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
@@ -5264,18 +4862,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
 								}
@@ -5291,11 +4885,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"
 								}
@@ -5339,7 +4928,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -5460,16 +5049,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerList"
@@ -5527,18 +5106,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 								}
@@ -5558,11 +5133,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
@@ -5574,11 +5144,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 								}
@@ -5732,11 +5297,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -5766,7 +5326,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -5786,11 +5346,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 								}
@@ -5852,18 +5407,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 								}
@@ -5879,11 +5430,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 								}
@@ -5965,11 +5511,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -5981,11 +5522,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
@@ -6071,18 +5607,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 								}
@@ -6098,11 +5630,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 								}
@@ -6146,7 +5673,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -6166,11 +5693,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 								}
@@ -6232,18 +5754,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 								}
@@ -6259,11 +5777,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 								}
@@ -6349,18 +5862,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 								}
@@ -6376,11 +5885,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancer"
 								}
@@ -6424,7 +5928,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -6545,16 +6049,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscalerList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscalerList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscalerList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscalerList"
@@ -6612,18 +6106,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 								}
@@ -6643,11 +6133,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
@@ -6659,11 +6144,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 								}
@@ -6817,11 +6297,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -6851,7 +6326,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -6871,11 +6346,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 								}
@@ -6937,18 +6407,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 								}
@@ -6964,11 +6430,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 								}
@@ -7050,11 +6511,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -7066,11 +6522,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
@@ -7156,18 +6607,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 								}
@@ -7183,11 +6630,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 								}
@@ -7231,7 +6673,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -7251,11 +6693,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 								}
@@ -7317,18 +6754,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 								}
@@ -7344,11 +6777,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 								}
@@ -7434,18 +6862,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 								}
@@ -7461,11 +6885,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"
 								}
@@ -7509,7 +6928,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -7630,16 +7049,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayList"
@@ -7697,18 +7106,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 								}
@@ -7728,11 +7133,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
@@ -7744,11 +7144,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 								}
@@ -7902,11 +7297,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -7936,7 +7326,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -7956,11 +7346,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 								}
@@ -8022,18 +7407,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 								}
@@ -8049,11 +7430,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 								}
@@ -8135,11 +7511,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -8151,11 +7522,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
@@ -8241,18 +7607,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 								}
@@ -8268,11 +7630,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 								}
@@ -8316,7 +7673,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -8336,11 +7693,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 								}
@@ -8402,18 +7754,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 								}
@@ -8429,11 +7777,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 								}
@@ -8519,18 +7862,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 								}
@@ -8546,11 +7885,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway"
 								}
@@ -8594,7 +7928,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -8715,16 +8049,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTableList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTableList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTableList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTableList"
@@ -8782,18 +8106,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
 								}
@@ -8813,11 +8133,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
@@ -8829,11 +8144,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
 								}
@@ -8987,11 +8297,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -9021,7 +8326,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -9041,11 +8346,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
 								}
@@ -9107,18 +8407,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
 								}
@@ -9134,11 +8430,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
 								}
@@ -9220,11 +8511,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -9236,11 +8522,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
@@ -9326,18 +8607,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
 								}
@@ -9353,11 +8630,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"
 								}
@@ -9401,7 +8673,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -9522,16 +8794,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterfaceList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterfaceList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterfaceList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterfaceList"
@@ -9589,18 +8851,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 								}
@@ -9620,11 +8878,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
@@ -9636,11 +8889,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 								}
@@ -9794,11 +9042,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -9828,7 +9071,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -9848,11 +9091,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 								}
@@ -9914,18 +9152,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 								}
@@ -9941,11 +9175,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 								}
@@ -10027,11 +9256,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -10043,11 +9267,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
@@ -10133,18 +9352,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 								}
@@ -10160,11 +9375,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 								}
@@ -10208,7 +9418,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -10228,11 +9438,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 								}
@@ -10294,18 +9499,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 								}
@@ -10321,11 +9522,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 								}
@@ -10411,18 +9607,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 								}
@@ -10438,11 +9630,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterface"
 								}
@@ -10486,7 +9673,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -10607,16 +9794,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkList"
@@ -10674,18 +9851,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 								}
@@ -10705,11 +9878,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
@@ -10721,11 +9889,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 								}
@@ -10879,11 +10042,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -10913,7 +10071,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -10933,11 +10091,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 								}
@@ -10999,18 +10152,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 								}
@@ -11026,11 +10175,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 								}
@@ -11112,11 +10256,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -11128,11 +10267,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
@@ -11218,18 +10352,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 								}
@@ -11245,11 +10375,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 								}
@@ -11293,7 +10418,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -11313,11 +10438,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 								}
@@ -11379,18 +10499,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 								}
@@ -11406,11 +10522,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 								}
@@ -11496,18 +10607,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 								}
@@ -11523,11 +10630,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Network"
 								}
@@ -11571,7 +10673,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -11596,16 +10698,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscalerList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscalerList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscalerList"
 								}
@@ -11674,7 +10766,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -11748,16 +10840,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayList"
@@ -11822,7 +10904,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -11896,16 +10978,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTableList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTableList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTableList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTableList"
@@ -11970,7 +11042,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -12136,16 +11208,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkIDList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkIDList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkIDList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkIDList"
@@ -12203,18 +11265,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
 								}
@@ -12234,11 +11292,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
@@ -12250,11 +11303,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
 								}
@@ -12408,11 +11456,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -12432,7 +11475,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -12452,11 +11495,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
 								}
@@ -12518,18 +11556,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
 								}
@@ -12545,11 +11579,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
 								}
@@ -12631,11 +11660,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -12647,11 +11671,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
@@ -12737,18 +11756,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
 								}
@@ -12764,11 +11779,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"
 								}
@@ -12802,7 +11812,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -12827,16 +11837,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterfaceList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterfaceList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterfaceList"
 								}
@@ -12905,7 +11905,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -12979,16 +11979,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkList"
@@ -13053,7 +12043,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -13219,16 +12209,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NodeList"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NodeList"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NodeList"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NodeList"
@@ -13286,18 +12266,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 								}
@@ -13317,11 +12293,6 @@
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
@@ -13333,11 +12304,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 								}
@@ -13491,11 +12457,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -13515,7 +12476,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -13535,11 +12496,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 								}
@@ -13601,18 +12557,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 								}
@@ -13628,11 +12580,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 								}
@@ -13714,11 +12661,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
@@ -13730,11 +12672,6 @@
 						"description": "Accepted",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
 								}
@@ -13820,18 +12757,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 								}
@@ -13847,11 +12780,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 								}
@@ -13885,7 +12813,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -13905,11 +12833,6 @@
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 								}
@@ -13971,18 +12894,14 @@
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 								}
@@ -13998,11 +12917,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 								}
@@ -14088,18 +13002,14 @@
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
 							}
 						}
-					}
+					},
+					"required": true
 				},
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 								}
@@ -14115,11 +13025,6 @@
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
 								"schema": {
 									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node"
 								}
@@ -14153,7 +13058,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -14178,16 +13083,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -14256,7 +13151,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -14330,16 +13225,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
@@ -14404,7 +13289,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -14478,16 +13363,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
@@ -14552,7 +13427,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -14622,16 +13497,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -14710,7 +13575,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -14784,16 +13649,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
@@ -14858,7 +13713,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -14932,16 +13787,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
@@ -15006,7 +13851,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -15080,16 +13925,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
@@ -15154,7 +13989,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -15224,16 +14059,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -15312,7 +14137,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -15382,16 +14207,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -15480,7 +14295,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -15550,16 +14365,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -15638,7 +14443,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -15708,16 +14513,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -15806,7 +14601,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -15876,16 +14671,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -15964,7 +14749,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -16034,16 +14819,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -16132,7 +14907,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -16202,16 +14977,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -16290,7 +15055,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -16360,16 +15125,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -16458,7 +15213,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -16528,16 +15283,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -16616,7 +15361,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -16686,16 +15431,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -16784,7 +15519,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -16854,16 +15589,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -16942,7 +15667,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -17012,16 +15737,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -17110,7 +15825,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -17180,16 +15895,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -17268,7 +15973,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -17338,16 +16043,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -17436,7 +16131,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -17506,16 +16201,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -17594,7 +16279,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -17664,16 +16349,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -17762,7 +16437,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -17832,16 +16507,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -17920,7 +16585,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -17990,16 +16655,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -18088,7 +16743,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -18158,16 +16813,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -18246,7 +16891,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -18316,16 +16961,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -18414,7 +17049,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -18488,16 +17123,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
@@ -18562,7 +17187,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -18636,16 +17261,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
@@ -18710,7 +17325,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -18784,16 +17399,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
@@ -18858,7 +17463,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -18932,16 +17537,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
@@ -19006,7 +17601,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -19076,16 +17671,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -19164,7 +17749,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -19238,16 +17823,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
@@ -19312,7 +17887,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -19386,16 +17961,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
@@ -19460,7 +18025,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -19534,16 +18099,6 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
 							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
 							"application/yaml": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
@@ -19608,7 +18163,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -19678,16 +18233,6 @@
 								}
 							},
 							"application/json;stream=watch": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf": {
-								"schema": {
-									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
-								}
-							},
-							"application/vnd.kubernetes.protobuf;stream=watch": {
 								"schema": {
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
 								}
@@ -19766,7 +18311,7 @@
 				{
 					"name": "pretty",
 					"in": "query",
-					"description": "If 'true', then the output is pretty printed.",
+					"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 					"schema": {
 						"type": "string",
 						"uniqueItems": true
@@ -20112,12 +18657,7 @@
 						]
 					},
 					"ip": {
-						"default": {},
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
-							}
-						]
+						"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
 					}
 				}
 			},
@@ -20191,17 +18731,13 @@
 						"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPClaimRef"
 					},
 					"ip": {
-						"default": {},
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
-							}
-						]
+						"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
 					},
 					"ipFamily": {
-						"description": "Possible enum values:\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+						"description": "Possible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
 						"type": "string",
 						"enum": [
+							"",
 							"IPv4",
 							"IPv6"
 						]
@@ -20362,12 +18898,7 @@
 						"description": "IPs are the IPs of the instance.",
 						"type": "array",
 						"items": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
-								}
-							]
+							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
 						}
 					},
 					"loadBalancerPorts": {
@@ -20433,12 +18964,7 @@
 					"ips": {
 						"type": "array",
 						"items": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
-								}
-							]
+							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
 						}
 					}
 				}
@@ -20518,7 +19044,6 @@
 				"properties": {
 					"ip": {
 						"description": "IP is the target IP.",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
@@ -20543,7 +19068,6 @@
 				"properties": {
 					"ip": {
 						"description": "IP specifies a specific IP to allocate. If empty, a random IP will be allocated if possible.",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
@@ -20551,9 +19075,10 @@
 						]
 					},
 					"ipFamily": {
-						"description": "IPFamily is the IP family of the IP. Has to match IP if specified. If unspecified and IP is specified, will be defaulted by using the IP family of IP. If only IPFamily is specified, a random IP of that family will be allocated if possible.\n\nPossible enum values:\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+						"description": "IPFamily is the IP family of the IP. Has to match IP if specified. If unspecified and IP is specified, will be defaulted by using the IP family of IP. If only IPFamily is specified, a random IP of that family will be allocated if possible.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
 						"type": "string",
 						"enum": [
+							"",
 							"IPv4",
 							"IPv6"
 						]
@@ -20997,7 +19522,6 @@
 				"properties": {
 					"ip": {
 						"description": "IP specifies a specific IP to allocate. If empty, a random IP will be allocated if possible.",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
@@ -21063,10 +19587,11 @@
 				],
 				"properties": {
 					"ipFamily": {
-						"description": "IPFamily is the IP family of the NAT gateway.\n\nPossible enum values:\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+						"description": "IPFamily is the IP family of the NAT gateway.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
 						"type": "string",
 						"default": "",
 						"enum": [
+							"",
 							"IPv4",
 							"IPv6"
 						]
@@ -21125,7 +19650,6 @@
 				"properties": {
 					"ip": {
 						"description": "IP is the IP to NAT.",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
@@ -21162,7 +19686,6 @@
 					},
 					"ip": {
 						"description": "IP is the source IP.",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
@@ -21564,10 +20087,11 @@
 						]
 					},
 					"ipFamily": {
-						"description": "IPFamily is the IP family of the handling NAT gateway.\n\nPossible enum values:\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+						"description": "IPFamily is the IP family of the handling NAT gateway.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
 						"type": "string",
 						"default": "",
 						"enum": [
+							"",
 							"IPv4",
 							"IPv6"
 						]
@@ -21601,7 +20125,6 @@
 				"properties": {
 					"ip": {
 						"description": "IP specifies a specific IP to allocate. If empty, a random ephemeral IP will be allocated.",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
@@ -21609,9 +20132,10 @@
 						]
 					},
 					"ipFamily": {
-						"description": "IPFamily is the IP family of the IP. Has to match IP if specified. If unspecified and IP is specified, will be defaulted by using the IP family of IP. If only IPFamily is specified, a random IP of that family will be allocated if possible.\n\nPossible enum values:\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+						"description": "IPFamily is the IP family of the IP. Has to match IP if specified. If unspecified and IP is specified, will be defaulted by using the IP family of IP. If only IPFamily is specified, a random IP of that family will be allocated if possible.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
 						"type": "string",
 						"enum": [
+							"",
 							"IPv4",
 							"IPv6"
 						]
@@ -21634,12 +20158,7 @@
 						"description": "IPs are the internal IPs of the network interface.",
 						"type": "array",
 						"items": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
-								}
-							]
+							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
 						}
 					},
 					"natGateways": {
@@ -21676,12 +20195,7 @@
 						"description": "Prefixes are additional prefixes to route to the network interface.",
 						"type": "array",
 						"items": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IPPrefix"
-								}
-							]
+							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IPPrefix"
 						}
 					},
 					"publicIPs": {
@@ -21706,12 +20220,7 @@
 					"natIPs": {
 						"type": "array",
 						"items": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
-								}
-							]
+							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
 						}
 					},
 					"pciAddress": {
@@ -21720,23 +20229,13 @@
 					"prefixes": {
 						"type": "array",
 						"items": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IPPrefix"
-								}
-							]
+							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IPPrefix"
 						}
 					},
 					"publicIPs": {
 						"type": "array",
 						"items": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
-								}
-							]
+							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
 						}
 					},
 					"state": {
@@ -22358,7 +20857,6 @@
 					},
 					"creationTimestamp": {
 						"description": "CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.\n\nPopulated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
@@ -22638,7 +21136,6 @@
 				"properties": {
 					"object": {
 						"description": "Object is:\n * If Type is Added or Modified: the new state of the object.\n * If Type is Deleted: the state of the object immediately before deletion.\n * If Type is Error: *Status is recommended; other types may make sense\n   depending on context.",
-						"default": {},
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.runtime.RawExtension"

@@ -23,7 +23,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/apiserver/pkg/admission"
-	"k8s.io/apiserver/pkg/features"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/apiserver/pkg/server/options"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
@@ -105,8 +104,6 @@ func (o *IronCoreNetServerOptions) Config() (*apiserver.Config, error) {
 		return nil, fmt.Errorf("error creating self-signed certificates: %w", err)
 	}
 
-	o.RecommendedOptions.Etcd.StorageConfig.Paging = utilfeature.DefaultFeatureGate.Enabled(features.APIListChunking)
-
 	o.RecommendedOptions.ExtraAdmissionInitializers = func(c *genericapiserver.RecommendedConfig) ([]admission.PluginInitializer, error) {
 		ironcoreAPINetClient, err := clientset.NewForConfig(c.LoopbackClientConfig)
 		if err != nil {
@@ -122,14 +119,12 @@ func (o *IronCoreNetServerOptions) Config() (*apiserver.Config, error) {
 	serverConfig := genericapiserver.NewRecommendedConfig(apiserver.Codecs)
 
 	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(apinetopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(apiserver.Scheme))
-	serverConfig.OpenAPIConfig.Info.Title = "ironcore-net"
+	serverConfig.OpenAPIConfig.Info.Title = "ironcore-net-api"
 	serverConfig.OpenAPIConfig.Info.Version = "0.1"
 
-	if utilfeature.DefaultFeatureGate.Enabled(features.OpenAPIV3) {
-		serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIConfig(apinetopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(apiserver.Scheme))
-		serverConfig.OpenAPIV3Config.Info.Title = "ironcore-net"
-		serverConfig.OpenAPIV3Config.Info.Version = "0.1"
-	}
+	serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(apinetopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(apiserver.Scheme))
+	serverConfig.OpenAPIV3Config.Info.Title = "ironcore-net-api"
+	serverConfig.OpenAPIV3Config.Info.Version = "0.1"
 
 	if err := o.RecommendedOptions.ApplyTo(serverConfig); err != nil {
 		return nil, err

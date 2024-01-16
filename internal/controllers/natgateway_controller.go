@@ -13,7 +13,7 @@ import (
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	apinetclient "github.com/ironcore-dev/ironcore-net/internal/client"
 	"github.com/ironcore-dev/ironcore-net/internal/natgateway"
-	"github.com/ironcore-dev/ironcore/utils/maps"
+	"github.com/ironcore-dev/ironcore-net/utils/maps"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	"golang.org/x/exp/slices"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
