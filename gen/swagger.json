@@ -30990,13 +30990,11 @@
 				"description": "get available resources",
 				"consumes": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -31027,9 +31025,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -31073,7 +31069,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -31101,9 +31097,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -31147,7 +31141,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -31175,9 +31169,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -31243,8 +31235,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -31317,8 +31308,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -31392,7 +31382,7 @@
 			},
 			"parameters": [
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -31404,8 +31394,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -31439,8 +31428,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -31507,8 +31495,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -31572,8 +31559,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -31641,7 +31627,7 @@
 					"required": true
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -31654,9 +31640,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -31700,7 +31684,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -31728,9 +31712,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -31774,7 +31756,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -31802,9 +31784,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -31848,7 +31828,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -31876,9 +31856,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -31944,8 +31922,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -32018,8 +31995,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -32096,7 +32072,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -32108,8 +32084,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -32143,8 +32118,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -32211,8 +32185,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -32276,8 +32249,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -32348,7 +32320,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -32360,8 +32332,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -32395,8 +32366,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -32466,8 +32436,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -32538,7 +32507,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -32551,9 +32520,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -32619,8 +32586,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -32693,8 +32659,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -32771,7 +32736,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -32783,8 +32748,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -32818,8 +32782,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -32886,8 +32849,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -32951,8 +32913,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -33023,7 +32984,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -33035,8 +32996,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -33070,8 +33030,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -33141,8 +33100,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -33213,7 +33171,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -33226,9 +33184,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -33294,8 +33250,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -33368,8 +33323,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -33446,7 +33400,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -33458,8 +33412,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -33493,8 +33446,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -33561,8 +33513,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -33626,8 +33577,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -33698,7 +33648,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -33711,9 +33661,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -33779,8 +33727,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -33853,8 +33800,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -33931,7 +33877,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -33943,8 +33889,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -33978,8 +33923,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -34046,8 +33990,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -34111,8 +34054,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -34183,7 +34125,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -34196,9 +34138,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -34264,8 +34204,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -34338,8 +34277,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -34416,7 +34354,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -34428,8 +34366,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -34463,8 +34400,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -34531,8 +34467,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -34596,8 +34531,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -34668,7 +34602,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -34680,8 +34614,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -34715,8 +34648,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -34786,8 +34718,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -34858,7 +34789,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -34871,9 +34802,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -34939,8 +34868,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -35013,8 +34941,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -35091,7 +35018,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -35103,8 +35030,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -35138,8 +35064,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -35206,8 +35131,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -35271,8 +35195,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -35343,7 +35266,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -35355,8 +35278,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -35390,8 +35312,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -35461,8 +35382,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -35533,7 +35453,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -35546,9 +35466,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -35614,8 +35532,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -35688,8 +35605,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -35766,7 +35682,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -35778,8 +35694,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -35813,8 +35728,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -35881,8 +35795,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -35946,8 +35859,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -36018,7 +35930,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -36030,8 +35942,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -36065,8 +35976,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -36136,8 +36046,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -36208,7 +36117,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -36221,9 +36130,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -36289,8 +36196,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -36363,8 +36269,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -36441,7 +36346,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -36453,8 +36358,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -36488,8 +36392,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -36556,8 +36459,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -36621,8 +36523,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -36693,7 +36594,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -36706,9 +36607,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -36774,8 +36673,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -36848,8 +36746,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -36926,7 +36823,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -36938,8 +36835,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -36973,8 +36869,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -37041,8 +36936,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -37106,8 +37000,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -37178,7 +37071,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -37190,8 +37083,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -37225,8 +37117,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -37296,8 +37187,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -37368,7 +37258,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -37381,9 +37271,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -37449,8 +37337,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -37523,8 +37410,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -37601,7 +37487,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -37613,8 +37499,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -37648,8 +37533,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -37716,8 +37600,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -37781,8 +37664,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -37853,7 +37735,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -37865,8 +37747,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -37900,8 +37781,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -37971,8 +37851,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -38043,7 +37922,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -38056,9 +37935,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -38102,7 +37979,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -38130,9 +38007,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -38176,7 +38051,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -38204,9 +38079,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -38250,7 +38123,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -38278,9 +38151,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -38346,8 +38217,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -38420,8 +38290,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -38495,7 +38364,7 @@
 			},
 			"parameters": [
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -38507,8 +38376,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -38542,8 +38410,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -38610,8 +38477,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -38675,8 +38541,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -38744,7 +38609,7 @@
 					"required": true
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -38757,9 +38622,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -38803,7 +38666,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -38831,9 +38694,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -38877,7 +38738,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -38905,9 +38766,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -38973,8 +38832,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -39047,8 +38905,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -39122,7 +38979,7 @@
 			},
 			"parameters": [
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -39134,8 +38991,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -39169,8 +39025,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -39237,8 +39092,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -39302,8 +39156,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -39371,7 +39224,7 @@
 					"required": true
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -39383,8 +39236,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -39418,8 +39270,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -39489,8 +39340,7 @@
 				],
 				"produces": [
 					"application/json",
-					"application/yaml",
-					"application/vnd.kubernetes.protobuf"
+					"application/yaml"
 				],
 				"schemes": [
 					"https"
@@ -39558,7 +39408,7 @@
 					"required": true
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -39571,9 +39421,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -39617,7 +39465,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -39645,9 +39493,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -39691,7 +39537,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -39719,9 +39565,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -39765,7 +39609,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -39793,9 +39637,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -39847,7 +39689,7 @@
 					"required": true
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -39875,9 +39717,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -39921,7 +39761,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -39949,9 +39789,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -39995,7 +39833,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -40023,9 +39861,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -40069,7 +39905,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -40097,9 +39933,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -40146,7 +39980,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -40174,9 +40008,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -40231,7 +40063,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -40259,9 +40091,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -40308,7 +40138,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -40336,9 +40166,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -40393,7 +40221,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -40421,9 +40249,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -40470,7 +40296,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -40498,9 +40324,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -40555,7 +40379,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -40583,9 +40407,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -40632,7 +40454,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -40660,9 +40482,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -40717,7 +40537,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -40745,9 +40565,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -40794,7 +40612,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -40822,9 +40640,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -40879,7 +40695,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -40907,9 +40723,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -40956,7 +40770,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -40984,9 +40798,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -41041,7 +40853,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -41069,9 +40881,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -41118,7 +40928,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -41146,9 +40956,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -41203,7 +41011,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -41231,9 +41039,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -41280,7 +41086,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -41308,9 +41114,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -41365,7 +41169,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -41393,9 +41197,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -41442,7 +41244,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -41470,9 +41272,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -41527,7 +41327,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -41555,9 +41355,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -41604,7 +41402,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -41632,9 +41430,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -41689,7 +41485,7 @@
 					"$ref": "#/parameters/namespace-vgWSWtn3"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -41717,9 +41513,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -41763,7 +41557,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -41791,9 +41585,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -41837,7 +41629,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -41865,9 +41657,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -41911,7 +41701,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -41939,9 +41729,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -41985,7 +41773,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -42013,9 +41801,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -42067,7 +41853,7 @@
 					"required": true
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -42095,9 +41881,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -42141,7 +41925,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -42169,9 +41953,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -42215,7 +41997,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -42243,9 +42025,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -42289,7 +42069,7 @@
 					"$ref": "#/parameters/limit-1NfNmdNH"
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -42317,9 +42097,7 @@
 				"produces": [
 					"application/json",
 					"application/yaml",
-					"application/vnd.kubernetes.protobuf",
-					"application/json;stream=watch",
-					"application/vnd.kubernetes.protobuf;stream=watch"
+					"application/json;stream=watch"
 				],
 				"schemes": [
 					"https"
@@ -42371,7 +42149,7 @@
 					"required": true
 				},
 				{
-					"$ref": "#/parameters/pretty-nN7o5FEq"
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				},
 				{
 					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
@@ -59324,9 +59102,10 @@
 					"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
 				},
 				"ipFamily": {
-					"description": "Possible enum values:\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+					"description": "Possible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
 					"type": "string",
 					"enum": [
+						"",
 						"IPv4",
 						"IPv6"
 					]
@@ -59566,9 +59345,10 @@
 					"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
 				},
 				"ipFamily": {
-					"description": "IPFamily is the IP family of the IP. Has to match IP if specified. If unspecified and IP is specified, will be defaulted by using the IP family of IP. If only IPFamily is specified, a random IP of that family will be allocated if possible.\n\nPossible enum values:\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+					"description": "IPFamily is the IP family of the IP. Has to match IP if specified. If unspecified and IP is specified, will be defaulted by using the IP family of IP. If only IPFamily is specified, a random IP of that family will be allocated if possible.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
 					"type": "string",
 					"enum": [
+						"",
 						"IPv4",
 						"IPv6"
 					]
@@ -59953,9 +59733,10 @@
 			],
 			"properties": {
 				"ipFamily": {
-					"description": "IPFamily is the IP family of the NAT gateway.\n\nPossible enum values:\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+					"description": "IPFamily is the IP family of the NAT gateway.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
 					"type": "string",
 					"enum": [
+						"",
 						"IPv4",
 						"IPv6"
 					]
@@ -60324,9 +60105,10 @@
 					"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterfaceNATClaimRef"
 				},
 				"ipFamily": {
-					"description": "IPFamily is the IP family of the handling NAT gateway.\n\nPossible enum values:\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+					"description": "IPFamily is the IP family of the handling NAT gateway.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
 					"type": "string",
 					"enum": [
+						"",
 						"IPv4",
 						"IPv6"
 					]
@@ -60361,9 +60143,10 @@
 					"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
 				},
 				"ipFamily": {
-					"description": "IPFamily is the IP family of the IP. Has to match IP if specified. If unspecified and IP is specified, will be defaulted by using the IP family of IP. If only IPFamily is specified, a random IP of that family will be allocated if possible.\n\nPossible enum values:\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+					"description": "IPFamily is the IP family of the IP. Has to match IP if specified. If unspecified and IP is specified, will be defaulted by using the IP family of IP. If only IPFamily is specified, a random IP of that family will be allocated if possible.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
 					"type": "string",
 					"enum": [
+						"",
 						"IPv4",
 						"IPv6"
 					]
@@ -76560,6 +76343,13 @@
 			"uniqueItems": true,
 			"type": "string",
 			"description": "If 'true', then the output is pretty printed.",
+			"name": "pretty",
+			"in": "query"
+		},
+		"pretty-tJGM1-ng": {
+			"uniqueItems": true,
+			"type": "string",
+			"description": "If 'true', then the output is pretty printed. Defaults to 'false' unless the user-agent indicates a browser or command-line HTTP tool (curl and wget).",
 			"name": "pretty",
 			"in": "query"
 		},
