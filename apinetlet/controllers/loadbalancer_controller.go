@@ -296,6 +296,8 @@ func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, lo
 		if err != nil {
 			return nil, err
 		}
+		// TODO fixme: we will rely on the migration controller for now to create the internal lb object
+		return r.APINetInterface.CoreV1alpha1().LoadBalancers(r.APINetNamespace).Get(ctx, string(loadBalancer.UID), metav1.GetOptions{})
 	case networkingv1alpha1.LoadBalancerTypePublic:
 		ips = r.getPublicLoadBalancerAPINetIPs(loadBalancer)
 	}
