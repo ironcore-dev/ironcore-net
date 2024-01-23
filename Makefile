@@ -156,19 +156,19 @@ run-metalnetlet: manifests generate fmt lint ## Run metalnetlet from your host.
 
 .PHONY: docker-build-apiserver
 docker-build-apiserver: ## Build apiserver image.
-	docker build --ssh default=${SSH_KEY} --target apiserver -t ${APISERVER_IMG} .
+	podman build --ssh default=${SSH_KEY} --target apiserver -t ${APISERVER_IMG} .
 
 .PHONY: docker-build-controller-manager
 docker-build-controller-manager: ## Build controller-manager image.
-	docker build --ssh default=${SSH_KEY} --target controller-manager -t ${CONTROLLER_MANAGER_IMG} .
+	podman build --ssh default=${SSH_KEY} --target controller-manager -t ${CONTROLLER_MANAGER_IMG} .
 
 .PHONY: docker-build-apinetlet
 docker-build-apinetlet: ## Build apinetlet image with the manager.
-	docker build --ssh default=${SSH_KEY} --target apinetlet-manager -t ${APINETLET_IMG} .
+	podman build --ssh default=${SSH_KEY} --target apinetlet-manager -t ${APINETLET_IMG} .
 
 .PHONY: docker-build-metalnetlet
 docker-build-metalnetlet: ## Build metalnetlet image with the manager.
-	docker build --ssh default=${SSH_KEY} --target metalnetlet-manager -t ${METALNETLET_IMG} .
+	podman build --ssh default=${SSH_KEY} --target metalnetlet-manager -t ${METALNETLET_IMG} .
 
 .PHONY: docker-build
 docker-build: docker-build-apiserver docker-build-controller-manager docker-build-apinetlet docker-build-metalnetlet ## Build docker images.
