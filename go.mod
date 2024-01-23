@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/bits-and-blooms/bitset v1.13.0
 	github.com/go-logr/logr v1.4.1
-	github.com/google/uuid v1.5.0
+	github.com/google/uuid v1.6.0
 	github.com/ironcore-dev/controller-utils v0.9.1
 	github.com/ironcore-dev/ironcore v0.1.2-0.20240116114543-d37a145029e7
 	github.com/ironcore-dev/metalnet v0.3.0
