@@ -223,15 +223,15 @@ deploy: deploy-ironcore-net deploy-apinetlet deploy-metalnetlet ## Deploy ironco
 
 .PHONY: undeploy-ironcore-net
 undeploy-ironcore-net: ## Undeploy ironcore-net controller from the K8s cluster specified in ~/.kube/config.
-	kubectl delete -k config/ironcore-net
+	kubectl delete -k config/controller/default
 
 .PHONY: undeploy-apinetlet
 undeploy-apinetlet: ## Undeploy apinetlet controller from the K8s cluster specified in ~/.kube/config.
-	kubectl delete -k config/apinetlet
+	kubectl delete -k config/apinetlet/default
 
 .PHONY: undeploy-metalnetlet
 undeploy-metalnetlet: ## Undeploy metalnetlet controller from the K8s cluster specified in ~/.kube/config.
-	kubectl delete -k config/metalnetlet
+	kubectl delete -k config/metalnetlet/default
 
 .PHONY: undeploy
 undeploy: undeploy-ironcore-net undeploy-apinetlet undeploy-metalnetlet ## Undeploy ironcore-net, apinetlet, metalnetlet controller from the K8s cluster specified in ~/.kube/config.
