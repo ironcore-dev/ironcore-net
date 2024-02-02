@@ -194,40 +194,19 @@ docker-push: docker-push-apiserver docker-push-controller-manager docker-push-ap
 
 ##@ Deployment
 
-.PHONY: install-ironcore-net
-install-ironcore-net: manifests ## Install ironcore-net CRDs into the K8s cluster specified in ~/.kube/config.
-	kubectl apply -k config/ironcore-net/crd
-
-.PHONY: uninstall-ironcore-net
-uninstall-ironcore-net: manifests ## Uninstall ironcore-net CRDs from the K8s cluster specified in ~/.kube/config.
-	kubectl delete-k config/ironcore-net/crd
-
-.PHONY: install-apinetlet
-install-apinetlet: manifests ## Install apinetlet CRDs into the K8s cluster specified in ~/.kube/config.
-	kubectl apply -k config/apinetlet/crd
-
-.PHONY: uninstall-apinetlet
-uninstall-apinetlet: manifests ## Uninstall apinetlet CRDs from the K8s cluster specified in ~/.kube/config.
-	kubectl delete-k config/apinetlet/crd
-
-.PHONY: install-metalnetlet
-install-metalnetlet: manifests ## Install metalnetlet CRDs into the K8s cluster specified in ~/.kube/config.
-	kubectl apply -k config/metalnetlet/crd
-
-.PHONY: uninstall-metalnetlet
-uninstall-metalnetlet: manifests ## Uninstall metalnetlet CRDs from the K8s cluster specified in ~/.kube/config.
-	kubectl delete-k config/metalnetlet/crd
-
 .PHONY: install
-install: install-ironcore-net install-apinetlet install-metalnetlet ## Uninstall ironcore-net, apinetlet, metalnetlet.
+install: manifests kustomize ## Install ironcore-net API server & API services into the K8s cluster specified in ~/.kube/config. This requires APISERVER_IMG to be available for the cluster.
+	cd config/apiserver/server && $(KUSTOMIZE) edit set image apiserver=${APISERVER_IMG}
+	kubectl apply -k config/apiserver/default
 
 .PHONY: uninstall
-uninstall: uninstall-ironcore-net uninstall-apinetlet uninstall-metalnetlet ## Uninstall ironcore-net, apinetlet, metalnetlet.
+uninstall: manifests kustomize ## Uninstall ironcore-net API server & API services from the K8s cluster specified in ~/.kube/config.
+	kubectl delete -k config/apiserver/default
 
 .PHONY: deploy-ironcore-net
 deploy-ironcore-net: manifests kustomize ## Deploy ironcore-net controller to the K8s cluster specified in ~/.kube/config.
 	cd config/controller/manager && $(KUSTOMIZE) edit set image controller=${CONTROLLER_MANAGER_IMG}
-	kubectl apply -k config/ironcore-net/default
+	kubectl apply -k config/controller/default
 
 .PHONY: deploy-apinetlet
 deploy-apinetlet: manifests kustomize ## Deploy apinetlet controller to the K8s cluster specified in ~/.kube/config.
@@ -244,15 +223,15 @@ deploy: deploy-ironcore-net deploy-apinetlet deploy-metalnetlet ## Deploy ironco
 
 .PHONY: undeploy-ironcore-net
 undeploy-ironcore-net: ## Undeploy ironcore-net controller from the K8s cluster specified in ~/.kube/config.
-	kubectl delete -k config/ironcore-net
+	kubectl delete -k config/controller/default
 
 .PHONY: undeploy-apinetlet
 undeploy-apinetlet: ## Undeploy apinetlet controller from the K8s cluster specified in ~/.kube/config.
-	kubectl delete -k config/apinetlet
+	kubectl delete -k config/apinetlet/default
 
 .PHONY: undeploy-metalnetlet
 undeploy-metalnetlet: ## Undeploy metalnetlet controller from the K8s cluster specified in ~/.kube/config.
-	kubectl delete -k config/metalnetlet
+	kubectl delete -k config/metalnetlet/default
 
 .PHONY: undeploy
 undeploy: undeploy-ironcore-net undeploy-apinetlet undeploy-metalnetlet ## Undeploy ironcore-net, apinetlet, metalnetlet controller from the K8s cluster specified in ~/.kube/config.
