@@ -5,7 +5,10 @@ package controllers
 
 import (
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	. "github.com/ironcore-dev/ironcore/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
@@ -13,6 +16,7 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
@@ -53,6 +57,174 @@ var _ = Describe("LoadBalancerController", func() {
 				"IPs": ConsistOf(MatchFields(IgnoreExtras, Fields{
 					"IPFamily": Equal(corev1.IPv4Protocol),
 					"Name":     Equal("ipv4"),
+				})),
+				"Selector": Equal(&metav1.LabelSelector{
+					MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+				}),
+				"Template": Equal(v1alpha1.InstanceTemplate{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+					},
+					Spec: v1alpha1.InstanceSpec{
+						Affinity: &v1alpha1.Affinity{
+							InstanceAntiAffinity: &v1alpha1.InstanceAntiAffinity{
+								RequiredDuringSchedulingIgnoredDuringExecution: []v1alpha1.InstanceAffinityTerm{
+									{
+										LabelSelector: &metav1.LabelSelector{
+											MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+										},
+										TopologyKey: v1alpha1.TopologyZoneLabel,
+									},
+								},
+							},
+						},
+					},
+				}),
+			}))),
+		)
+	})
+
+	It("should manage the internal APINet load balancer and its discrete IPs", func(ctx SpecContext) {
+		By("creating an internal load balancer")
+		loadBalancer := &networkingv1alpha1.LoadBalancer{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "load-balancer-",
+			},
+			Spec: networkingv1alpha1.LoadBalancerSpec{
+				Type:       networkingv1alpha1.LoadBalancerTypeInternal,
+				IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+				IPs: []networkingv1alpha1.IPSource{
+					{
+						Value: commonv1alpha1.MustParseNewIP("10.0.0.1"),
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())
+
+		By("waiting for the internal APINet load balancer to exist")
+		apiNetLoadBalancer := &v1alpha1.LoadBalancer{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: apiNetNs.Name,
+				Name:      string(loadBalancer.UID),
+			},
+		}
+		Eventually(Object(apiNetLoadBalancer)).Should(SatisfyAll(
+			HaveField("Labels", apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer)),
+			HaveField("Spec", MatchFields(IgnoreExtras, Fields{
+				"Type":       Equal(v1alpha1.LoadBalancerTypeInternal),
+				"NetworkRef": Equal(corev1.LocalObjectReference{Name: apiNetNetwork.Name}),
+				"IPs": ConsistOf(MatchFields(IgnoreExtras, Fields{
+					"IPFamily": Equal(corev1.IPv4Protocol),
+					"IP":       Equal(net.MustParseIP("10.0.0.1")),
+				})),
+				"Selector": Equal(&metav1.LabelSelector{
+					MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+				}),
+				"Template": Equal(v1alpha1.InstanceTemplate{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+					},
+					Spec: v1alpha1.InstanceSpec{
+						Affinity: &v1alpha1.Affinity{
+							InstanceAntiAffinity: &v1alpha1.InstanceAntiAffinity{
+								RequiredDuringSchedulingIgnoredDuringExecution: []v1alpha1.InstanceAffinityTerm{
+									{
+										LabelSelector: &metav1.LabelSelector{
+											MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+										},
+										TopologyKey: v1alpha1.TopologyZoneLabel,
+									},
+								},
+							},
+						},
+					},
+				}),
+			}))),
+		)
+	})
+
+	It("should manage the internal APINet load balancer and its ephemeral IPs", func(ctx SpecContext) {
+		By("creating a new parent prefix")
+		parentPrefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      "load-balancer-ephemeral",
+			},
+			Spec: ipamv1alpha1.PrefixSpec{
+				IPFamily: corev1.IPv4Protocol,
+				Prefix:   commonv1alpha1.MustParseNewIPPrefix("10.0.0.1/24"),
+			},
+		}
+		Expect(k8sClient.Create(ctx, parentPrefix)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, parentPrefix)
+
+		By("creating an internal load balancer")
+		loadBalancer := &networkingv1alpha1.LoadBalancer{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      "load-balancer-ephemeral",
+			},
+			Spec: networkingv1alpha1.LoadBalancerSpec{
+				Type:       networkingv1alpha1.LoadBalancerTypeInternal,
+				IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+				IPs: []networkingv1alpha1.IPSource{
+					{
+						Ephemeral: &networkingv1alpha1.EphemeralPrefixSource{
+							PrefixTemplate: &ipamv1alpha1.PrefixTemplateSpec{
+								Spec: ipamv1alpha1.PrefixSpec{
+									IPFamily: corev1.IPv4Protocol,
+									ParentRef: &corev1.LocalObjectReference{
+										Name: "load-balancer-ephemeral",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, loadBalancer)
+
+		By("creating a new prefix")
+		prefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      "load-balancer-ephemeral-0",
+			},
+			Spec: ipamv1alpha1.PrefixSpec{
+				IPFamily: corev1.IPv4Protocol,
+				Prefix:   commonv1alpha1.MustParseNewIPPrefix("10.0.0.1/32"),
+			},
+		}
+		Expect(controllerutil.SetControllerReference(loadBalancer, prefix, k8sClient.Scheme())).To(Succeed())
+		Expect(k8sClient.Create(ctx, prefix)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, prefix)
+
+		By("patching the prefix phase to allocated")
+		Eventually(UpdateStatus(prefix, func() {
+			prefix.Status.Phase = ipamv1alpha1.PrefixPhaseAllocated
+		})).Should(Succeed())
+
+		By("waiting for the internal APINet load balancer to exist")
+		apiNetLoadBalancer := &v1alpha1.LoadBalancer{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: apiNetNs.Name,
+				Name:      string(loadBalancer.UID),
+			},
+		}
+		Eventually(Object(apiNetLoadBalancer)).Should(SatisfyAll(
+			HaveField("Labels", apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer)),
+			HaveField("Spec", MatchFields(IgnoreExtras, Fields{
+				"Type":       Equal(v1alpha1.LoadBalancerTypeInternal),
+				"NetworkRef": Equal(corev1.LocalObjectReference{Name: apiNetNetwork.Name}),
+				"IPs": ConsistOf(MatchFields(IgnoreExtras, Fields{
+					"IPFamily": Equal(corev1.IPv4Protocol),
+					"IP":       Equal(net.MustParseIP("10.0.0.1")),
 				})),
 				"Selector": Equal(&metav1.LabelSelector{
 					MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
