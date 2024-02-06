@@ -64,7 +64,7 @@ type REST struct {
 func (r *REST) beginCreate(ctx context.Context, obj runtime.Object, opts *metav1.CreateOptions) (genericregistry.FinishFunc, error) {
 	loadBalancer := obj.(*core.LoadBalancer)
 
-	if loadBalancer.Spec.Type != core.LoadBalancerTypePublic {
+	if loadBalancer.Spec.Type != core.LoadBalancerTypePublic && loadBalancer.Spec.Type != core.LoadBalancerTypeInternal {
 		return nil, nil
 	}
 
@@ -88,7 +88,7 @@ func (r *REST) beginUpdate(ctx context.Context, obj, oldObj runtime.Object, opts
 	newLoadBalancer := obj.(*core.LoadBalancer)
 	oldLoadBalancer := oldObj.(*core.LoadBalancer)
 
-	if newLoadBalancer.Spec.Type != core.LoadBalancerTypePublic {
+	if newLoadBalancer.Spec.Type != core.LoadBalancerTypePublic && newLoadBalancer.Spec.Type != core.LoadBalancerTypeInternal {
 		return nil, nil
 	}
 
@@ -110,7 +110,7 @@ func (r *REST) beginUpdate(ctx context.Context, obj, oldObj runtime.Object, opts
 func (r *REST) afterDelete(obj runtime.Object, opts *metav1.DeleteOptions) {
 	loadBalancer := obj.(*core.LoadBalancer)
 
-	if loadBalancer.Spec.Type != core.LoadBalancerTypePublic {
+	if loadBalancer.Spec.Type != core.LoadBalancerTypePublic && loadBalancer.Spec.Type != core.LoadBalancerTypeInternal {
 		return
 	}
 
