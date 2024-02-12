@@ -136,6 +136,36 @@ func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceAPINetNetworkInterfa
 	return errors.Join(errs...)
 }
 
+func (r *NetworkInterfaceReconciler) releaseVirtualIPsForNetworkInterface(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) error {
+	vipList := &networkingv1alpha1.VirtualIPList{}
+	if err := r.List(ctx, vipList,
+		client.InNamespace(nic.Namespace),
+	); err != nil {
+		return fmt.Errorf("error listing virtual IPs: %w", err)
+	}
+
+	// create a shallow copy of the network interface with the
+	// deletion timestamp removed in order to properly release the virtual IP
+	nonDeletingNic := *nic
+	nonDeletingNic.DeletionTimestamp = nil
+
+	var (
+		strat    = &virtualIPClaimStrategy{r.Client}
+		claimMgr = claimmanager.New(&nonDeletingNic, claimmanager.NothingSelector(), strat)
+		errs     []error
+	)
+
+	for _, vip := range vipList.Items {
+		_, err := claimMgr.Claim(ctx, &vip)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+
+	}
+	return errors.Join(errs...)
+}
+
 func (r *NetworkInterfaceReconciler) delete(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (ctrl.Result, error) {
 	log.V(1).Info("Delete")
 	if !controllerutil.ContainsFinalizer(nic, networkInterfaceFinalizer) {
@@ -147,6 +177,11 @@ func (r *NetworkInterfaceReconciler) delete(ctx context.Context, log logr.Logger
 		return ctrl.Result{}, fmt.Errorf("error releasing apinet network interfaces: %w", err)
 	}
 	log.V(1).Info("Released APINet network interfaces")
+
+	if err := r.releaseVirtualIPsForNetworkInterface(ctx, nic); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error releasing virtual IPs: %w", err)
+	}
+	log.V(1).Info("Released virtual IPs")
 
 	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, nic, networkInterfaceFinalizer); err != nil {
 		return ctrl.Result{}, err
