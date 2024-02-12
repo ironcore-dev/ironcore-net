@@ -19,9 +19,9 @@ resources:
   - ../apiservice
   - ../certmanager
 
-patchesStrategicMerge:
-  - apiserver_certificate_patch.yaml
-  - apiservicecainjection_patch.yaml
+patches:
+  - path: apiserver_certificate_patch.yaml
+  - path: apiservicecainjection_patch.yaml
 
 replacements:
   - source:

@@ -4,15 +4,6 @@ kind: Kustomization
 resources:
   - ../default
 
-patchesStrategicMerge:
-  - patch-apiserver.yaml
-  - patch-manager.yaml
-
 patches:
-  - target:
-      group: apps
-      version: v1
-      kind: Deployment
-      namespace: ironcore-net-system
-      name: ironcore-net-apiserver
-    path: add-apiserver-args.yaml
+  - path: patch-apiserver.yaml
+  - path: patch-manager.yaml
