@@ -159,11 +159,32 @@ func (r *NATGatewayReconciler) manageNATTable(
 	ips []net.IP,
 	existingAllocByNicID map[types.UID]natIPAllocation,
 ) (used, requests int64, err error) {
+	natGatewayList := &v1alpha1.NATGatewayList{}
+	if err := r.List(ctx, natGatewayList,
+		client.InNamespace(natGateway.Namespace),
+	); err != nil {
+		return 0, 0, fmt.Errorf("error listing nat gatway: %w", err)
+	}
+
+	networkList := make(map[string]struct{})
+	for _, nat := range natGatewayList.Items {
+		if nat.Spec.NetworkRef.Name != "" {
+			networkList[nat.Spec.NetworkRef.Name] = struct{}{}
+		}
+	}
+
 	nicList := &v1alpha1.NetworkInterfaceList{}
 	if err := r.List(ctx, nicList,
 		client.InNamespace(natGateway.Namespace),
 	); err != nil {
 		return 0, 0, fmt.Errorf("error listing network interfaces: %w", err)
+	}
+
+	nattableNicList := &v1alpha1.NetworkInterfaceList{}
+	for _, nic := range nicList.Items {
+		if _, ok := networkList[nic.Spec.NetworkRef.Name]; ok {
+			nattableNicList.Items = append(nattableNicList.Items, nic)
+		}
 	}
 
 	var (
@@ -185,7 +206,7 @@ func (r *NATGatewayReconciler) manageNATTable(
 		processFree    []int
 		errs           []error
 	)
-	for i, nic := range nicList.Items {
+	for i, nic := range nattableNicList.Items {
 		claimer := v1alpha1.GetNetworkInterfaceNATClaimer(&nic, natGateway.Spec.IPFamily)
 		if claimer != nil {
 			if claimer.UID != natGateway.UID {
@@ -230,7 +251,7 @@ func (r *NATGatewayReconciler) manageNATTable(
 
 	var full bool
 	for _, i := range processClaimed {
-		nic := nicList.Items[i]
+		nic := nattableNicList.Items[i]
 
 		if !full {
 			ip, port, endPort, ok := mgr.UseNextFree()
@@ -271,7 +292,7 @@ func (r *NATGatewayReconciler) manageNATTable(
 			}
 		)
 		for _, i := range processFree {
-			nic := nicList.Items[i]
+			nic := nattableNicList.Items[i]
 
 			if shouldUseNextFree {
 				var ok bool

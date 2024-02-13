@@ -17,6 +17,7 @@ import (
 var _ = Describe("NATGatewayController", func() {
 	ns := SetupNamespace(&k8sClient)
 	network := SetupNetwork(ns)
+	networkWithoutNAT := SetupNetwork(ns)
 
 	It("should correctly reconcile the NAT gateway", func(ctx SpecContext) {
 		By("creating a NAT gateway")
@@ -50,6 +51,20 @@ var _ = Describe("NATGatewayController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+
+		By("creating a network interface using network not claiming NAT Gateway")
+		nic1 := &v1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "nic-",
+			},
+			Spec: v1alpha1.NetworkInterfaceSpec{
+				NodeRef:    corev1.LocalObjectReference{Name: "my-node"},
+				NetworkRef: corev1.LocalObjectReference{Name: networkWithoutNAT.Name},
+				IPs:        []net.IP{net.MustParseIP("10.0.0.2")},
+			},
+		}
+		Expect(k8sClient.Create(ctx, nic1)).To(Succeed())
 
 		By("waiting for the NAT table to be updated")
 		natTable := &v1alpha1.NATTable{
