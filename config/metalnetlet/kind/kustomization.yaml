@@ -6,3 +6,10 @@ resources:
 
 patches:
   - path: patch-controller.yaml
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      namespace: system
+      name: controller-manager
+    path: add-manager-args.yaml
