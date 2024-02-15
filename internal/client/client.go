@@ -17,6 +17,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+const NetworkInterfaceSpecNetworkRefNameField = "spec.networkRef.name"
+
 func ClaimNetworkInterfaceNAT(
 	ctx context.Context,
 	c client.Client,
@@ -124,5 +126,12 @@ func ReleaseNetworkInterfaceNAT(ctx context.Context, c client.Client, nic *v1alp
 			return fmt.Errorf("error releasing network interface: %w", err)
 		}
 		return nil
+	})
+}
+
+func SetupNetworkInterfaceNetworkNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &v1alpha1.NetworkInterface{}, NetworkInterfaceSpecNetworkRefNameField, func(obj client.Object) []string {
+		nic := obj.(*v1alpha1.NetworkInterface)
+		return []string{nic.Spec.NetworkRef.Name}
 	})
 }
