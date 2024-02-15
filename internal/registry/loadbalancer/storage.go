@@ -65,7 +65,7 @@ func (r *REST) beginCreate(ctx context.Context, obj runtime.Object, opts *metav1
 	loadBalancer := obj.(*core.LoadBalancer)
 
 	if loadBalancer.Spec.Type != core.LoadBalancerTypePublic {
-		return nil, nil
+		return func(ctx context.Context, success bool) {}, nil
 	}
 
 	dryRun := dryrun.IsDryRun(opts.DryRun)
@@ -89,7 +89,7 @@ func (r *REST) beginUpdate(ctx context.Context, obj, oldObj runtime.Object, opts
 	oldLoadBalancer := oldObj.(*core.LoadBalancer)
 
 	if newLoadBalancer.Spec.Type != core.LoadBalancerTypePublic {
-		return nil, nil
+		return func(ctx context.Context, success bool) {}, nil
 	}
 
 	dryRun := dryrun.IsDryRun(opts.DryRun)
