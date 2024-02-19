@@ -6,7 +6,7 @@ require (
 	github.com/bits-and-blooms/bitset v1.13.0
 	github.com/go-logr/logr v1.4.1
 	github.com/google/uuid v1.6.0
-	github.com/ironcore-dev/controller-utils v0.9.1
+	github.com/ironcore-dev/controller-utils v0.9.2
 	github.com/ironcore-dev/ironcore v0.1.2-0.20240116114543-d37a145029e7
 	github.com/ironcore-dev/metalnet v0.3.2
 	github.com/onsi/ginkgo/v2 v2.15.0
@@ -108,7 +108,7 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiextensions-apiserver v0.29.0 // indirect
+	k8s.io/apiextensions-apiserver v0.29.1 // indirect
 	k8s.io/kms v0.29.2 // indirect
 	k8s.io/kube-aggregator v0.29.0 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.28.0 // indirect
