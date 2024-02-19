@@ -9,6 +9,7 @@ import (
 
 	"github.com/ironcore-dev/controller-utils/configutils"
 	ironcorenetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apinetclient "github.com/ironcore-dev/ironcore-net/internal/client"
 	"github.com/ironcore-dev/ironcore-net/internal/controllers"
 	ironcorenet "github.com/ironcore-dev/ironcore-net/internal/controllers/certificate/ironcore-net"
 	"github.com/ironcore-dev/ironcore-net/internal/controllers/scheduler"
@@ -62,6 +63,7 @@ func main() {
 	flag.Parse()
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+	ctx := ctrl.SetupSignalHandler()
 
 	cfg, err := configutils.GetConfig()
 	if err != nil {
@@ -162,6 +164,11 @@ func main() {
 		Cache:         schedulerCache,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Scheduler")
+		os.Exit(1)
+	}
+
+	if err := apinetclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
+		setupLog.Error(err, "unable to setup field indexer", "field", apinetclient.NetworkInterfaceSpecNetworkRefNameField)
 		os.Exit(1)
 	}
 

@@ -12,6 +12,7 @@ import (
 
 	"github.com/ironcore-dev/controller-utils/buildutils"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apinetclient "github.com/ironcore-dev/ironcore-net/internal/client"
 	ironcorenet "github.com/ironcore-dev/ironcore-net/internal/controllers/certificate/ironcore-net"
 	"github.com/ironcore-dev/ironcore-net/internal/controllers/scheduler"
 	"github.com/ironcore-dev/ironcore-net/utils/expectations"
@@ -171,6 +172,9 @@ var _ = BeforeSuite(func() {
 
 	mgrCtx, cancel := context.WithCancel(context.Background())
 	DeferCleanup(cancel)
+
+	Expect(apinetclient.SetupNetworkInterfaceNetworkNameFieldIndexer(mgrCtx, k8sManager.GetFieldIndexer())).To(Succeed())
+
 	go func() {
 		defer GinkgoRecover()
 		Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")

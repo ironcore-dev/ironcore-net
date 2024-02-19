@@ -162,6 +162,7 @@ func (r *NATGatewayReconciler) manageNATTable(
 	nicList := &v1alpha1.NetworkInterfaceList{}
 	if err := r.List(ctx, nicList,
 		client.InNamespace(natGateway.Namespace),
+		client.MatchingFields{apinetclient.NetworkInterfaceSpecNetworkRefNameField: natGateway.Spec.NetworkRef.Name},
 	); err != nil {
 		return 0, 0, fmt.Errorf("error listing network interfaces: %w", err)
 	}
