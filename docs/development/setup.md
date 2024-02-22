@@ -30,9 +30,7 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 Reference: [ironcore docs](https://github.com/ironcore-dev/ironcore/blob/main/docs/development/setup.md)
 
 
-## Setup `ironcore-net` 
-
-### Setup `ironcore-net` with `kind` cluster
+## Setup `ironcore-net` with `kind` cluster
 
 For local development with `kind`, a make target that builds and loads the apiserver/controller images and then applies
 the manifests is available via
@@ -57,50 +55,10 @@ make kind-build-load-restart-metalnetlet
 make kind-apply-metalnetlet
 ```
 
-### Setup `ironcore-net` with any other kubernetes cluster
-
-For local development with any kubernetes cluster other than `kind`, a make target that applies the manifests using 
-provided images is available via
-
-1. Install ironcore-net API server and API services into the K8s cluster.
-
-```shell
-make install APISERVER_IMG=<apiserver image>
-```
-
-2. Deploy ironcore-net controller, apinetlet controller and metalnetlet controller to the K8s cluster.
-
-```shell
-make deploy CONTROLLER_MANAGER_IMG=<ironcore-net controller-manager image> APINETLET_IMG=<apinetlet image> METALNETLET_IMG=<metalnetlet image>
-```
-
-If you want to deploy any of ironcore-net controller, apinetlet controller and metalnetlet controller individually 
-then use below make targets respectively
-
-```shell
-make deploy-ironcore-net CONTROLLER_MANAGER_IMG=<ironcore-net controller-manager image>
-make deploy-apinetlet APINETLET_IMG=<apinetlet image>
-make deploy-metalnetlet METALNETLET_IMG=<metalnetlet image>
-```
-
-**Note**: This requires the `APISERVER_IMG` (Makefile default set to `apiserver`), `CONTROLLER_MANAGER_IMG` (Makefile default set to `controller`), `APINETLET_IMG` (Makefile default set to `apinetlet`) and `METALNETLET_IMG` (Makefile default set to `metalnetlet`) to be pullable from your kubernetes
-cluster.
-
-## Cleanup
-
-### Cleanup from `kind` cluster
+## Cleanup from `kind` cluster
 
 ```shell
 make kind-delete
 make kind-delete-apinetlet
 make kind-delete-metalnetlet
-```
-
-### Cleanup from any other kubernetes cluster
-
-```shell
-make uninstall
-make undeploy
-make undeploy-apinetlet
-make undeploy-metalnetlet
 ```
