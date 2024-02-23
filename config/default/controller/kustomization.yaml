@@ -4,5 +4,5 @@ kind: Kustomization
 resources:
   - ../../controller/default
 
-patchesStrategicMerge:
-  - remove-namespace.yaml
+patches:
+  - path: remove-namespace.yaml
