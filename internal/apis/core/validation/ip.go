@@ -54,9 +54,9 @@ func ValidateIPSpecUpdate(newSpec, oldSpec *core.IPSpec, fldPath *field.Path) fi
 
 	allErrs = append(allErrs, validation.ValidateImmutableField(newSpec.Type, oldSpec.Type, fldPath.Child("type"))...)
 	allErrs = append(allErrs, validation.ValidateImmutableField(newSpec.IPFamily, oldSpec.IPFamily, fldPath.Child("ipFamily"))...)
-	if newSpec.IP != oldSpec.IP {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("ip"), newSpec.IP, validation.FieldImmutableErrorMsg))
-	}
+	//if newSpec.IP != oldSpec.IP {
+	//	allErrs = append(allErrs, field.Invalid(fldPath.Child("ip"), newSpec.IP, validation.FieldImmutableErrorMsg))
+	//}
 
 	return allErrs
 }
