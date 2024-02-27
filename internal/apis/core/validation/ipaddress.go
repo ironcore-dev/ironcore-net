@@ -35,7 +35,7 @@ func ValidateIPAddressUpdate(newIPAddress, oldIPAddress *core.IPAddress) field.E
 
 	allErrs = append(allErrs, validation.ValidateObjectMetaAccessorUpdate(newIPAddress, oldIPAddress, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, ValidateIPAddress(newIPAddress)...)
-	allErrs = append(allErrs, ValidateIPAddressSpecUpdate(&newIPAddress.Spec, &oldIPAddress.Spec, field.NewPath("spec"))...)
+	//allErrs = append(allErrs, ValidateIPAddressSpecUpdate(&newIPAddress.Spec, &oldIPAddress.Spec, field.NewPath("spec"))...)
 
 	return allErrs
 }
