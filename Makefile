@@ -210,12 +210,12 @@ deploy-ironcore-net: manifests kustomize ## Deploy ironcore-net controller to th
 
 .PHONY: deploy-apinetlet
 deploy-apinetlet: manifests kustomize ## Deploy apinetlet controller to the K8s cluster specified in ~/.kube/config.
-	cd config/apinetlet/manager && $(KUSTOMIZE) edit set image controller=${APINETLET_IMG}
+	cd config/apinetlet/manager && $(KUSTOMIZE) edit set image apinetlet=${APINETLET_IMG}
 	kubectl apply -k config/apinetlet/default
 
 .PHONY: deploy-metalnetlet
 deploy-metalnetlet: manifests kustomize ## Deploy metalnetlet controller to the K8s cluster specified in ~/.kube/config.
-	cd config/metalnetlet/manager && $(KUSTOMIZE) edit set image controller=${METALNETLET_IMG}
+	cd config/metalnetlet/manager && $(KUSTOMIZE) edit set image metalnetlet=${METALNETLET_IMG}
 	kubectl apply -k config/metalnetlet/default
 
 .PHONY: deploy
@@ -304,7 +304,7 @@ kind-apply: manifests ## Apply config/kind to the cluster specified in ~/.kube/c
 	kubectl apply -k config/kind
 
 .PHONY: kind-deploy
-kind-deploy: kind-build-load-restart kind-apply ## Build, load and restart ironcore-net and apinetlet and apply them.
+kind-deploy: kind-build-load-restart kind-apply ## Build, load and restart ironcore-net apiserver and controller manager and apply them.
 
 .PHONY: kind-delete
 kind-delete: ## Delete config/kind from the cluster specified in ~/.kube/config.

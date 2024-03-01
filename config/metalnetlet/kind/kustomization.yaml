@@ -5,10 +5,8 @@ resources:
   - ../default
   - apinet-rbac
 
-patchesStrategicMerge:
-  - patch-controller.yaml
-
-patchesJson6902:
+patches:
+  - path: patch-controller.yaml
   - target:
       group: apps
       version: v1

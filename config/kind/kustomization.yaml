@@ -4,11 +4,9 @@ kind: Kustomization
 resources:
   - ../default
 
-patchesStrategicMerge:
-  - patch-apiserver.yaml
-  - patch-manager.yaml
-
 patches:
+  - path: patch-apiserver.yaml
+  - path: patch-manager.yaml
   - target:
       group: apps
       version: v1
