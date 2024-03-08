@@ -2179,6 +2179,7 @@ func Convert_core_NetworkList_To_v1alpha1_NetworkList(in *core.NetworkList, out 
 
 func autoConvert_v1alpha1_NetworkSpec_To_core_NetworkSpec(in *v1alpha1.NetworkSpec, out *core.NetworkSpec, s conversion.Scope) error {
 	out.ID = in.ID
+	out.PeeredIDs = *(*[]string)(unsafe.Pointer(&in.PeeredIDs))
 	return nil
 }
 
@@ -2189,6 +2190,7 @@ func Convert_v1alpha1_NetworkSpec_To_core_NetworkSpec(in *v1alpha1.NetworkSpec, 
 
 func autoConvert_core_NetworkSpec_To_v1alpha1_NetworkSpec(in *core.NetworkSpec, out *v1alpha1.NetworkSpec, s conversion.Scope) error {
 	out.ID = in.ID
+	out.PeeredIDs = *(*[]string)(unsafe.Pointer(&in.PeeredIDs))
 	return nil
 }
 

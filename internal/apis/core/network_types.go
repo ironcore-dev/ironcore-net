@@ -10,6 +10,8 @@ import (
 type NetworkSpec struct {
 	// ID is the ID of the network.
 	ID string
+	// PeeredIDs are the IDs of networks to peer with.
+	PeeredIDs []string `json:"peeredIDs,omitempty"`
 }
 
 type NetworkStatus struct {
