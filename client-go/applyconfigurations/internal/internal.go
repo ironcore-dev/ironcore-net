@@ -772,6 +772,12 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: id
       type:
         scalar: string
+    - name: peeredIDs
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: atomic
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkStatus
   map:
     elementType:

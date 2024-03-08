@@ -154,6 +154,12 @@ func SetupTest(apiNetNamespace *corev1.Namespace) *corev1.Namespace {
 			APINetNamespace: apiNetNamespace.Name,
 		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
 
+		Expect((&NetworkPeeringReconciler{
+			Client:          k8sManager.GetClient(),
+			APINetClient:    k8sManager.GetClient(),
+			APINetNamespace: apiNetNamespace.Name,
+		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
+
 		Expect((&NetworkInterfaceReconciler{
 			Client:          k8sManager.GetClient(),
 			APINetClient:    k8sManager.GetClient(),
