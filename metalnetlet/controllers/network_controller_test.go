@@ -26,7 +26,9 @@ var _ = Describe("NetworkController", func() {
 				Namespace:    ns.Name,
 				GenerateName: "network-",
 			},
-			Spec: v1alpha1.NetworkSpec{},
+			Spec: v1alpha1.NetworkSpec{
+				PeeredIDs: []string{"123456", "234567"},
+			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
 
@@ -43,7 +45,8 @@ var _ = Describe("NetworkController", func() {
 		}
 		Eventually(Object(metalnetNetwork)).Should(SatisfyAll(
 			HaveField("Spec", metalnetv1alpha1.NetworkSpec{
-				ID: vni,
+				ID:        vni,
+				PeeredIDs: []int32{123456, 234567},
 			}),
 		))
 	})

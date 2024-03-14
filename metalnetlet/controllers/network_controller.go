@@ -144,6 +144,16 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 			ID: vni,
 		},
 	}
+
+	for _, peeredId := range network.Spec.PeeredIDs {
+		id, err := networkid.ParseVNI(peeredId)
+		if err != nil {
+			return ctrl.Result{}, fmt.Errorf("error converting network peering ID to int32: %w", err)
+		}
+
+		metalnetNetwork.Spec.PeeredIDs = append(metalnetNetwork.Spec.PeeredIDs, int32(id))
+	}
+
 	if err := r.MetalnetClient.Patch(ctx, metalnetNetwork, client.Apply, MetalnetFieldOwner, client.ForceOwnership); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying network: %w", err)
 	}
