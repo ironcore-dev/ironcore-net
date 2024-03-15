@@ -23,7 +23,7 @@ var _ = Describe("NetworkPeeringController", func() {
 	apiNetNs := SetupNamespace(&k8sClient)
 	SetupTest(apiNetNs)
 
-	It("should peer networks in the same namespace referencing each other", func(ctx SpecContext) {
+	It("should peer networks in the same namespace referencing a single parent network", func(ctx SpecContext) {
 		By("creating a network network-1")
 		network1 := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
@@ -43,6 +43,13 @@ var _ = Describe("NetworkPeeringController", func() {
 						Name: "peering-2",
 						NetworkRef: networkingv1alpha1.NetworkPeeringNetworkRef{
 							Name: "network-3",
+						},
+					},
+					{
+						Name: "peering-3",
+						NetworkRef: networkingv1alpha1.NetworkPeeringNetworkRef{
+							Name:      "network-4",
+							Namespace: ns.Name,
 						},
 					},
 				},
@@ -90,6 +97,26 @@ var _ = Describe("NetworkPeeringController", func() {
 		}
 		Expect(k8sClient.Create(ctx, network3)).To(Succeed())
 
+		By("creating a network network-4")
+		network4 := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      "network-4",
+			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				Peerings: []networkingv1alpha1.NetworkPeering{
+					{
+						Name: "peering-4",
+						NetworkRef: networkingv1alpha1.NetworkPeeringNetworkRef{
+							Name:      "network-1",
+							Namespace: ns.Name,
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, network4)).To(Succeed())
+
 		By("waiting for the corresponding APINet networks to be created")
 		apiNetNetwork1 := &apinetv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
@@ -115,6 +142,14 @@ var _ = Describe("NetworkPeeringController", func() {
 		}
 		Eventually(Get(apiNetNetwork3)).Should(Succeed())
 
+		apiNetNetwork4 := &apinetv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: apiNetNs.Name,
+				Name:      string(network4.UID),
+			},
+		}
+		Eventually(Get(apiNetNetwork4)).Should(Succeed())
+
 		By("inspecting the created apinet networks")
 		Expect(apiNetNetwork1.Labels).To(Equal(
 			apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), network1),
@@ -125,6 +160,16 @@ var _ = Describe("NetworkPeeringController", func() {
 			apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), network2),
 		))
 		Expect(apiNetNetwork2.Spec.ID).NotTo(BeEmpty())
+
+		Expect(apiNetNetwork3.Labels).To(Equal(
+			apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), network3),
+		))
+		Expect(apiNetNetwork3.Spec.ID).NotTo(BeEmpty())
+
+		Expect(apiNetNetwork4.Labels).To(Equal(
+			apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), network4),
+		))
+		Expect(apiNetNetwork4.Spec.ID).NotTo(BeEmpty())
 
 		By("waiting for networks to reference each other")
 		Eventually(Object(network1)).
@@ -143,12 +188,18 @@ var _ = Describe("NetworkPeeringController", func() {
 					Namespace: network3.Namespace,
 					Name:      network3.Name,
 					UID:       network3.UID,
+				}, networkingv1alpha1.NetworkPeeringClaimRef{
+					Namespace: network4.Namespace,
+					Name:      network4.Name,
+					UID:       network4.UID,
 				})),
 				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
 				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
 					Name: network1.Spec.Peerings[0].Name,
 				}, networkingv1alpha1.NetworkPeeringStatus{
 					Name: network1.Spec.Peerings[1].Name,
+				}, networkingv1alpha1.NetworkPeeringStatus{
+					Name: network1.Spec.Peerings[2].Name,
 				})),
 			))
 
@@ -190,16 +241,39 @@ var _ = Describe("NetworkPeeringController", func() {
 				})),
 			))
 
+		Eventually(Object(network4)).
+			Should(SatisfyAll(
+				HaveField("Spec.ProviderID", Equal(provider.GetNetworkID(
+					apiNetNetwork4.Namespace,
+					apiNetNetwork4.Name,
+					apiNetNetwork4.Spec.ID,
+					apiNetNetwork4.UID,
+				))),
+				HaveField("Spec.PeeringClaimRefs", ConsistOf(networkingv1alpha1.NetworkPeeringClaimRef{
+					Namespace: network1.Namespace,
+					Name:      network1.Name,
+					UID:       network1.UID,
+				})),
+				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
+				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
+					Name: network4.Spec.Peerings[0].Name,
+				})),
+			))
+
 		By("ensuring apinet network peeredIDs are updated")
 		Eventually(Object(apiNetNetwork1)).Should(SatisfyAll(
-			HaveField("Spec.PeeredIDs", ConsistOf(apiNetNetwork2.Spec.ID, apiNetNetwork3.Spec.ID)),
+			HaveField("Spec.PeeredIDs", ConsistOf(apiNetNetwork2.Spec.ID, apiNetNetwork3.Spec.ID, apiNetNetwork4.Spec.ID)),
 		))
 
 		Eventually(Object(apiNetNetwork2)).Should(SatisfyAll(
 			HaveField("Spec.PeeredIDs", ConsistOf(apiNetNetwork1.Spec.ID)),
 		))
 
-		Eventually(Object(apiNetNetwork2)).Should(SatisfyAll(
+		Eventually(Object(apiNetNetwork3)).Should(SatisfyAll(
+			HaveField("Spec.PeeredIDs", ConsistOf(apiNetNetwork1.Spec.ID)),
+		))
+
+		Eventually(Object(apiNetNetwork4)).Should(SatisfyAll(
 			HaveField("Spec.PeeredIDs", ConsistOf(apiNetNetwork1.Spec.ID)),
 		))
 
@@ -207,16 +281,19 @@ var _ = Describe("NetworkPeeringController", func() {
 		Expect(k8sClient.Delete(ctx, network1)).To(Succeed())
 		Expect(k8sClient.Delete(ctx, network2)).To(Succeed())
 		Expect(k8sClient.Delete(ctx, network3)).To(Succeed())
+		Expect(k8sClient.Delete(ctx, network4)).To(Succeed())
 
 		By("waiting for networks to be gone")
 		Eventually(Get(network1)).Should(Satisfy(apierrors.IsNotFound))
 		Eventually(Get(network2)).Should(Satisfy(apierrors.IsNotFound))
 		Eventually(Get(network3)).Should(Satisfy(apierrors.IsNotFound))
+		Eventually(Get(network4)).Should(Satisfy(apierrors.IsNotFound))
 
 		By("asserting the corresponding apinet network is gone as well")
 		Expect(k8sClient.Get(ctx, client.ObjectKeyFromObject(apiNetNetwork1), apiNetNetwork1)).To(Satisfy(apierrors.IsNotFound))
 		Expect(k8sClient.Get(ctx, client.ObjectKeyFromObject(apiNetNetwork2), apiNetNetwork2)).To(Satisfy(apierrors.IsNotFound))
 		Expect(k8sClient.Get(ctx, client.ObjectKeyFromObject(apiNetNetwork3), apiNetNetwork3)).To(Satisfy(apierrors.IsNotFound))
+		Expect(k8sClient.Get(ctx, client.ObjectKeyFromObject(apiNetNetwork4), apiNetNetwork4)).To(Satisfy(apierrors.IsNotFound))
 	})
 
 	It("should peer two networks from different namespaces if they reference each other correctly", func(ctx SpecContext) {
@@ -465,5 +542,233 @@ var _ = Describe("NetworkPeeringController", func() {
 		By("asserting the corresponding apinet network is gone as well")
 		Expect(k8sClient.Get(ctx, client.ObjectKeyFromObject(apiNetNetwork1), apiNetNetwork1)).To(Satisfy(apierrors.IsNotFound))
 		Expect(k8sClient.Get(ctx, client.ObjectKeyFromObject(apiNetNetwork2), apiNetNetwork2)).To(Satisfy(apierrors.IsNotFound))
+	})
+
+	It("should peer networks in the same namespace referencing each other", func(ctx SpecContext) {
+		By("creating a network network-1")
+		network1 := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      "network-1",
+			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				Peerings: []networkingv1alpha1.NetworkPeering{
+					{
+						Name: "peering-1",
+						NetworkRef: networkingv1alpha1.NetworkPeeringNetworkRef{
+							Name:      "network-2",
+							Namespace: ns.Name,
+						},
+					},
+					{
+						Name: "peering-2",
+						NetworkRef: networkingv1alpha1.NetworkPeeringNetworkRef{
+							Name:      "network-3",
+							Namespace: ns.Name,
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, network1)).To(Succeed())
+
+		By("creating a network network-2")
+		network2 := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      "network-2",
+			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				Peerings: []networkingv1alpha1.NetworkPeering{
+					{
+						Name: "peering-1",
+						NetworkRef: networkingv1alpha1.NetworkPeeringNetworkRef{
+							Name:      "network-1",
+							Namespace: ns.Name,
+						},
+					},
+					{
+						Name: "peering-2",
+						NetworkRef: networkingv1alpha1.NetworkPeeringNetworkRef{
+							Name:      "network-3",
+							Namespace: ns.Name,
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, network2)).To(Succeed())
+
+		By("creating a network network-3")
+		network3 := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      "network-3",
+			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				Peerings: []networkingv1alpha1.NetworkPeering{
+					{
+						Name: "peering-1",
+						NetworkRef: networkingv1alpha1.NetworkPeeringNetworkRef{
+							Name:      "network-1",
+							Namespace: ns.Name,
+						},
+					},
+					{
+						Name: "peering-2",
+						NetworkRef: networkingv1alpha1.NetworkPeeringNetworkRef{
+							Name:      "network-2",
+							Namespace: ns.Name,
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, network3)).To(Succeed())
+
+		By("waiting for the corresponding APINet networks to be created")
+		apiNetNetwork1 := &apinetv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: apiNetNs.Name,
+				Name:      string(network1.UID),
+			},
+		}
+		Eventually(Get(apiNetNetwork1)).Should(Succeed())
+
+		apiNetNetwork2 := &apinetv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: apiNetNs.Name,
+				Name:      string(network2.UID),
+			},
+		}
+		Eventually(Get(apiNetNetwork2)).Should(Succeed())
+
+		apiNetNetwork3 := &apinetv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: apiNetNs.Name,
+				Name:      string(network3.UID),
+			},
+		}
+		Eventually(Get(apiNetNetwork3)).Should(Succeed())
+
+		By("inspecting the created apinet networks")
+		Expect(apiNetNetwork1.Labels).To(Equal(
+			apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), network1),
+		))
+		Expect(apiNetNetwork1.Spec.ID).NotTo(BeEmpty())
+
+		Expect(apiNetNetwork2.Labels).To(Equal(
+			apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), network2),
+		))
+		Expect(apiNetNetwork2.Spec.ID).NotTo(BeEmpty())
+
+		Expect(apiNetNetwork3.Labels).To(Equal(
+			apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), network3),
+		))
+		Expect(apiNetNetwork3.Spec.ID).NotTo(BeEmpty())
+
+		By("waiting for networks to reference each other")
+		Eventually(Object(network1)).
+			Should(SatisfyAll(
+				HaveField("Spec.ProviderID", Equal(provider.GetNetworkID(
+					apiNetNetwork1.Namespace,
+					apiNetNetwork1.Name,
+					apiNetNetwork1.Spec.ID,
+					apiNetNetwork1.UID,
+				))),
+				HaveField("Spec.PeeringClaimRefs", ConsistOf(networkingv1alpha1.NetworkPeeringClaimRef{
+					Namespace: network2.Namespace,
+					Name:      network2.Name,
+					UID:       network2.UID,
+				}, networkingv1alpha1.NetworkPeeringClaimRef{
+					Namespace: network3.Namespace,
+					Name:      network3.Name,
+					UID:       network3.UID,
+				})),
+				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
+				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
+					Name: network1.Spec.Peerings[0].Name,
+				}, networkingv1alpha1.NetworkPeeringStatus{
+					Name: network1.Spec.Peerings[1].Name,
+				})),
+			))
+
+		Eventually(Object(network2)).
+			Should(SatisfyAll(
+				HaveField("Spec.ProviderID", Equal(provider.GetNetworkID(
+					apiNetNetwork2.Namespace,
+					apiNetNetwork2.Name,
+					apiNetNetwork2.Spec.ID,
+					apiNetNetwork2.UID,
+				))),
+				HaveField("Spec.PeeringClaimRefs", ConsistOf(networkingv1alpha1.NetworkPeeringClaimRef{
+					Namespace: network1.Namespace,
+					Name:      network1.Name,
+					UID:       network1.UID,
+				}, networkingv1alpha1.NetworkPeeringClaimRef{
+					Namespace: network3.Namespace,
+					Name:      network3.Name,
+					UID:       network3.UID,
+				})),
+				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
+				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
+					Name: network2.Spec.Peerings[0].Name,
+				}, networkingv1alpha1.NetworkPeeringStatus{
+					Name: network2.Spec.Peerings[1].Name,
+				})),
+			))
+
+		Eventually(Object(network3)).
+			Should(SatisfyAll(
+				HaveField("Spec.ProviderID", Equal(provider.GetNetworkID(
+					apiNetNetwork3.Namespace,
+					apiNetNetwork3.Name,
+					apiNetNetwork3.Spec.ID,
+					apiNetNetwork3.UID,
+				))),
+				HaveField("Spec.PeeringClaimRefs", ConsistOf(networkingv1alpha1.NetworkPeeringClaimRef{
+					Namespace: network1.Namespace,
+					Name:      network1.Name,
+					UID:       network1.UID,
+				}, networkingv1alpha1.NetworkPeeringClaimRef{
+					Namespace: network2.Namespace,
+					Name:      network2.Name,
+					UID:       network2.UID,
+				})),
+				HaveField("Status.State", Equal(networkingv1alpha1.NetworkStateAvailable)),
+				HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
+					Name: network3.Spec.Peerings[0].Name,
+				}, networkingv1alpha1.NetworkPeeringStatus{
+					Name: network3.Spec.Peerings[1].Name,
+				})),
+			))
+
+		By("ensuring apinet network peeredIDs are updated")
+		Eventually(Object(apiNetNetwork1)).Should(SatisfyAll(
+			HaveField("Spec.PeeredIDs", ConsistOf(apiNetNetwork2.Spec.ID, apiNetNetwork3.Spec.ID)),
+		))
+
+		Eventually(Object(apiNetNetwork2)).Should(SatisfyAll(
+			HaveField("Spec.PeeredIDs", ConsistOf(apiNetNetwork1.Spec.ID, apiNetNetwork3.Spec.ID)),
+		))
+
+		Eventually(Object(apiNetNetwork3)).Should(SatisfyAll(
+			HaveField("Spec.PeeredIDs", ConsistOf(apiNetNetwork1.Spec.ID, apiNetNetwork2.Spec.ID)),
+		))
+
+		By("deleting the networks")
+		Expect(k8sClient.Delete(ctx, network1)).To(Succeed())
+		Expect(k8sClient.Delete(ctx, network2)).To(Succeed())
+		Expect(k8sClient.Delete(ctx, network3)).To(Succeed())
+
+		By("waiting for networks to be gone")
+		Eventually(Get(network1)).Should(Satisfy(apierrors.IsNotFound))
+		Eventually(Get(network2)).Should(Satisfy(apierrors.IsNotFound))
+		Eventually(Get(network3)).Should(Satisfy(apierrors.IsNotFound))
+
+		By("asserting the corresponding apinet network is gone as well")
+		Expect(k8sClient.Get(ctx, client.ObjectKeyFromObject(apiNetNetwork1), apiNetNetwork1)).To(Satisfy(apierrors.IsNotFound))
+		Expect(k8sClient.Get(ctx, client.ObjectKeyFromObject(apiNetNetwork2), apiNetNetwork2)).To(Satisfy(apierrors.IsNotFound))
+		Expect(k8sClient.Get(ctx, client.ObjectKeyFromObject(apiNetNetwork3), apiNetNetwork3)).To(Satisfy(apierrors.IsNotFound))
 	})
 })
