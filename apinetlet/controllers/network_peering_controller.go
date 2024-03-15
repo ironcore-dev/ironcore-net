@@ -10,9 +10,9 @@ import (
 	"github.com/go-logr/logr"
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	clientutils "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/util/sets"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
@@ -106,6 +106,8 @@ func (r *NetworkPeeringReconciler) updateStatus(
 	for _, name := range peeringNames {
 		newStatusPeerings = append(newStatusPeerings, networkingv1alpha1.NetworkPeeringStatus{
 			Name: name,
+			// TODO - Add other Peering Status fields when NetworkPeeringStatus
+			// is extended with Phase or any other status field in ironcore
 		})
 	}
 	network.Status.Peerings = newStatusPeerings
@@ -181,10 +183,10 @@ func (r *NetworkPeeringReconciler) reconcilePeering(
 	targetNetworkKey := client.ObjectKey{Namespace: targetNetworkNamespace, Name: targetNetworkRef.Name}
 	log = log.WithValues("TargetNetworkKey", targetNetworkKey)
 
-	log.V(2).Info("Getting target network")
+	log.V(1).Info("Getting target network")
 	if err := r.Get(ctx, targetNetworkKey, targetNetwork); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return networkingv1alpha1.NetworkPeeringClaimRef{}, "", "", fmt.Errorf("error getting network %s: %w", targetNetworkKey, err)
+			return networkingv1alpha1.NetworkPeeringClaimRef{}, "", "", fmt.Errorf("error getting target network %s: %w", targetNetworkKey, err)
 		}
 
 		log.V(1).Info("Target network not found")
@@ -229,16 +231,21 @@ func (r *NetworkPeeringReconciler) reconcilePeering(
 	return networkingv1alpha1.NetworkPeeringClaimRef{}, "", "", nil
 }
 
-func (r *NetworkPeeringReconciler) enqueueNetworksForPeering() handler.EventHandler {
+func (r *NetworkPeeringReconciler) enqueuePeeringReferencedNetworks() handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
-		log := ctrl.LoggerFrom(ctx)
-		networkList := &networkingv1alpha1.NetworkList{}
-		if err := r.List(ctx, networkList); err != nil {
-			log.Error(err, "Error listing networks")
-			return nil
-		}
+		network := obj.(*networkingv1alpha1.Network)
+		reqs := sets.New[ctrl.Request]()
+		for _, peering := range network.Spec.Peerings {
+			ref := peering.NetworkRef
+			refNamespace := ref.Namespace
+			if refNamespace == "" {
+				refNamespace = network.Namespace
+			}
 
-		return clientutils.ReconcileRequestsFromObjectStructSlice[*networkingv1alpha1.Network](networkList.Items)
+			refKey := client.ObjectKey{Namespace: refNamespace, Name: ref.Name}
+			reqs.Insert(ctrl.Request{NamespacedName: refKey})
+		}
+		return reqs.UnsortedList()
 	})
 }
 
@@ -263,7 +270,7 @@ func (r *NetworkPeeringReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCach
 		).
 		Watches(
 			&networkingv1alpha1.Network{},
-			r.enqueueNetworksForPeering(),
+			r.enqueuePeeringReferencedNetworks(),
 			builder.WithPredicates(r.networkStateAvailablePredicate()),
 		).
 		Complete(r)
