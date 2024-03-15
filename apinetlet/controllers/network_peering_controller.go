@@ -229,7 +229,7 @@ func (r *NetworkPeeringReconciler) reconcilePeering(
 	return networkingv1alpha1.NetworkPeeringClaimRef{}, "", "", nil
 }
 
-func (r *NetworkPeeringReconciler) enqueueNetworksHavingPeerings() handler.EventHandler {
+func (r *NetworkPeeringReconciler) enqueueNetworksForPeering() handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		log := ctrl.LoggerFrom(ctx)
 		networkList := &networkingv1alpha1.NetworkList{}
@@ -263,7 +263,7 @@ func (r *NetworkPeeringReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCach
 		).
 		Watches(
 			&networkingv1alpha1.Network{},
-			r.enqueueNetworksHavingPeerings(),
+			r.enqueueNetworksForPeering(),
 			builder.WithPredicates(r.networkStateAvailablePredicate()),
 		).
 		Complete(r)
