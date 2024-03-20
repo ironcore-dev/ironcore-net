@@ -24,3 +24,20 @@ The valid `NetworkID` range can be configured using the `apiserver`s
 
 When deleting a `Network`, the corresponding `NetworkID` is cleaned up
 alongside the claiming `Network`.
+
+## Network Peering
+
+When creating network peering both `ironcore` `Network`s has to specify matching, 
+`spec.peerings` referencing each other respectively. A `ironcore` `Network` can be peered with 
+multiple `network`s in any namespcae.
+
+Once specified `apinetlet` `NetworkPeeringController` validates if all the specified `network`s are in 
+`Available` state,they do exists and have matching `peerings`. 
+
+If validation is successful, `apinetlet` `NetworkPeeringController` updates `ironcore` `Network` 
+`status.peerings` with network peering `name`s and `spec.incomingPeerings` with valid 
+incoming peerings. Also `apinetlet` `NetworkPeeringController` updates `ironcore-net` `Network` 
+`spec.peeredIDs` with valid peered network's `providerID`'s.
+
+Once `ironcore-net` `Network` is updated with `spec.peeredIDs`, `metalnetlet` `NetworkController` 
+updates `metalnet` `Network` `spec.peeredIDs` with corresponding `ironcore-net` `Network` `spec.peeredIDs`
