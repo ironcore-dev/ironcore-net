@@ -78,6 +78,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkInterfaceSpec":        schema_ironcore_net_api_core_v1alpha1_NetworkInterfaceSpec(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkInterfaceStatus":      schema_ironcore_net_api_core_v1alpha1_NetworkInterfaceStatus(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkList":                 schema_ironcore_net_api_core_v1alpha1_NetworkList(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPeeringStatus":        schema_ironcore_net_api_core_v1alpha1_NetworkPeeringStatus(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkSpec":                 schema_ironcore_net_api_core_v1alpha1_NetworkSpec(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkStatus":               schema_ironcore_net_api_core_v1alpha1_NetworkStatus(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.Node":                        schema_ironcore_net_api_core_v1alpha1_Node(ref),
@@ -2765,6 +2766,35 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkList(ref common.ReferenceCallb
 	}
 }
 
+func schema_ironcore_net_api_core_v1alpha1_NetworkPeeringStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPeeringStatus is the status of a network peering.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the network peering.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"state": {
+						SchemaProps: spec.SchemaProps{
+							Description: "State represents the network peering state",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+		},
+	}
+}
+
 func schema_ironcore_net_api_core_v1alpha1_NetworkSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -2804,8 +2834,26 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkStatus(ref common.ReferenceCal
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"peerings": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Peerings contains the states of the network peerings for the network.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPeeringStatus"),
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPeeringStatus"},
 	}
 }
 
