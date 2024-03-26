@@ -200,16 +200,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&controllers.NetworkPeeringReconciler{
-		Client:           mgr.GetClient(),
-		APINetClient:     apiNetCluster.GetClient(),
-		APINetNamespace:  apiNetNamespace,
-		WatchFilterValue: watchFilterValue,
-	}).SetupWithManager(mgr, apiNetCluster.GetCache()); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "NetworkPeering")
-		os.Exit(1)
-	}
-
 	if err = (&controllers.NetworkInterfaceReconciler{
 		Client:           mgr.GetClient(),
 		APINetClient:     apiNetCluster.GetClient(),

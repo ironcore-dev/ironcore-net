@@ -15,6 +15,30 @@ type NetworkSpec struct {
 }
 
 type NetworkStatus struct {
+	// Peerings contains the states of the network peerings for the network.
+	Peerings []NetworkPeeringStatus `json:"peerings,omitempty"`
+}
+
+// NetworkState is the state of a network.
+// +enum
+type NetworkState string
+
+// NetworkPeeringState is the state a NetworkPeering can be in
+type NetworkPeeringState string
+
+const (
+	// NetworkPeeringStatePending signals that the network peering is not applied.
+	NetworkPeeringStatePending NetworkPeeringState = "Pending"
+	// NetworkPeeringStateApplied signals that the network peering is applied.
+	NetworkPeeringStateApplied NetworkPeeringState = "Applied"
+)
+
+// NetworkPeeringStatus is the status of a network peering.
+type NetworkPeeringStatus struct {
+	// Name is the name of the network peering.
+	Name string `json:"name"`
+	// State represents the network peering state
+	State NetworkPeeringState `json:"state,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

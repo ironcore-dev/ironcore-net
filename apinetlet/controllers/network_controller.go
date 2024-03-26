@@ -193,6 +193,28 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 		},
 	}
 
+	var peeredIDs []string
+	for _, peeringClaimRef := range network.Spec.PeeringClaimRefs {
+		log.V(1).Info("Get apinet network for target network")
+		targetApinetNetwork := &apinetv1alpha1.Network{}
+		if err := r.APINetClient.Get(ctx, client.ObjectKey{Namespace: r.APINetNamespace, Name: string(peeringClaimRef.UID)}, targetApinetNetwork); err != nil {
+			log.V(1).Info("target apinet network is not created yet")
+			break
+		}
+		peeredIDs = append(peeredIDs, targetApinetNetwork.Spec.ID)
+	}
+	apiNetNetwork.Spec.PeeredIDs = peeredIDs
+
+	var peerings []apinetv1alpha1.NetworkPeeringStatus
+	for _, peering := range network.Status.Peerings {
+		peerings = append(peerings, apinetv1alpha1.NetworkPeeringStatus{
+			Name: peering.Name,
+			// TODO remove below comment after merging ironcore PR #1026
+			// State: peering.State,
+		})
+	}
+	apiNetNetwork.Status.Peerings = peerings
+
 	log.V(1).Info("Applying APINet network")
 	if err := r.APINetClient.Patch(ctx, apiNetNetwork, client.Apply, fieldOwner, client.ForceOwnership); err != nil {
 		return nil, fmt.Errorf("error applying apinet network: %w", err)
