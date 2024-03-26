@@ -19,8 +19,8 @@ import (
 type NetworkApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *NetworkSpecApplyConfiguration `json:"spec,omitempty"`
-	Status                           *corev1alpha1.NetworkStatus    `json:"status,omitempty"`
+	Spec                             *NetworkSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status                           *NetworkStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // Network constructs an declarative configuration of the Network type for use with
@@ -239,7 +239,7 @@ func (b *NetworkApplyConfiguration) WithSpec(value *NetworkSpecApplyConfiguratio
 // WithStatus sets the Status field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Status field is set to the value of the last call.
-func (b *NetworkApplyConfiguration) WithStatus(value corev1alpha1.NetworkStatus) *NetworkApplyConfiguration {
-	b.Status = &value
+func (b *NetworkApplyConfiguration) WithStatus(value *NetworkStatusApplyConfiguration) *NetworkApplyConfiguration {
+	b.Status = value
 	return b
 }

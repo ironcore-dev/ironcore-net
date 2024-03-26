@@ -8,7 +8,8 @@ package v1alpha1
 // NetworkSpecApplyConfiguration represents an declarative configuration of the NetworkSpec type for use
 // with apply.
 type NetworkSpecApplyConfiguration struct {
-	ID *string `json:"id,omitempty"`
+	ID        *string  `json:"id,omitempty"`
+	PeeredIDs []string `json:"peeredIDs,omitempty"`
 }
 
 // NetworkSpecApplyConfiguration constructs an declarative configuration of the NetworkSpec type for use with
@@ -22,5 +23,15 @@ func NetworkSpec() *NetworkSpecApplyConfiguration {
 // If called multiple times, the ID field is set to the value of the last call.
 func (b *NetworkSpecApplyConfiguration) WithID(value string) *NetworkSpecApplyConfiguration {
 	b.ID = &value
+	return b
+}
+
+// WithPeeredIDs adds the given value to the PeeredIDs field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the PeeredIDs field.
+func (b *NetworkSpecApplyConfiguration) WithPeeredIDs(values ...string) *NetworkSpecApplyConfiguration {
+	for i := range values {
+		b.PeeredIDs = append(b.PeeredIDs, values[i])
+	}
 	return b
 }
