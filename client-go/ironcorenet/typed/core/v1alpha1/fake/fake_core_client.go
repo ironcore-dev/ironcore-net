@@ -63,6 +63,14 @@ func (c *FakeCoreV1alpha1) NetworkInterfaces(namespace string) v1alpha1.NetworkI
 	return &FakeNetworkInterfaces{c, namespace}
 }
 
+func (c *FakeCoreV1alpha1) NetworkPolicies(namespace string) v1alpha1.NetworkPolicyInterface {
+	return &FakeNetworkPolicies{c, namespace}
+}
+
+func (c *FakeCoreV1alpha1) NetworkPolicyRules(namespace string) v1alpha1.NetworkPolicyRuleInterface {
+	return &FakeNetworkPolicyRules{c, namespace}
+}
+
 func (c *FakeCoreV1alpha1) Nodes() v1alpha1.NodeInterface {
 	return &FakeNodes{c}
 }
