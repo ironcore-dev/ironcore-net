@@ -208,9 +208,8 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 	var peerings []apinetv1alpha1.NetworkPeeringStatus
 	for _, peering := range network.Status.Peerings {
 		peerings = append(peerings, apinetv1alpha1.NetworkPeeringStatus{
-			Name: peering.Name,
-			// TODO remove below comment after merging ironcore PR #1026
-			// State: peering.State,
+			Name:  peering.Name,
+			State: apinetv1alpha1.NetworkPeeringStatePending,
 		})
 	}
 	apiNetNetwork.Status.Peerings = peerings

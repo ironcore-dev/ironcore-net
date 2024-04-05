@@ -148,7 +148,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	for _, peeredId := range network.Spec.PeeredIDs {
 		id, err := networkid.ParseVNI(peeredId)
 		if err != nil {
-			return ctrl.Result{}, fmt.Errorf("error converting network peering ID to int32: %w", err)
+			return ctrl.Result{}, fmt.Errorf("failed to parse peered network ID: %w", err)
 		}
 
 		metalnetNetwork.Spec.PeeredIDs = append(metalnetNetwork.Spec.PeeredIDs, int32(id))

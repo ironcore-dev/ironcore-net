@@ -167,9 +167,8 @@ var _ = Describe("NetworkController", func() {
 			UID:       network2.UID,
 		}}
 		network1.Status.Peerings = []networkingv1alpha1.NetworkPeeringStatus{{
-			Name: network1.Spec.Peerings[0].Name,
-			// TODO remove below comment after merging ironcore PR #1026
-			// State: networkingv1alpha1.NetworkPeeringStatePending,
+			Name:  network1.Spec.Peerings[0].Name,
+			State: networkingv1alpha1.NetworkPeeringStatePending,
 		}}
 		Expect(k8sClient.Patch(ctx, network1, client.MergeFrom(baseNetwork1))).To(Succeed())
 
@@ -180,9 +179,8 @@ var _ = Describe("NetworkController", func() {
 			UID:       network1.UID,
 		}}
 		network2.Status.Peerings = []networkingv1alpha1.NetworkPeeringStatus{{
-			Name: network2.Spec.Peerings[0].Name,
-			// TODO remove below comment after merging ironcore PR #1026
-			// State: networkingv1alpha1.NetworkPeeringStatePending,
+			Name:  network2.Spec.Peerings[0].Name,
+			State: networkingv1alpha1.NetworkPeeringStatePending,
 		}}
 		Expect(k8sClient.Patch(ctx, network2, client.MergeFrom(baseNetwork2))).To(Succeed())
 
