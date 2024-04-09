@@ -16,6 +16,7 @@ import (
 type NetworkPolicySpecApplyConfiguration struct {
 	NetworkRef               *v1.LocalObjectReference                     `json:"networkRef,omitempty"`
 	NetworkInterfaceSelector *metav1.LabelSelectorApplyConfiguration      `json:"networkInterfaceSelector,omitempty"`
+	Priority                 *int32                                       `json:"priority,omitempty"`
 	Ingress                  []NetworkPolicyIngressRuleApplyConfiguration `json:"ingress,omitempty"`
 	Egress                   []NetworkPolicyEgressRuleApplyConfiguration  `json:"egress,omitempty"`
 	PolicyTypes              []corev1alpha1.PolicyType                    `json:"policyTypes,omitempty"`
@@ -40,6 +41,14 @@ func (b *NetworkPolicySpecApplyConfiguration) WithNetworkRef(value v1.LocalObjec
 // If called multiple times, the NetworkInterfaceSelector field is set to the value of the last call.
 func (b *NetworkPolicySpecApplyConfiguration) WithNetworkInterfaceSelector(value *metav1.LabelSelectorApplyConfiguration) *NetworkPolicySpecApplyConfiguration {
 	b.NetworkInterfaceSelector = value
+	return b
+}
+
+// WithPriority sets the Priority field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Priority field is set to the value of the last call.
+func (b *NetworkPolicySpecApplyConfiguration) WithPriority(value int32) *NetworkPolicySpecApplyConfiguration {
+	b.Priority = &value
 	return b
 }
 

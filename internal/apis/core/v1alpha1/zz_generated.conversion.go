@@ -2598,9 +2598,7 @@ func Convert_core_NetworkPolicyList_To_v1alpha1_NetworkPolicyList(in *core.Netwo
 }
 
 func autoConvert_v1alpha1_NetworkPolicyPeer_To_core_NetworkPolicyPeer(in *v1alpha1.NetworkPolicyPeer, out *core.NetworkPolicyPeer, s conversion.Scope) error {
-	if err := Convert_v1alpha1_ObjectSelector_To_core_ObjectSelector(&in.ObjectSelector, &out.ObjectSelector, s); err != nil {
-		return err
-	}
+	out.ObjectSelector = (*core.ObjectSelector)(unsafe.Pointer(in.ObjectSelector))
 	out.IPBlock = (*core.IPBlock)(unsafe.Pointer(in.IPBlock))
 	return nil
 }
@@ -2611,9 +2609,7 @@ func Convert_v1alpha1_NetworkPolicyPeer_To_core_NetworkPolicyPeer(in *v1alpha1.N
 }
 
 func autoConvert_core_NetworkPolicyPeer_To_v1alpha1_NetworkPolicyPeer(in *core.NetworkPolicyPeer, out *v1alpha1.NetworkPolicyPeer, s conversion.Scope) error {
-	if err := Convert_core_ObjectSelector_To_v1alpha1_ObjectSelector(&in.ObjectSelector, &out.ObjectSelector, s); err != nil {
-		return err
-	}
+	out.ObjectSelector = (*v1alpha1.ObjectSelector)(unsafe.Pointer(in.ObjectSelector))
 	out.IPBlock = (*v1alpha1.IPBlock)(unsafe.Pointer(in.IPBlock))
 	return nil
 }
@@ -2704,6 +2700,7 @@ func Convert_core_NetworkPolicyRuleList_To_v1alpha1_NetworkPolicyRuleList(in *co
 func autoConvert_v1alpha1_NetworkPolicySpec_To_core_NetworkPolicySpec(in *v1alpha1.NetworkPolicySpec, out *core.NetworkPolicySpec, s conversion.Scope) error {
 	out.NetworkRef = in.NetworkRef
 	out.NetworkInterfaceSelector = in.NetworkInterfaceSelector
+	out.Priority = (*int32)(unsafe.Pointer(in.Priority))
 	out.Ingress = *(*[]core.NetworkPolicyIngressRule)(unsafe.Pointer(&in.Ingress))
 	out.Egress = *(*[]core.NetworkPolicyEgressRule)(unsafe.Pointer(&in.Egress))
 	out.PolicyTypes = *(*[]core.PolicyType)(unsafe.Pointer(&in.PolicyTypes))
@@ -2718,6 +2715,7 @@ func Convert_v1alpha1_NetworkPolicySpec_To_core_NetworkPolicySpec(in *v1alpha1.N
 func autoConvert_core_NetworkPolicySpec_To_v1alpha1_NetworkPolicySpec(in *core.NetworkPolicySpec, out *v1alpha1.NetworkPolicySpec, s conversion.Scope) error {
 	out.NetworkRef = in.NetworkRef
 	out.NetworkInterfaceSelector = in.NetworkInterfaceSelector
+	out.Priority = (*int32)(unsafe.Pointer(in.Priority))
 	out.Ingress = *(*[]v1alpha1.NetworkPolicyIngressRule)(unsafe.Pointer(&in.Ingress))
 	out.Egress = *(*[]v1alpha1.NetworkPolicyEgressRule)(unsafe.Pointer(&in.Egress))
 	out.PolicyTypes = *(*[]v1alpha1.PolicyType)(unsafe.Pointer(&in.PolicyTypes))

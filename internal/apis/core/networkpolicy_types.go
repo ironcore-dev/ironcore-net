@@ -15,6 +15,12 @@ type NetworkPolicySpec struct {
 	NetworkRef corev1.LocalObjectReference `json:"networkRef"`
 	// NetworkInterfaceSelector selects the network interfaces that are subject to this policy.
 	NetworkInterfaceSelector metav1.LabelSelector `json:"networkInterfaceSelector"`
+	// Priority is an optional field that specifies the order in which the policy is applied.
+	// Policies with higher "order" are applied after those with lower
+	// order.  If the order is omitted, it may be considered to be "infinite" - i.e. the
+	// policy will be applied last.  Policies with identical order will be applied in
+	// alphanumerical order based on the Policy "Name".
+	Priority *int32 `json:"priority,omitempty"`
 	// Ingress specifies rules for ingress traffic.
 	Ingress []NetworkPolicyIngressRule `json:"ingress,omitempty"`
 	// Egress specifies rules for egress traffic.
@@ -53,7 +59,7 @@ type IPBlock struct {
 type NetworkPolicyPeer struct {
 	// ObjectSelector selects peers with the given kind matching the label selector.
 	// Exclusive with other peer specifiers.
-	ObjectSelector ObjectSelector `json:"objectSelector,omitempty"`
+	ObjectSelector *ObjectSelector `json:"objectSelector,omitempty"`
 	// IPBlock specifies the ip block from or to which network traffic may come.
 	IPBlock *IPBlock `json:"ipBlock,omitempty"`
 }

@@ -870,7 +870,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: objectSelector
       type:
         namedType: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.ObjectSelector
-      default: {}
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyPort
   map:
     fields:
@@ -947,6 +946,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             scalar: string
           elementRelationship: atomic
+    - name: priority
+      type:
+        scalar: numeric
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyTargetRef
   map:
     fields:

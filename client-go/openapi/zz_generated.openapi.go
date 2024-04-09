@@ -3122,7 +3122,6 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkPolicyPeer(ref common.Referenc
 					"objectSelector": {
 						SchemaProps: spec.SchemaProps{
 							Description: "ObjectSelector selects peers with the given kind matching the label selector. Exclusive with other peer specifiers.",
-							Default:     map[string]interface{}{},
 							Ref:         ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.ObjectSelector"),
 						},
 					},
@@ -3328,6 +3327,13 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkPolicySpec(ref common.Referenc
 							Description: "NetworkInterfaceSelector selects the network interfaces that are subject to this policy.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
+						},
+					},
+					"priority": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Priority is an optional field that specifies the order in which the policy is applied. Policies with higher \"order\" are applied after those with lower order.  If the order is omitted, it may be considered to be \"infinite\" - i.e. the policy will be applied last.  Policies with identical order will be applied in alphanumerical order based on the Policy \"Name\".",
+							Type:        []string{"integer"},
+							Format:      "int32",
 						},
 					},
 					"ingress": {
