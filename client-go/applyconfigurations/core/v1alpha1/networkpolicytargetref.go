@@ -12,9 +12,8 @@ import (
 // NetworkPolicyTargetRefApplyConfiguration represents an declarative configuration of the NetworkPolicyTargetRef type for use
 // with apply.
 type NetworkPolicyTargetRefApplyConfiguration struct {
-	UID        *types.UID `json:"uid,omitempty"`
-	Name       *string    `json:"name,omitempty"`
-	ProviderID *string    `json:"providerID,omitempty"`
+	UID  *types.UID `json:"uid,omitempty"`
+	Name *string    `json:"name,omitempty"`
 }
 
 // NetworkPolicyTargetRefApplyConfiguration constructs an declarative configuration of the NetworkPolicyTargetRef type for use with
@@ -36,13 +35,5 @@ func (b *NetworkPolicyTargetRefApplyConfiguration) WithUID(value types.UID) *Net
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *NetworkPolicyTargetRefApplyConfiguration) WithName(value string) *NetworkPolicyTargetRefApplyConfiguration {
 	b.Name = &value
-	return b
-}
-
-// WithProviderID sets the ProviderID field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the ProviderID field is set to the value of the last call.
-func (b *NetworkPolicyTargetRefApplyConfiguration) WithProviderID(value string) *NetworkPolicyTargetRefApplyConfiguration {
-	b.ProviderID = &value
 	return b
 }

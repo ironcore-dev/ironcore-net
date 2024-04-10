@@ -3410,16 +3410,8 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkPolicyTargetRef(ref common.Ref
 							Format:      "",
 						},
 					},
-					"providerID": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ProviderID is the provider internal id of the target.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
 				},
-				Required: []string{"uid", "name", "providerID"},
+				Required: []string{"uid", "name"},
 			},
 		},
 	}

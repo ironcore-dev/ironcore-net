@@ -956,10 +956,6 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
-    - name: providerID
-      type:
-        scalar: string
-      default: ""
     - name: uid
       type:
         scalar: string

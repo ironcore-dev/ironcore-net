@@ -2730,7 +2730,6 @@ func Convert_core_NetworkPolicySpec_To_v1alpha1_NetworkPolicySpec(in *core.Netwo
 func autoConvert_v1alpha1_NetworkPolicyTargetRef_To_core_NetworkPolicyTargetRef(in *v1alpha1.NetworkPolicyTargetRef, out *core.NetworkPolicyTargetRef, s conversion.Scope) error {
 	out.UID = types.UID(in.UID)
 	out.Name = in.Name
-	out.ProviderID = in.ProviderID
 	return nil
 }
 
@@ -2742,7 +2741,6 @@ func Convert_v1alpha1_NetworkPolicyTargetRef_To_core_NetworkPolicyTargetRef(in *
 func autoConvert_core_NetworkPolicyTargetRef_To_v1alpha1_NetworkPolicyTargetRef(in *core.NetworkPolicyTargetRef, out *v1alpha1.NetworkPolicyTargetRef, s conversion.Scope) error {
 	out.UID = types.UID(in.UID)
 	out.Name = in.Name
-	out.ProviderID = in.ProviderID
 	return nil
 }
 
