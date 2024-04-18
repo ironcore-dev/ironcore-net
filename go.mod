@@ -1,6 +1,7 @@
 module github.com/ironcore-dev/ironcore-net
 
 go 1.22
+toolchain go1.22.2
 
 require (
 	github.com/bits-and-blooms/bitset v1.13.0
@@ -16,12 +17,12 @@ require (
 	go4.org/netipx v0.0.0-20220812043211-3cc044ffd68d
 	golang.org/x/exp v0.0.0-20221212164502-fae10dda9338
 	k8s.io/api v0.29.4
-	k8s.io/apimachinery v0.29.4
+	k8s.io/apimachinery v0.30.0
 	k8s.io/apiserver v0.29.4
 	k8s.io/client-go v0.29.4
 	k8s.io/component-base v0.29.4
 	k8s.io/klog/v2 v2.120.1
-	k8s.io/kube-openapi v0.0.0-20231010175941-2dd684a91f00
+	k8s.io/kube-openapi v0.0.0-20240228011516-70dd3763d340
 	k8s.io/utils v0.0.0-20240102154912-e7106e64919e
 	sigs.k8s.io/controller-runtime v0.17.3
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1
@@ -96,7 +97,7 @@ require (
 	golang.org/x/term v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
-	golang.org/x/tools v0.17.0 // indirect
+	golang.org/x/tools v0.18.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto v0.0.0-20231106174013-bbf56f31fb17 // indirect
