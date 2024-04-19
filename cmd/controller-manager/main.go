@@ -9,7 +9,9 @@ import (
 
 	"github.com/ironcore-dev/controller-utils/configutils"
 	ironcorenetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	apinetclient "github.com/ironcore-dev/ironcore-net/internal/client"
+
 	"github.com/ironcore-dev/ironcore-net/internal/controllers"
 	ironcorenet "github.com/ironcore-dev/ironcore-net/internal/controllers/certificate/ironcore-net"
 	"github.com/ironcore-dev/ironcore-net/internal/controllers/scheduler"
@@ -117,6 +119,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err = (&controllers.NetworkPolicyReconciler{
+		Client: mgr.GetClient(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "NetworkPolicy")
+		os.Exit(1)
+	}
+
 	if err = (&controllers.NATGatewayReconciler{
 		Client:        mgr.GetClient(),
 		EventRecorder: mgr.GetEventRecorderFor("natgateways"),
@@ -169,6 +178,11 @@ func main() {
 
 	if err := apinetclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 		setupLog.Error(err, "unable to setup field indexer", "field", apinetclient.NetworkInterfaceSpecNetworkRefNameField)
+		os.Exit(1)
+	}
+
+	if err := apinetletclient.SetupNetworkPolicyNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
+		setupLog.Error(err, "unable to setup field indexer", "field", apinetletclient.NetworkPolicyNetworkNameField)
 		os.Exit(1)
 	}
 

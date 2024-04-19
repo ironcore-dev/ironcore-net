@@ -26,7 +26,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.DaemonSetSpec":               schema_ironcore_net_api_core_v1alpha1_DaemonSetSpec(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.DaemonSetStatus":             schema_ironcore_net_api_core_v1alpha1_DaemonSetStatus(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IP":                          schema_ironcore_net_api_core_v1alpha1_IP(ref),
-		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPAdd":                       schema_ironcore_net_api_core_v1alpha1_IPAdd(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPAddress":                   schema_ironcore_net_api_core_v1alpha1_IPAddress(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPAddressClaimRef":           schema_ironcore_net_api_core_v1alpha1_IPAddressClaimRef(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPAddressList":               schema_ironcore_net_api_core_v1alpha1_IPAddressList(ref),
@@ -34,7 +33,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPBlock":                     schema_ironcore_net_api_core_v1alpha1_IPBlock(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPClaimRef":                  schema_ironcore_net_api_core_v1alpha1_IPClaimRef(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPList":                      schema_ironcore_net_api_core_v1alpha1_IPList(ref),
-		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPPrefix":                    schema_ironcore_net_api_core_v1alpha1_IPPrefix(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPSpec":                      schema_ironcore_net_api_core_v1alpha1_IPSpec(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPStatus":                    schema_ironcore_net_api_core_v1alpha1_IPStatus(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.Instance":                    schema_ironcore_net_api_core_v1alpha1_Instance(ref),
@@ -603,17 +601,6 @@ func schema_ironcore_net_api_core_v1alpha1_IP(ref common.ReferenceCallback) comm
 	}
 }
 
-func schema_ironcore_net_api_core_v1alpha1_IPAdd(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "IPAdd is an IP address.",
-				Type:        []string{"object"},
-			},
-		},
-	}
-}
-
 func schema_ironcore_net_api_core_v1alpha1_IPAddress(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -888,17 +875,6 @@ func schema_ironcore_net_api_core_v1alpha1_IPList(ref common.ReferenceCallback) 
 		},
 		Dependencies: []string{
 			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IP", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-	}
-}
-
-func schema_ironcore_net_api_core_v1alpha1_IPPrefix(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "IPPrefix represents a network prefix.",
-				Type:        []string{"object"},
-			},
-		},
 	}
 }
 
@@ -2940,7 +2916,7 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkPolicy(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "NetworkPolicy is the Schema for the networkpolicies API",
+				Description: "NetworkPolicy is the Schema for the networkpolicies API.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -3027,20 +3003,6 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkPolicyIngressRule(ref common.R
 				Description: "NetworkPolicyIngressRule describes a rule to regulate ingress traffic with.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"ports": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Ports specifies the list of ports which should be made accessible for this rule. Each item in this list is combined using a logical OR. Empty matches all ports. As soon as a single item is present, only these ports are allowed.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPort"),
-									},
-								},
-							},
-						},
-					},
 					"from": {
 						SchemaProps: spec.SchemaProps{
 							Description: "From specifies the list of sources which should be able to send traffic to the selected network interfaces. Fields are combined using a logical OR. Empty matches all sources. As soon as a single item is present, only these peers are allowed.",
@@ -3050,6 +3012,20 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkPolicyIngressRule(ref common.R
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
 										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPeer"),
+									},
+								},
+							},
+						},
+					},
+					"ports": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Ports specifies the list of ports which should be made accessible for this rule. Each item in this list is combined using a logical OR. Empty matches all ports. As soon as a single item is present, only these ports are allowed.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPort"),
 									},
 								},
 							},
@@ -3222,6 +3198,13 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkPolicyRule(ref common.Referenc
 							},
 						},
 					},
+					"priority": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Priority is an optional field that specifies the order in which the policy is applied.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
 					"ingressRule": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IngressRules are the ingress rules.",
@@ -3251,7 +3234,7 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkPolicyRule(ref common.Referenc
 						},
 					},
 				},
-				Required: []string{"networkRef", "targets"},
+				Required: []string{"networkRef"},
 			},
 		},
 		Dependencies: []string{
@@ -3312,8 +3295,7 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkPolicySpec(ref common.Referenc
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "NetworkPolicySpec defines the desired state of NetworkPolicy.",
-				Type:        []string{"object"},
+				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
 					"networkRef": {
 						SchemaProps: spec.SchemaProps{
@@ -3750,14 +3732,14 @@ func schema_ironcore_net_api_core_v1alpha1_ObjectIP(ref common.ReferenceCallback
 					"prefix": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Prefix is the prefix of the IP.",
-							Ref:         ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPPrefix"),
+							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPPrefix"},
+			"github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"},
 	}
 }
 
@@ -3918,8 +3900,7 @@ func schema_ironcore_net_api_core_v1alpha1_TargetNetworkInterface(ref common.Ref
 					"ip": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IP is the IP address of the target network interface.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPAdd"),
+							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
 						},
 					},
 					"targetRef": {
@@ -3933,7 +3914,7 @@ func schema_ironcore_net_api_core_v1alpha1_TargetNetworkInterface(ref common.Ref
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPAdd", "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyTargetRef"},
+			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyTargetRef", "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"},
 	}
 }
 

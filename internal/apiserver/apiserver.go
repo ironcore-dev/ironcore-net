@@ -26,6 +26,8 @@ import (
 	"github.com/ironcore-dev/ironcore-net/internal/registry/network/networkidallocator"
 	"github.com/ironcore-dev/ironcore-net/internal/registry/networkid"
 	"github.com/ironcore-dev/ironcore-net/internal/registry/networkinterface"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/networkpolicy"
+	"github.com/ironcore-dev/ironcore-net/internal/registry/networkpolicyrule"
 	"github.com/ironcore-dev/ironcore-net/internal/registry/node"
 	ironcoreserializer "github.com/ironcore-dev/ironcore-net/internal/serializer"
 	corev1 "k8s.io/api/core/v1"
@@ -213,6 +215,20 @@ func (c completedConfig) New() (*IronCoreServer, error) {
 	}
 
 	v1alpha1storage["loadbalancerroutings"] = loadBalancerRoutingStorage.LoadBalancerRouting
+
+	networkPolicyStorage, err := networkpolicy.NewStorage(Scheme, c.GenericConfig.RESTOptionsGetter)
+	if err != nil {
+		return nil, err
+	}
+
+	v1alpha1storage["networkpolicies"] = networkPolicyStorage.NetworkPolicy
+
+	networkPolicyRuleStorage, err := networkpolicyrule.NewStorage(Scheme, c.GenericConfig.RESTOptionsGetter)
+	if err != nil {
+		return nil, err
+	}
+
+	v1alpha1storage["networkpolicyrules"] = networkPolicyRuleStorage.NetworkPolicyRule
 
 	natGatewayStorage, err := natgateway.NewStorage(Scheme, c.GenericConfig.RESTOptionsGetter, ipAllocByFamily)
 	if err != nil {

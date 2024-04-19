@@ -8,27 +8,14 @@ package v1alpha1
 // NetworkPolicyIngressRuleApplyConfiguration represents an declarative configuration of the NetworkPolicyIngressRule type for use
 // with apply.
 type NetworkPolicyIngressRuleApplyConfiguration struct {
-	Ports []NetworkPolicyPortApplyConfiguration `json:"ports,omitempty"`
 	From  []NetworkPolicyPeerApplyConfiguration `json:"from,omitempty"`
+	Ports []NetworkPolicyPortApplyConfiguration `json:"ports,omitempty"`
 }
 
 // NetworkPolicyIngressRuleApplyConfiguration constructs an declarative configuration of the NetworkPolicyIngressRule type for use with
 // apply.
 func NetworkPolicyIngressRule() *NetworkPolicyIngressRuleApplyConfiguration {
 	return &NetworkPolicyIngressRuleApplyConfiguration{}
-}
-
-// WithPorts adds the given value to the Ports field in the declarative configuration
-// and returns the receiver, so that objects can be build by chaining "With" function invocations.
-// If called multiple times, values provided by each call will be appended to the Ports field.
-func (b *NetworkPolicyIngressRuleApplyConfiguration) WithPorts(values ...*NetworkPolicyPortApplyConfiguration) *NetworkPolicyIngressRuleApplyConfiguration {
-	for i := range values {
-		if values[i] == nil {
-			panic("nil value passed to WithPorts")
-		}
-		b.Ports = append(b.Ports, *values[i])
-	}
-	return b
 }
 
 // WithFrom adds the given value to the From field in the declarative configuration
@@ -40,6 +27,19 @@ func (b *NetworkPolicyIngressRuleApplyConfiguration) WithFrom(values ...*Network
 			panic("nil value passed to WithFrom")
 		}
 		b.From = append(b.From, *values[i])
+	}
+	return b
+}
+
+// WithPorts adds the given value to the Ports field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the Ports field.
+func (b *NetworkPolicyIngressRuleApplyConfiguration) WithPorts(values ...*NetworkPolicyPortApplyConfiguration) *NetworkPolicyIngressRuleApplyConfiguration {
+	for i := range values {
+		if values[i] == nil {
+			panic("nil value passed to WithPorts")
+		}
+		b.Ports = append(b.Ports, *values[i])
 	}
 	return b
 }

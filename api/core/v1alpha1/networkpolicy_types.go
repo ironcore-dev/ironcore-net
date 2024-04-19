@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
+// SPDX-FileCopyrightText: 2024 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package v1alpha1
@@ -9,7 +9,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// NetworkPolicySpec defines the desired state of NetworkPolicy.
 type NetworkPolicySpec struct {
 	// NetworkRef is the network to regulate using this policy.
 	NetworkRef corev1.LocalObjectReference `json:"networkRef"`
@@ -66,14 +65,14 @@ type NetworkPolicyPeer struct {
 
 // NetworkPolicyIngressRule describes a rule to regulate ingress traffic with.
 type NetworkPolicyIngressRule struct {
-	// Ports specifies the list of ports which should be made accessible for
-	// this rule. Each item in this list is combined using a logical OR. Empty matches all ports.
-	// As soon as a single item is present, only these ports are allowed.
-	Ports []NetworkPolicyPort `json:"ports,omitempty"`
 	// From specifies the list of sources which should be able to send traffic to the
 	// selected network interfaces. Fields are combined using a logical OR. Empty matches all sources.
 	// As soon as a single item is present, only these peers are allowed.
 	From []NetworkPolicyPeer `json:"from,omitempty"`
+	// Ports specifies the list of ports which should be made accessible for
+	// this rule. Each item in this list is combined using a logical OR. Empty matches all ports.
+	// As soon as a single item is present, only these ports are allowed.
+	Ports []NetworkPolicyPort `json:"ports,omitempty"`
 }
 
 // NetworkPolicyEgressRule describes a rule to regulate egress traffic with.
@@ -98,10 +97,10 @@ const (
 	PolicyTypeEgress PolicyType = "Egress"
 )
 
-// +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +genclient
 
-// NetworkPolicy is the Schema for the networkpolicies API
+// NetworkPolicy is the Schema for the networkpolicies API.
 type NetworkPolicy struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

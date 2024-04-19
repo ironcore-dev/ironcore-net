@@ -4,8 +4,6 @@
 package v1alpha1
 
 import (
-	"net/netip"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
@@ -51,23 +49,4 @@ type LocalUIDReference struct {
 	Name string `json:"name"`
 	// UID is the UID of the referenced entity.
 	UID types.UID `json:"uid"`
-}
-
-// IPPrefix represents a network prefix.
-// +nullable
-type IPPrefix struct {
-	netip.Prefix `json:"-"`
-}
-
-func (in *IPPrefix) DeepCopyInto(out *IPPrefix) {
-	*out = *in
-}
-
-// IPAdd is an IP address.
-type IPAdd struct {
-	netip.Addr `json:"-"`
-}
-
-func (in *IPAdd) DeepCopyInto(out *IPAdd) {
-	*out = *in
 }

@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	net "github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 )
 
 // TargetNetworkInterfaceApplyConfiguration represents an declarative configuration of the TargetNetworkInterface type for use
 // with apply.
 type TargetNetworkInterfaceApplyConfiguration struct {
-	IP        *v1alpha1.IPAdd                           `json:"ip,omitempty"`
+	IP        *net.IP                                   `json:"ip,omitempty"`
 	TargetRef *NetworkPolicyTargetRefApplyConfiguration `json:"targetRef,omitempty"`
 }
 
@@ -25,7 +25,7 @@ func TargetNetworkInterface() *TargetNetworkInterfaceApplyConfiguration {
 // WithIP sets the IP field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the IP field is set to the value of the last call.
-func (b *TargetNetworkInterfaceApplyConfiguration) WithIP(value v1alpha1.IPAdd) *TargetNetworkInterfaceApplyConfiguration {
+func (b *TargetNetworkInterfaceApplyConfiguration) WithIP(value net.IP) *TargetNetworkInterfaceApplyConfiguration {
 	b.IP = &value
 	return b
 }

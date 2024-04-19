@@ -23,6 +23,22 @@ rules:
   - update
   - watch
 - apiGroups:
+  - core.apinet.ironcore.dev
+  resources:
+  - networkinterfaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.apinet.ironcore.dev
+  resources:
+  - networks
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - ipam.ironcore.dev
   resources:
   - prefixes
@@ -111,6 +127,23 @@ rules:
   - networkinterfaces/status
   verbs:
   - get
+  - patch
+  - update
+- apiGroups:
+  - networking.ironcore.dev
+  resources:
+  - networkpolicies
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.ironcore.dev
+  resources:
+  - networkpolicies/finalizers
+  verbs:
   - patch
   - update
 - apiGroups:

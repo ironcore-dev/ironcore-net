@@ -93,18 +93,6 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPStatus
       default: {}
-- name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAdd
-  map:
-    elementType:
-      scalar: untyped
-      list:
-        elementType:
-          namedType: __untyped_atomic_
-        elementRelationship: atomic
-      map:
-        elementType:
-          namedType: __untyped_deduced_
-        elementRelationship: separable
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress
   map:
     fields:
@@ -177,18 +165,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: uid
       type:
         scalar: string
-- name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPPrefix
-  map:
-    elementType:
-      scalar: untyped
-      list:
-        elementType:
-          namedType: __untyped_atomic_
-        elementRelationship: atomic
-      map:
-        elementType:
-          namedType: __untyped_deduced_
-        elementRelationship: separable
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPSpec
   map:
     fields:
@@ -911,6 +887,9 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LocalUIDReference
       default: {}
+    - name: priority
+      type:
+        scalar: numeric
     - name: targets
       type:
         list:
@@ -1102,7 +1081,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: prefix
       type:
-        namedType: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPPrefix
+        namedType: com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IPPrefix
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.ObjectSelector
   map:
     fields:
@@ -1162,8 +1141,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: ip
       type:
-        namedType: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAdd
-      default: {}
+        namedType: com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP
     - name: targetRef
       type:
         namedType: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyTargetRef

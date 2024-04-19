@@ -21,6 +21,7 @@ type NetworkPolicyRuleApplyConfiguration struct {
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	NetworkRef                       *LocalUIDReferenceApplyConfiguration       `json:"networkRef,omitempty"`
 	Targets                          []TargetNetworkInterfaceApplyConfiguration `json:"targets,omitempty"`
+	Priority                         *int32                                     `json:"priority,omitempty"`
 	IngressRules                     []RuleApplyConfiguration                   `json:"ingressRule,omitempty"`
 	EgressRules                      []RuleApplyConfiguration                   `json:"egressRule,omitempty"`
 }
@@ -248,6 +249,14 @@ func (b *NetworkPolicyRuleApplyConfiguration) WithTargets(values ...*TargetNetwo
 		}
 		b.Targets = append(b.Targets, *values[i])
 	}
+	return b
+}
+
+// WithPriority sets the Priority field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Priority field is set to the value of the last call.
+func (b *NetworkPolicyRuleApplyConfiguration) WithPriority(value int32) *NetworkPolicyRuleApplyConfiguration {
+	b.Priority = &value
 	return b
 }
 
