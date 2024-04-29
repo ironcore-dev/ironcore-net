@@ -18,6 +18,7 @@ import (
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
 	flag "github.com/spf13/pflag"
+
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
@@ -64,6 +65,8 @@ func main() {
 
 	var apiNetNamespace string
 
+	var leaderElectionNamespace string
+
 	var watchNamespace string
 	var watchFilterValue string
 
@@ -72,6 +75,7 @@ func main() {
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
+	flag.StringVar(&leaderElectionNamespace, "leader-elect-namespace", "", "Namespace that the controller uses to setup leader election.")
 
 	configOptions.BindFlags(flag.CommandLine)
 	apiNetGetConfigOptions.BindFlags(flag.CommandLine, config.WithNamePrefix(apiNetFlagPrefix))
@@ -126,9 +130,10 @@ func main() {
 		Metrics: metricsserver.Options{
 			BindAddress: metricsAddr,
 		},
-		HealthProbeBindAddress: probeAddr,
-		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "fa89daf5.apinetlet.apinet.ironcore.dev",
+		HealthProbeBindAddress:  probeAddr,
+		LeaderElection:          enableLeaderElection,
+		LeaderElectionID:        "fa89daf5.apinetlet.apinet.ironcore.dev",
+		LeaderElectionNamespace: leaderElectionNamespace,
 		Cache: cache.Options{
 			DefaultNamespaces: cacheDefaultNamespaces,
 		},
