@@ -12,7 +12,7 @@ import (
 // NetworkPeeringStatusApplyConfiguration represents an declarative configuration of the NetworkPeeringStatus type for use
 // with apply.
 type NetworkPeeringStatusApplyConfiguration struct {
-	Name  *string                       `json:"name,omitempty"`
+	ID    *int32                        `json:"id,omitempty"`
 	State *v1alpha1.NetworkPeeringState `json:"state,omitempty"`
 }
 
@@ -22,11 +22,11 @@ func NetworkPeeringStatus() *NetworkPeeringStatusApplyConfiguration {
 	return &NetworkPeeringStatusApplyConfiguration{}
 }
 
-// WithName sets the Name field in the declarative configuration to the given value
+// WithID sets the ID field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Name field is set to the value of the last call.
-func (b *NetworkPeeringStatusApplyConfiguration) WithName(value string) *NetworkPeeringStatusApplyConfiguration {
-	b.Name = &value
+// If called multiple times, the ID field is set to the value of the last call.
+func (b *NetworkPeeringStatusApplyConfiguration) WithID(value int32) *NetworkPeeringStatusApplyConfiguration {
+	b.ID = &value
 	return b
 }
 

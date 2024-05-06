@@ -4,6 +4,8 @@
 package controllers
 
 import (
+	"strconv"
+
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
@@ -184,13 +186,51 @@ var _ = Describe("NetworkController", func() {
 		}}
 		Expect(k8sClient.Patch(ctx, network2, client.MergeFrom(baseNetwork2))).To(Succeed())
 
-		By("ensuring apinet network peeredIDs are updated")
+		By("ensuring apinet network spec peerings are updated")
 		Eventually(Object(apiNetNetwork1)).Should(SatisfyAll(
-			HaveField("Spec.PeeredIDs", ConsistOf(apiNetNetwork2.Spec.ID)),
+			HaveField("Spec.Peerings", ConsistOf(apinetv1alpha1.NetworkPeering{
+				Name: network1.Spec.Peerings[0].Name,
+				ID:   apiNetNetwork2.Spec.ID,
+			})),
 		))
 
 		Eventually(Object(apiNetNetwork2)).Should(SatisfyAll(
-			HaveField("Spec.PeeredIDs", ConsistOf(apiNetNetwork1.Spec.ID)),
+			HaveField("Spec.Peerings", ConsistOf(apinetv1alpha1.NetworkPeering{
+				Name: network2.Spec.Peerings[0].Name,
+				ID:   apiNetNetwork1.Spec.ID,
+			})),
+		))
+
+		By("patching apinet network peering status")
+		apiNetNetwork2ID, _ := strconv.Atoi(apiNetNetwork2.Spec.ID)
+		Eventually(UpdateStatus(apiNetNetwork1, func() {
+			apiNetNetwork1.Status.Peerings = []apinetv1alpha1.NetworkPeeringStatus{{
+				ID:    int32(apiNetNetwork2ID),
+				State: apinetv1alpha1.NetworkPeeringStateReady,
+			}}
+		})).Should(Succeed())
+
+		apiNetNetwork1ID, _ := strconv.Atoi(apiNetNetwork1.Spec.ID)
+		Eventually(UpdateStatus(apiNetNetwork2, func() {
+			apiNetNetwork2.Status.Peerings = []apinetv1alpha1.NetworkPeeringStatus{{
+				ID:    int32(apiNetNetwork1ID),
+				State: apinetv1alpha1.NetworkPeeringStateReady,
+			}}
+		})).Should(Succeed())
+
+		By("ensuring ironcore networks peering status is updated")
+		Eventually(Object(network1)).Should(SatisfyAll(
+			HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
+				Name:  network1.Spec.Peerings[0].Name,
+				State: networkingv1alpha1.NetworkPeeringStateReady,
+			})),
+		))
+
+		Eventually(Object(network2)).Should(SatisfyAll(
+			HaveField("Status.Peerings", ConsistOf(networkingv1alpha1.NetworkPeeringStatus{
+				Name:  network2.Spec.Peerings[0].Name,
+				State: networkingv1alpha1.NetworkPeeringStateReady,
+			})),
 		))
 
 		By("deleting the networks")

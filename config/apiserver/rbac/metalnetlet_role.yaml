@@ -140,6 +140,14 @@ rules:
 - apiGroups:
   - core.apinet.ironcore.dev
   resources:
+  - networks/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - core.apinet.ironcore.dev
+  resources:
   - nodes
   verbs:
   - create

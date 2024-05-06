@@ -8,8 +8,8 @@ package v1alpha1
 // NetworkSpecApplyConfiguration represents an declarative configuration of the NetworkSpec type for use
 // with apply.
 type NetworkSpecApplyConfiguration struct {
-	ID        *string  `json:"id,omitempty"`
-	PeeredIDs []string `json:"peeredIDs,omitempty"`
+	ID       *string                            `json:"id,omitempty"`
+	Peerings []NetworkPeeringApplyConfiguration `json:"peerings,omitempty"`
 }
 
 // NetworkSpecApplyConfiguration constructs an declarative configuration of the NetworkSpec type for use with
@@ -26,12 +26,15 @@ func (b *NetworkSpecApplyConfiguration) WithID(value string) *NetworkSpecApplyCo
 	return b
 }
 
-// WithPeeredIDs adds the given value to the PeeredIDs field in the declarative configuration
+// WithPeerings adds the given value to the Peerings field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
-// If called multiple times, values provided by each call will be appended to the PeeredIDs field.
-func (b *NetworkSpecApplyConfiguration) WithPeeredIDs(values ...string) *NetworkSpecApplyConfiguration {
+// If called multiple times, values provided by each call will be appended to the Peerings field.
+func (b *NetworkSpecApplyConfiguration) WithPeerings(values ...*NetworkPeeringApplyConfiguration) *NetworkSpecApplyConfiguration {
 	for i := range values {
-		b.PeeredIDs = append(b.PeeredIDs, values[i])
+		if values[i] == nil {
+			panic("nil value passed to WithPeerings")
+		}
+		b.Peerings = append(b.Peerings, *values[i])
 	}
 	return b
 }

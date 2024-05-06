@@ -766,13 +766,24 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
-- name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeeringStatus
+- name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeering
   map:
     fields:
+    - name: id
+      type:
+        scalar: string
+      default: ""
     - name: name
       type:
         scalar: string
       default: ""
+- name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeeringStatus
+  map:
+    fields:
+    - name: id
+      type:
+        scalar: numeric
+      default: 0
     - name: state
       type:
         scalar: string
@@ -782,11 +793,11 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: id
       type:
         scalar: string
-    - name: peeredIDs
+    - name: peerings
       type:
         list:
           elementType:
-            scalar: string
+            namedType: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeering
           elementRelationship: atomic
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkStatus
   map:
