@@ -106,8 +106,14 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &corev1alpha1.NetworkInterfaceSpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("NetworkInterfaceStatus"):
 		return &corev1alpha1.NetworkInterfaceStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("NetworkPeering"):
+		return &corev1alpha1.NetworkPeeringApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("NetworkPeeringStatus"):
+		return &corev1alpha1.NetworkPeeringStatusApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("NetworkSpec"):
 		return &corev1alpha1.NetworkSpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("NetworkStatus"):
+		return &corev1alpha1.NetworkStatusApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("Node"):
 		return &corev1alpha1.NodeApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("NodeAffinity"):

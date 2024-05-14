@@ -10,9 +10,45 @@ import (
 type NetworkSpec struct {
 	// ID is the ID of the network.
 	ID string `json:"id,omitempty"`
+	// Peerings are the network peerings with this network
+	Peerings []NetworkPeering `json:"peerings,omitempty"`
+}
+
+// NetworkPeering defines a network peering with another network.
+type NetworkPeering struct {
+	// Name is the semantical name of the network peering.
+	Name string `json:"name"`
+	// ID is the ID of the network to peer with.
+	ID string `json:"id"`
 }
 
 type NetworkStatus struct {
+	// Peerings contains the states of the network peerings for the network.
+	Peerings []NetworkPeeringStatus `json:"peerings,omitempty"`
+}
+
+// NetworkState is the state of a network.
+// +enum
+type NetworkState string
+
+// NetworkPeeringState is the state a NetworkPeering can be in
+type NetworkPeeringState string
+
+const (
+	// NetworkPeeringStatePending signals that the network peering is not applied.
+	NetworkPeeringStatePending NetworkPeeringState = "Pending"
+	// NetworkPeeringStateReady signals that the network peering is ready.
+	NetworkPeeringStateReady NetworkPeeringState = "Ready"
+	// NetworkPeeringStateError signals that the network peering is in error state.
+	NetworkPeeringStateError NetworkPeeringState = "Error"
+)
+
+// NetworkPeeringStatus is the status of a network peering.
+type NetworkPeeringStatus struct {
+	// ID is the ID of network
+	ID int32 `json:"id"`
+	// State represents the network peering state
+	State NetworkPeeringState `json:"state,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

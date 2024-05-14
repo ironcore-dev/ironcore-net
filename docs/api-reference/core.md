@@ -1098,6 +1098,17 @@ string
 <p>ID is the ID of the network.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>peeredIDs</code><br/>
+<em>
+[]string
+</em>
+</td>
+<td>
+<p>PeeredIDs are the IDs of networks to peer with.</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -3363,6 +3374,85 @@ PCIAddress
 </tr>
 </tbody>
 </table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPeeringState">NetworkPeeringState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus</a>)
+</p>
+<div>
+<p>NetworkPeeringState is the state a NetworkPeering can be in</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Error&#34;</p></td>
+<td><p>NetworkPeeringStateError signals that the network peering is in error state.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>NetworkPeeringStatePending signals that the network peering is not applied.</p>
+</td>
+</tr><tr><td><p>&#34;Ready&#34;</p></td>
+<td><p>NetworkPeeringStateReady signals that the network peering is ready.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkStatus">NetworkStatus</a>)
+</p>
+<div>
+<p>NetworkPeeringStatus is the status of a network peering.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the network peering.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>id</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>ID is the ID of network</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeeringState">
+NetworkPeeringState
+</a>
+</em>
+</td>
+<td>
+<p>State represents the network peering state</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkSpec">NetworkSpec
 </h3>
 <p>
@@ -3389,8 +3479,24 @@ string
 <p>ID is the ID of the network.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>peeredIDs</code><br/>
+<em>
+[]string
+</em>
+</td>
+<td>
+<p>PeeredIDs are the IDs of networks to peer with.</p>
+</td>
+</tr>
 </tbody>
 </table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkState">NetworkState
+(<code>string</code> alias)</h3>
+<div>
+<p>NetworkState is the state of a network.</p>
+</div>
 <h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkStatus">NetworkStatus
 </h3>
 <p>
@@ -3398,6 +3504,29 @@ string
 </p>
 <div>
 </div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>peerings</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeeringStatus">
+[]NetworkPeeringStatus
+</a>
+</em>
+</td>
+<td>
+<p>Peerings contains the states of the network peerings for the network.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="core.apinet.ironcore.dev/v1alpha1.NodeAffinity">NodeAffinity
 </h3>
 <p>
