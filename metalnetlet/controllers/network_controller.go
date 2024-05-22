@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
-	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	metalnetletclient "github.com/ironcore-dev/ironcore-net/metalnetlet/client"
 	metalnetlethandler "github.com/ironcore-dev/ironcore-net/metalnetlet/handler"
 	"github.com/ironcore-dev/ironcore-net/networkid"
@@ -35,12 +35,13 @@ type NetworkReconciler struct {
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networks,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networks/finalizers,verbs=update;patch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networks/status,verbs=get;update;patch
 
 //+cluster=metalnet:kubebuilder:rbac:groups=networking.metalnet.ironcore.dev,resources=networks,verbs=get;list;watch;create;update;patch;delete;deletecollection
 
 func (r *NetworkReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
-	network := &v1alpha1.Network{}
+	network := &apinetv1alpha1.Network{}
 	if err := r.Get(ctx, req.NamespacedName, network); err != nil {
 		if !apierrors.IsNotFound(err) {
 			return ctrl.Result{}, fmt.Errorf("error getting network: %w", err)
@@ -57,7 +58,7 @@ func (r *NetworkReconciler) deleteGone(ctx context.Context, log logr.Logger, net
 	log.V(1).Info("Deleting all metalnet networks that match the network label")
 	if err := r.MetalnetClient.DeleteAllOf(ctx, &metalnetv1alpha1.Network{},
 		client.InNamespace(r.MetalnetNamespace),
-		metalnetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), networkKey, &v1alpha1.Network{}),
+		metalnetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), networkKey, &apinetv1alpha1.Network{}),
 	); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error deleting metalnet networks matching network label: %w", err)
 	}
@@ -66,14 +67,14 @@ func (r *NetworkReconciler) deleteGone(ctx context.Context, log logr.Logger, net
 	return ctrl.Result{}, nil
 }
 
-func (r *NetworkReconciler) reconcileExists(ctx context.Context, log logr.Logger, network *v1alpha1.Network) (ctrl.Result, error) {
+func (r *NetworkReconciler) reconcileExists(ctx context.Context, log logr.Logger, network *apinetv1alpha1.Network) (ctrl.Result, error) {
 	if !network.DeletionTimestamp.IsZero() {
 		return r.delete(ctx, log, network)
 	}
 	return r.reconcile(ctx, log, network)
 }
 
-func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network *v1alpha1.Network) (ctrl.Result, error) {
+func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network *apinetv1alpha1.Network) (ctrl.Result, error) {
 	log.V(1).Info("Delete")
 
 	if !controllerutil.ContainsFinalizer(network, PartitionFinalizer(r.PartitionName)) {
@@ -109,7 +110,16 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 	return ctrl.Result{}, nil
 }
 
-func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, network *v1alpha1.Network) (ctrl.Result, error) {
+func (r *NetworkReconciler) updateApinetNetworkStatus(ctx context.Context, network *apinetv1alpha1.Network, metalnetNetwork *metalnetv1alpha1.Network) error {
+	networkBase := network.DeepCopy()
+	network.Status.Peerings = metalnetNetworkPeeringsStatusToNetworkPeeringsStatus(metalnetNetwork.Status.Peerings)
+	if err := r.Status().Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
+		return fmt.Errorf("unable to patch network: %w", err)
+	}
+	return nil
+}
+
+func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, network *apinetv1alpha1.Network) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
 	vni, err := networkid.ParseVNI(network.Spec.ID)
@@ -144,10 +154,26 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 			ID: vni,
 		},
 	}
+
+	for _, peering := range network.Spec.Peerings {
+		id, err := networkid.ParseVNI(peering.ID)
+		if err != nil {
+			return ctrl.Result{}, fmt.Errorf("failed to parse peered network ID: %w", err)
+		}
+
+		metalnetNetwork.Spec.PeeredIDs = append(metalnetNetwork.Spec.PeeredIDs, id)
+	}
+
 	if err := r.MetalnetClient.Patch(ctx, metalnetNetwork, client.Apply, MetalnetFieldOwner, client.ForceOwnership); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying network: %w", err)
 	}
 	log.V(1).Info("Applied metalnet network")
+
+	log.V(1).Info("Updating apinet network status")
+	if err := r.updateApinetNetworkStatus(ctx, network, metalnetNetwork); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error updating apinet networkstatus: %w", err)
+	}
+	log.V(1).Info("Updated apinet network status")
 
 	log.V(1).Info("Reconciled")
 	return ctrl.Result{}, nil
@@ -156,11 +182,11 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, metalnetCache cache.Cache) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
-			&v1alpha1.Network{},
+			&apinetv1alpha1.Network{},
 		).
 		WatchesRawSource(
 			source.Kind(metalnetCache, &metalnetv1alpha1.Network{}),
-			metalnetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &v1alpha1.Network{}),
+			metalnetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &apinetv1alpha1.Network{}),
 		).
 		Complete(r)
 }

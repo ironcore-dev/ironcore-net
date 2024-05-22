@@ -5,6 +5,8 @@ package controllers
 
 import (
 	"fmt"
+	"slices"
+	"strconv"
 
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
@@ -68,4 +70,20 @@ func apiNetNetworkInterfaceStateToNetworkInterfaceState(state apinetv1alpha1.Net
 	default:
 		return networkingv1alpha1.NetworkInterfaceStatePending
 	}
+}
+
+func apiNetNetworkPeeringsStatusToNetworkPeeringsStatus(peerings []apinetv1alpha1.NetworkPeeringStatus, specPeerings []apinetv1alpha1.NetworkPeering) []networkingv1alpha1.NetworkPeeringStatus {
+	networkPeeringsStatus := []networkingv1alpha1.NetworkPeeringStatus{}
+	for _, peering := range peerings {
+		idx := slices.IndexFunc(specPeerings, func(specPeering apinetv1alpha1.NetworkPeering) bool {
+			return specPeering.ID == strconv.Itoa(int(peering.ID))
+		})
+		if idx != -1 {
+			networkPeeringsStatus = append(networkPeeringsStatus, networkingv1alpha1.NetworkPeeringStatus{
+				Name:  specPeerings[idx].Name,
+				State: networkingv1alpha1.NetworkPeeringState(peering.State),
+			})
+		}
+	}
+	return networkPeeringsStatus
 }
