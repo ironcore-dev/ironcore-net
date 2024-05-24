@@ -91,7 +91,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyRule":           schema_ironcore_net_api_core_v1alpha1_NetworkPolicyRule(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyRuleList":       schema_ironcore_net_api_core_v1alpha1_NetworkPolicyRuleList(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicySpec":           schema_ironcore_net_api_core_v1alpha1_NetworkPolicySpec(ref),
-		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyTargetRef":      schema_ironcore_net_api_core_v1alpha1_NetworkPolicyTargetRef(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkSpec":                 schema_ironcore_net_api_core_v1alpha1_NetworkSpec(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkStatus":               schema_ironcore_net_api_core_v1alpha1_NetworkStatus(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.Node":                        schema_ironcore_net_api_core_v1alpha1_Node(ref),
@@ -3370,35 +3369,6 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkPolicySpec(ref common.Referenc
 	}
 }
 
-func schema_ironcore_net_api_core_v1alpha1_NetworkPolicyTargetRef(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"uid": {
-						SchemaProps: spec.SchemaProps{
-							Description: "UID is the UID of the target.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the target.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"uid", "name"},
-			},
-		},
-	}
-}
-
 func schema_ironcore_net_api_core_v1alpha1_NetworkSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3906,7 +3876,7 @@ func schema_ironcore_net_api_core_v1alpha1_TargetNetworkInterface(ref common.Ref
 					"targetRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "TargetRef is the target providing the destination.",
-							Ref:         ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyTargetRef"),
+							Ref:         ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.LocalUIDReference"),
 						},
 					},
 				},
@@ -3914,7 +3884,7 @@ func schema_ironcore_net_api_core_v1alpha1_TargetNetworkInterface(ref common.Ref
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyTargetRef", "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"},
+			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.LocalUIDReference", "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"},
 	}
 }
 

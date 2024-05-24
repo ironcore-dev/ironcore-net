@@ -7,7 +7,6 @@ import (
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -35,14 +34,7 @@ type TargetNetworkInterface struct {
 	// IP is the IP address of the target network interface.
 	IP net.IP `json:"ip"`
 	// TargetRef is the target providing the destination.
-	TargetRef *NetworkPolicyTargetRef `json:"targetRef,omitempty"`
-}
-
-type NetworkPolicyTargetRef struct {
-	// UID is the UID of the target.
-	UID types.UID `json:"uid"`
-	// Name is the name of the target.
-	Name string `json:"name"`
+	TargetRef *LocalUIDReference `json:"targetRef,omitempty"`
 }
 
 type Rule struct {

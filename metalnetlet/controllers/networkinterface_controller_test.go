@@ -104,7 +104,7 @@ var _ = Describe("NetworkInterfaceController", func() {
 			Targets: []v1alpha1.TargetNetworkInterface{
 				{
 					IP: net.MustParseIP("10.0.0.1"),
-					TargetRef: &v1alpha1.NetworkPolicyTargetRef{
+					TargetRef: &v1alpha1.LocalUIDReference{
 						UID:  nic.UID,
 						Name: nic.Name,
 					},

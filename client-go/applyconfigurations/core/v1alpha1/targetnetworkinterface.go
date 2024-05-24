@@ -12,8 +12,8 @@ import (
 // TargetNetworkInterfaceApplyConfiguration represents an declarative configuration of the TargetNetworkInterface type for use
 // with apply.
 type TargetNetworkInterfaceApplyConfiguration struct {
-	IP        *net.IP                                   `json:"ip,omitempty"`
-	TargetRef *NetworkPolicyTargetRefApplyConfiguration `json:"targetRef,omitempty"`
+	IP        *net.IP                              `json:"ip,omitempty"`
+	TargetRef *LocalUIDReferenceApplyConfiguration `json:"targetRef,omitempty"`
 }
 
 // TargetNetworkInterfaceApplyConfiguration constructs an declarative configuration of the TargetNetworkInterface type for use with
@@ -33,7 +33,7 @@ func (b *TargetNetworkInterfaceApplyConfiguration) WithIP(value net.IP) *TargetN
 // WithTargetRef sets the TargetRef field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the TargetRef field is set to the value of the last call.
-func (b *TargetNetworkInterfaceApplyConfiguration) WithTargetRef(value *NetworkPolicyTargetRefApplyConfiguration) *TargetNetworkInterfaceApplyConfiguration {
+func (b *TargetNetworkInterfaceApplyConfiguration) WithTargetRef(value *LocalUIDReferenceApplyConfiguration) *TargetNetworkInterfaceApplyConfiguration {
 	b.TargetRef = value
 	return b
 }

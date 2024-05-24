@@ -90,7 +90,7 @@ func (r *NetworkPolicyReconciler) deleteGone(ctx context.Context, log logr.Logge
 		return ctrl.Result{}, fmt.Errorf("error deleting apinet network policies: %w", err)
 	}
 
-	log.V(1).Info("Issued delete for any leftover APINet network policy")
+	log.V(1).Info("Deleted any leftover APINet network policy")
 	return ctrl.Result{}, nil
 }
 
@@ -120,17 +120,16 @@ func (r *NetworkPolicyReconciler) delete(ctx context.Context, log logr.Logger, n
 		if !apierrors.IsNotFound(err) {
 			return ctrl.Result{}, fmt.Errorf("error deleting apinet network policy: %w", err)
 		}
-
-		log.V(1).Info("APINet network policy is gone, removing finalizer")
-		if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, networkPolicy, networkPolicyFinalizer); err != nil {
-			return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
-		}
-		log.V(1).Info("Deleted")
-		return ctrl.Result{}, nil
 	}
 
-	log.V(1).Info("APINet network policy is not yet gone, requeueing")
-	return ctrl.Result{Requeue: true}, nil
+	log.V(1).Info("APINet network policy is gone, removing finalizer")
+	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, networkPolicy, networkPolicyFinalizer); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
+	}
+
+	log.V(1).Info("Deleted")
+
+	return ctrl.Result{}, nil
 }
 
 func (r *NetworkPolicyReconciler) reconcile(ctx context.Context, log logr.Logger, networkPolicy *networkingv1alpha1.NetworkPolicy) (ctrl.Result, error) {
@@ -220,7 +219,7 @@ func (r *NetworkPolicyReconciler) findTargets(ctx context.Context, apiNetNetwork
 		for _, ip := range apiNetNic.Spec.IPs {
 			targets = append(targets, apinetv1alpha1.TargetNetworkInterface{
 				IP: ip,
-				TargetRef: &apinetv1alpha1.NetworkPolicyTargetRef{
+				TargetRef: &apinetv1alpha1.LocalUIDReference{
 					UID:  apiNetNic.UID,
 					Name: apiNetNic.Name,
 				},
@@ -330,9 +329,14 @@ func (r *NetworkPolicyReconciler) fetchIPsFromNetworkInterfaces(ctx context.Cont
 		}
 
 		for _, ip := range nic.Spec.IPs {
+			ipFamily := corev1.IPv4Protocol
+			if ip.Addr.Is6() {
+				ipFamily = corev1.IPv6Protocol
+			}
+			ip.Addr.Is4()
 			ips = append(ips, apinetv1alpha1.ObjectIP{
-				Prefix:   net.IPPrefix{Prefix: netip.PrefixFrom(ip.Addr, 32)},
-				IPFamily: corev1.IPv4Protocol, // TODO: later support for IPv6
+				Prefix:   net.IPPrefix{Prefix: netip.PrefixFrom(ip.Addr, ip.Addr.BitLen())},
+				IPFamily: ipFamily,
 			})
 		}
 	}
@@ -362,8 +366,8 @@ func (r *NetworkPolicyReconciler) fetchIPsFromLoadBalancers(ctx context.Context,
 		for _, ip := range lb.Spec.IPs {
 			// TODO: handle LoadBalancerIP when only IPFamily is specified to allocate a random IP.
 			ips = append(ips, apinetv1alpha1.ObjectIP{
-				Prefix:   net.IPPrefix{Prefix: netip.PrefixFrom(ip.IP.Addr, 32)},
-				IPFamily: corev1.IPv4Protocol, // TODO: later support for IPv6
+				Prefix:   net.IPPrefix{Prefix: netip.PrefixFrom(ip.IP.Addr, ip.IP.Addr.BitLen())},
+				IPFamily: ip.IPFamily,
 			})
 		}
 	}
@@ -401,7 +405,11 @@ func (r *NetworkPolicyReconciler) applyNetworkPolicyRule(
 		IngressRules: ingressRules,
 		EgressRules:  egressRules,
 	}
-	_ = ctrl.SetControllerReference(apiNetNetworkPolicy, networkPolicyRule, r.Scheme())
+	err := ctrl.SetControllerReference(apiNetNetworkPolicy, networkPolicyRule, r.Scheme())
+	if err != nil {
+		return fmt.Errorf("error setting controller reference: %w", err)
+	}
+
 	if err := r.Patch(ctx, networkPolicyRule, client.Apply, networkPolicyFieldOwner, client.ForceOwnership); err != nil {
 		return fmt.Errorf("error applying network policy rule: %w", err)
 	}

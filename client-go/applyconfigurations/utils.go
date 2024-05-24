@@ -128,8 +128,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &corev1alpha1.NetworkPolicyRuleApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("NetworkPolicySpec"):
 		return &corev1alpha1.NetworkPolicySpecApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("NetworkPolicyTargetRef"):
-		return &corev1alpha1.NetworkPolicyTargetRefApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("NetworkSpec"):
 		return &corev1alpha1.NetworkSpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("NetworkStatus"):

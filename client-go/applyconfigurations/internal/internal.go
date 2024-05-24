@@ -790,6 +790,27 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
+- name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeering
+  map:
+    fields:
+    - name: id
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
+      default: ""
+- name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeeringStatus
+  map:
+    fields:
+    - name: id
+      type:
+        scalar: numeric
+      default: 0
+    - name: state
+      type:
+        scalar: string
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicy
   map:
     fields:
@@ -928,38 +949,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: priority
       type:
         scalar: numeric
-- name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyTargetRef
-  map:
-    fields:
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: uid
-      type:
-        scalar: string
-      default: ""
-- name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeering
-  map:
-    fields:
-    - name: id
-      type:
-        scalar: string
-      default: ""
-    - name: name
-      type:
-        scalar: string
-      default: ""
-- name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeeringStatus
-  map:
-    fields:
-    - name: id
-      type:
-        scalar: numeric
-      default: 0
-    - name: state
-      type:
-        scalar: string
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkSpec
   map:
     fields:
@@ -1144,7 +1133,7 @@ var schemaYAML = typed.YAMLObject(`types:
         namedType: com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP
     - name: targetRef
       type:
-        namedType: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyTargetRef
+        namedType: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LocalUIDReference
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.TopologySpreadConstraint
   map:
     fields:

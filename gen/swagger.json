@@ -61863,6 +61863,42 @@
 				}
 			]
 		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeering": {
+			"description": "NetworkPeering defines a network peering with another network.",
+			"type": "object",
+			"required": [
+				"name",
+				"id"
+			],
+			"properties": {
+				"id": {
+					"description": "ID is the ID of the network to peer with.",
+					"type": "string"
+				},
+				"name": {
+					"description": "Name is the semantical name of the network peering.",
+					"type": "string"
+				}
+			}
+		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeeringStatus": {
+			"description": "NetworkPeeringStatus is the status of a network peering.",
+			"type": "object",
+			"required": [
+				"id"
+			],
+			"properties": {
+				"id": {
+					"description": "ID is the ID of network",
+					"type": "integer",
+					"format": "int32"
+				},
+				"state": {
+					"description": "State represents the network peering state",
+					"type": "string"
+				}
+			}
+		},
 		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicy": {
 			"description": "NetworkPolicy is the Schema for the networkpolicies API.",
 			"type": "object",
@@ -62135,34 +62171,33 @@
 				}
 			}
 		},
-		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyTargetRef": {
-			"type": "object",
-			"required": [
-				"uid",
-				"name"
-			],
-			"properties": {
-				"name": {
-					"description": "Name is the name of the target.",
-					"type": "string"
-				},
-				"uid": {
-					"description": "UID is the UID of the target.",
-					"type": "string"
-				}
-			}
-		},
 		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkSpec": {
 			"type": "object",
 			"properties": {
 				"id": {
 					"description": "ID is the ID of the network.",
 					"type": "string"
+				},
+				"peerings": {
+					"description": "Peerings are the network peerings with this network",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeering"
+					}
 				}
 			}
 		},
 		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkStatus": {
-			"type": "object"
+			"type": "object",
+			"properties": {
+				"peerings": {
+					"description": "Peerings contains the states of the network peerings for the network.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeeringStatus"
+					}
+				}
+			}
 		},
 		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node": {
 			"description": "Node is the schema for the nodes API.",
@@ -62404,7 +62439,7 @@
 				},
 				"targetRef": {
 					"description": "TargetRef is the target providing the destination.",
-					"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyTargetRef"
+					"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LocalUIDReference"
 				}
 			}
 		},
