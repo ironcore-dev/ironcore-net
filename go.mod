@@ -4,7 +4,7 @@ go 1.22.2
 
 require (
 	github.com/bits-and-blooms/bitset v1.13.0
-	github.com/go-logr/logr v1.4.1
+	github.com/go-logr/logr v1.4.2
 	github.com/google/uuid v1.6.0
 	github.com/ironcore-dev/controller-utils v0.9.3
 	github.com/ironcore-dev/ironcore v0.1.2-0.20240514120326-51392fa00b86
