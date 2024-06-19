@@ -14,9 +14,11 @@ import (
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	metalnetletclient "github.com/ironcore-dev/ironcore-net/metalnetlet/client"
 	utilhandler "github.com/ironcore-dev/ironcore-net/metalnetlet/handler"
+	netiputils "github.com/ironcore-dev/ironcore-net/utils/netip"
 	"github.com/ironcore-dev/ironcore/utils/generic"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
+
 	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -212,53 +214,52 @@ func extractFirewallRulesFromRule(rule v1alpha1.Rule, direction metalnetv1alpha1
 	var firewallRules []metalnetv1alpha1.FirewallRule
 
 	for _, port := range rule.NetworkPolicyPorts {
-		firewallRule := metalnetv1alpha1.FirewallRule{
-			FirewallRuleID: types.UID(uuid.New().String()),
-			Direction:      direction,
-			Action:         metalnetv1alpha1.FirewallRuleActionAccept,
-			Priority:       priority,
-			IpFamily:       corev1.IPv4Protocol, //TODO: later support for IPv6
-			ProtocolMatch:  &metalnetv1alpha1.ProtocolMatch{},
+		baseFirewallRule := metalnetv1alpha1.FirewallRule{
+			Direction:     direction,
+			Action:        metalnetv1alpha1.FirewallRuleActionAccept,
+			Priority:      priority,
+			ProtocolMatch: &metalnetv1alpha1.ProtocolMatch{},
 		}
 
 		switch *port.Protocol {
 		case corev1.ProtocolTCP:
-			firewallRule.ProtocolMatch.ProtocolType = generic.Pointer(metalnetv1alpha1.FirewallRuleProtocolTypeTCP)
+			baseFirewallRule.ProtocolMatch.ProtocolType = generic.Pointer(metalnetv1alpha1.FirewallRuleProtocolTypeTCP)
 		case corev1.ProtocolUDP:
-			firewallRule.ProtocolMatch.ProtocolType = generic.Pointer(metalnetv1alpha1.FirewallRuleProtocolTypeUDP)
+			baseFirewallRule.ProtocolMatch.ProtocolType = generic.Pointer(metalnetv1alpha1.FirewallRuleProtocolTypeUDP)
 			//TODO: no support for SCTP protocol in metalnetlet and metalnetlet FirewallRuleProtocolTypeICMP is not defined in ironcore
 		}
 
 		if port.Port != 0 {
 			if direction == metalnetv1alpha1.FirewallRuleDirectionIngress {
-				firewallRule.ProtocolMatch.PortRange = &metalnetv1alpha1.PortMatch{SrcPort: &port.Port}
+				baseFirewallRule.ProtocolMatch.PortRange = &metalnetv1alpha1.PortMatch{SrcPort: &port.Port}
 			} else {
-				firewallRule.ProtocolMatch.PortRange = &metalnetv1alpha1.PortMatch{DstPort: &port.Port}
+				baseFirewallRule.ProtocolMatch.PortRange = &metalnetv1alpha1.PortMatch{DstPort: &port.Port}
 			}
 			if port.EndPort != nil {
 				if direction == metalnetv1alpha1.FirewallRuleDirectionIngress {
-					firewallRule.ProtocolMatch.PortRange.EndSrcPort = *port.EndPort
+					baseFirewallRule.ProtocolMatch.PortRange.EndSrcPort = *port.EndPort
 				} else {
-					firewallRule.ProtocolMatch.PortRange.EndDstPort = *port.EndPort
+					baseFirewallRule.ProtocolMatch.PortRange.EndDstPort = *port.EndPort
 				}
 			}
 		}
 
 		for _, cidrBlock := range rule.CIDRBlock {
-			cidrFirewallRule := firewallRule
-			cidrFirewallRule.FirewallRuleID = types.UID(uuid.New().String())
+			firewallRule := baseFirewallRule
+			firewallRule.FirewallRuleID = types.UID(uuid.New().String())
+			firewallRule.IpFamily = netiputils.GetIPFamilyFromPrefix(cidrBlock.CIDR)
 
 			if direction == metalnetv1alpha1.FirewallRuleDirectionIngress {
-				cidrFirewallRule.SourcePrefix = &metalnetv1alpha1.IPPrefix{Prefix: cidrBlock.CIDR.Prefix}
+				firewallRule.SourcePrefix = &metalnetv1alpha1.IPPrefix{Prefix: cidrBlock.CIDR.Prefix}
 			} else {
-				cidrFirewallRule.DestinationPrefix = &metalnetv1alpha1.IPPrefix{Prefix: cidrBlock.CIDR.Prefix}
+				firewallRule.DestinationPrefix = &metalnetv1alpha1.IPPrefix{Prefix: cidrBlock.CIDR.Prefix}
 			}
 
-			firewallRules = append(firewallRules, cidrFirewallRule)
+			firewallRules = append(firewallRules, firewallRule)
 
 			if len(cidrBlock.Except) > 0 {
 				for _, exceptCIDR := range cidrBlock.Except {
-					exceptFirewallRule := cidrFirewallRule
+					exceptFirewallRule := firewallRule
 					exceptFirewallRule.FirewallRuleID = types.UID(uuid.New().String())
 					exceptFirewallRule.Action = metalnetv1alpha1.FirewallRuleActionDeny
 
@@ -274,16 +275,17 @@ func extractFirewallRulesFromRule(rule v1alpha1.Rule, direction metalnetv1alpha1
 		}
 
 		for _, objectIP := range rule.ObjectIPs {
-			objectIPFirewallRule := firewallRule
-			objectIPFirewallRule.FirewallRuleID = types.UID(uuid.New().String())
+			firewallRule := baseFirewallRule
+			firewallRule.FirewallRuleID = types.UID(uuid.New().String())
+			firewallRule.IpFamily = netiputils.GetIPFamilyFromPrefix(objectIP.Prefix)
 
 			if direction == metalnetv1alpha1.FirewallRuleDirectionIngress {
-				objectIPFirewallRule.SourcePrefix = &metalnetv1alpha1.IPPrefix{Prefix: objectIP.Prefix.Prefix}
+				firewallRule.SourcePrefix = &metalnetv1alpha1.IPPrefix{Prefix: objectIP.Prefix.Prefix}
 			} else {
-				objectIPFirewallRule.DestinationPrefix = &metalnetv1alpha1.IPPrefix{Prefix: objectIP.Prefix.Prefix}
+				firewallRule.DestinationPrefix = &metalnetv1alpha1.IPPrefix{Prefix: objectIP.Prefix.Prefix}
 			}
 
-			firewallRules = append(firewallRules, objectIPFirewallRule)
+			firewallRules = append(firewallRules, firewallRule)
 		}
 	}
 

@@ -120,6 +120,12 @@ var _ = Describe("NetworkInterfaceController", func() {
 								{Prefix: netip.MustParsePrefix("192.168.2.100/32")},
 							},
 						},
+						{
+							CIDR: net.IPPrefix{Prefix: netip.MustParsePrefix("2001:db8::/64")},
+							Except: []net.IPPrefix{
+								{Prefix: netip.MustParsePrefix("2001:db8::1234/128")},
+							},
+						},
 					},
 					ObjectIPs: []v1alpha1.ObjectIP{
 						{
@@ -145,6 +151,9 @@ var _ = Describe("NetworkInterfaceController", func() {
 					ObjectIPs: []v1alpha1.ObjectIP{
 						{
 							Prefix: net.IPPrefix{Prefix: netip.MustParsePrefix("192.168.178.60/32")},
+						},
+						{
+							Prefix: net.IPPrefix{Prefix: netip.MustParsePrefix("2001:db8:5678:abcd::60/128")},
 						},
 					},
 					NetworkPolicyPorts: []v1alpha1.NetworkPolicyPort{
@@ -213,6 +222,46 @@ var _ = Describe("NetworkInterfaceController", func() {
 					"IpFamily":       Equal(corev1.IPv4Protocol),
 					"SourcePrefix": PointTo(MatchFields(IgnoreExtras, Fields{
 						"Prefix": Equal(netip.MustParsePrefix("192.168.2.100/32")),
+					})),
+					"DestinationPrefix": BeNil(),
+					"ProtocolMatch": PointTo(MatchFields(IgnoreExtras, Fields{
+						"ProtocolType": PointTo(Equal(metalnetv1alpha1.FirewallRuleProtocolTypeTCP)),
+						"PortRange": PointTo(MatchFields(IgnoreExtras, Fields{
+							"SrcPort":    PointTo(Equal(int32(8080))),
+							"EndSrcPort": Equal(int32(8090)),
+							"DstPort":    BeNil(),
+							"EndDstPort": BeEquivalentTo(0),
+						})),
+					})),
+				}),
+				MatchFields(IgnoreExtras, Fields{
+					"FirewallRuleID": Not(BeEmpty()),
+					"Direction":      Equal(metalnetv1alpha1.FirewallRuleDirectionIngress),
+					"Action":         Equal(metalnetv1alpha1.FirewallRuleActionAccept),
+					"Priority":       PointTo(Equal(int32(3000))),
+					"IpFamily":       Equal(corev1.IPv6Protocol),
+					"SourcePrefix": PointTo(MatchFields(IgnoreExtras, Fields{
+						"Prefix": Equal(netip.MustParsePrefix("2001:db8::/64")),
+					})),
+					"DestinationPrefix": BeNil(),
+					"ProtocolMatch": PointTo(MatchFields(IgnoreExtras, Fields{
+						"ProtocolType": PointTo(Equal(metalnetv1alpha1.FirewallRuleProtocolTypeTCP)),
+						"PortRange": PointTo(MatchFields(IgnoreExtras, Fields{
+							"SrcPort":    PointTo(Equal(int32(8080))),
+							"EndSrcPort": Equal(int32(8090)),
+							"DstPort":    BeNil(),
+							"EndDstPort": BeEquivalentTo(0),
+						})),
+					})),
+				}),
+				MatchFields(IgnoreExtras, Fields{
+					"FirewallRuleID": Not(BeEmpty()),
+					"Direction":      Equal(metalnetv1alpha1.FirewallRuleDirectionIngress),
+					"Action":         Equal(metalnetv1alpha1.FirewallRuleActionDeny),
+					"Priority":       PointTo(Equal(int32(3000))),
+					"IpFamily":       Equal(corev1.IPv6Protocol),
+					"SourcePrefix": PointTo(MatchFields(IgnoreExtras, Fields{
+						"Prefix": Equal(netip.MustParsePrefix("2001:db8::1234/128")),
 					})),
 					"DestinationPrefix": BeNil(),
 					"ProtocolMatch": PointTo(MatchFields(IgnoreExtras, Fields{
@@ -314,6 +363,46 @@ var _ = Describe("NetworkInterfaceController", func() {
 					"SourcePrefix":   BeNil(),
 					"DestinationPrefix": PointTo(MatchFields(IgnoreExtras, Fields{
 						"Prefix": Equal(netip.MustParsePrefix("192.168.178.60/32")),
+					})),
+					"ProtocolMatch": PointTo(MatchFields(IgnoreExtras, Fields{
+						"ProtocolType": PointTo(Equal(metalnetv1alpha1.FirewallRuleProtocolTypeTCP)),
+						"PortRange": PointTo(MatchFields(IgnoreExtras, Fields{
+							"SrcPort":    BeNil(),
+							"EndSrcPort": BeEquivalentTo(0),
+							"DstPort":    PointTo(Equal(int32(9000))),
+							"EndDstPort": Equal(int32(9010)),
+						})),
+					})),
+				}),
+				MatchFields(IgnoreExtras, Fields{
+					"FirewallRuleID": Not(BeEmpty()),
+					"Direction":      Equal(metalnetv1alpha1.FirewallRuleDirectionEgress),
+					"Action":         Equal(metalnetv1alpha1.FirewallRuleActionAccept),
+					"Priority":       PointTo(Equal(int32(3000))),
+					"IpFamily":       Equal(corev1.IPv6Protocol),
+					"SourcePrefix":   BeNil(),
+					"DestinationPrefix": PointTo(MatchFields(IgnoreExtras, Fields{
+						"Prefix": Equal(netip.MustParsePrefix("2001:db8:5678:abcd::60/128")),
+					})),
+					"ProtocolMatch": PointTo(MatchFields(IgnoreExtras, Fields{
+						"ProtocolType": PointTo(Equal(metalnetv1alpha1.FirewallRuleProtocolTypeTCP)),
+						"PortRange": PointTo(MatchFields(IgnoreExtras, Fields{
+							"SrcPort":    BeNil(),
+							"EndSrcPort": BeEquivalentTo(0),
+							"DstPort":    PointTo(Equal(int32(8095))),
+							"EndDstPort": BeEquivalentTo(0),
+						})),
+					})),
+				}),
+				MatchFields(IgnoreExtras, Fields{
+					"FirewallRuleID": Not(BeEmpty()),
+					"Direction":      Equal(metalnetv1alpha1.FirewallRuleDirectionEgress),
+					"Action":         Equal(metalnetv1alpha1.FirewallRuleActionAccept),
+					"Priority":       PointTo(Equal(int32(3000))),
+					"IpFamily":       Equal(corev1.IPv6Protocol),
+					"SourcePrefix":   BeNil(),
+					"DestinationPrefix": PointTo(MatchFields(IgnoreExtras, Fields{
+						"Prefix": Equal(netip.MustParsePrefix("2001:db8:5678:abcd::60/128")),
 					})),
 					"ProtocolMatch": PointTo(MatchFields(IgnoreExtras, Fields{
 						"ProtocolType": PointTo(Equal(metalnetv1alpha1.FirewallRuleProtocolTypeTCP)),

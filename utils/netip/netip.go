@@ -8,6 +8,9 @@ import (
 	"math"
 	"math/big"
 	"net/netip"
+
+	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
+	corev1 "k8s.io/api/core/v1"
 )
 
 func PrefixSize(p netip.Prefix) int64 {
@@ -30,4 +33,11 @@ func AddOffsetAddress(address netip.Addr, offset uint64) (netip.Addr, error) {
 		return netip.Addr{}, fmt.Errorf("invalid address %v", r.Bytes())
 	}
 	return addr, nil
+}
+
+func GetIPFamilyFromPrefix(ipPrefix net.IPPrefix) corev1.IPFamily {
+	if ipPrefix.Addr().Is6() {
+		return corev1.IPv6Protocol
+	}
+	return corev1.IPv4Protocol
 }

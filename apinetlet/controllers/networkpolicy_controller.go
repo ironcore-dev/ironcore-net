@@ -333,7 +333,6 @@ func (r *NetworkPolicyReconciler) fetchIPsFromNetworkInterfaces(ctx context.Cont
 			if ip.Addr.Is6() {
 				ipFamily = corev1.IPv6Protocol
 			}
-			ip.Addr.Is4()
 			ips = append(ips, apinetv1alpha1.ObjectIP{
 				Prefix:   net.IPPrefix{Prefix: netip.PrefixFrom(ip.Addr, ip.Addr.BitLen())},
 				IPFamily: ipFamily,
