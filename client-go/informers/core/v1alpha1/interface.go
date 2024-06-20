@@ -35,6 +35,10 @@ type Interface interface {
 	NetworkIDs() NetworkIDInformer
 	// NetworkInterfaces returns a NetworkInterfaceInformer.
 	NetworkInterfaces() NetworkInterfaceInformer
+	// NetworkPolicies returns a NetworkPolicyInformer.
+	NetworkPolicies() NetworkPolicyInformer
+	// NetworkPolicyRules returns a NetworkPolicyRuleInformer.
+	NetworkPolicyRules() NetworkPolicyRuleInformer
 	// Nodes returns a NodeInformer.
 	Nodes() NodeInformer
 }
@@ -108,6 +112,16 @@ func (v *version) NetworkIDs() NetworkIDInformer {
 // NetworkInterfaces returns a NetworkInterfaceInformer.
 func (v *version) NetworkInterfaces() NetworkInterfaceInformer {
 	return &networkInterfaceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// NetworkPolicies returns a NetworkPolicyInformer.
+func (v *version) NetworkPolicies() NetworkPolicyInformer {
+	return &networkPolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// NetworkPolicyRules returns a NetworkPolicyRuleInformer.
+func (v *version) NetworkPolicyRules() NetworkPolicyRuleInformer {
+	return &networkPolicyRuleInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // Nodes returns a NodeInformer.

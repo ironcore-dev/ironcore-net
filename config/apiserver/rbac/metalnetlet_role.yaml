@@ -123,6 +123,22 @@ rules:
 - apiGroups:
   - core.apinet.ironcore.dev
   resources:
+  - networkpolicies
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.apinet.ironcore.dev
+  resources:
+  - networkpolicyrules
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.apinet.ironcore.dev
+  resources:
   - networks
   verbs:
   - get

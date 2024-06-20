@@ -109,6 +109,32 @@ rules:
 - apiGroups:
   - core.apinet.ironcore.dev
   resources:
+  - networkpolicies
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.apinet.ironcore.dev
+  resources:
+  - networkpolicyrules
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.apinet.ironcore.dev
+  resources:
   - networks
   verbs:
   - create

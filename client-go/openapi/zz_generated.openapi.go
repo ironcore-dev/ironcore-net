@@ -30,6 +30,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPAddressClaimRef":           schema_ironcore_net_api_core_v1alpha1_IPAddressClaimRef(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPAddressList":               schema_ironcore_net_api_core_v1alpha1_IPAddressList(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPAddressSpec":               schema_ironcore_net_api_core_v1alpha1_IPAddressSpec(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPBlock":                     schema_ironcore_net_api_core_v1alpha1_IPBlock(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPClaimRef":                  schema_ironcore_net_api_core_v1alpha1_IPClaimRef(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPList":                      schema_ironcore_net_api_core_v1alpha1_IPList(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPSpec":                      schema_ironcore_net_api_core_v1alpha1_IPSpec(ref),
@@ -51,6 +52,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.LoadBalancerSpec":            schema_ironcore_net_api_core_v1alpha1_LoadBalancerSpec(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.LoadBalancerStatus":          schema_ironcore_net_api_core_v1alpha1_LoadBalancerStatus(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.LoadBalancerTargetRef":       schema_ironcore_net_api_core_v1alpha1_LoadBalancerTargetRef(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.LocalUIDReference":           schema_ironcore_net_api_core_v1alpha1_LocalUIDReference(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NATGateway":                  schema_ironcore_net_api_core_v1alpha1_NATGateway(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NATGatewayAutoscaler":        schema_ironcore_net_api_core_v1alpha1_NATGatewayAutoscaler(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NATGatewayAutoscalerList":    schema_ironcore_net_api_core_v1alpha1_NATGatewayAutoscalerList(ref),
@@ -80,6 +82,15 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkList":                 schema_ironcore_net_api_core_v1alpha1_NetworkList(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPeering":              schema_ironcore_net_api_core_v1alpha1_NetworkPeering(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPeeringStatus":        schema_ironcore_net_api_core_v1alpha1_NetworkPeeringStatus(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicy":               schema_ironcore_net_api_core_v1alpha1_NetworkPolicy(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyEgressRule":     schema_ironcore_net_api_core_v1alpha1_NetworkPolicyEgressRule(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyIngressRule":    schema_ironcore_net_api_core_v1alpha1_NetworkPolicyIngressRule(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyList":           schema_ironcore_net_api_core_v1alpha1_NetworkPolicyList(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPeer":           schema_ironcore_net_api_core_v1alpha1_NetworkPolicyPeer(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPort":           schema_ironcore_net_api_core_v1alpha1_NetworkPolicyPort(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyRule":           schema_ironcore_net_api_core_v1alpha1_NetworkPolicyRule(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyRuleList":       schema_ironcore_net_api_core_v1alpha1_NetworkPolicyRuleList(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicySpec":           schema_ironcore_net_api_core_v1alpha1_NetworkPolicySpec(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkSpec":                 schema_ironcore_net_api_core_v1alpha1_NetworkSpec(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkStatus":               schema_ironcore_net_api_core_v1alpha1_NetworkStatus(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.Node":                        schema_ironcore_net_api_core_v1alpha1_Node(ref),
@@ -90,7 +101,11 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NodeSelectorTerm":            schema_ironcore_net_api_core_v1alpha1_NodeSelectorTerm(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NodeSpec":                    schema_ironcore_net_api_core_v1alpha1_NodeSpec(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NodeStatus":                  schema_ironcore_net_api_core_v1alpha1_NodeStatus(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.ObjectIP":                    schema_ironcore_net_api_core_v1alpha1_ObjectIP(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.ObjectSelector":              schema_ironcore_net_api_core_v1alpha1_ObjectSelector(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.PCIAddress":                  schema_ironcore_net_api_core_v1alpha1_PCIAddress(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.Rule":                        schema_ironcore_net_api_core_v1alpha1_Rule(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.TargetNetworkInterface":      schema_ironcore_net_api_core_v1alpha1_TargetNetworkInterface(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.TopologySpreadConstraint":    schema_ironcore_net_api_core_v1alpha1_TopologySpreadConstraint(ref),
 		"github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP":                       schema_ironcore_net_apimachinery_api_net_IP(ref),
 		"github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix":                 schema_ironcore_net_apimachinery_api_net_IPPrefix(ref),
@@ -739,6 +754,41 @@ func schema_ironcore_net_api_core_v1alpha1_IPAddressSpec(ref common.ReferenceCal
 		},
 		Dependencies: []string{
 			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPAddressClaimRef", "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"},
+	}
+}
+
+func schema_ironcore_net_api_core_v1alpha1_IPBlock(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "IPBlock specifies an ip block with optional exceptions.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"cidr": {
+						SchemaProps: spec.SchemaProps{
+							Description: "CIDR is a string representing the ip block.",
+							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"),
+						},
+					},
+					"except": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Except is a slice of CIDRs that should not be included within the specified CIDR. Values will be rejected if they are outside CIDR.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"cidr"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"},
 	}
 }
 
@@ -1606,6 +1656,41 @@ func schema_ironcore_net_api_core_v1alpha1_LoadBalancerTargetRef(ref common.Refe
 		},
 		Dependencies: []string{
 			"k8s.io/api/core/v1.LocalObjectReference"},
+	}
+}
+
+func schema_ironcore_net_api_core_v1alpha1_LocalUIDReference(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "LocalUIDReference is a reference to another entity including its UID",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the referenced entity.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"uid": {
+						SchemaProps: spec.SchemaProps{
+							Description: "UID is the UID of the referenced entity.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name", "uid"},
+			},
+			VendorExtensible: spec.VendorExtensible{
+				Extensions: spec.Extensions{
+					"x-kubernetes-map-type": "atomic",
+				},
+			},
+		},
 	}
 }
 
@@ -2826,6 +2911,464 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkPeeringStatus(ref common.Refer
 	}
 }
 
+func schema_ironcore_net_api_core_v1alpha1_NetworkPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicy is the Schema for the networkpolicies API.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicySpec"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicySpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_ironcore_net_api_core_v1alpha1_NetworkPolicyEgressRule(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicyEgressRule describes a rule to regulate egress traffic with.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"ports": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Ports specifies the list of destination ports that can be called with this rule. Each item in this list is combined using a logical OR. Empty matches all ports. As soon as a single item is present, only these ports are allowed.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPort"),
+									},
+								},
+							},
+						},
+					},
+					"to": {
+						SchemaProps: spec.SchemaProps{
+							Description: "To specifies the list of destinations which the selected network interfaces should be able to send traffic to. Fields are combined using a logical OR. Empty matches all destinations. As soon as a single item is present, only these peers are allowed.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPeer"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPeer", "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPort"},
+	}
+}
+
+func schema_ironcore_net_api_core_v1alpha1_NetworkPolicyIngressRule(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicyIngressRule describes a rule to regulate ingress traffic with.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"from": {
+						SchemaProps: spec.SchemaProps{
+							Description: "From specifies the list of sources which should be able to send traffic to the selected network interfaces. Fields are combined using a logical OR. Empty matches all sources. As soon as a single item is present, only these peers are allowed.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPeer"),
+									},
+								},
+							},
+						},
+					},
+					"ports": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Ports specifies the list of ports which should be made accessible for this rule. Each item in this list is combined using a logical OR. Empty matches all ports. As soon as a single item is present, only these ports are allowed.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPort"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPeer", "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPort"},
+	}
+}
+
+func schema_ironcore_net_api_core_v1alpha1_NetworkPolicyList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicyList contains a list of NetworkPolicy.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicy"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicy", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_ironcore_net_api_core_v1alpha1_NetworkPolicyPeer(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicyPeer describes a peer to allow traffic to / from.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"objectSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ObjectSelector selects peers with the given kind matching the label selector. Exclusive with other peer specifiers.",
+							Ref:         ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.ObjectSelector"),
+						},
+					},
+					"ipBlock": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IPBlock specifies the ip block from or to which network traffic may come.",
+							Ref:         ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPBlock"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPBlock", "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.ObjectSelector"},
+	}
+}
+
+func schema_ironcore_net_api_core_v1alpha1_NetworkPolicyPort(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicyPort describes a port to allow traffic on",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"protocol": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this field defaults to TCP.\n\nPossible enum values:\n - `\"SCTP\"` is the SCTP protocol.\n - `\"TCP\"` is the TCP protocol.\n - `\"UDP\"` is the UDP protocol.",
+							Type:        []string{"string"},
+							Format:      "",
+							Enum:        []interface{}{"SCTP", "TCP", "UDP"},
+						},
+					},
+					"port": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The port on the given protocol. If this field is not provided, this matches all port names and numbers. If present, only traffic on the specified protocol AND port will be matched.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"endPort": {
+						SchemaProps: spec.SchemaProps{
+							Description: "EndPort indicates that the range of ports from Port to EndPort, inclusive, should be allowed by the policy. This field cannot be defined if the port field is not defined. The endPort must be equal or greater than port.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_ironcore_net_api_core_v1alpha1_NetworkPolicyRule(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicyRule is the schema for the networkpolicyrules API.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"networkRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkRef is the network the load balancer is assigned to.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.LocalUIDReference"),
+						},
+					},
+					"targets": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Targets are the targets of the network policy.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.TargetNetworkInterface"),
+									},
+								},
+							},
+						},
+					},
+					"priority": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Priority is an optional field that specifies the order in which the policy is applied.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"ingressRule": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IngressRules are the ingress rules.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.Rule"),
+									},
+								},
+							},
+						},
+					},
+					"egressRule": {
+						SchemaProps: spec.SchemaProps{
+							Description: "EgressRules are the egress rules.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.Rule"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"networkRef"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.LocalUIDReference", "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.Rule", "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.TargetNetworkInterface", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_ironcore_net_api_core_v1alpha1_NetworkPolicyRuleList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NetworkPolicyRulesList contains a list of NetworkPolicyRule.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyRule"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyRule", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_ironcore_net_api_core_v1alpha1_NetworkPolicySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"networkRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkRef is the network to regulate using this policy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+					"networkInterfaceSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkInterfaceSelector selects the network interfaces that are subject to this policy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"),
+						},
+					},
+					"priority": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Priority is an optional field that specifies the order in which the policy is applied. Policies with higher \"order\" are applied after those with lower order.  If the order is omitted, it may be considered to be \"infinite\" - i.e. the policy will be applied last.  Policies with identical order will be applied in alphanumerical order based on the Policy \"Name\".",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"ingress": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Ingress specifies rules for ingress traffic.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyIngressRule"),
+									},
+								},
+							},
+						},
+					},
+					"egress": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Egress specifies rules for egress traffic.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyEgressRule"),
+									},
+								},
+							},
+						},
+					},
+					"policyTypes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "PolicyTypes specifies the types of policies this network policy contains.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"networkRef", "networkInterfaceSelector"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyEgressRule", "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyIngressRule", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelector"},
+	}
+}
+
 func schema_ironcore_net_api_core_v1alpha1_NetworkSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3142,6 +3685,88 @@ func schema_ironcore_net_api_core_v1alpha1_NodeStatus(ref common.ReferenceCallba
 	}
 }
 
+func schema_ironcore_net_api_core_v1alpha1_ObjectIP(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"ipFamily": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IPFamily is the IPFamily of the prefix. If unset but Prefix is set, this can be inferred.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+							Type:        []string{"string"},
+							Format:      "",
+							Enum:        []interface{}{"", "IPv4", "IPv6"},
+						},
+					},
+					"prefix": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Prefix is the prefix of the IP.",
+							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"},
+	}
+}
+
+func schema_ironcore_net_api_core_v1alpha1_ObjectSelector(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ObjectSelector specifies how to select objects of a certain kind.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is the kind of object to select.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"matchLabels": {
+						SchemaProps: spec.SchemaProps{
+							Description: "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"matchExpressions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelectorRequirement"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"kind"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.LabelSelectorRequirement"},
+	}
+}
+
 func schema_ironcore_net_api_core_v1alpha1_PCIAddress(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3176,6 +3801,90 @@ func schema_ironcore_net_api_core_v1alpha1_PCIAddress(ref common.ReferenceCallba
 				},
 			},
 		},
+	}
+}
+
+func schema_ironcore_net_api_core_v1alpha1_Rule(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"ipBlock": {
+						SchemaProps: spec.SchemaProps{
+							Description: "CIDRBlock specifies the CIDR block from which network traffic may come or go.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPBlock"),
+									},
+								},
+							},
+						},
+					},
+					"ips": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ObjectIPs are the object IPs the rule applies to.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.ObjectIP"),
+									},
+								},
+							},
+						},
+					},
+					"networkPolicyPorts": {
+						SchemaProps: spec.SchemaProps{
+							Description: "NetworkPolicyPorts are the protocol type and ports.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPort"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPBlock", "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPort", "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.ObjectIP"},
+	}
+}
+
+func schema_ironcore_net_api_core_v1alpha1_TargetNetworkInterface(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TargetNetworkInterface is the target of the network policy.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"ip": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IP is the IP address of the target network interface.",
+							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
+						},
+					},
+					"targetRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "TargetRef is the target providing the destination.",
+							Ref:         ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.LocalUIDReference"),
+						},
+					},
+				},
+				Required: []string{"ip"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.LocalUIDReference", "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"},
 	}
 }
 

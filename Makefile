@@ -112,7 +112,7 @@ ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 test-only: envtest ## Only run tests.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./... -coverprofile cover.out
 
-.PHONY: openapi-extractor
+.PHONY: extract-openapi
 extract-openapi: envtest openapi-extractor
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" $(OPENAPI_EXTRACTOR) \
 		--apiserver-package="github.com/ironcore-dev/ironcore-net/cmd/apiserver" \

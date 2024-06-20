@@ -64,6 +64,9 @@ var _ = Describe("NetworkInterfaceController", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "nic-",
+				Labels: map[string]string{
+					"app": "test",
+				},
 			},
 			Spec: networkingv1alpha1.NetworkInterfaceSpec{
 				ProviderID: provider.GetNetworkInterfaceID(apiNetNs.Name, apiNetNic.Name, "node", apiNetNic.UID),
@@ -81,6 +84,7 @@ var _ = Describe("NetworkInterfaceController", func() {
 
 		By("waiting for the APINet network interface to be claimed")
 		Eventually(Object(apiNetNic)).Should(SatisfyAll(
+			HaveField("Labels", HaveKeyWithValue("app", "test")),
 			HaveField("Spec.PublicIPs", ConsistOf(HaveField("IP", net.IP{Addr: publicIP.Addr}))),
 			WithTransform(func(apiNetNic *apinetv1alpha1.NetworkInterface) *apinetletclient.SourceObjectData {
 				return apinetletclient.SourceObjectDataFromObject(

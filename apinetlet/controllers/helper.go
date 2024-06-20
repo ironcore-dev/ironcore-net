@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -25,6 +26,17 @@ func getAPINetNetworkName(ctx context.Context, c client.Client, networkKey clien
 		return "", nil
 	}
 	return string(network.UID), nil
+}
+
+func getApiNetNetwork(ctx context.Context, c client.Client, apiNetNetworkKey client.ObjectKey) (*apinetv1alpha1.Network, error) {
+	network := &apinetv1alpha1.Network{}
+	if err := c.Get(ctx, apiNetNetworkKey, network); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return nil, fmt.Errorf("error getting apiNetNetwork %s: %w", apiNetNetworkKey.Name, err)
+		}
+		return nil, nil
+	}
+	return network, nil
 }
 
 func isPrefixAllocated(prefix *ipamv1alpha1.Prefix) bool {

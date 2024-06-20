@@ -46,6 +46,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &corev1alpha1.IPAddressClaimRefApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("IPAddressSpec"):
 		return &corev1alpha1.IPAddressSpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("IPBlock"):
+		return &corev1alpha1.IPBlockApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("IPClaimRef"):
 		return &corev1alpha1.IPClaimRefApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("IPSpec"):
@@ -66,6 +68,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &corev1alpha1.LoadBalancerStatusApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("LoadBalancerTargetRef"):
 		return &corev1alpha1.LoadBalancerTargetRefApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("LocalUIDReference"):
+		return &corev1alpha1.LocalUIDReferenceApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("NATGateway"):
 		return &corev1alpha1.NATGatewayApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("NATGatewayAutoscaler"):
@@ -110,6 +114,20 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &corev1alpha1.NetworkPeeringApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("NetworkPeeringStatus"):
 		return &corev1alpha1.NetworkPeeringStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("NetworkPolicy"):
+		return &corev1alpha1.NetworkPolicyApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("NetworkPolicyEgressRule"):
+		return &corev1alpha1.NetworkPolicyEgressRuleApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("NetworkPolicyIngressRule"):
+		return &corev1alpha1.NetworkPolicyIngressRuleApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("NetworkPolicyPeer"):
+		return &corev1alpha1.NetworkPolicyPeerApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("NetworkPolicyPort"):
+		return &corev1alpha1.NetworkPolicyPortApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("NetworkPolicyRule"):
+		return &corev1alpha1.NetworkPolicyRuleApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("NetworkPolicySpec"):
+		return &corev1alpha1.NetworkPolicySpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("NetworkSpec"):
 		return &corev1alpha1.NetworkSpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("NetworkStatus"):
@@ -124,8 +142,16 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &corev1alpha1.NodeSelectorRequirementApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("NodeSelectorTerm"):
 		return &corev1alpha1.NodeSelectorTermApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ObjectIP"):
+		return &corev1alpha1.ObjectIPApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ObjectSelector"):
+		return &corev1alpha1.ObjectSelectorApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("PCIAddress"):
 		return &corev1alpha1.PCIAddressApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("Rule"):
+		return &corev1alpha1.RuleApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("TargetNetworkInterface"):
+		return &corev1alpha1.TargetNetworkInterfaceApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("TopologySpreadConstraint"):
 		return &corev1alpha1.TopologySpreadConstraintApplyConfiguration{}
 
