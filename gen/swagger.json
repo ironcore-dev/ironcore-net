@@ -62071,7 +62071,7 @@
 					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
 				},
 				"networkRef": {
-					"description": "NetworkRef is the network the load balancer is assigned to.",
+					"description": "NetworkRef is the network to which network policy is applied.",
 					"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LocalUIDReference"
 				},
 				"priority": {

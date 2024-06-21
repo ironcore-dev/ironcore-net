@@ -17,7 +17,7 @@ type NetworkPolicyRule struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// NetworkRef is the network the load balancer is assigned to.
+	// NetworkRef is the network to which network policy is applied.
 	NetworkRef LocalUIDReference `json:"networkRef"`
 	// Targets are the targets of the network policy.
 	Targets []TargetNetworkInterface `json:"targets,omitempty"`
