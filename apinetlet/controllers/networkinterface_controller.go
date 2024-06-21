@@ -222,7 +222,18 @@ func (s *apiNetNetworkInterfaceClaimStrategy) ClaimState(claimer client.Object, 
 func (s *apiNetNetworkInterfaceClaimStrategy) Adopt(ctx context.Context, claimer client.Object, obj client.Object) error {
 	apiNetNic := obj.(*apinetv1alpha1.NetworkInterface)
 	base := apiNetNic.DeepCopy()
-	metautils.SetLabels(apiNetNic, apinetletclient.SourceLabels(s.Scheme(), s.RESTMapper(), claimer))
+	combinedLabels := make(map[string]string)
+	if claimerLabels := claimer.GetLabels(); claimerLabels != nil {
+		for key, value := range claimerLabels {
+			combinedLabels[key] = value
+		}
+	}
+	if sourceLabels := apinetletclient.SourceLabels(s.Scheme(), s.RESTMapper(), claimer); sourceLabels != nil {
+		for key, value := range sourceLabels {
+			combinedLabels[key] = value
+		}
+	}
+	apiNetNic.SetLabels(combinedLabels)
 	return s.Patch(ctx, apiNetNic, client.StrategicMergeFrom(base))
 }
 

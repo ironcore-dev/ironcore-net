@@ -54,6 +54,10 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&NetworkIDList{},
 		&NetworkInterface{},
 		&NetworkInterfaceList{},
+		&NetworkPolicy{},
+		&NetworkPolicyList{},
+		&NetworkPolicyRule{},
+		&NetworkPolicyRuleList{},
 		&Node{},
 		&NodeList{},
 	)

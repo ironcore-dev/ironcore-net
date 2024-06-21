@@ -8,7 +8,9 @@ import (
 	"sort"
 
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/equality"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -35,6 +37,12 @@ var IPFamilies = sets.New(
 	corev1.IPv6Protocol,
 )
 
+var supportedProtocols = sets.New(
+	corev1.ProtocolTCP,
+	corev1.ProtocolUDP,
+	corev1.ProtocolSCTP,
+)
+
 func ValidateIPFamily(ipFamily corev1.IPFamily, fldPath *field.Path) field.ErrorList {
 	return ValidateEnum(IPFamilies, ipFamily, fldPath, "must specify IP family")
 }
@@ -45,4 +53,16 @@ func ValidateIPMatchesFamily(ip net.IP, ipFamily corev1.IPFamily, fldPath *field
 		allErrs = append(allErrs, field.Invalid(fldPath, ip, fmt.Sprintf("IP should have family %s", ipFamily)))
 	}
 	return allErrs
+}
+
+func ValidateImmutableField(newVal, oldVal interface{}, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+	if !equality.Semantic.DeepEqual(oldVal, newVal) {
+		allErrs = append(allErrs, field.Forbidden(fldPath, validation.FieldImmutableErrorMsg))
+	}
+	return allErrs
+}
+
+func ValidateProtocol(protocol corev1.Protocol, fldPath *field.Path) field.ErrorList {
+	return ValidateEnum(supportedProtocols, protocol, fldPath, "must specify protocol")
 }

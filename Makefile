@@ -112,7 +112,7 @@ ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 test-only: envtest ## Only run tests.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./... -coverprofile cover.out
 
-.PHONY: openapi-extractor
+.PHONY: extract-openapi
 extract-openapi: envtest openapi-extractor
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" $(OPENAPI_EXTRACTOR) \
 		--apiserver-package="github.com/ironcore-dev/ironcore-net/cmd/apiserver" \
@@ -349,11 +349,11 @@ GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 KUSTOMIZE_VERSION ?= v5.1.1
 CODE_GENERATOR_VERSION ?= v0.29.0
 VGOPATH_VERSION ?= v0.1.3
-CONTROLLER_TOOLS_VERSION ?= v0.13.0
+CONTROLLER_TOOLS_VERSION ?= v0.14.0
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.1
-GOIMPORTS_VERSION ?= v0.13.0
-GOLANGCI_LINT_VERSION ?= v1.56.0
+GOIMPORTS_VERSION ?= v0.20.0
+GOLANGCI_LINT_VERSION ?= v1.57.2
 OPENAPI_EXTRACTOR_VERSION ?= v0.1.4
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"

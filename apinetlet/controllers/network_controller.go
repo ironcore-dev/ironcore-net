@@ -6,6 +6,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
@@ -114,9 +115,10 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 	return ctrl.Result{Requeue: true}, nil
 }
 
-func (r *NetworkReconciler) updateNetworkStatus(ctx context.Context, network *networkingv1alpha1.Network, state networkingv1alpha1.NetworkState) error {
+func (r *NetworkReconciler) updateNetworkStatus(ctx context.Context, network *networkingv1alpha1.Network, apiNetNetwork *apinetv1alpha1.Network, state networkingv1alpha1.NetworkState) error {
 	networkBase := network.DeepCopy()
 	network.Status.State = state
+	network.Status.Peerings = apiNetNetworkPeeringsStatusToNetworkPeeringsStatus(apiNetNetwork.Status.Peerings, apiNetNetwork.Spec.Peerings)
 	if err := r.Status().Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
 		return fmt.Errorf("unable to patch network: %w", err)
 	}
@@ -139,7 +141,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	apiNetNetwork, err := r.applyAPINetNetwork(ctx, log, network)
 	if err != nil {
 		if network.Status.State != networkingv1alpha1.NetworkStateAvailable {
-			if err := r.updateNetworkStatus(ctx, network, networkingv1alpha1.NetworkStatePending); err != nil {
+			if err := r.updateNetworkStatus(ctx, network, apiNetNetwork, networkingv1alpha1.NetworkStatePending); err != nil {
 				log.Error(err, "Error updating network state")
 			}
 		}
@@ -159,9 +161,10 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	}
 
 	log.V(1).Info("Updating network status")
-	if err := r.updateNetworkStatus(ctx, network, networkingv1alpha1.NetworkStateAvailable); err != nil {
+	if err := r.updateNetworkStatus(ctx, network, apiNetNetwork, networkingv1alpha1.NetworkStateAvailable); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error updating network status: %w", err)
 	}
+	log.V(1).Info("Updated network status")
 
 	log.V(1).Info("Reconciled")
 	return ctrl.Result{}, nil
@@ -192,6 +195,27 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 			Labels:    apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), network),
 		},
 	}
+
+	var peerings []apinetv1alpha1.NetworkPeering
+	for _, peeringClaimRef := range network.Spec.PeeringClaimRefs {
+		log.V(1).Info("Get apinet network for target network")
+		targetApinetNetwork := &apinetv1alpha1.Network{}
+		if err := r.APINetClient.Get(ctx, client.ObjectKey{Namespace: r.APINetNamespace, Name: string(peeringClaimRef.UID)}, targetApinetNetwork); err != nil {
+			log.V(1).Info("target apinet network is not created yet")
+			break
+		}
+
+		idx := slices.IndexFunc(network.Spec.Peerings, func(peering networkingv1alpha1.NetworkPeering) bool {
+			return peering.NetworkRef.Name == peeringClaimRef.Name
+		})
+		if idx != -1 {
+			peerings = append(peerings, apinetv1alpha1.NetworkPeering{
+				Name: network.Spec.Peerings[idx].Name,
+				ID:   targetApinetNetwork.Spec.ID,
+			})
+		}
+	}
+	apiNetNetwork.Spec.Peerings = peerings
 
 	log.V(1).Info("Applying APINet network")
 	if err := r.APINetClient.Patch(ctx, apiNetNetwork, client.Apply, fieldOwner, client.ForceOwnership); err != nil {

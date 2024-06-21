@@ -8,17 +8,22 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	"github.com/google/uuid"
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	metalnetletclient "github.com/ironcore-dev/ironcore-net/metalnetlet/client"
 	utilhandler "github.com/ironcore-dev/ironcore-net/metalnetlet/handler"
+	netiputils "github.com/ironcore-dev/ironcore-net/utils/netip"
+	"github.com/ironcore-dev/ironcore/utils/generic"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
+
 	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -47,6 +52,8 @@ type NetworkInterfaceReconciler struct {
 //+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=loadbalancers,verbs=get;list;watch
 //+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=nattables,verbs=get;list;watch
 //+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=natgateways,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networkpolicies,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networkpolicyrules,verbs=get;list;watch
 
 //+cluster=metalnet:kubebuilder:rbac:groups=networking.metalnet.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch;create;update;patch;delete;deletecollection
 //+cluster=metalnet:kubebuilder:rbac:groups="",resources=nodes,verbs=get;list;watch
@@ -159,6 +166,130 @@ func (r *NetworkInterfaceReconciler) getLoadBalancerTargetsForNetworkInterface(c
 	ips := ipSet.UnsortedList()
 	slices.SortFunc(ips, func(ip1, ip2 net.IP) bool { return ip1.Compare(ip2.Addr) < 0 })
 	return ips, nil
+}
+
+func (r *NetworkInterfaceReconciler) getNetworkPolicyRulesForNetworkInterface(ctx context.Context, nic *v1alpha1.NetworkInterface) ([]metalnetv1alpha1.FirewallRule, error) {
+	var firewallRules []metalnetv1alpha1.FirewallRule
+
+	npRuleList := &v1alpha1.NetworkPolicyRuleList{}
+	if err := r.List(ctx, npRuleList,
+		client.InNamespace(nic.Namespace),
+	); err != nil {
+		return nil, fmt.Errorf("error listing network policy rules: %w", err)
+	}
+
+	for _, npRule := range npRuleList.Items {
+		hasDst := slices.ContainsFunc(npRule.Targets,
+			func(target v1alpha1.TargetNetworkInterface) bool {
+				return slices.Contains(nic.Spec.IPs, target.IP)
+			},
+		)
+		if hasDst {
+			rules := getFirewallRulesFromNetworkPolicyRule(&npRule)
+			firewallRules = append(firewallRules, rules...)
+		}
+	}
+
+	return firewallRules, nil
+}
+
+func getFirewallRulesFromNetworkPolicyRule(npRule *v1alpha1.NetworkPolicyRule) []metalnetv1alpha1.FirewallRule {
+	var firewallRules []metalnetv1alpha1.FirewallRule
+	priority := npRule.Priority
+
+	for _, ingressRule := range npRule.IngressRules {
+		rules := extractFirewallRulesFromRule(ingressRule, metalnetv1alpha1.FirewallRuleDirectionIngress, priority)
+		firewallRules = append(firewallRules, rules...)
+	}
+
+	for _, egressRule := range npRule.EgressRules {
+		rules := extractFirewallRulesFromRule(egressRule, metalnetv1alpha1.FirewallRuleDirectionEgress, priority)
+		firewallRules = append(firewallRules, rules...)
+	}
+
+	return firewallRules
+}
+
+func extractFirewallRulesFromRule(rule v1alpha1.Rule, direction metalnetv1alpha1.FirewallRuleDirection, priority *int32) []metalnetv1alpha1.FirewallRule {
+	var firewallRules []metalnetv1alpha1.FirewallRule
+
+	for _, port := range rule.NetworkPolicyPorts {
+		baseFirewallRule := metalnetv1alpha1.FirewallRule{
+			Direction:     direction,
+			Action:        metalnetv1alpha1.FirewallRuleActionAccept,
+			Priority:      priority,
+			ProtocolMatch: &metalnetv1alpha1.ProtocolMatch{},
+		}
+
+		switch *port.Protocol {
+		case corev1.ProtocolTCP:
+			baseFirewallRule.ProtocolMatch.ProtocolType = generic.Pointer(metalnetv1alpha1.FirewallRuleProtocolTypeTCP)
+		case corev1.ProtocolUDP:
+			baseFirewallRule.ProtocolMatch.ProtocolType = generic.Pointer(metalnetv1alpha1.FirewallRuleProtocolTypeUDP)
+			//TODO: no support for SCTP protocol in metalnetlet and metalnetlet FirewallRuleProtocolTypeICMP is not defined in ironcore
+		}
+
+		if port.Port != 0 {
+			if direction == metalnetv1alpha1.FirewallRuleDirectionIngress {
+				baseFirewallRule.ProtocolMatch.PortRange = &metalnetv1alpha1.PortMatch{SrcPort: &port.Port}
+			} else {
+				baseFirewallRule.ProtocolMatch.PortRange = &metalnetv1alpha1.PortMatch{DstPort: &port.Port}
+			}
+			if port.EndPort != nil {
+				if direction == metalnetv1alpha1.FirewallRuleDirectionIngress {
+					baseFirewallRule.ProtocolMatch.PortRange.EndSrcPort = *port.EndPort
+				} else {
+					baseFirewallRule.ProtocolMatch.PortRange.EndDstPort = *port.EndPort
+				}
+			}
+		}
+
+		for _, cidrBlock := range rule.CIDRBlock {
+			firewallRule := baseFirewallRule
+			firewallRule.FirewallRuleID = types.UID(uuid.New().String())
+			firewallRule.IpFamily = netiputils.GetIPFamilyFromPrefix(cidrBlock.CIDR)
+
+			if direction == metalnetv1alpha1.FirewallRuleDirectionIngress {
+				firewallRule.SourcePrefix = &metalnetv1alpha1.IPPrefix{Prefix: cidrBlock.CIDR.Prefix}
+			} else {
+				firewallRule.DestinationPrefix = &metalnetv1alpha1.IPPrefix{Prefix: cidrBlock.CIDR.Prefix}
+			}
+
+			firewallRules = append(firewallRules, firewallRule)
+
+			if len(cidrBlock.Except) > 0 {
+				for _, exceptCIDR := range cidrBlock.Except {
+					exceptFirewallRule := firewallRule
+					exceptFirewallRule.FirewallRuleID = types.UID(uuid.New().String())
+					exceptFirewallRule.Action = metalnetv1alpha1.FirewallRuleActionDeny
+
+					if direction == metalnetv1alpha1.FirewallRuleDirectionIngress {
+						exceptFirewallRule.SourcePrefix = &metalnetv1alpha1.IPPrefix{Prefix: exceptCIDR.Prefix}
+					} else {
+						exceptFirewallRule.DestinationPrefix = &metalnetv1alpha1.IPPrefix{Prefix: exceptCIDR.Prefix}
+					}
+
+					firewallRules = append(firewallRules, exceptFirewallRule)
+				}
+			}
+		}
+
+		for _, objectIP := range rule.ObjectIPs {
+			firewallRule := baseFirewallRule
+			firewallRule.FirewallRuleID = types.UID(uuid.New().String())
+			firewallRule.IpFamily = netiputils.GetIPFamilyFromPrefix(objectIP.Prefix)
+
+			if direction == metalnetv1alpha1.FirewallRuleDirectionIngress {
+				firewallRule.SourcePrefix = &metalnetv1alpha1.IPPrefix{Prefix: objectIP.Prefix.Prefix}
+			} else {
+				firewallRule.DestinationPrefix = &metalnetv1alpha1.IPPrefix{Prefix: objectIP.Prefix.Prefix}
+			}
+
+			firewallRules = append(firewallRules, firewallRule)
+		}
+	}
+
+	return firewallRules
 }
 
 func (r *NetworkInterfaceReconciler) getNATDetailsForNetworkInterface(
@@ -345,6 +476,12 @@ func (r *NetworkInterfaceReconciler) applyMetalnetNic(ctx context.Context, log l
 		return nil, false, fmt.Errorf("error getting load balancer targets: %w", err)
 	}
 
+	log.V(1).Info("Getting network policy rules")
+	npRules, err := r.getNetworkPolicyRulesForNetworkInterface(ctx, nic)
+	if err != nil {
+		return nil, false, fmt.Errorf("error getting network policy rules: %w", err)
+	}
+
 	log.V(1).Info("Getting NAT IPs")
 	natIPs, err := r.getNATDetailsForNetworkInterface(ctx, nic)
 	if err != nil {
@@ -370,6 +507,7 @@ func (r *NetworkInterfaceReconciler) applyMetalnetNic(ctx context.Context, log l
 			LoadBalancerTargets: ipsToMetalnetIPPrefixes(targets),
 			NAT:                 workaroundMetalnetNoIPv6NATDetailsToNATDetailsPointer(natIPs),
 			NodeName:            &metalnetNodeName,
+			FirewallRules:       npRules,
 		},
 	}
 	log.V(1).Info("Applying metalnet network interface")
@@ -475,6 +613,69 @@ func (r *NetworkInterfaceReconciler) enqueueByLoadBalancer() handler.EventHandle
 	})
 }
 
+func (r *NetworkInterfaceReconciler) reconcileRequestsByNetworkPolicyRule(
+	ctx context.Context,
+	log logr.Logger,
+	networkPolicyRule *v1alpha1.NetworkPolicyRule,
+) []ctrl.Request {
+	nicList := &v1alpha1.NetworkInterfaceList{}
+	if err := r.List(ctx, nicList,
+		client.InNamespace(networkPolicyRule.Namespace),
+	); err != nil {
+		log.Error(err, "Error listing network interfaces")
+		return nil
+	}
+
+	metalnetNodeList := &corev1.NodeList{}
+	if err := r.MetalnetClient.List(ctx, metalnetNodeList); err != nil {
+		log.Error(err, "Error listing metalnet nodes")
+		return nil
+	}
+
+	targetIPs := utilslices.ToSetFunc(networkPolicyRule.Targets,
+		func(target v1alpha1.TargetNetworkInterface) net.IP { return target.IP },
+	)
+
+	var reqs []ctrl.Request
+	for _, nic := range nicList.Items {
+		if _, err := ParseNodeName(r.PartitionName, nic.Spec.NodeRef.Name); err != nil {
+			continue
+		}
+
+		if targetIPs.HasAny(nic.Spec.IPs...) {
+			reqs = append(reqs, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&nic)})
+		}
+	}
+	return reqs
+}
+
+func (r *NetworkInterfaceReconciler) enqueueByNetworkPolicyRule() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
+		networkPolicyRule := obj.(*v1alpha1.NetworkPolicyRule)
+		log := ctrl.LoggerFrom(ctx)
+
+		return r.reconcileRequestsByNetworkPolicyRule(ctx, log, networkPolicyRule)
+	})
+}
+
+func (r *NetworkInterfaceReconciler) enqueueByNetworkPolicy() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
+		networkPolicy := obj.(*v1alpha1.NetworkPolicy)
+		log := ctrl.LoggerFrom(ctx)
+
+		networkPolicyKey := client.ObjectKeyFromObject(networkPolicy)
+		networkPolicyRule := &v1alpha1.NetworkPolicyRule{}
+		if err := r.Get(ctx, networkPolicyKey, networkPolicyRule); err != nil {
+			if !apierrors.IsNotFound(err) {
+				log.Error(err, "Error getting network policy rule")
+			}
+			return nil
+		}
+
+		return r.reconcileRequestsByNetworkPolicyRule(ctx, log, networkPolicyRule)
+	})
+}
+
 func (r *NetworkInterfaceReconciler) enqueueByMetalnetNode() handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		metalnetNode := obj.(*corev1.Node)
@@ -518,6 +719,14 @@ func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager, metalnet
 		Watches(
 			&v1alpha1.LoadBalancerRouting{},
 			r.enqueueByLoadBalancerRouting(),
+		).
+		Watches(
+			&v1alpha1.NetworkPolicy{},
+			r.enqueueByNetworkPolicy(),
+		).
+		Watches(
+			&v1alpha1.NetworkPolicyRule{},
+			r.enqueueByNetworkPolicyRule(),
 		).
 		WatchesRawSource(
 			source.Kind(metalnetCache, &metalnetv1alpha1.NetworkInterface{}),

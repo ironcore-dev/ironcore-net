@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/netip"
 
-	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	"github.com/ironcore-dev/ironcore/utils/generic"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
@@ -43,16 +43,16 @@ func ipsIPFamilies(ips []net.IP) []corev1.IPFamily {
 	return utilslices.Map(ips, net.IP.Family)
 }
 
-func metalnetNetworkInterfaceStateToNetworkInterfaceStatus(mStatus metalnetv1alpha1.NetworkInterfaceState) v1alpha1.NetworkInterfaceState {
+func metalnetNetworkInterfaceStateToNetworkInterfaceStatus(mStatus metalnetv1alpha1.NetworkInterfaceState) apinetv1alpha1.NetworkInterfaceState {
 	switch mStatus {
 	case metalnetv1alpha1.NetworkInterfaceStatePending:
-		return v1alpha1.NetworkInterfaceStatePending
+		return apinetv1alpha1.NetworkInterfaceStatePending
 	case metalnetv1alpha1.NetworkInterfaceStateReady:
-		return v1alpha1.NetworkInterfaceStateReady
+		return apinetv1alpha1.NetworkInterfaceStateReady
 	case metalnetv1alpha1.NetworkInterfaceStateError:
-		return v1alpha1.NetworkInterfaceStateError
+		return apinetv1alpha1.NetworkInterfaceStateError
 	default:
-		return v1alpha1.NetworkInterfaceStatePending
+		return apinetv1alpha1.NetworkInterfaceStatePending
 	}
 }
 
@@ -72,18 +72,18 @@ func metalnetIPPrefixesToIPPrefixes(prefixes []metalnetv1alpha1.IPPrefix) []net.
 	return utilslices.Map(prefixes, metalnetIPPrefixToIPPrefix)
 }
 
-func loadBalancerTypeToMetalnetLoadBalancerType(loadBalancerType v1alpha1.LoadBalancerType) (metalnetv1alpha1.LoadBalancerType, error) {
+func loadBalancerTypeToMetalnetLoadBalancerType(loadBalancerType apinetv1alpha1.LoadBalancerType) (metalnetv1alpha1.LoadBalancerType, error) {
 	switch loadBalancerType {
-	case v1alpha1.LoadBalancerTypePublic:
+	case apinetv1alpha1.LoadBalancerTypePublic:
 		return metalnetv1alpha1.LoadBalancerTypePublic, nil
-	case v1alpha1.LoadBalancerTypeInternal:
+	case apinetv1alpha1.LoadBalancerTypeInternal:
 		return metalnetv1alpha1.LoadBalancerTypeInternal, nil
 	default:
 		return "", fmt.Errorf("unknown load balancer type %q", loadBalancerType)
 	}
 }
 
-func loadBalancerPortToMetalnetLoadBalancerPort(port v1alpha1.LoadBalancerPort) metalnetv1alpha1.LBPort {
+func loadBalancerPortToMetalnetLoadBalancerPort(port apinetv1alpha1.LoadBalancerPort) metalnetv1alpha1.LBPort {
 	protocol := generic.Deref(port.Protocol, corev1.ProtocolTCP)
 
 	return metalnetv1alpha1.LBPort{
@@ -92,7 +92,7 @@ func loadBalancerPortToMetalnetLoadBalancerPort(port v1alpha1.LoadBalancerPort) 
 	}
 }
 
-func loadBalancerPortsToMetalnetLoadBalancerPorts(ports []v1alpha1.LoadBalancerPort) []metalnetv1alpha1.LBPort {
+func loadBalancerPortsToMetalnetLoadBalancerPorts(ports []apinetv1alpha1.LoadBalancerPort) []metalnetv1alpha1.LBPort {
 	return utilslices.Map(ports, loadBalancerPortToMetalnetLoadBalancerPort)
 }
 
@@ -137,4 +137,15 @@ func workaroundMetalnetNoIPv6NATDetailsToNATDetailsPointer(natDetails []metalnet
 		}
 	}
 	return nil
+}
+
+func metalnetNetworkPeeringsStatusToNetworkPeeringsStatus(peerings []metalnetv1alpha1.NetworkPeeringStatus) []apinetv1alpha1.NetworkPeeringStatus {
+	return utilslices.Map(peerings, metalnetNetworkPeeringStatusToNetworkPeeringStatus)
+}
+
+func metalnetNetworkPeeringStatusToNetworkPeeringStatus(peering metalnetv1alpha1.NetworkPeeringStatus) apinetv1alpha1.NetworkPeeringStatus {
+	return apinetv1alpha1.NetworkPeeringStatus{
+		ID:    peering.ID,
+		State: apinetv1alpha1.NetworkPeeringState(peering.State),
+	}
 }

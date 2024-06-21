@@ -37262,6 +37262,960 @@
 				}
 			]
 		},
+		"/apis/core.apinet.ironcore.dev/v1alpha1/namespaces/{namespace}/networkpolicies": {
+			"get": {
+				"description": "list or watch objects of kind NetworkPolicy",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/json;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "listCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicy",
+				"parameters": [
+					{
+						"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+					},
+					{
+						"$ref": "#/parameters/continue-QfD61s0i"
+					},
+					{
+						"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+					},
+					{
+						"$ref": "#/parameters/labelSelector-5Zw57w4C"
+					},
+					{
+						"$ref": "#/parameters/limit-1NfNmdNH"
+					},
+					{
+						"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+					},
+					{
+						"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+					},
+					{
+						"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+					},
+					{
+						"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+					},
+					{
+						"$ref": "#/parameters/watch-XNNPZGbK"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyList"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "list",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"post": {
+				"description": "create a NetworkPolicy",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "createCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicy",
+				"parameters": [
+					{
+						"name": "body",
+						"in": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicy"
+						}
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-Qy4HdaTW"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicy"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicy"
+						}
+					},
+					"202": {
+						"description": "Accepted",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicy"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "post",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"delete": {
+				"description": "delete collection of NetworkPolicy",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNamespacedNetworkPolicy",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-2Y1dVQaQ"
+					},
+					{
+						"$ref": "#/parameters/continue-QfD61s0i"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+					},
+					{
+						"$ref": "#/parameters/gracePeriodSeconds--K5HaBOS"
+					},
+					{
+						"$ref": "#/parameters/labelSelector-5Zw57w4C"
+					},
+					{
+						"$ref": "#/parameters/limit-1NfNmdNH"
+					},
+					{
+						"$ref": "#/parameters/orphanDependents-uRB25kX5"
+					},
+					{
+						"$ref": "#/parameters/propagationPolicy-6jk3prlO"
+					},
+					{
+						"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+					},
+					{
+						"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+					},
+					{
+						"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+					},
+					{
+						"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "deletecollection",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/namespace-vgWSWtn3"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				}
+			]
+		},
+		"/apis/core.apinet.ironcore.dev/v1alpha1/namespaces/{namespace}/networkpolicies/{name}": {
+			"get": {
+				"description": "read the specified NetworkPolicy",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "readCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicy",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicy"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "get",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"put": {
+				"description": "replace the specified NetworkPolicy",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "replaceCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicy",
+				"parameters": [
+					{
+						"name": "body",
+						"in": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicy"
+						}
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-Qy4HdaTW"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicy"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicy"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "put",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"delete": {
+				"description": "delete a NetworkPolicy",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "deleteCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicy",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-2Y1dVQaQ"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/gracePeriodSeconds--K5HaBOS"
+					},
+					{
+						"$ref": "#/parameters/orphanDependents-uRB25kX5"
+					},
+					{
+						"$ref": "#/parameters/propagationPolicy-6jk3prlO"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+						}
+					},
+					"202": {
+						"description": "Accepted",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "delete",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"patch": {
+				"description": "partially update the specified NetworkPolicy",
+				"consumes": [
+					"application/json-patch+json",
+					"application/merge-patch+json",
+					"application/strategic-merge-patch+json",
+					"application/apply-patch+yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "patchCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicy",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-78PwaGsr"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-7c6nTn1T"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/force-tOGGb0Yi"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicy"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicy"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "patch",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"uniqueItems": true,
+					"type": "string",
+					"description": "name of the NetworkPolicy",
+					"name": "name",
+					"in": "path",
+					"required": true
+				},
+				{
+					"$ref": "#/parameters/namespace-vgWSWtn3"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				}
+			]
+		},
+		"/apis/core.apinet.ironcore.dev/v1alpha1/namespaces/{namespace}/networkpolicyrules": {
+			"get": {
+				"description": "list or watch objects of kind NetworkPolicyRule",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/json;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "listCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicyRule",
+				"parameters": [
+					{
+						"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+					},
+					{
+						"$ref": "#/parameters/continue-QfD61s0i"
+					},
+					{
+						"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+					},
+					{
+						"$ref": "#/parameters/labelSelector-5Zw57w4C"
+					},
+					{
+						"$ref": "#/parameters/limit-1NfNmdNH"
+					},
+					{
+						"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+					},
+					{
+						"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+					},
+					{
+						"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+					},
+					{
+						"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+					},
+					{
+						"$ref": "#/parameters/watch-XNNPZGbK"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRuleList"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "list",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicyRule",
+					"version": "v1alpha1"
+				}
+			},
+			"post": {
+				"description": "create a NetworkPolicyRule",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "createCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicyRule",
+				"parameters": [
+					{
+						"name": "body",
+						"in": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRule"
+						}
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-Qy4HdaTW"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRule"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRule"
+						}
+					},
+					"202": {
+						"description": "Accepted",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRule"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "post",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicyRule",
+					"version": "v1alpha1"
+				}
+			},
+			"delete": {
+				"description": "delete collection of NetworkPolicyRule",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNamespacedNetworkPolicyRule",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-2Y1dVQaQ"
+					},
+					{
+						"$ref": "#/parameters/continue-QfD61s0i"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+					},
+					{
+						"$ref": "#/parameters/gracePeriodSeconds--K5HaBOS"
+					},
+					{
+						"$ref": "#/parameters/labelSelector-5Zw57w4C"
+					},
+					{
+						"$ref": "#/parameters/limit-1NfNmdNH"
+					},
+					{
+						"$ref": "#/parameters/orphanDependents-uRB25kX5"
+					},
+					{
+						"$ref": "#/parameters/propagationPolicy-6jk3prlO"
+					},
+					{
+						"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+					},
+					{
+						"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+					},
+					{
+						"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+					},
+					{
+						"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "deletecollection",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicyRule",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/namespace-vgWSWtn3"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				}
+			]
+		},
+		"/apis/core.apinet.ironcore.dev/v1alpha1/namespaces/{namespace}/networkpolicyrules/{name}": {
+			"get": {
+				"description": "read the specified NetworkPolicyRule",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "readCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicyRule",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRule"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "get",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicyRule",
+					"version": "v1alpha1"
+				}
+			},
+			"put": {
+				"description": "replace the specified NetworkPolicyRule",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "replaceCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicyRule",
+				"parameters": [
+					{
+						"name": "body",
+						"in": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRule"
+						}
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-Qy4HdaTW"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRule"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRule"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "put",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicyRule",
+					"version": "v1alpha1"
+				}
+			},
+			"delete": {
+				"description": "delete a NetworkPolicyRule",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "deleteCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicyRule",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-2Y1dVQaQ"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/gracePeriodSeconds--K5HaBOS"
+					},
+					{
+						"$ref": "#/parameters/orphanDependents-uRB25kX5"
+					},
+					{
+						"$ref": "#/parameters/propagationPolicy-6jk3prlO"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+						}
+					},
+					"202": {
+						"description": "Accepted",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "delete",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicyRule",
+					"version": "v1alpha1"
+				}
+			},
+			"patch": {
+				"description": "partially update the specified NetworkPolicyRule",
+				"consumes": [
+					"application/json-patch+json",
+					"application/merge-patch+json",
+					"application/strategic-merge-patch+json",
+					"application/apply-patch+yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "patchCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicyRule",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-78PwaGsr"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-7c6nTn1T"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/force-tOGGb0Yi"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRule"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRule"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "patch",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicyRule",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"uniqueItems": true,
+					"type": "string",
+					"description": "name of the NetworkPolicyRule",
+					"name": "name",
+					"in": "path",
+					"required": true
+				},
+				{
+					"$ref": "#/parameters/namespace-vgWSWtn3"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				}
+			]
+		},
 		"/apis/core.apinet.ironcore.dev/v1alpha1/namespaces/{namespace}/networks": {
 			"get": {
 				"description": "list or watch objects of kind Network",
@@ -38646,6 +39600,150 @@
 				"x-kubernetes-group-version-kind": {
 					"group": "core.apinet.ironcore.dev",
 					"kind": "NetworkInterface",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+				},
+				{
+					"$ref": "#/parameters/continue-QfD61s0i"
+				},
+				{
+					"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+				},
+				{
+					"$ref": "#/parameters/labelSelector-5Zw57w4C"
+				},
+				{
+					"$ref": "#/parameters/limit-1NfNmdNH"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				},
+				{
+					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+				},
+				{
+					"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+				},
+				{
+					"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+				},
+				{
+					"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+				},
+				{
+					"$ref": "#/parameters/watch-XNNPZGbK"
+				}
+			]
+		},
+		"/apis/core.apinet.ironcore.dev/v1alpha1/networkpolicies": {
+			"get": {
+				"description": "list or watch objects of kind NetworkPolicy",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/json;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "listCoreApinetIroncoreDevV1alpha1NetworkPolicyForAllNamespaces",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyList"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "list",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+				},
+				{
+					"$ref": "#/parameters/continue-QfD61s0i"
+				},
+				{
+					"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+				},
+				{
+					"$ref": "#/parameters/labelSelector-5Zw57w4C"
+				},
+				{
+					"$ref": "#/parameters/limit-1NfNmdNH"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				},
+				{
+					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+				},
+				{
+					"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+				},
+				{
+					"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+				},
+				{
+					"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+				},
+				{
+					"$ref": "#/parameters/watch-XNNPZGbK"
+				}
+			]
+		},
+		"/apis/core.apinet.ironcore.dev/v1alpha1/networkpolicyrules": {
+			"get": {
+				"description": "list or watch objects of kind NetworkPolicyRule",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/json;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "listCoreApinetIroncoreDevV1alpha1NetworkPolicyRuleForAllNamespaces",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRuleList"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "list",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicyRule",
 					"version": "v1alpha1"
 				}
 			},
@@ -41346,6 +42444,322 @@
 				}
 			]
 		},
+		"/apis/core.apinet.ironcore.dev/v1alpha1/watch/namespaces/{namespace}/networkpolicies": {
+			"get": {
+				"description": "watch individual changes to a list of NetworkPolicy. deprecated: use the 'watch' parameter with a list operation instead.",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/json;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "watchCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicyList",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "watchlist",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+				},
+				{
+					"$ref": "#/parameters/continue-QfD61s0i"
+				},
+				{
+					"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+				},
+				{
+					"$ref": "#/parameters/labelSelector-5Zw57w4C"
+				},
+				{
+					"$ref": "#/parameters/limit-1NfNmdNH"
+				},
+				{
+					"$ref": "#/parameters/namespace-vgWSWtn3"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				},
+				{
+					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+				},
+				{
+					"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+				},
+				{
+					"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+				},
+				{
+					"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+				},
+				{
+					"$ref": "#/parameters/watch-XNNPZGbK"
+				}
+			]
+		},
+		"/apis/core.apinet.ironcore.dev/v1alpha1/watch/namespaces/{namespace}/networkpolicies/{name}": {
+			"get": {
+				"description": "watch changes to an object of kind NetworkPolicy. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/json;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "watchCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicy",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "watch",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+				},
+				{
+					"$ref": "#/parameters/continue-QfD61s0i"
+				},
+				{
+					"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+				},
+				{
+					"$ref": "#/parameters/labelSelector-5Zw57w4C"
+				},
+				{
+					"$ref": "#/parameters/limit-1NfNmdNH"
+				},
+				{
+					"uniqueItems": true,
+					"type": "string",
+					"description": "name of the NetworkPolicy",
+					"name": "name",
+					"in": "path",
+					"required": true
+				},
+				{
+					"$ref": "#/parameters/namespace-vgWSWtn3"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				},
+				{
+					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+				},
+				{
+					"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+				},
+				{
+					"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+				},
+				{
+					"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+				},
+				{
+					"$ref": "#/parameters/watch-XNNPZGbK"
+				}
+			]
+		},
+		"/apis/core.apinet.ironcore.dev/v1alpha1/watch/namespaces/{namespace}/networkpolicyrules": {
+			"get": {
+				"description": "watch individual changes to a list of NetworkPolicyRule. deprecated: use the 'watch' parameter with a list operation instead.",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/json;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "watchCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicyRuleList",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "watchlist",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicyRule",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+				},
+				{
+					"$ref": "#/parameters/continue-QfD61s0i"
+				},
+				{
+					"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+				},
+				{
+					"$ref": "#/parameters/labelSelector-5Zw57w4C"
+				},
+				{
+					"$ref": "#/parameters/limit-1NfNmdNH"
+				},
+				{
+					"$ref": "#/parameters/namespace-vgWSWtn3"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				},
+				{
+					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+				},
+				{
+					"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+				},
+				{
+					"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+				},
+				{
+					"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+				},
+				{
+					"$ref": "#/parameters/watch-XNNPZGbK"
+				}
+			]
+		},
+		"/apis/core.apinet.ironcore.dev/v1alpha1/watch/namespaces/{namespace}/networkpolicyrules/{name}": {
+			"get": {
+				"description": "watch changes to an object of kind NetworkPolicyRule. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/json;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "watchCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicyRule",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "watch",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicyRule",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+				},
+				{
+					"$ref": "#/parameters/continue-QfD61s0i"
+				},
+				{
+					"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+				},
+				{
+					"$ref": "#/parameters/labelSelector-5Zw57w4C"
+				},
+				{
+					"$ref": "#/parameters/limit-1NfNmdNH"
+				},
+				{
+					"uniqueItems": true,
+					"type": "string",
+					"description": "name of the NetworkPolicyRule",
+					"name": "name",
+					"in": "path",
+					"required": true
+				},
+				{
+					"$ref": "#/parameters/namespace-vgWSWtn3"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				},
+				{
+					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+				},
+				{
+					"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+				},
+				{
+					"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+				},
+				{
+					"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+				},
+				{
+					"$ref": "#/parameters/watch-XNNPZGbK"
+				}
+			]
+		},
 		"/apis/core.apinet.ironcore.dev/v1alpha1/watch/namespaces/{namespace}/networks": {
 			"get": {
 				"description": "watch individual changes to a list of Network. deprecated: use the 'watch' parameter with a list operation instead.",
@@ -41905,6 +43319,150 @@
 				"x-kubernetes-group-version-kind": {
 					"group": "core.apinet.ironcore.dev",
 					"kind": "NetworkInterface",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+				},
+				{
+					"$ref": "#/parameters/continue-QfD61s0i"
+				},
+				{
+					"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+				},
+				{
+					"$ref": "#/parameters/labelSelector-5Zw57w4C"
+				},
+				{
+					"$ref": "#/parameters/limit-1NfNmdNH"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				},
+				{
+					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+				},
+				{
+					"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+				},
+				{
+					"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+				},
+				{
+					"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+				},
+				{
+					"$ref": "#/parameters/watch-XNNPZGbK"
+				}
+			]
+		},
+		"/apis/core.apinet.ironcore.dev/v1alpha1/watch/networkpolicies": {
+			"get": {
+				"description": "watch individual changes to a list of NetworkPolicy. deprecated: use the 'watch' parameter with a list operation instead.",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/json;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "watchCoreApinetIroncoreDevV1alpha1NetworkPolicyListForAllNamespaces",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "watchlist",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+				},
+				{
+					"$ref": "#/parameters/continue-QfD61s0i"
+				},
+				{
+					"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+				},
+				{
+					"$ref": "#/parameters/labelSelector-5Zw57w4C"
+				},
+				{
+					"$ref": "#/parameters/limit-1NfNmdNH"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				},
+				{
+					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+				},
+				{
+					"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+				},
+				{
+					"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+				},
+				{
+					"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+				},
+				{
+					"$ref": "#/parameters/watch-XNNPZGbK"
+				}
+			]
+		},
+		"/apis/core.apinet.ironcore.dev/v1alpha1/watch/networkpolicyrules": {
+			"get": {
+				"description": "watch individual changes to a list of NetworkPolicyRule. deprecated: use the 'watch' parameter with a list operation instead.",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/json;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"coreApinetIroncoreDev_v1alpha1"
+				],
+				"operationId": "watchCoreApinetIroncoreDevV1alpha1NetworkPolicyRuleListForAllNamespaces",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "watchlist",
+				"x-kubernetes-group-version-kind": {
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicyRule",
 					"version": "v1alpha1"
 				}
 			},
@@ -59039,6 +60597,26 @@
 				}
 			}
 		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPBlock": {
+			"description": "IPBlock specifies an ip block with optional exceptions.",
+			"type": "object",
+			"required": [
+				"cidr"
+			],
+			"properties": {
+				"cidr": {
+					"description": "CIDR is a string representing the ip block.",
+					"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IPPrefix"
+				},
+				"except": {
+					"description": "Except is a slice of CIDRs that should not be included within the specified CIDR. Values will be rejected if they are outside CIDR.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IPPrefix"
+					}
+				}
+			}
+		},
 		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPClaimRef": {
 			"type": "object",
 			"properties": {
@@ -59556,6 +61134,25 @@
 					"type": "string"
 				}
 			}
+		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LocalUIDReference": {
+			"description": "LocalUIDReference is a reference to another entity including its UID",
+			"type": "object",
+			"required": [
+				"name",
+				"uid"
+			],
+			"properties": {
+				"name": {
+					"description": "Name is the name of the referenced entity.",
+					"type": "string"
+				},
+				"uid": {
+					"description": "UID is the UID of the referenced entity.",
+					"type": "string"
+				}
+			},
+			"x-kubernetes-map-type": "atomic"
 		},
 		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGateway": {
 			"description": "NATGateway is the schema for the natgateways API.",
@@ -60266,17 +61863,341 @@
 				}
 			]
 		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeering": {
+			"description": "NetworkPeering defines a network peering with another network.",
+			"type": "object",
+			"required": [
+				"name",
+				"id"
+			],
+			"properties": {
+				"id": {
+					"description": "ID is the ID of the network to peer with.",
+					"type": "string"
+				},
+				"name": {
+					"description": "Name is the semantical name of the network peering.",
+					"type": "string"
+				}
+			}
+		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeeringStatus": {
+			"description": "NetworkPeeringStatus is the status of a network peering.",
+			"type": "object",
+			"required": [
+				"id"
+			],
+			"properties": {
+				"id": {
+					"description": "ID is the ID of network",
+					"type": "integer",
+					"format": "int32"
+				},
+				"state": {
+					"description": "State represents the network peering state",
+					"type": "string"
+				}
+			}
+		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicy": {
+			"description": "NetworkPolicy is the Schema for the networkpolicies API.",
+			"type": "object",
+			"properties": {
+				"apiVersion": {
+					"description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+					"type": "string"
+				},
+				"kind": {
+					"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+					"type": "string"
+				},
+				"metadata": {
+					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+				},
+				"spec": {
+					"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicySpec"
+				}
+			},
+			"x-kubernetes-group-version-kind": [
+				{
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicy",
+					"version": "v1alpha1"
+				}
+			]
+		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyEgressRule": {
+			"description": "NetworkPolicyEgressRule describes a rule to regulate egress traffic with.",
+			"type": "object",
+			"properties": {
+				"ports": {
+					"description": "Ports specifies the list of destination ports that can be called with this rule. Each item in this list is combined using a logical OR. Empty matches all ports. As soon as a single item is present, only these ports are allowed.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyPort"
+					}
+				},
+				"to": {
+					"description": "To specifies the list of destinations which the selected network interfaces should be able to send traffic to. Fields are combined using a logical OR. Empty matches all destinations. As soon as a single item is present, only these peers are allowed.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyPeer"
+					}
+				}
+			}
+		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyIngressRule": {
+			"description": "NetworkPolicyIngressRule describes a rule to regulate ingress traffic with.",
+			"type": "object",
+			"properties": {
+				"from": {
+					"description": "From specifies the list of sources which should be able to send traffic to the selected network interfaces. Fields are combined using a logical OR. Empty matches all sources. As soon as a single item is present, only these peers are allowed.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyPeer"
+					}
+				},
+				"ports": {
+					"description": "Ports specifies the list of ports which should be made accessible for this rule. Each item in this list is combined using a logical OR. Empty matches all ports. As soon as a single item is present, only these ports are allowed.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyPort"
+					}
+				}
+			}
+		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyList": {
+			"description": "NetworkPolicyList contains a list of NetworkPolicy.",
+			"type": "object",
+			"required": [
+				"items"
+			],
+			"properties": {
+				"apiVersion": {
+					"description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+					"type": "string"
+				},
+				"items": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicy"
+					}
+				},
+				"kind": {
+					"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+					"type": "string"
+				},
+				"metadata": {
+					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+				}
+			},
+			"x-kubernetes-group-version-kind": [
+				{
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicyList",
+					"version": "v1alpha1"
+				}
+			]
+		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyPeer": {
+			"description": "NetworkPolicyPeer describes a peer to allow traffic to / from.",
+			"type": "object",
+			"properties": {
+				"ipBlock": {
+					"description": "IPBlock specifies the ip block from or to which network traffic may come.",
+					"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPBlock"
+				},
+				"objectSelector": {
+					"description": "ObjectSelector selects peers with the given kind matching the label selector. Exclusive with other peer specifiers.",
+					"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.ObjectSelector"
+				}
+			}
+		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyPort": {
+			"description": "NetworkPolicyPort describes a port to allow traffic on",
+			"type": "object",
+			"properties": {
+				"endPort": {
+					"description": "EndPort indicates that the range of ports from Port to EndPort, inclusive, should be allowed by the policy. This field cannot be defined if the port field is not defined. The endPort must be equal or greater than port.",
+					"type": "integer",
+					"format": "int32"
+				},
+				"port": {
+					"description": "The port on the given protocol. If this field is not provided, this matches all port names and numbers. If present, only traffic on the specified protocol AND port will be matched.",
+					"type": "integer",
+					"format": "int32"
+				},
+				"protocol": {
+					"description": "Protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this field defaults to TCP.\n\nPossible enum values:\n - `\"SCTP\"` is the SCTP protocol.\n - `\"TCP\"` is the TCP protocol.\n - `\"UDP\"` is the UDP protocol.",
+					"type": "string",
+					"enum": [
+						"SCTP",
+						"TCP",
+						"UDP"
+					]
+				}
+			}
+		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRule": {
+			"description": "NetworkPolicyRule is the schema for the networkpolicyrules API.",
+			"type": "object",
+			"required": [
+				"networkRef"
+			],
+			"properties": {
+				"apiVersion": {
+					"description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+					"type": "string"
+				},
+				"egressRule": {
+					"description": "EgressRules are the egress rules.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Rule"
+					}
+				},
+				"ingressRule": {
+					"description": "IngressRules are the ingress rules.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Rule"
+					}
+				},
+				"kind": {
+					"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+					"type": "string"
+				},
+				"metadata": {
+					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+				},
+				"networkRef": {
+					"description": "NetworkRef is the network the load balancer is assigned to.",
+					"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LocalUIDReference"
+				},
+				"priority": {
+					"description": "Priority is an optional field that specifies the order in which the policy is applied.",
+					"type": "integer",
+					"format": "int32"
+				},
+				"targets": {
+					"description": "Targets are the targets of the network policy.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.TargetNetworkInterface"
+					}
+				}
+			},
+			"x-kubernetes-group-version-kind": [
+				{
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicyRule",
+					"version": "v1alpha1"
+				}
+			]
+		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRuleList": {
+			"description": "NetworkPolicyRulesList contains a list of NetworkPolicyRule.",
+			"type": "object",
+			"required": [
+				"items"
+			],
+			"properties": {
+				"apiVersion": {
+					"description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+					"type": "string"
+				},
+				"items": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRule"
+					}
+				},
+				"kind": {
+					"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+					"type": "string"
+				},
+				"metadata": {
+					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+				}
+			},
+			"x-kubernetes-group-version-kind": [
+				{
+					"group": "core.apinet.ironcore.dev",
+					"kind": "NetworkPolicyRuleList",
+					"version": "v1alpha1"
+				}
+			]
+		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicySpec": {
+			"type": "object",
+			"required": [
+				"networkRef",
+				"networkInterfaceSelector"
+			],
+			"properties": {
+				"egress": {
+					"description": "Egress specifies rules for egress traffic.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyEgressRule"
+					}
+				},
+				"ingress": {
+					"description": "Ingress specifies rules for ingress traffic.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyIngressRule"
+					}
+				},
+				"networkInterfaceSelector": {
+					"description": "NetworkInterfaceSelector selects the network interfaces that are subject to this policy.",
+					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
+				},
+				"networkRef": {
+					"description": "NetworkRef is the network to regulate using this policy.",
+					"$ref": "#/definitions/io.k8s.api.core.v1.LocalObjectReference"
+				},
+				"policyTypes": {
+					"description": "PolicyTypes specifies the types of policies this network policy contains.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"priority": {
+					"description": "Priority is an optional field that specifies the order in which the policy is applied. Policies with higher \"order\" are applied after those with lower order.  If the order is omitted, it may be considered to be \"infinite\" - i.e. the policy will be applied last.  Policies with identical order will be applied in alphanumerical order based on the Policy \"Name\".",
+					"type": "integer",
+					"format": "int32"
+				}
+			}
+		},
 		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkSpec": {
 			"type": "object",
 			"properties": {
 				"id": {
 					"description": "ID is the ID of the network.",
 					"type": "string"
+				},
+				"peerings": {
+					"description": "Peerings are the network peerings with this network",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeering"
+					}
 				}
 			}
 		},
 		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkStatus": {
-			"type": "object"
+			"type": "object",
+			"properties": {
+				"peerings": {
+					"description": "Peerings contains the states of the network peerings for the network.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeeringStatus"
+					}
+				}
+			}
 		},
 		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node": {
 			"description": "Node is the schema for the nodes API.",
@@ -60416,6 +62337,51 @@
 		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NodeStatus": {
 			"type": "object"
 		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.ObjectIP": {
+			"type": "object",
+			"properties": {
+				"ipFamily": {
+					"description": "IPFamily is the IPFamily of the prefix. If unset but Prefix is set, this can be inferred.\n\nPossible enum values:\n - `\"\"` indicates that this IP is unknown protocol\n - `\"IPv4\"` indicates that this IP is IPv4 protocol\n - `\"IPv6\"` indicates that this IP is IPv6 protocol",
+					"type": "string",
+					"enum": [
+						"",
+						"IPv4",
+						"IPv6"
+					]
+				},
+				"prefix": {
+					"description": "Prefix is the prefix of the IP.",
+					"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IPPrefix"
+				}
+			}
+		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.ObjectSelector": {
+			"description": "ObjectSelector specifies how to select objects of a certain kind.",
+			"type": "object",
+			"required": [
+				"kind"
+			],
+			"properties": {
+				"kind": {
+					"description": "Kind is the kind of object to select.",
+					"type": "string"
+				},
+				"matchExpressions": {
+					"description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement"
+					}
+				},
+				"matchLabels": {
+					"description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+					"type": "object",
+					"additionalProperties": {
+						"type": "string"
+					}
+				}
+			}
+		},
 		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.PCIAddress": {
 			"description": "PCIAddress is a PCI address.",
 			"type": "object",
@@ -60431,6 +62397,49 @@
 				},
 				"slot": {
 					"type": "string"
+				}
+			}
+		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Rule": {
+			"type": "object",
+			"properties": {
+				"ipBlock": {
+					"description": "CIDRBlock specifies the CIDR block from which network traffic may come or go.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPBlock"
+					}
+				},
+				"ips": {
+					"description": "ObjectIPs are the object IPs the rule applies to.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.ObjectIP"
+					}
+				},
+				"networkPolicyPorts": {
+					"description": "NetworkPolicyPorts are the protocol type and ports.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyPort"
+					}
+				}
+			}
+		},
+		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.TargetNetworkInterface": {
+			"description": "TargetNetworkInterface is the target of the network policy.",
+			"type": "object",
+			"required": [
+				"ip"
+			],
+			"properties": {
+				"ip": {
+					"description": "IP is the IP address of the target network interface.",
+					"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
+				},
+				"targetRef": {
+					"description": "TargetRef is the target providing the destination.",
+					"$ref": "#/definitions/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LocalUIDReference"
 				}
 			}
 		},

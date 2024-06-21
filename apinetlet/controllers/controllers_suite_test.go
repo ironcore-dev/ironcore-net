@@ -11,6 +11,9 @@ import (
 
 	"github.com/ironcore-dev/controller-utils/buildutils"
 	"github.com/ironcore-dev/controller-utils/modutils"
+	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
+	apinetclient "github.com/ironcore-dev/ironcore-net/internal/client"
+
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
@@ -138,6 +141,9 @@ func SetupTest(apiNetNamespace *corev1.Namespace) *corev1.Namespace {
 		})
 		Expect(err).ToNot(HaveOccurred())
 
+		Expect(apinetletclient.SetupNetworkPolicyNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+		Expect(apinetclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, k8sManager.GetFieldIndexer())).To(Succeed())
+
 		apiNetInterface := ironcorenet.NewForConfigOrDie(cfg)
 
 		// register reconciler here
@@ -174,12 +180,20 @@ func SetupTest(apiNetNamespace *corev1.Namespace) *corev1.Namespace {
 			APINetNamespace: apiNetNamespace.Name,
 		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
 
+		Expect((&NetworkPolicyReconciler{
+			Client:          k8sManager.GetClient(),
+			APINetClient:    k8sManager.GetClient(),
+			APINetInterface: apiNetInterface,
+			APINetNamespace: apiNetNamespace.Name,
+		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
+
 		mgrCtx, cancel := context.WithCancel(context.Background())
 		DeferCleanup(cancel)
 		go func() {
 			defer GinkgoRecover()
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
 		}()
+
 	})
 
 	return apiNetNamespace

@@ -34,6 +34,10 @@ Resource Types:
 </li><li>
 <a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterface">NetworkInterface</a>
 </li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicy">NetworkPolicy</a>
+</li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyRule">NetworkPolicyRule</a>
+</li><li>
 <a href="#core.apinet.ironcore.dev/v1alpha1.Node">Node</a>
 </li></ul>
 <h3 id="core.apinet.ironcore.dev/v1alpha1.DaemonSet">DaemonSet
@@ -1098,6 +1102,17 @@ string
 <p>ID is the ID of the network.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>peeredIDs</code><br/>
+<em>
+[]string
+</em>
+</td>
+<td>
+<p>PeeredIDs are the IDs of networks to peer with.</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -1339,6 +1354,257 @@ NetworkInterfaceStatus
 </em>
 </td>
 <td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicy">NetworkPolicy
+</h3>
+<div>
+<p>NetworkPolicy is the Schema for the networkpolicies API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>NetworkPolicy</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicySpec">
+NetworkPolicySpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the network to regulate using this policy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaceSelector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaceSelector selects the network interfaces that are subject to this policy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>priority</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Priority is an optional field that specifies the order in which the policy is applied.
+Policies with higher &ldquo;order&rdquo; are applied after those with lower
+order.  If the order is omitted, it may be considered to be &ldquo;infinite&rdquo; - i.e. the
+policy will be applied last.  Policies with identical order will be applied in
+alphanumerical order based on the Policy &ldquo;Name&rdquo;.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ingress</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyIngressRule">
+[]NetworkPolicyIngressRule
+</a>
+</em>
+</td>
+<td>
+<p>Ingress specifies rules for ingress traffic.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>egress</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyEgressRule">
+[]NetworkPolicyEgressRule
+</a>
+</em>
+</td>
+<td>
+<p>Egress specifies rules for egress traffic.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>policyTypes</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.PolicyType">
+[]PolicyType
+</a>
+</em>
+</td>
+<td>
+<p>PolicyTypes specifies the types of policies this network policy contains.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicyRule">NetworkPolicyRule
+</h3>
+<div>
+<p>NetworkPolicyRule is the schema for the networkpolicyrules API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>NetworkPolicyRule</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LocalUIDReference">
+LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the network the load balancer is assigned to.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>targets</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.TargetNetworkInterface">
+[]TargetNetworkInterface
+</a>
+</em>
+</td>
+<td>
+<p>Targets are the targets of the network policy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>priority</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Priority is an optional field that specifies the order in which the policy is applied.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ingressRule</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.Rule">
+[]Rule
+</a>
+</em>
+</td>
+<td>
+<p>IngressRules are the ingress rules.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>egressRule</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.Rule">
+[]Rule
+</a>
+</em>
+</td>
+<td>
+<p>EgressRules are the egress rules.</p>
 </td>
 </tr>
 </tbody>
@@ -1634,6 +1900,51 @@ IPAddressClaimRef
 </em>
 </td>
 <td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.IPBlock">IPBlock
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPeer">NetworkPolicyPeer</a>, <a href="#core.apinet.ironcore.dev/v1alpha1.Rule">Rule</a>)
+</p>
+<div>
+<p>IPBlock specifies an ip block with optional exceptions.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>cidr</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IPPrefix">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>CIDR is a string representing the ip block.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>except</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IPPrefix">
+[]github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Except is a slice of CIDRs that should not be included within the specified CIDR.
+Values will be rejected if they are outside CIDR.</p>
 </td>
 </tr>
 </tbody>
@@ -2557,6 +2868,48 @@ Kubernetes core/v1.LocalObjectReference
 <td></td>
 </tr></tbody>
 </table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.LocalUIDReference">LocalUIDReference
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyRule">NetworkPolicyRule</a>)
+</p>
+<div>
+<p>LocalUIDReference is a reference to another entity including its UID</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the referenced entity.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+<p>UID is the UID of the referenced entity.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="core.apinet.ironcore.dev/v1alpha1.NATGatewayAutoscalerSpec">NATGatewayAutoscalerSpec
 </h3>
 <p>
@@ -3363,6 +3716,422 @@ PCIAddress
 </tr>
 </tbody>
 </table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPeeringState">NetworkPeeringState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus</a>)
+</p>
+<div>
+<p>NetworkPeeringState is the state a NetworkPeering can be in</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Error&#34;</p></td>
+<td><p>NetworkPeeringStateError signals that the network peering is in error state.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>NetworkPeeringStatePending signals that the network peering is not applied.</p>
+</td>
+</tr><tr><td><p>&#34;Ready&#34;</p></td>
+<td><p>NetworkPeeringStateReady signals that the network peering is ready.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkStatus">NetworkStatus</a>)
+</p>
+<div>
+<p>NetworkPeeringStatus is the status of a network peering.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the network peering.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>id</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>ID is the ID of network</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeeringState">
+NetworkPeeringState
+</a>
+</em>
+</td>
+<td>
+<p>State represents the network peering state</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicyEgressRule">NetworkPolicyEgressRule
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicySpec">NetworkPolicySpec</a>)
+</p>
+<div>
+<p>NetworkPolicyEgressRule describes a rule to regulate egress traffic with.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ports</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPort">
+[]NetworkPolicyPort
+</a>
+</em>
+</td>
+<td>
+<p>Ports specifies the list of destination ports that can be called with
+this rule. Each item in this list is combined using a logical OR. Empty matches all ports.
+As soon as a single item is present, only these ports are allowed.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>to</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPeer">
+[]NetworkPolicyPeer
+</a>
+</em>
+</td>
+<td>
+<p>To specifies the list of destinations which the selected network interfaces should be
+able to send traffic to. Fields are combined using a logical OR. Empty matches all destinations.
+As soon as a single item is present, only these peers are allowed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicyIngressRule">NetworkPolicyIngressRule
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicySpec">NetworkPolicySpec</a>)
+</p>
+<div>
+<p>NetworkPolicyIngressRule describes a rule to regulate ingress traffic with.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>from</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPeer">
+[]NetworkPolicyPeer
+</a>
+</em>
+</td>
+<td>
+<p>From specifies the list of sources which should be able to send traffic to the
+selected network interfaces. Fields are combined using a logical OR. Empty matches all sources.
+As soon as a single item is present, only these peers are allowed.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ports</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPort">
+[]NetworkPolicyPort
+</a>
+</em>
+</td>
+<td>
+<p>Ports specifies the list of ports which should be made accessible for
+this rule. Each item in this list is combined using a logical OR. Empty matches all ports.
+As soon as a single item is present, only these ports are allowed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPeer">NetworkPolicyPeer
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyEgressRule">NetworkPolicyEgressRule</a>, <a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyIngressRule">NetworkPolicyIngressRule</a>)
+</p>
+<div>
+<p>NetworkPolicyPeer describes a peer to allow traffic to / from.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>objectSelector</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.ObjectSelector">
+ObjectSelector
+</a>
+</em>
+</td>
+<td>
+<p>ObjectSelector selects peers with the given kind matching the label selector.
+Exclusive with other peer specifiers.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipBlock</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.IPBlock">
+IPBlock
+</a>
+</em>
+</td>
+<td>
+<p>IPBlock specifies the ip block from or to which network traffic may come.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPort">NetworkPolicyPort
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyEgressRule">NetworkPolicyEgressRule</a>, <a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyIngressRule">NetworkPolicyIngressRule</a>, <a href="#core.apinet.ironcore.dev/v1alpha1.Rule">Rule</a>)
+</p>
+<div>
+<p>NetworkPolicyPort describes a port to allow traffic on</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>protocol</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#protocol-v1-core">
+Kubernetes core/v1.Protocol
+</a>
+</em>
+</td>
+<td>
+<p>Protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this
+field defaults to TCP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>port</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>The port on the given protocol. If this field is not provided, this matches
+all port names and numbers.
+If present, only traffic on the specified protocol AND port will be matched.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>endPort</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>EndPort indicates that the range of ports from Port to EndPort, inclusive,
+should be allowed by the policy. This field cannot be defined if the port field
+is not defined. The endPort must be equal or greater than port.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicySpec">NetworkPolicySpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicy">NetworkPolicy</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the network to regulate using this policy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaceSelector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaceSelector selects the network interfaces that are subject to this policy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>priority</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Priority is an optional field that specifies the order in which the policy is applied.
+Policies with higher &ldquo;order&rdquo; are applied after those with lower
+order.  If the order is omitted, it may be considered to be &ldquo;infinite&rdquo; - i.e. the
+policy will be applied last.  Policies with identical order will be applied in
+alphanumerical order based on the Policy &ldquo;Name&rdquo;.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ingress</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyIngressRule">
+[]NetworkPolicyIngressRule
+</a>
+</em>
+</td>
+<td>
+<p>Ingress specifies rules for ingress traffic.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>egress</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyEgressRule">
+[]NetworkPolicyEgressRule
+</a>
+</em>
+</td>
+<td>
+<p>Egress specifies rules for egress traffic.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>policyTypes</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.PolicyType">
+[]PolicyType
+</a>
+</em>
+</td>
+<td>
+<p>PolicyTypes specifies the types of policies this network policy contains.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicyTargetRef">NetworkPolicyTargetRef
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.TargetNetworkInterface">TargetNetworkInterface</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+<p>UID is the UID of the target.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the target.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkSpec">NetworkSpec
 </h3>
 <p>
@@ -3389,8 +4158,24 @@ string
 <p>ID is the ID of the network.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>peeredIDs</code><br/>
+<em>
+[]string
+</em>
+</td>
+<td>
+<p>PeeredIDs are the IDs of networks to peer with.</p>
+</td>
+</tr>
 </tbody>
 </table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkState">NetworkState
+(<code>string</code> alias)</h3>
+<div>
+<p>NetworkState is the state of a network.</p>
+</div>
 <h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkStatus">NetworkStatus
 </h3>
 <p>
@@ -3398,6 +4183,29 @@ string
 </p>
 <div>
 </div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>peerings</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeeringStatus">
+[]NetworkPeeringStatus
+</a>
+</em>
+</td>
+<td>
+<p>Peerings contains the states of the network peerings for the network.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="core.apinet.ironcore.dev/v1alpha1.NodeAffinity">NodeAffinity
 </h3>
 <p>
@@ -3603,6 +4411,95 @@ Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.</p>
 </p>
 <div>
 </div>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.ObjectIP">ObjectIP
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.Rule">Rule</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ipFamily</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#ipfamily-v1-core">
+Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamily is the IPFamily of the prefix.
+If unset but Prefix is set, this can be inferred.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefix</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IPPrefix">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Prefix is the prefix of the IP.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.ObjectSelector">ObjectSelector
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPeer">NetworkPolicyPeer</a>)
+</p>
+<div>
+<p>ObjectSelector specifies how to select objects of a certain kind.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>kind</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Kind is the kind of object to select.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>LabelSelector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>
+(Members of <code>LabelSelector</code> are embedded into this type.)
+</p>
+<p>LabelSelector is the label selector to select objects of the specified Kind by.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="core.apinet.ironcore.dev/v1alpha1.PCIAddress">PCIAddress
 </h3>
 <p>
@@ -3657,6 +4554,129 @@ string
 </em>
 </td>
 <td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.PolicyType">PolicyType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicySpec">NetworkPolicySpec</a>)
+</p>
+<div>
+<p>PolicyType is a type of policy.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Egress&#34;</p></td>
+<td><p>PolicyTypeEgress is a policy that describes egress traffic.</p>
+</td>
+</tr><tr><td><p>&#34;Ingress&#34;</p></td>
+<td><p>PolicyTypeIngress is a policy that describes ingress traffic.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.Rule">Rule
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyRule">NetworkPolicyRule</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ipBlock</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.IPBlock">
+[]IPBlock
+</a>
+</em>
+</td>
+<td>
+<p>CIDRBlock specifies the CIDR block from which network traffic may come or go.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.ObjectIP">
+[]ObjectIP
+</a>
+</em>
+</td>
+<td>
+<p>ObjectIPs are the object IPs the rule applies to.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkPolicyPorts</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPort">
+[]NetworkPolicyPort
+</a>
+</em>
+</td>
+<td>
+<p>NetworkPolicyPorts are the protocol type and ports.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.TargetNetworkInterface">TargetNetworkInterface
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyRule">NetworkPolicyRule</a>)
+</p>
+<div>
+<p>TargetNetworkInterface is the target of the network policy.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+<p>IP is the IP address of the target network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>targetRef</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyTargetRef">
+NetworkPolicyTargetRef
+</a>
+</em>
+</td>
+<td>
+<p>TargetRef is the target providing the destination.</p>
 </td>
 </tr>
 </tbody>
