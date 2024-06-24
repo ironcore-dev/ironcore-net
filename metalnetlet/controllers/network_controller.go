@@ -155,6 +155,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 		},
 	}
 
+	peeredPrefixes := []metalnetv1alpha1.PeeredPrefix{}
 	for _, peering := range network.Spec.Peerings {
 		id, err := networkid.ParseVNI(peering.ID)
 		if err != nil {
@@ -162,7 +163,15 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 		}
 
 		metalnetNetwork.Spec.PeeredIDs = append(metalnetNetwork.Spec.PeeredIDs, id)
+		if peering.Prefixes != nil && len(*peering.Prefixes) > 0 {
+			peeredPrefix := metalnetv1alpha1.PeeredPrefix{
+				ID:       int32(id),
+				Prefixes: ipPrefixesToMetalnetPrefixes(*peering.Prefixes),
+			}
+			peeredPrefixes = append(peeredPrefixes, peeredPrefix)
+		}
 	}
+	metalnetNetwork.Spec.PeeredPrefixes = peeredPrefixes
 
 	if err := r.MetalnetClient.Patch(ctx, metalnetNetwork, client.Apply, MetalnetFieldOwner, client.ForceOwnership); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying network: %w", err)
