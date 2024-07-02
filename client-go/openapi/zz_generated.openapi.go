@@ -3178,7 +3178,7 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkPolicyRule(ref common.Referenc
 					},
 					"networkRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "NetworkRef is the network the load balancer is assigned to.",
+							Description: "NetworkRef is the network to which network policy is applied.",
 							Default:     map[string]interface{}{},
 							Ref:         ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.LocalUIDReference"),
 						},

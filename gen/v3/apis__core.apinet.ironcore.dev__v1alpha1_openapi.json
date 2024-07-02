@@ -23259,7 +23259,7 @@
 						]
 					},
 					"networkRef": {
-						"description": "NetworkRef is the network the load balancer is assigned to.",
+						"description": "NetworkRef is the network to which network policy is applied.",
 						"default": {},
 						"allOf": [
 							{

@@ -158,6 +158,53 @@ spec:
   template: {}
 ```
 
+### `NetworkPolicy`
+
+A `NetworkPolicy` limits traffic to and from various objects like `NetworkInterfaces`, `LoadBalancers` etc. for the target objects within a specific network. 
+
+When a `NetworkPolicy` is applied, a `NetworkPolicyRule` object is created to contain the policy rules specified in the `NetworkPolicy`. 
+
+Then, `metalnetlet` translates these policy rules from the `NetworkPolicyRule` object and applies them to the `NetworkInterface`s.
+
+Example manifest
+```yaml
+apiVersion: core.apinet.ironcore.dev/v1alpha1
+kind: NetworkPolicy
+metadata:
+  namespace: default
+  name: my-networkpolicy
+spec:
+  networkRef:
+    name: my-network
+  networkInterfaceSelector:
+    matchLabels:
+      app: db
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: 172.17.0.0/16
+    - objectSelector:
+        kind: NetworkInterface
+        matchLabels:
+    - objectSelector:
+        kind: LoadBalancer
+        matchLabels:
+          app: web
+    ports:
+    - protocol: TCP
+      port: 5432
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 10.0.0.0/24
+    ports:
+    - protocol: TCP
+      port: 8080
+```
+
 ## `NATGateway`
 
 A `NATGateway` allows NAT-ing external IPs to multiple target
