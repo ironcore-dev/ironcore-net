@@ -8,8 +8,9 @@ package v1alpha1
 // NetworkPeeringApplyConfiguration represents an declarative configuration of the NetworkPeering type for use
 // with apply.
 type NetworkPeeringApplyConfiguration struct {
-	Name *string `json:"name,omitempty"`
-	ID   *string `json:"id,omitempty"`
+	Name     *string                           `json:"name,omitempty"`
+	ID       *string                           `json:"id,omitempty"`
+	Prefixes []PeeringPrefixApplyConfiguration `json:"prefixes,omitempty"`
 }
 
 // NetworkPeeringApplyConfiguration constructs an declarative configuration of the NetworkPeering type for use with
@@ -31,5 +32,18 @@ func (b *NetworkPeeringApplyConfiguration) WithName(value string) *NetworkPeerin
 // If called multiple times, the ID field is set to the value of the last call.
 func (b *NetworkPeeringApplyConfiguration) WithID(value string) *NetworkPeeringApplyConfiguration {
 	b.ID = &value
+	return b
+}
+
+// WithPrefixes adds the given value to the Prefixes field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the Prefixes field.
+func (b *NetworkPeeringApplyConfiguration) WithPrefixes(values ...*PeeringPrefixApplyConfiguration) *NetworkPeeringApplyConfiguration {
+	for i := range values {
+		if values[i] == nil {
+			panic("nil value passed to WithPrefixes")
+		}
+		b.Prefixes = append(b.Prefixes, *values[i])
+	}
 	return b
 }

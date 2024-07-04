@@ -801,6 +801,12 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+    - name: prefixes
+      type:
+        list:
+          elementType:
+            namedType: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.PeeringPrefix
+          elementRelationship: atomic
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeeringStatus
   map:
     fields:
@@ -1104,6 +1110,16 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: slot
       type:
         scalar: string
+- name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.PeeringPrefix
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: prefix
+      type:
+        namedType: com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IPPrefix
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Rule
   map:
     fields:

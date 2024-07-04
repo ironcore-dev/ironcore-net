@@ -104,6 +104,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.ObjectIP":                    schema_ironcore_net_api_core_v1alpha1_ObjectIP(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.ObjectSelector":              schema_ironcore_net_api_core_v1alpha1_ObjectSelector(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.PCIAddress":                  schema_ironcore_net_api_core_v1alpha1_PCIAddress(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.PeeringPrefix":               schema_ironcore_net_api_core_v1alpha1_PeeringPrefix(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.Rule":                        schema_ironcore_net_api_core_v1alpha1_Rule(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.TargetNetworkInterface":      schema_ironcore_net_api_core_v1alpha1_TargetNetworkInterface(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.TopologySpreadConstraint":    schema_ironcore_net_api_core_v1alpha1_TopologySpreadConstraint(ref),
@@ -2875,10 +2876,26 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkPeering(ref common.ReferenceCa
 							Format:      "",
 						},
 					},
+					"prefixes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Prefixes is a list of prefixes that we want only to be exposed to the peered network, if no prefixes are specified no filtering will be done.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.PeeringPrefix"),
+									},
+								},
+							},
+						},
+					},
 				},
 				Required: []string{"name", "id"},
 			},
 		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.PeeringPrefix"},
 	}
 }
 
@@ -3801,6 +3818,36 @@ func schema_ironcore_net_api_core_v1alpha1_PCIAddress(ref common.ReferenceCallba
 				},
 			},
 		},
+	}
+}
+
+func schema_ironcore_net_api_core_v1alpha1_PeeringPrefix(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PeeringPrefixes defines prefixes to be exposed to the peered network",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the semantical name of the peering prefixes",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"prefix": {
+						SchemaProps: spec.SchemaProps{
+							Description: "CIDR to be exposed to the peered network",
+							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"),
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"},
 	}
 }
 

@@ -44,9 +44,11 @@ var _ = Describe("NetworkController", func() {
 		By("updating apinet networks spec with peerings")
 		baseNetwork1 := network1.DeepCopy()
 		network1.Spec.Peerings = []apinetv1alpha1.NetworkPeering{{
-			Name:     "peering-1",
-			Prefixes: &[]net.IPPrefix{net.MustParseIPPrefix("10.0.0.0/24")},
-			ID:       network2.Spec.ID}}
+			Name: "peering-1",
+			Prefixes: []apinetv1alpha1.PeeringPrefix{{
+				Name:   "my-prefix",
+				Prefix: net.MustParseNewIPPrefix("10.0.0.0/24")}},
+			ID: network2.Spec.ID}}
 		Expect(k8sClient.Patch(ctx, network1, client.MergeFrom(baseNetwork1))).To(Succeed())
 
 		baseNetwork2 := network2.DeepCopy()

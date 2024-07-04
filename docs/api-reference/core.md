@@ -1104,13 +1104,15 @@ string
 </tr>
 <tr>
 <td>
-<code>peeredIDs</code><br/>
+<code>peerings</code><br/>
 <em>
-[]string
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeering">
+[]NetworkPeering
+</a>
 </em>
 </td>
 <td>
-<p>PeeredIDs are the IDs of networks to peer with.</p>
+<p>Peerings are the network peerings with this network</p>
 </td>
 </tr>
 </table>
@@ -2871,7 +2873,7 @@ Kubernetes core/v1.LocalObjectReference
 <h3 id="core.apinet.ironcore.dev/v1alpha1.LocalUIDReference">LocalUIDReference
 </h3>
 <p>
-(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyRule">NetworkPolicyRule</a>)
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyRule">NetworkPolicyRule</a>, <a href="#core.apinet.ironcore.dev/v1alpha1.TargetNetworkInterface">TargetNetworkInterface</a>)
 </p>
 <div>
 <p>LocalUIDReference is a reference to another entity including its UID</p>
@@ -3716,6 +3718,60 @@ PCIAddress
 </tr>
 </tbody>
 </table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPeering">NetworkPeering
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkSpec">NetworkSpec</a>)
+</p>
+<div>
+<p>NetworkPeering defines a network peering with another network.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the semantical name of the network peering.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>id</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ID is the ID of the network to peer with.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefixes</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.PeeringPrefix">
+[]PeeringPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Prefixes is a list of prefixes that we want only to be exposed
+to the peered network, if no prefixes are specified no filtering will be done.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPeeringState">NetworkPeeringState
 (<code>string</code> alias)</h3>
 <p>
@@ -3758,17 +3814,6 @@ PCIAddress
 </tr>
 </thead>
 <tbody>
-<tr>
-<td>
-<code>name</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Name is the name of the network peering.</p>
-</td>
-</tr>
 <tr>
 <td>
 <code>id</code><br/>
@@ -4091,47 +4136,6 @@ alphanumerical order based on the Policy &ldquo;Name&rdquo;.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicyTargetRef">NetworkPolicyTargetRef
-</h3>
-<p>
-(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.TargetNetworkInterface">TargetNetworkInterface</a>)
-</p>
-<div>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>uid</code><br/>
-<em>
-<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
-k8s.io/apimachinery/pkg/types.UID
-</a>
-</em>
-</td>
-<td>
-<p>UID is the UID of the target.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>name</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Name is the name of the target.</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkSpec">NetworkSpec
 </h3>
 <p>
@@ -4160,13 +4164,15 @@ string
 </tr>
 <tr>
 <td>
-<code>peeredIDs</code><br/>
+<code>peerings</code><br/>
 <em>
-[]string
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeering">
+[]NetworkPeering
+</a>
 </em>
 </td>
 <td>
-<p>PeeredIDs are the IDs of networks to peer with.</p>
+<p>Peerings are the network peerings with this network</p>
 </td>
 </tr>
 </tbody>
@@ -4558,6 +4564,48 @@ string
 </tr>
 </tbody>
 </table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.PeeringPrefix">PeeringPrefix
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeering">NetworkPeering</a>)
+</p>
+<div>
+<p>PeeringPrefixes defines prefixes to be exposed to the peered network</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the semantical name of the peering prefixes</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefix</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IPPrefix">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>CIDR to be exposed to the peered network</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="core.apinet.ironcore.dev/v1alpha1.PolicyType">PolicyType
 (<code>string</code> alias)</h3>
 <p>
@@ -4670,8 +4718,8 @@ github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
 <td>
 <code>targetRef</code><br/>
 <em>
-<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyTargetRef">
-NetworkPolicyTargetRef
+<a href="#core.apinet.ironcore.dev/v1alpha1.LocalUIDReference">
+LocalUIDReference
 </a>
 </em>
 </td>

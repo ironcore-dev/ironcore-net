@@ -14,6 +14,7 @@ import (
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -206,12 +207,22 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 		}
 
 		idx := slices.IndexFunc(network.Spec.Peerings, func(peering networkingv1alpha1.NetworkPeering) bool {
-			return peering.NetworkRef.Name == peeringClaimRef.Name
+			peeringNetworkNamespace := peering.NetworkRef.Namespace
+			if peeringNetworkNamespace == "" {
+				peeringNetworkNamespace = network.Namespace
+			}
+			return peering.NetworkRef.Name == peeringClaimRef.Name && peeringNetworkNamespace == peeringClaimRef.Namespace
 		})
 		if idx != -1 {
+			peeringPrefixes, err := r.getAPINetNetworkPeeringPrefixes(ctx, network.Spec.Peerings[idx].Prefixes, network.Namespace)
+			if err != nil {
+				return nil, fmt.Errorf("error getting apinet network peering prefixes: %w", err)
+			}
+
 			peerings = append(peerings, apinetv1alpha1.NetworkPeering{
-				Name: network.Spec.Peerings[idx].Name,
-				ID:   targetApinetNetwork.Spec.ID,
+				Name:     network.Spec.Peerings[idx].Name,
+				ID:       targetApinetNetwork.Spec.ID,
+				Prefixes: peeringPrefixes,
 			})
 		}
 	}
@@ -222,6 +233,37 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 		return nil, fmt.Errorf("error applying apinet network: %w", err)
 	}
 	return apiNetNetwork, nil
+}
+
+func (r *NetworkReconciler) getAPINetNetworkPeeringPrefixes(ctx context.Context, peeringPrefixes []networkingv1alpha1.PeeringPrefix,
+	networkNamespace string) ([]apinetv1alpha1.PeeringPrefix, error) {
+	apinetPeeringPrefixes := []apinetv1alpha1.PeeringPrefix{}
+	for _, prefix := range peeringPrefixes {
+		if prefix.Prefix != nil {
+			apinetPeeringPrefixes = append(apinetPeeringPrefixes, apinetv1alpha1.PeeringPrefix{
+				Name:   prefix.Name,
+				Prefix: iPPrefixToAPINetIPPrefix(*prefix.Prefix),
+			})
+		} else if prefix.PrefixRef.Name != "" {
+			ipamPrefix := &ipamv1alpha1.Prefix{}
+			if err := r.Get(ctx, client.ObjectKey{Namespace: networkNamespace, Name: prefix.PrefixRef.Name}, ipamPrefix); err != nil {
+				if !apierrors.IsNotFound(err) {
+					return nil, fmt.Errorf("error getting prefix %s: %w", client.ObjectKey{Namespace: networkNamespace, Name: prefix.PrefixRef.Name}, err)
+				}
+				continue
+			}
+
+			if ipamPrefix.Status.Phase != ipamv1alpha1.PrefixPhaseAllocated {
+				continue
+			}
+
+			apinetPeeringPrefixes = append(apinetPeeringPrefixes, apinetv1alpha1.PeeringPrefix{
+				Name:   prefix.Name,
+				Prefix: iPPrefixToAPINetIPPrefix(*ipamPrefix.Spec.Prefix),
+			})
+		}
+	}
+	return apinetPeeringPrefixes, nil
 }
 
 func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache cache.Cache) error {
