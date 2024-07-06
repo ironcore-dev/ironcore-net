@@ -41,6 +41,21 @@ For its instances, the `apinet` `LoadBalancer` is created with a `template`
 that specifies instance anti-affinity to ensure instances are distributed
 cross-zone.
 
+### `NetworkPolicy`
+
+For a `networking.ironcore.dev/NetworkPolicy` a corresponding
+`core.apinet.ironcore.dev/NetworkPolicy` is created in the `apinet` cluster.
+The name of the `NetworkPolicy` in the `apinet` cluster is the `uid` of the
+`NetworkPolicy` in the `ironcore` cluster.
+The `NetworkPolicy` applies to `NetworkInterfaces` within a specific `Network`, filtered by the label specified in the `NetworkPolicy` spec.
+
+Based on the `PolicyTypes` (`egress` and/or `ingress`), rules can be specified to limit the traffic on the target object to and from various objects like `LoadBalancer`, `NetworkInterface` or `IPBlock` on certain `ports`.
+
+When a `NetworkPolicy` is applied, a `NetworkPolicyRule` object is created with the specified policy rules. `Metalnetlet` then reads the `NetworkPolicyRule` and enforces these policy (firewall) rules on the target `NetworkInterface`s.
+
+for example refer to [NetworkPolicy object](./objects.md#networkpolicy)
+
+
 ### `NATGateway`
 
 For a `networking.ironcore.dev/NATGateway` a corresponding

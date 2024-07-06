@@ -210,6 +210,17 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err = (&controllers.NetworkPolicyReconciler{
+		Client:           mgr.GetClient(),
+		APINetClient:     apiNetCluster.GetClient(),
+		APINetInterface:  apiNetIface,
+		APINetNamespace:  apiNetNamespace,
+		WatchFilterValue: watchFilterValue,
+	}).SetupWithManager(mgr, apiNetCluster.GetCache()); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "NetworkPolicy")
+		os.Exit(1)
+	}
+
 	if err = (&controllers.VirtualIPReconciler{
 		Client:           mgr.GetClient(),
 		APINetClient:     apiNetCluster.GetClient(),

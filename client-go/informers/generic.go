@@ -64,6 +64,10 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().NetworkIDs().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("networkinterfaces"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().NetworkInterfaces().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("networkpolicies"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().NetworkPolicies().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("networkpolicyrules"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().NetworkPolicyRules().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("nodes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Core().V1alpha1().Nodes().Informer()}, nil
 
