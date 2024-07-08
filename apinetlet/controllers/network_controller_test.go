@@ -301,9 +301,8 @@ var _ = Describe("NetworkController", func() {
 							Namespace: ns.Name,
 						},
 						Prefixes: []networkingv1alpha1.PeeringPrefix{{
-							Name:      "prefix-2",
-							Prefix:    commonv1alpha1.NewIPPrefix(netip.MustParsePrefix("192.168.178.20/32")),
-							PrefixRef: corev1.LocalObjectReference{Name: "prefix-2"},
+							Name:   "prefix-2",
+							Prefix: commonv1alpha1.NewIPPrefix(netip.MustParsePrefix("192.168.178.20/32")),
 						}},
 					},
 				},
