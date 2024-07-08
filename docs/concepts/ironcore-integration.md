@@ -24,6 +24,10 @@ be patched with the corresponding provider ID of the `apinet` `Network` and
 set to `state: Available`.
 The provider ID format & parsing can be found in [`provider.go`](../../apinetlet/provider/provider.go).
 
+If `ironcore` `Network` has peerings, then they will be translated and 
+patched into `apinet` `Network`. More details can be found here 
+[`Network Peering`](./network-lifecycle.md#network-peering)
+
 ### `LoadBalancer`
 
 For a `networking.ironcore.dev/LoadBalancer` a corresponding
