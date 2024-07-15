@@ -5,6 +5,7 @@ package controllers
 
 import (
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	"github.com/ironcore-dev/ironcore-net/networkid"
 	. "github.com/ironcore-dev/ironcore/utils/testing"
 	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
@@ -44,7 +45,10 @@ var _ = Describe("NetworkController", func() {
 		baseNetwork1 := network1.DeepCopy()
 		network1.Spec.Peerings = []apinetv1alpha1.NetworkPeering{{
 			Name: "peering-1",
-			ID:   network2.Spec.ID}}
+			Prefixes: []apinetv1alpha1.PeeringPrefix{{
+				Name:   "my-prefix",
+				Prefix: net.MustParseNewIPPrefix("10.0.0.0/24")}},
+			ID: network2.Spec.ID}}
 		Expect(k8sClient.Patch(ctx, network1, client.MergeFrom(baseNetwork1))).To(Succeed())
 
 		baseNetwork2 := network2.DeepCopy()
@@ -70,7 +74,12 @@ var _ = Describe("NetworkController", func() {
 		}
 		Eventually(Object(metalnetNetwork1)).Should(SatisfyAll(
 			HaveField("Spec", metalnetv1alpha1.NetworkSpec{
-				ID:        network1Vni,
+				ID: network1Vni,
+				PeeredPrefixes: []metalnetv1alpha1.PeeredPrefix{
+					{
+						ID:       network2Vni,
+						Prefixes: []metalnetv1alpha1.IPPrefix{metalnetv1alpha1.MustParseIPPrefix("10.0.0.0/24")}, // Add desired IPPrefixes here
+					}},
 				PeeredIDs: []int32{network2Vni},
 			}),
 		))

@@ -63,6 +63,10 @@ func apiNetIPPrefixesToIPPrefixes(ips []net.IPPrefix) []commonv1alpha1.IPPrefix 
 	return utilslices.Map(ips, apiNetIPPrefixToIPPrefix)
 }
 
+func iPPrefixToAPINetIPPrefix(prefix commonv1alpha1.IPPrefix) *net.IPPrefix {
+	return &net.IPPrefix{Prefix: prefix.Prefix}
+}
+
 func apiNetNetworkInterfaceStateToNetworkInterfaceState(state apinetv1alpha1.NetworkInterfaceState) networkingv1alpha1.NetworkInterfaceState {
 	switch state {
 	case apinetv1alpha1.NetworkInterfaceStatePending:
@@ -83,9 +87,19 @@ func apiNetNetworkPeeringsStatusToNetworkPeeringsStatus(peerings []apinetv1alpha
 			return specPeering.ID == strconv.Itoa(int(peering.ID))
 		})
 		if idx != -1 {
+			prefixStatus := []networkingv1alpha1.PeeringPrefixStatus{}
+			if peering.State == apinetv1alpha1.NetworkPeeringStateReady {
+				for _, peeringPrefix := range specPeerings[idx].Prefixes {
+					prefixStatus = append(prefixStatus, networkingv1alpha1.PeeringPrefixStatus{
+						Name:   peeringPrefix.Name,
+						Prefix: (*commonv1alpha1.IPPrefix)(peeringPrefix.Prefix),
+					})
+				}
+			}
 			networkPeeringsStatus = append(networkPeeringsStatus, networkingv1alpha1.NetworkPeeringStatus{
-				Name:  specPeerings[idx].Name,
-				State: networkingv1alpha1.NetworkPeeringState(peering.State),
+				Name:     specPeerings[idx].Name,
+				State:    networkingv1alpha1.NetworkPeeringState(peering.State),
+				Prefixes: prefixStatus,
 			})
 		}
 	}

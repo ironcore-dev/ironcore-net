@@ -10,6 +10,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	metalnetletclient "github.com/ironcore-dev/ironcore-net/metalnetlet/client"
 	metalnetlethandler "github.com/ironcore-dev/ironcore-net/metalnetlet/handler"
 	"github.com/ironcore-dev/ironcore-net/networkid"
@@ -155,6 +156,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 		},
 	}
 
+	peeredPrefixes := []metalnetv1alpha1.PeeredPrefix{}
 	for _, peering := range network.Spec.Peerings {
 		id, err := networkid.ParseVNI(peering.ID)
 		if err != nil {
@@ -162,7 +164,17 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 		}
 
 		metalnetNetwork.Spec.PeeredIDs = append(metalnetNetwork.Spec.PeeredIDs, id)
+
+		if peering.Prefixes != nil && len(peering.Prefixes) > 0 {
+			ipPrefixes := getIPPrefixes(peering.Prefixes)
+			peeredPrefix := metalnetv1alpha1.PeeredPrefix{
+				ID:       int32(id),
+				Prefixes: ipPrefixesToMetalnetPrefixes(ipPrefixes),
+			}
+			peeredPrefixes = append(peeredPrefixes, peeredPrefix)
+		}
 	}
+	metalnetNetwork.Spec.PeeredPrefixes = peeredPrefixes
 
 	if err := r.MetalnetClient.Patch(ctx, metalnetNetwork, client.Apply, MetalnetFieldOwner, client.ForceOwnership); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying network: %w", err)
@@ -177,6 +189,16 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 
 	log.V(1).Info("Reconciled")
 	return ctrl.Result{}, nil
+}
+
+func getIPPrefixes(peeringPrefixes []apinetv1alpha1.PeeringPrefix) []net.IPPrefix {
+	ipPrefixes := []net.IPPrefix{}
+	for _, peeringPrefix := range peeringPrefixes {
+		if peeringPrefix.Prefix != nil {
+			ipPrefixes = append(ipPrefixes, *peeringPrefix.Prefix)
+		}
+	}
+	return ipPrefixes
 }
 
 func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, metalnetCache cache.Cache) error {

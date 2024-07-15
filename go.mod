@@ -7,7 +7,7 @@ require (
 	github.com/go-logr/logr v1.4.2
 	github.com/google/uuid v1.6.0
 	github.com/ironcore-dev/controller-utils v0.9.3
-	github.com/ironcore-dev/ironcore v0.1.2
+	github.com/ironcore-dev/ironcore v0.1.3-0.20240704135250-f673fe34afc4
 	github.com/ironcore-dev/metalnet v0.3.9-0.20240502160212-b55083c9fb6b
 	github.com/onsi/ginkgo/v2 v2.19.0
 	github.com/onsi/gomega v1.33.1

@@ -148,6 +148,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &corev1alpha1.ObjectSelectorApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("PCIAddress"):
 		return &corev1alpha1.PCIAddressApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("PeeringPrefix"):
+		return &corev1alpha1.PeeringPrefixApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("Rule"):
 		return &corev1alpha1.RuleApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("TargetNetworkInterface"):

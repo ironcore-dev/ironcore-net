@@ -4,6 +4,7 @@
 package v1alpha1
 
 import (
+	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -20,6 +21,17 @@ type NetworkPeering struct {
 	Name string `json:"name"`
 	// ID is the ID of the network to peer with.
 	ID string `json:"id"`
+	// Prefixes is a list of prefixes that we want only to be exposed
+	// to the peered network, if no prefixes are specified no filtering will be done.
+	Prefixes []PeeringPrefix `json:"prefixes,omitempty"`
+}
+
+// PeeringPrefixes defines prefixes to be exposed to the peered network
+type PeeringPrefix struct {
+	// Name is the semantical name of the peering prefixes
+	Name string `json:"name"`
+	// CIDR to be exposed to the peered network
+	Prefix *net.IPPrefix `json:"prefix,omitempty"`
 }
 
 type NetworkStatus struct {
