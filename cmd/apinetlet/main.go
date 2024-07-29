@@ -9,34 +9,34 @@ import (
 	"fmt"
 	"os"
 
+	flag "github.com/spf13/pflag"
+
 	ironcorenetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apinetletconfig "github.com/ironcore-dev/ironcore-net/apinetlet/client/config"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/controllers"
 	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
+
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
-	flag "github.com/spf13/pflag"
-
-	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
-	// to ensure that exec-entrypoint and run can make use of them.
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
-	//+kubebuilder:scaffold:imports
+
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
 var (
-	scheme   = runtime.NewScheme()
-	setupLog = ctrl.Log.WithName("setup")
+	mgrScheme       = runtime.NewScheme()
+	apinetletScheme = runtime.NewScheme()
+	setupLog        = ctrl.Log.WithName("setup")
 )
 
 const (
@@ -44,11 +44,15 @@ const (
 )
 
 func init() {
-	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
+	utilruntime.Must(clientgoscheme.AddToScheme(mgrScheme))
+	utilruntime.Must(clientgoscheme.AddToScheme(apinetletScheme))
 
-	utilruntime.Must(networkingv1alpha1.AddToScheme(scheme))
-	utilruntime.Must(ipamv1alpha1.AddToScheme(scheme))
-	utilruntime.Must(ironcorenetv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(networkingv1alpha1.AddToScheme(mgrScheme))
+	utilruntime.Must(ipamv1alpha1.AddToScheme(mgrScheme))
+
+	utilruntime.Must(networkingv1alpha1.AddToScheme(apinetletScheme))
+	utilruntime.Must(ipamv1alpha1.AddToScheme(apinetletScheme))
+	utilruntime.Must(ironcorenetv1alpha1.AddToScheme(apinetletScheme))
 
 	//+kubebuilder:scaffold:scheme
 }
@@ -66,8 +70,18 @@ func main() {
 	var watchNamespace string
 	var watchFilterValue string
 
-	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
-	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
+	flag.StringVar(
+		&metricsAddr,
+		"metrics-bind-address",
+		":8080",
+		"The address the metric endpoint binds to.",
+	)
+	flag.StringVar(
+		&probeAddr,
+		"health-probe-bind-address",
+		":8081",
+		"The address the probe endpoint binds to.",
+	)
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
@@ -75,10 +89,28 @@ func main() {
 	configOptions.BindFlags(flag.CommandLine)
 	apiNetGetConfigOptions.BindFlags(flag.CommandLine, config.WithNamePrefix(apiNetFlagPrefix))
 
-	flag.StringVar(&apiNetNamespace, "api-net-namespace", "", "api-net cluster namespace to manage all objects in.")
+	flag.StringVar(
+		&apiNetNamespace,
+		"api-net-namespace",
+		"",
+		"api-net cluster namespace to manage all objects in.",
+	)
 
-	flag.StringVar(&watchNamespace, "namespace", "", "Namespace that the controller watches to reconcile ironcore objects. If unspecified, the controller watches for ironcore objects across all namespaces.")
-	flag.StringVar(&watchFilterValue, "watch-filter", "", fmt.Sprintf("label value that the controller watches to reconcile ironcore objects. Label key is always %s. If unspecified, the controller watches for all ironcore objects", commonv1alpha1.WatchLabel))
+	flag.StringVar(
+		&watchNamespace,
+		"namespace",
+		"",
+		"Namespace that the controller watches to reconcile ironcore objects. If unspecified, the controller watches for ironcore objects across all namespaces.",
+	)
+	flag.StringVar(
+		&watchFilterValue,
+		"watch-filter",
+		"",
+		fmt.Sprintf(
+			"label value that the controller watches to reconcile ironcore objects. Label key is always %s. If unspecified, the controller watches for all ironcore objects",
+			commonv1alpha1.WatchLabel,
+		),
+	)
 
 	opts := zap.Options{
 		Development: true,
@@ -98,7 +130,11 @@ func main() {
 	}
 
 	if watchNamespace != "" {
-		setupLog.Info("Watching ironcore objects only in namespace for reconciliation", "namespace", watchNamespace)
+		setupLog.Info(
+			"Watching ironcore objects only in namespace for reconciliation",
+			"namespace",
+			watchNamespace,
+		)
 	}
 
 	cfg, cfgCtrl, err := apinetletconfig.GetConfig(ctx, &configOptions)
@@ -121,7 +157,7 @@ func main() {
 		}
 	}
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
-		Scheme: scheme,
+		Scheme: mgrScheme,
 		Metrics: metricsserver.Options{
 			BindAddress: metricsAddr,
 		},
@@ -147,7 +183,7 @@ func main() {
 	}
 
 	apiNetCluster, err := cluster.New(apiNetCfg, func(options *cluster.Options) {
-		options.Scheme = scheme
+		options.Scheme = apinetletScheme
 		options.Cache.DefaultNamespaces = map[string]cache.Config{
 			apiNetNamespace: {},
 		}
