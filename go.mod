@@ -9,8 +9,8 @@ require (
 	github.com/ironcore-dev/controller-utils v0.9.3
 	github.com/ironcore-dev/ironcore v0.1.3-0.20240704135250-f673fe34afc4
 	github.com/ironcore-dev/metalnet v0.3.9-0.20240502160212-b55083c9fb6b
-	github.com/onsi/ginkgo/v2 v2.19.0
-	github.com/onsi/gomega v1.33.1
+	github.com/onsi/ginkgo/v2 v2.19.1
+	github.com/onsi/gomega v1.34.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	go4.org/netipx v0.0.0-20220812043211-3cc044ffd68d
@@ -102,7 +102,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20240318140521-94a12d6c2237 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240318140521-94a12d6c2237 // indirect
 	google.golang.org/grpc v1.64.1 // indirect
-	google.golang.org/protobuf v1.33.0 // indirect
+	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
