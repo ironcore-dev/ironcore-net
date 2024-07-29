@@ -351,7 +351,7 @@ func (r *LoadBalancerReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache 
 		).
 		WatchesRawSource(
 			source.Kind(apiNetCache, &apinetv1alpha1.LoadBalancer{}),
-			apinetlethandler.EnqueueRequestForSource(r.APINetClient.Scheme(), r.APINetClient.RESTMapper(), &apinetv1alpha1.LoadBalancer{}),
+			apinetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.LoadBalancer{}),
 		).
 		Owns(&ipamv1alpha1.Prefix{}).
 		Watches(

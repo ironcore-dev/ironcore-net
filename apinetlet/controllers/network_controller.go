@@ -329,7 +329,7 @@ func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache cache
 		).
 		WatchesRawSource(
 			source.Kind(apiNetCache, &apinetv1alpha1.Network{}),
-			handler.EnqueueRequestForSource(r.APINetClient.Scheme(), r.APINetClient.RESTMapper(), &networkingv1alpha1.Network{}),
+			handler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.Network{}),
 		).
 		Complete(r)
 }

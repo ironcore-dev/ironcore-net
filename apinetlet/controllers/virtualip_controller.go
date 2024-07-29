@@ -235,7 +235,7 @@ func (r *VirtualIPReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache cac
 		).
 		WatchesRawSource(
 			source.Kind(apiNetCache, &apinetv1alpha1.IP{}),
-			handler.EnqueueRequestForSource(r.APINetClient.Scheme(), r.APINetClient.RESTMapper(), &networkingv1alpha1.VirtualIP{}),
+			handler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.VirtualIP{}),
 		).
 		Complete(r)
 }
