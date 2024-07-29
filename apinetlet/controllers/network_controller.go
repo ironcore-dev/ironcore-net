@@ -9,11 +9,13 @@ import (
 	"slices"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/controller-utils/clientutils"
+
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
+
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
@@ -52,7 +54,11 @@ func (r *NetworkReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	network := &networkingv1alpha1.Network{}
 	if err := r.Get(ctx, req.NamespacedName, network); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return ctrl.Result{}, fmt.Errorf("error getting network %s: %w", req.NamespacedName, err)
+			return ctrl.Result{}, fmt.Errorf(
+				"error getting network %s: %w",
+				req.NamespacedName,
+				err,
+			)
 		}
 
 		return r.deleteGone(ctx, log, req.NamespacedName)
@@ -61,7 +67,11 @@ func (r *NetworkReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	return r.reconcileExists(ctx, log, network)
 }
 
-func (r *NetworkReconciler) deleteGone(ctx context.Context, log logr.Logger, networkKey client.ObjectKey) (ctrl.Result, error) {
+func (r *NetworkReconciler) deleteGone(
+	ctx context.Context,
+	log logr.Logger,
+	networkKey client.ObjectKey,
+) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
 	log.V(1).Info("Deleting any matching apinet networks")
@@ -76,7 +86,11 @@ func (r *NetworkReconciler) deleteGone(ctx context.Context, log logr.Logger, net
 	return ctrl.Result{}, nil
 }
 
-func (r *NetworkReconciler) reconcileExists(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (ctrl.Result, error) {
+func (r *NetworkReconciler) reconcileExists(
+	ctx context.Context,
+	log logr.Logger,
+	network *networkingv1alpha1.Network,
+) (ctrl.Result, error) {
 	log = log.WithValues("UID", network.UID)
 	if !network.DeletionTimestamp.IsZero() {
 		return r.delete(ctx, log, network)
@@ -84,7 +98,11 @@ func (r *NetworkReconciler) reconcileExists(ctx context.Context, log logr.Logger
 	return r.reconcile(ctx, log, network)
 }
 
-func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (ctrl.Result, error) {
+func (r *NetworkReconciler) delete(
+	ctx context.Context,
+	log logr.Logger,
+	network *networkingv1alpha1.Network,
+) (ctrl.Result, error) {
 	log.V(1).Info("Delete")
 
 	if !controllerutil.ContainsFinalizer(network, networkFinalizer) {
@@ -116,17 +134,29 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 	return ctrl.Result{Requeue: true}, nil
 }
 
-func (r *NetworkReconciler) updateNetworkStatus(ctx context.Context, network *networkingv1alpha1.Network, apiNetNetwork *apinetv1alpha1.Network, state networkingv1alpha1.NetworkState) error {
+func (r *NetworkReconciler) updateNetworkStatus(
+	ctx context.Context,
+	network *networkingv1alpha1.Network,
+	apiNetNetwork *apinetv1alpha1.Network,
+	state networkingv1alpha1.NetworkState,
+) error {
 	networkBase := network.DeepCopy()
 	network.Status.State = state
-	network.Status.Peerings = apiNetNetworkPeeringsStatusToNetworkPeeringsStatus(apiNetNetwork.Status.Peerings, apiNetNetwork.Spec.Peerings)
+	network.Status.Peerings = apiNetNetworkPeeringsStatusToNetworkPeeringsStatus(
+		apiNetNetwork.Status.Peerings,
+		apiNetNetwork.Spec.Peerings,
+	)
 	if err := r.Status().Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
 		return fmt.Errorf("unable to patch network: %w", err)
 	}
 	return nil
 }
 
-func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (ctrl.Result, error) {
+func (r *NetworkReconciler) reconcile(
+	ctx context.Context,
+	log logr.Logger,
+	network *networkingv1alpha1.Network,
+) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
 	log.V(1).Info("Ensuring finalizer")
@@ -177,14 +207,23 @@ func (r *NetworkReconciler) setNetworkProviderID(
 	apiNetNetwork *apinetv1alpha1.Network,
 ) error {
 	base := network.DeepCopy()
-	network.Spec.ProviderID = provider.GetNetworkID(apiNetNetwork.Namespace, apiNetNetwork.Name, apiNetNetwork.Spec.ID, apiNetNetwork.UID)
+	network.Spec.ProviderID = provider.GetNetworkID(
+		apiNetNetwork.Namespace,
+		apiNetNetwork.Name,
+		apiNetNetwork.Spec.ID,
+		apiNetNetwork.UID,
+	)
 	if err := r.Patch(ctx, network, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("unable to patch network: %w", err)
 	}
 	return nil
 }
 
-func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (*apinetv1alpha1.Network, error) {
+func (r *NetworkReconciler) applyAPINetNetwork(
+	ctx context.Context,
+	log logr.Logger,
+	network *networkingv1alpha1.Network,
+) (*apinetv1alpha1.Network, error) {
 	apiNetNetwork := &apinetv1alpha1.Network{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: apinetv1alpha1.SchemeGroupVersion.String(),
@@ -206,15 +245,23 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 			break
 		}
 
-		idx := slices.IndexFunc(network.Spec.Peerings, func(peering networkingv1alpha1.NetworkPeering) bool {
-			peeringNetworkNamespace := peering.NetworkRef.Namespace
-			if peeringNetworkNamespace == "" {
-				peeringNetworkNamespace = network.Namespace
-			}
-			return peering.NetworkRef.Name == peeringClaimRef.Name && peeringNetworkNamespace == peeringClaimRef.Namespace
-		})
+		idx := slices.IndexFunc(
+			network.Spec.Peerings,
+			func(peering networkingv1alpha1.NetworkPeering) bool {
+				peeringNetworkNamespace := peering.NetworkRef.Namespace
+				if peeringNetworkNamespace == "" {
+					peeringNetworkNamespace = network.Namespace
+				}
+				return peering.NetworkRef.Name == peeringClaimRef.Name &&
+					peeringNetworkNamespace == peeringClaimRef.Namespace
+			},
+		)
 		if idx != -1 {
-			peeringPrefixes, err := r.getAPINetNetworkPeeringPrefixes(ctx, network.Spec.Peerings[idx].Prefixes, network.Namespace)
+			peeringPrefixes, err := r.getAPINetNetworkPeeringPrefixes(
+				ctx,
+				network.Spec.Peerings[idx].Prefixes,
+				network.Namespace,
+			)
 			if err != nil {
 				return nil, fmt.Errorf("error getting apinet network peering prefixes: %w", err)
 			}
@@ -235,8 +282,11 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 	return apiNetNetwork, nil
 }
 
-func (r *NetworkReconciler) getAPINetNetworkPeeringPrefixes(ctx context.Context, peeringPrefixes []networkingv1alpha1.PeeringPrefix,
-	networkNamespace string) ([]apinetv1alpha1.PeeringPrefix, error) {
+func (r *NetworkReconciler) getAPINetNetworkPeeringPrefixes(
+	ctx context.Context,
+	peeringPrefixes []networkingv1alpha1.PeeringPrefix,
+	networkNamespace string,
+) ([]apinetv1alpha1.PeeringPrefix, error) {
 	apinetPeeringPrefixes := []apinetv1alpha1.PeeringPrefix{}
 	for _, prefix := range peeringPrefixes {
 		if prefix.Prefix != nil {
@@ -279,7 +329,7 @@ func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache cache
 		).
 		WatchesRawSource(
 			source.Kind(apiNetCache, &apinetv1alpha1.Network{}),
-			handler.EnqueueRequestForSource(mgr.GetScheme(), mgr.GetRESTMapper(), &networkingv1alpha1.Network{}),
+			handler.EnqueueRequestForSource(r.APINetClient.Scheme(), r.APINetClient.RESTMapper(), &networkingv1alpha1.Network{}),
 		).
 		Complete(r)
 }

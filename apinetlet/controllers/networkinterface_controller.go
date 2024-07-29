@@ -9,14 +9,17 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/controller-utils/clientutils"
-	"github.com/ironcore-dev/controller-utils/metautils"
+	"golang.org/x/exp/slices"
+
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	apinetlethandler "github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
 	utilgeneric "github.com/ironcore-dev/ironcore-net/utils/generic"
+
+	"github.com/ironcore-dev/controller-utils/clientutils"
+	"github.com/ironcore-dev/controller-utils/metautils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -24,7 +27,6 @@ import (
 	"github.com/ironcore-dev/ironcore/utils/generic"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
-	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -59,7 +61,10 @@ type NetworkInterfaceReconciler struct {
 
 //+cluster=apinet:kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch;update;patch
 
-func (r *NetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *NetworkInterfaceReconciler) Reconcile(
+	ctx context.Context,
+	req ctrl.Request,
+) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
 	nic := &networkingv1alpha1.NetworkInterface{}
 	if err := r.Get(ctx, req.NamespacedName, nic); err != nil {
@@ -68,7 +73,10 @@ func (r *NetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		}
 
 		if err := r.releaseNetworkInterfaceKeyAPINetInterfaces(ctx, req.NamespacedName); err != nil {
-			return ctrl.Result{}, fmt.Errorf("error releasing apinet network interfaces by key: %w", err)
+			return ctrl.Result{}, fmt.Errorf(
+				"error releasing apinet network interfaces by key: %w",
+				err,
+			)
 		}
 		return ctrl.Result{}, nil
 	}
@@ -76,14 +84,21 @@ func (r *NetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	return r.reconcileExists(ctx, log, nic)
 }
 
-func (r *NetworkInterfaceReconciler) reconcileExists(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (ctrl.Result, error) {
+func (r *NetworkInterfaceReconciler) reconcileExists(
+	ctx context.Context,
+	log logr.Logger,
+	nic *networkingv1alpha1.NetworkInterface,
+) (ctrl.Result, error) {
 	if !nic.DeletionTimestamp.IsZero() {
 		return r.delete(ctx, log, nic)
 	}
 	return r.reconcile(ctx, log, nic)
 }
 
-func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceKeyAPINetInterfaces(ctx context.Context, nicKey client.ObjectKey) error {
+func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceKeyAPINetInterfaces(
+	ctx context.Context,
+	nicKey client.ObjectKey,
+) error {
 	apiNetNicList := &apinetv1alpha1.NetworkInterfaceList{}
 	if err := r.APINetClient.List(ctx, apiNetNicList,
 		client.InNamespace(r.APINetNamespace),
@@ -94,21 +109,33 @@ func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceKeyAPINetInterfaces(
 
 	var errs []error
 	for _, apiNetNic := range apiNetNicList.Items {
-		if err := r.releaseAPINetNetworkInterface(ctx, &apiNetNic); client.IgnoreNotFound(err) != nil {
+		if err := r.releaseAPINetNetworkInterface(ctx, &apiNetNic); client.IgnoreNotFound(
+			err,
+		) != nil {
 			errs = append(errs, err)
 		}
 	}
 	return errors.Join(errs...)
 }
 
-func (r *NetworkInterfaceReconciler) releaseAPINetNetworkInterface(ctx context.Context, apiNetNic *apinetv1alpha1.NetworkInterface) error {
-	keys := apinetletclient.SourceLabelKeys(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.NetworkInterface{})
+func (r *NetworkInterfaceReconciler) releaseAPINetNetworkInterface(
+	ctx context.Context,
+	apiNetNic *apinetv1alpha1.NetworkInterface,
+) error {
+	keys := apinetletclient.SourceLabelKeys(
+		r.Scheme(),
+		r.RESTMapper(),
+		&networkingv1alpha1.NetworkInterface{},
+	)
 	base := apiNetNic.DeepCopy()
 	metautils.DeleteLabels(apiNetNic, keys)
 	return r.APINetClient.Patch(ctx, apiNetNic, client.StrategicMergeFrom(base))
 }
 
-func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceAPINetNetworkInterfaces(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) error {
+func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceAPINetNetworkInterfaces(
+	ctx context.Context,
+	nic *networkingv1alpha1.NetworkInterface,
+) error {
 	apiNetNicList := &apinetv1alpha1.NetworkInterfaceList{}
 	if err := r.APINetClient.List(ctx, apiNetNicList,
 		client.InNamespace(r.APINetNamespace),
@@ -136,7 +163,10 @@ func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceAPINetNetworkInterfa
 	return errors.Join(errs...)
 }
 
-func (r *NetworkInterfaceReconciler) releaseVirtualIPsForNetworkInterface(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) error {
+func (r *NetworkInterfaceReconciler) releaseVirtualIPsForNetworkInterface(
+	ctx context.Context,
+	nic *networkingv1alpha1.NetworkInterface,
+) error {
 	vipList := &networkingv1alpha1.VirtualIPList{}
 	if err := r.List(ctx, vipList,
 		client.InNamespace(nic.Namespace),
@@ -166,7 +196,11 @@ func (r *NetworkInterfaceReconciler) releaseVirtualIPsForNetworkInterface(ctx co
 	return errors.Join(errs...)
 }
 
-func (r *NetworkInterfaceReconciler) delete(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (ctrl.Result, error) {
+func (r *NetworkInterfaceReconciler) delete(
+	ctx context.Context,
+	log logr.Logger,
+	nic *networkingv1alpha1.NetworkInterface,
+) (ctrl.Result, error) {
 	log.V(1).Info("Delete")
 	if !controllerutil.ContainsFinalizer(nic, networkInterfaceFinalizer) {
 		log.V(1).Info("No finalizer present, nothing to do")
@@ -192,7 +226,9 @@ func (r *NetworkInterfaceReconciler) delete(ctx context.Context, log logr.Logger
 	return ctrl.Result{}, nil
 }
 
-func (r *NetworkInterfaceReconciler) networkInterfaceVirtualIPSelector(nic *networkingv1alpha1.NetworkInterface) claimmanager.Selector {
+func (r *NetworkInterfaceReconciler) networkInterfaceVirtualIPSelector(
+	nic *networkingv1alpha1.NetworkInterface,
+) claimmanager.Selector {
 	vipNames := sets.New[string]()
 	if vipSrc := nic.Spec.VirtualIP; vipSrc != nil {
 		name := networkingv1alpha1.NetworkInterfaceVirtualIPName(nic.Name, *vipSrc)
@@ -208,7 +244,10 @@ type apiNetNetworkInterfaceClaimStrategy struct {
 	client.Client
 }
 
-func (s *apiNetNetworkInterfaceClaimStrategy) ClaimState(claimer client.Object, obj client.Object) claimmanager.ClaimState {
+func (s *apiNetNetworkInterfaceClaimStrategy) ClaimState(
+	claimer client.Object,
+	obj client.Object,
+) claimmanager.ClaimState {
 	apiNetNic := obj.(*apinetv1alpha1.NetworkInterface)
 	if data := apinetletclient.SourceObjectDataFromObject(s.Scheme(), s.RESTMapper(), claimer, apiNetNic); data != nil {
 		if data.UID == claimer.GetUID() {
@@ -219,7 +258,11 @@ func (s *apiNetNetworkInterfaceClaimStrategy) ClaimState(claimer client.Object, 
 	return claimmanager.ClaimStateFree
 }
 
-func (s *apiNetNetworkInterfaceClaimStrategy) Adopt(ctx context.Context, claimer client.Object, obj client.Object) error {
+func (s *apiNetNetworkInterfaceClaimStrategy) Adopt(
+	ctx context.Context,
+	claimer client.Object,
+	obj client.Object,
+) error {
 	apiNetNic := obj.(*apinetv1alpha1.NetworkInterface)
 	base := apiNetNic.DeepCopy()
 	combinedLabels := make(map[string]string)
@@ -237,7 +280,11 @@ func (s *apiNetNetworkInterfaceClaimStrategy) Adopt(ctx context.Context, claimer
 	return s.Patch(ctx, apiNetNic, client.StrategicMergeFrom(base))
 }
 
-func (s *apiNetNetworkInterfaceClaimStrategy) Release(ctx context.Context, claimer client.Object, obj client.Object) error {
+func (s *apiNetNetworkInterfaceClaimStrategy) Release(
+	ctx context.Context,
+	claimer client.Object,
+	obj client.Object,
+) error {
 	apiNetNic := obj.(*apinetv1alpha1.NetworkInterface)
 	base := apiNetNic.DeepCopy()
 	keys := apinetletclient.SourceLabelKeys(s.Scheme(), s.RESTMapper(), claimer)
@@ -251,7 +298,10 @@ type virtualIPClaimStrategy struct {
 	client.Client
 }
 
-func (s *virtualIPClaimStrategy) ClaimState(claimer client.Object, obj client.Object) claimmanager.ClaimState {
+func (s *virtualIPClaimStrategy) ClaimState(
+	claimer client.Object,
+	obj client.Object,
+) claimmanager.ClaimState {
 	vip := obj.(*networkingv1alpha1.VirtualIP)
 	if targetRef := vip.Spec.TargetRef; targetRef != nil {
 		if targetRef.UID == claimer.GetUID() {
@@ -262,7 +312,11 @@ func (s *virtualIPClaimStrategy) ClaimState(claimer client.Object, obj client.Ob
 	return claimmanager.ClaimStateFree
 }
 
-func (s *virtualIPClaimStrategy) Adopt(ctx context.Context, claimer client.Object, obj client.Object) error {
+func (s *virtualIPClaimStrategy) Adopt(
+	ctx context.Context,
+	claimer client.Object,
+	obj client.Object,
+) error {
 	vip := obj.(*networkingv1alpha1.VirtualIP)
 	base := vip.DeepCopy()
 	vip.Spec.TargetRef = &commonv1alpha1.LocalUIDReference{
@@ -272,14 +326,21 @@ func (s *virtualIPClaimStrategy) Adopt(ctx context.Context, claimer client.Objec
 	return s.Patch(ctx, vip, client.StrategicMergeFrom(base))
 }
 
-func (s *virtualIPClaimStrategy) Release(ctx context.Context, claimer client.Object, obj client.Object) error {
+func (s *virtualIPClaimStrategy) Release(
+	ctx context.Context,
+	claimer client.Object,
+	obj client.Object,
+) error {
 	vip := obj.(*networkingv1alpha1.VirtualIP)
 	base := vip.DeepCopy()
 	vip.Spec.TargetRef = nil
 	return s.Patch(ctx, vip, client.StrategicMergeFrom(base))
 }
 
-func (r *NetworkInterfaceReconciler) getVirtualIPsForNetworkInterface(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) ([]networkingv1alpha1.VirtualIP, error) {
+func (r *NetworkInterfaceReconciler) getVirtualIPsForNetworkInterface(
+	ctx context.Context,
+	nic *networkingv1alpha1.NetworkInterface,
+) ([]networkingv1alpha1.VirtualIP, error) {
 	vipList := &networkingv1alpha1.VirtualIPList{}
 	if err := r.List(ctx, vipList,
 		client.InNamespace(nic.Namespace),
@@ -309,7 +370,10 @@ func (r *NetworkInterfaceReconciler) getVirtualIPsForNetworkInterface(ctx contex
 	return vips, errors.Join(errs...)
 }
 
-func (r *NetworkInterfaceReconciler) networkInterfaceAPINetNetworkInterfaceSelector(log logr.Logger, nic *networkingv1alpha1.NetworkInterface) claimmanager.Selector {
+func (r *NetworkInterfaceReconciler) networkInterfaceAPINetNetworkInterfaceSelector(
+	log logr.Logger,
+	nic *networkingv1alpha1.NetworkInterface,
+) claimmanager.Selector {
 	namespace, name, node, uid, err := provider.ParseNetworkInterfaceID(nic.Spec.ProviderID)
 	if err != nil {
 		log.V(1).Info("Error parsing network interface id", "error", err)
@@ -341,8 +405,12 @@ func (r *NetworkInterfaceReconciler) getAPINetNetworkInterfaceForNetworkInterfac
 	}
 
 	var (
-		sel            = r.networkInterfaceAPINetNetworkInterfaceSelector(log, nic)
-		claimMgr       = claimmanager.New(nic, sel, &apiNetNetworkInterfaceClaimStrategy{r.APINetClient})
+		sel      = r.networkInterfaceAPINetNetworkInterfaceSelector(log, nic)
+		claimMgr = claimmanager.New(
+			nic,
+			sel,
+			&apiNetNetworkInterfaceClaimStrategy{r.APINetClient},
+		)
 		foundAPINetNic *apinetv1alpha1.NetworkInterface
 		errs           []error
 	)
@@ -372,7 +440,10 @@ func (r *NetworkInterfaceReconciler) getPrefixesForNetworkInterface(
 			res = append(res, net.IPPrefix{Prefix: prefixSrc.Value.Prefix})
 		case prefixSrc.Ephemeral != nil:
 			ipamPrefix := &ipamv1alpha1.Prefix{}
-			ipamPrefixKey := client.ObjectKey{Namespace: nic.Namespace, Name: networkingv1alpha1.NetworkInterfacePrefixIPAMPrefixName(nic.Name, idx)}
+			ipamPrefixKey := client.ObjectKey{
+				Namespace: nic.Namespace,
+				Name:      networkingv1alpha1.NetworkInterfacePrefixIPAMPrefixName(nic.Name, idx),
+			}
 			if err := r.Get(ctx, ipamPrefixKey, ipamPrefix); err != nil {
 				if !apierrors.IsNotFound(err) {
 					return nil, err
@@ -450,7 +521,11 @@ func (r *NetworkInterfaceReconciler) setNetworkInterfacePending(
 	return r.Status().Patch(ctx, nic, client.StrategicMergeFrom(base))
 }
 
-func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (ctrl.Result, error) {
+func (r *NetworkInterfaceReconciler) reconcile(
+	ctx context.Context,
+	log logr.Logger,
+	nic *networkingv1alpha1.NetworkInterface,
+) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
 	modified, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, nic, networkInterfaceFinalizer)
@@ -481,7 +556,10 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	}
 
 	if err := errors.Join(errs...); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error getting APINet network interface for network interface: %w", err)
+		return ctrl.Result{}, fmt.Errorf(
+			"error getting APINet network interface for network interface: %w",
+			err,
+		)
 	}
 
 	if apiNetNic == nil {
@@ -497,12 +575,20 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	}
 
 	var (
-		expectedState     = apiNetNetworkInterfaceStateToNetworkInterfaceState(apiNetNic.Status.State)
+		expectedState = apiNetNetworkInterfaceStateToNetworkInterfaceState(
+			apiNetNic.Status.State,
+		)
 		expectedIPs       = apiNetIPsToIPs(apiNetNic.Spec.IPs)
 		expectedPrefixes  = apiNetIPPrefixesToIPPrefixes(apiNetNic.Spec.Prefixes)
 		expectedVirtualIP = WorkaroundOnlyV4VirtualIPs(apiNetIPsToIPs(apiNetNic.Status.PublicIPs))
 	)
-	if !NetworkInterfaceStatusUpToDate(nic, expectedState, expectedIPs, expectedPrefixes, expectedVirtualIP) {
+	if !NetworkInterfaceStatusUpToDate(
+		nic,
+		expectedState,
+		expectedIPs,
+		expectedPrefixes,
+		expectedVirtualIP,
+	) {
 		if err := r.updateNetworkInterfaceStatus(ctx, nic, expectedState, expectedIPs, expectedPrefixes, expectedVirtualIP); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error updating network interface status: %w", err)
 		}
@@ -562,42 +648,54 @@ func WorkaroundOnlyV4VirtualIPs(ips []commonv1alpha1.IP) *commonv1alpha1.IP {
 }
 
 func (r *NetworkInterfaceReconciler) enqueueByVirtualIP() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
-		vip := obj.(*networkingv1alpha1.VirtualIP)
-		targetRef := vip.Spec.TargetRef
-		if targetRef == nil {
-			return nil
-		}
-		return []ctrl.Request{{NamespacedName: client.ObjectKey{Namespace: vip.Namespace, Name: targetRef.Name}}}
-	})
+	return handler.EnqueueRequestsFromMapFunc(
+		func(ctx context.Context, obj client.Object) []ctrl.Request {
+			vip := obj.(*networkingv1alpha1.VirtualIP)
+			targetRef := vip.Spec.TargetRef
+			if targetRef == nil {
+				return nil
+			}
+			return []ctrl.Request{
+				{NamespacedName: client.ObjectKey{Namespace: vip.Namespace, Name: targetRef.Name}},
+			}
+		},
+	)
 }
 
 func (r *NetworkInterfaceReconciler) enqueueByNetworkInterfaceVirtualIPSelection() handler.EventHandler {
-	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
-		vip := obj.(*networkingv1alpha1.VirtualIP)
-		log := ctrl.LoggerFrom(ctx)
+	return handler.EnqueueRequestsFromMapFunc(
+		func(ctx context.Context, obj client.Object) []ctrl.Request {
+			vip := obj.(*networkingv1alpha1.VirtualIP)
+			log := ctrl.LoggerFrom(ctx)
 
-		nicList := &networkingv1alpha1.NetworkInterfaceList{}
-		if err := r.List(ctx, nicList,
-			client.InNamespace(vip.Namespace),
-		); err != nil {
-			log.Error(err, "Error listing network interfaces")
-			return nil
-		}
-
-		var reqs []ctrl.Request
-		for _, nic := range nicList.Items {
-			sel := r.networkInterfaceVirtualIPSelector(&nic)
-			if sel.Match(vip) {
-				reqs = append(reqs, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&nic)})
+			nicList := &networkingv1alpha1.NetworkInterfaceList{}
+			if err := r.List(ctx, nicList,
+				client.InNamespace(vip.Namespace),
+			); err != nil {
+				log.Error(err, "Error listing network interfaces")
+				return nil
 			}
-		}
 
-		return reqs
-	})
+			var reqs []ctrl.Request
+			for _, nic := range nicList.Items {
+				sel := r.networkInterfaceVirtualIPSelector(&nic)
+				if sel.Match(vip) {
+					reqs = append(
+						reqs,
+						ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&nic)},
+					)
+				}
+			}
+
+			return reqs
+		},
+	)
 }
 
-func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache cache.Cache) error {
+func (r *NetworkInterfaceReconciler) SetupWithManager(
+	mgr ctrl.Manager,
+	apiNetCache cache.Cache,
+) error {
 	log := ctrl.Log.WithName("networkinterface").WithName("setup")
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
@@ -609,7 +707,7 @@ func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCa
 		).
 		WatchesRawSource(
 			source.Kind(apiNetCache, &apinetv1alpha1.NetworkInterface{}),
-			apinetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.NetworkInterface{}),
+			apinetlethandler.EnqueueRequestForSource(r.APINetClient.Scheme(), r.APINetClient.RESTMapper(), &networkingv1alpha1.NetworkInterface{}),
 		).
 		Owns(&ipamv1alpha1.Prefix{}).
 		Watches(
