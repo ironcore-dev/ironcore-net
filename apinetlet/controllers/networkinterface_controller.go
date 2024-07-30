@@ -609,7 +609,7 @@ func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCa
 		).
 		WatchesRawSource(
 			source.Kind(apiNetCache, &apinetv1alpha1.NetworkInterface{}),
-			apinetlethandler.EnqueueRequestForSource(r.APINetClient.Scheme(), r.APINetClient.RESTMapper(), &networkingv1alpha1.NetworkInterface{}),
+			apinetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.NetworkInterface{}),
 		).
 		Owns(&ipamv1alpha1.Prefix{}).
 		Watches(

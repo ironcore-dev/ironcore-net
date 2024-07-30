@@ -216,11 +216,11 @@ func (r *NATGatewayReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache ca
 		).
 		WatchesRawSource(
 			source.Kind(apiNetCache, &v1alpha1.NATGateway{}),
-			handler.EnqueueRequestForSource(r.APINetClient.Scheme(), r.APINetClient.RESTMapper(), &networkingv1alpha1.NATGateway{}),
+			handler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.NATGateway{}),
 		).
 		WatchesRawSource(
 			source.Kind(apiNetCache, &v1alpha1.NATGatewayAutoscaler{}),
-			handler.EnqueueRequestForSource(r.APINetClient.Scheme(), r.APINetClient.RESTMapper(), &networkingv1alpha1.NATGateway{}),
+			handler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.NATGateway{}),
 		).
 		Complete(r)
 }

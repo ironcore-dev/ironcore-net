@@ -587,7 +587,7 @@ func (r *NetworkPolicyReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache
 		).
 		WatchesRawSource(
 			source.Kind(apiNetCache, &apinetv1alpha1.NetworkPolicy{}),
-			apinetlethandler.EnqueueRequestForSource(r.APINetClient.Scheme(), r.APINetClient.RESTMapper(), &networkingv1alpha1.NetworkPolicy{}),
+			apinetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.NetworkPolicy{}),
 		).
 		// Watches(
 		// 	&apinetv1alpha1.Network{},
