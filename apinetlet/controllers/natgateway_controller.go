@@ -9,15 +9,13 @@ import (
 	"slices"
 
 	"github.com/go-logr/logr"
-
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
-
-	"github.com/ironcore-dev/controller-utils/clientutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/generic"
@@ -53,10 +51,7 @@ type NATGatewayReconciler struct {
 //+cluster=apinet:kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=natgateways,verbs=get;list;watch;create;update;patch;delete;deletecollection
 //+cluster=apinet:kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=natgatewayautoscalers,verbs=get;list;watch;create;update;patch;delete;deletecollection
 
-func (r *NATGatewayReconciler) Reconcile(
-	ctx context.Context,
-	req ctrl.Request,
-) (ctrl.Result, error) {
+func (r *NATGatewayReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
 	natGateway := &networkingv1alpha1.NATGateway{}
 	if err := r.Get(ctx, req.NamespacedName, natGateway); err != nil {
@@ -68,11 +63,7 @@ func (r *NATGatewayReconciler) Reconcile(
 	return r.reconcileExists(ctx, log, natGateway)
 }
 
-func (r *NATGatewayReconciler) deleteGone(
-	ctx context.Context,
-	log logr.Logger,
-	key client.ObjectKey,
-) (ctrl.Result, error) {
+func (r *NATGatewayReconciler) deleteGone(ctx context.Context, log logr.Logger, key client.ObjectKey) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
 	log.V(1).Info("Deleting any APINet NAT gateway by key")
@@ -87,22 +78,14 @@ func (r *NATGatewayReconciler) deleteGone(
 	return ctrl.Result{}, nil
 }
 
-func (r *NATGatewayReconciler) reconcileExists(
-	ctx context.Context,
-	log logr.Logger,
-	natGateway *networkingv1alpha1.NATGateway,
-) (ctrl.Result, error) {
+func (r *NATGatewayReconciler) reconcileExists(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (ctrl.Result, error) {
 	if !natGateway.DeletionTimestamp.IsZero() {
 		return r.delete(ctx, log, natGateway)
 	}
 	return r.reconcile(ctx, log, natGateway)
 }
 
-func (r *NATGatewayReconciler) delete(
-	ctx context.Context,
-	log logr.Logger,
-	natGateway *networkingv1alpha1.NATGateway,
-) (ctrl.Result, error) {
+func (r *NATGatewayReconciler) delete(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (ctrl.Result, error) {
 	log.V(1).Info("Delete")
 
 	if !controllerutil.ContainsFinalizer(natGateway, natGatewayFinalizer) {
@@ -135,20 +118,11 @@ func (r *NATGatewayReconciler) delete(
 	return ctrl.Result{Requeue: true}, nil
 }
 
-func (r *NATGatewayReconciler) reconcile(
-	ctx context.Context,
-	log logr.Logger,
-	natGateway *networkingv1alpha1.NATGateway,
-) (ctrl.Result, error) {
+func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
 	log.V(1).Info("Ensuring finalizer")
-	modified, err := clientutils.PatchEnsureFinalizer(
-		ctx,
-		r.Client,
-		natGateway,
-		natGatewayFinalizer,
-	)
+	modified, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, natGateway, natGatewayFinalizer)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error ensuring finalizer: %w", err)
 	}
@@ -158,10 +132,7 @@ func (r *NATGatewayReconciler) reconcile(
 	}
 	log.V(1).Info("Finalizer is present")
 
-	networkKey := client.ObjectKey{
-		Namespace: natGateway.Namespace,
-		Name:      natGateway.Spec.NetworkRef.Name,
-	}
+	networkKey := client.ObjectKey{Namespace: natGateway.Namespace, Name: natGateway.Spec.NetworkRef.Name}
 	networkName, err := getAPINetNetworkName(ctx, r.Client, networkKey)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error getting apinet network name: %w", err)
@@ -171,16 +142,17 @@ func (r *NATGatewayReconciler) reconcile(
 		return ctrl.Result{}, nil
 	}
 
-	apiNetNATGatewayCfg := apinetv1alpha1ac.NATGateway(string(natGateway.UID), r.APINetNamespace).
-		WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), natGateway)).
-		WithSpec(apinetv1alpha1ac.NATGatewaySpec().
-			WithIPFamily(natGateway.Spec.IPFamily).
-			WithNetworkRef(corev1.LocalObjectReference{Name: networkName}).
-			WithPortsPerNetworkInterface(generic.Deref(
-				natGateway.Spec.PortsPerNetworkInterface,
-				networkingv1alpha1.DefaultPortsPerNetworkInterface,
-			)),
-		)
+	apiNetNATGatewayCfg :=
+		apinetv1alpha1ac.NATGateway(string(natGateway.UID), r.APINetNamespace).
+			WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), natGateway)).
+			WithSpec(apinetv1alpha1ac.NATGatewaySpec().
+				WithIPFamily(natGateway.Spec.IPFamily).
+				WithNetworkRef(corev1.LocalObjectReference{Name: networkName}).
+				WithPortsPerNetworkInterface(generic.Deref(
+					natGateway.Spec.PortsPerNetworkInterface,
+					networkingv1alpha1.DefaultPortsPerNetworkInterface,
+				)),
+			)
 	apiNetNATGateway, err := r.APINetInterface.CoreV1alpha1().
 		NATGateways(r.APINetNamespace).
 		Apply(ctx, apiNetNATGatewayCfg, metav1.ApplyOptions{FieldManager: string(fieldOwner), Force: true})
@@ -200,12 +172,8 @@ func (r *NATGatewayReconciler) reconcile(
 		},
 		Spec: v1alpha1.NATGatewayAutoscalerSpec{
 			NATGatewayRef: corev1.LocalObjectReference{Name: apiNetNATGateway.Name},
-			MinPublicIPs: generic.Pointer[int32](
-				1,
-			), // TODO: Make this configurable via ironcore NAT gateway
-			MaxPublicIPs: generic.Pointer[int32](
-				10,
-			), // TODO: Configure depending on ironcore NAT gateway
+			MinPublicIPs:  generic.Pointer[int32](1),  // TODO: Make this configurable via ironcore NAT gateway
+			MaxPublicIPs:  generic.Pointer[int32](10), // TODO: Configure depending on ironcore NAT gateway
 		},
 	}
 	_ = ctrl.SetControllerReference(apiNetNATGateway, apiNetNATGatewayAutoscaler, r.Scheme())

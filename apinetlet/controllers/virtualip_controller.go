@@ -9,14 +9,12 @@ import (
 	"net/netip"
 
 	"github.com/go-logr/logr"
-
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
-
-	"github.com/ironcore-dev/controller-utils/clientutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
@@ -51,19 +49,12 @@ type VirtualIPReconciler struct {
 
 //+cluster=apinet:kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=ips,verbs=get;list;watch;create;update;patch;delete;deletecollection
 
-func (r *VirtualIPReconciler) Reconcile(
-	ctx context.Context,
-	req ctrl.Request,
-) (ctrl.Result, error) {
+func (r *VirtualIPReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
 	virtualIP := &networkingv1alpha1.VirtualIP{}
 	if err := r.Get(ctx, req.NamespacedName, virtualIP); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return ctrl.Result{}, fmt.Errorf(
-				"error getting virtual ip %s: %w",
-				req.NamespacedName,
-				err,
-			)
+			return ctrl.Result{}, fmt.Errorf("error getting virtual ip %s: %w", req.NamespacedName, err)
 		}
 
 		return r.deleteGone(ctx, log, req.NamespacedName)
@@ -72,11 +63,7 @@ func (r *VirtualIPReconciler) Reconcile(
 	return r.reconcileExists(ctx, log, virtualIP)
 }
 
-func (r *VirtualIPReconciler) deleteGone(
-	ctx context.Context,
-	log logr.Logger,
-	virtualIPKey client.ObjectKey,
-) (ctrl.Result, error) {
+func (r *VirtualIPReconciler) deleteGone(ctx context.Context, log logr.Logger, virtualIPKey client.ObjectKey) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
 	log.V(1).Info("Deleting any matching APINet ips")
@@ -103,11 +90,7 @@ func (r *VirtualIPReconciler) reconcileExists(
 	return r.reconcile(ctx, log, virtualIP)
 }
 
-func (r *VirtualIPReconciler) delete(
-	ctx context.Context,
-	log logr.Logger,
-	virtualIP *networkingv1alpha1.VirtualIP,
-) (ctrl.Result, error) {
+func (r *VirtualIPReconciler) delete(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (ctrl.Result, error) {
 	log.V(1).Info("Delete")
 
 	if !controllerutil.ContainsFinalizer(virtualIP, virtualIPFinalizer) {
@@ -139,11 +122,7 @@ func (r *VirtualIPReconciler) delete(
 	return ctrl.Result{Requeue: true}, nil
 }
 
-func (r *VirtualIPReconciler) reconcile(
-	ctx context.Context,
-	log logr.Logger,
-	virtualIP *networkingv1alpha1.VirtualIP,
-) (ctrl.Result, error) {
+func (r *VirtualIPReconciler) reconcile(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
 	log.V(1).Info("Ensuring finalizer")
@@ -173,17 +152,14 @@ func (r *VirtualIPReconciler) reconcile(
 	return ctrl.Result{}, nil
 }
 
-func (r *VirtualIPReconciler) applyIP(
-	ctx context.Context,
-	log logr.Logger,
-	virtualIP *networkingv1alpha1.VirtualIP,
-) (netip.Addr, error) {
-	apiNetIPApplyCfg := apinetv1alpha1ac.IP(string(virtualIP.UID), r.APINetNamespace).
-		WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), virtualIP)).
-		WithSpec(apinetv1alpha1ac.IPSpec().
-			WithType(apinetv1alpha1.IPTypePublic).
-			WithIPFamily(virtualIP.Spec.IPFamily),
-		)
+func (r *VirtualIPReconciler) applyIP(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (netip.Addr, error) {
+	apiNetIPApplyCfg :=
+		apinetv1alpha1ac.IP(string(virtualIP.UID), r.APINetNamespace).
+			WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), virtualIP)).
+			WithSpec(apinetv1alpha1ac.IPSpec().
+				WithType(apinetv1alpha1.IPTypePublic).
+				WithIPFamily(virtualIP.Spec.IPFamily),
+			)
 
 	apiNetIP, err := r.APINetInterface.CoreV1alpha1().
 		IPs(r.APINetNamespace).
@@ -197,11 +173,7 @@ func (r *VirtualIPReconciler) applyIP(
 	return ip.Addr, nil
 }
 
-func (r *VirtualIPReconciler) patchStatusAllocated(
-	ctx context.Context,
-	virtualIP *networkingv1alpha1.VirtualIP,
-	addr netip.Addr,
-) error {
+func (r *VirtualIPReconciler) patchStatusAllocated(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIP, addr netip.Addr) error {
 	base := virtualIP.DeepCopy()
 	virtualIP.Status.IP = &commonv1alpha1.IP{Addr: addr}
 	if err := r.Status().Patch(ctx, virtualIP, client.StrategicMergeFrom(base)); err != nil {
@@ -210,10 +182,7 @@ func (r *VirtualIPReconciler) patchStatusAllocated(
 	return nil
 }
 
-func (r *VirtualIPReconciler) patchStatusUnallocated(
-	ctx context.Context,
-	virtualIP *networkingv1alpha1.VirtualIP,
-) error {
+func (r *VirtualIPReconciler) patchStatusUnallocated(ctx context.Context, virtualIP *networkingv1alpha1.VirtualIP) error {
 	base := virtualIP.DeepCopy()
 	virtualIP.Status.IP = nil
 	if err := r.Status().Patch(ctx, virtualIP, client.MergeFrom(base)); err != nil {
