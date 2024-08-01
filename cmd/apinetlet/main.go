@@ -10,6 +10,7 @@ import (
 	"os"
 
 	ironcorenetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	apinetletconfig "github.com/ironcore-dev/ironcore-net/apinetlet/client/config"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/controllers"
 	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
@@ -48,6 +49,7 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(mgrScheme))
 	utilruntime.Must(networkingv1alpha1.AddToScheme(mgrScheme))
 	utilruntime.Must(ipamv1alpha1.AddToScheme(mgrScheme))
+	utilruntime.Must(ironcorenetv1alpha1.AddToScheme(mgrScheme))
 
 	utilruntime.Must(clientgoscheme.AddToScheme(apinetletScheme))
 	utilruntime.Must(networkingv1alpha1.AddToScheme(apinetletScheme))
@@ -233,6 +235,11 @@ func main() {
 		WatchFilterValue: watchFilterValue,
 	}).SetupWithManager(mgr, apiNetCluster.GetCache()); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "VirtualIP")
+		os.Exit(1)
+	}
+
+	if err := apinetletclient.SetupNetworkPolicyNetworkNameFieldIndexer(ctx, apiNetCluster.GetFieldIndexer()); err != nil {
+		setupLog.Error(err, "unable to setup field indexer", "field", apinetletclient.NetworkPolicyNetworkNameField)
 		os.Exit(1)
 	}
 
