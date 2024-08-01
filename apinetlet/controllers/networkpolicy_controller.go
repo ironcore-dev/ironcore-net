@@ -8,6 +8,10 @@ import (
 	"fmt"
 	"net/netip"
 
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/util/workqueue"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
+
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
@@ -23,8 +27,6 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -32,7 +34,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
@@ -59,11 +60,10 @@ type NetworkPolicyReconciler struct {
 //+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkpolicies,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkpolicies/finalizers,verbs=update;patch
 
-//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch
-//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networks,verbs=get;list;watch
-
 //+cluster=apinet:kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networkpolicies,verbs=get;list;watch;create;update;patch;delete;deletecollection
 //+cluster=apinet:kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networkpolicyrules,verbs=get;list;watch;create;update;patch;delete;deletecollection
+//+cluster=apinet:kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networks,verbs=get;list;watch
+//+cluster=apinet:kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch
 
 func (r *NetworkPolicyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
@@ -589,12 +589,12 @@ func (r *NetworkPolicyReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache
 			source.Kind(apiNetCache, &apinetv1alpha1.NetworkPolicy{}),
 			apinetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.NetworkPolicy{}),
 		).
-		Watches(
-			&apinetv1alpha1.Network{},
+		WatchesRawSource(
+			source.Kind(apiNetCache, &apinetv1alpha1.Network{}),
 			r.enqueueByNetwork(),
 		).
-		Watches(
-			&apinetv1alpha1.NetworkInterface{},
+		WatchesRawSource(
+			source.Kind(apiNetCache, &apinetv1alpha1.NetworkInterface{}),
 			r.enqueueByNetworkInterface(),
 			builder.WithPredicates(r.networkInterfaceReadyPredicate()),
 		).

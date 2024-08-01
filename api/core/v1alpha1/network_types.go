@@ -26,7 +26,7 @@ type NetworkPeering struct {
 	Prefixes []PeeringPrefix `json:"prefixes,omitempty"`
 }
 
-// PeeringPrefixes defines prefixes to be exposed to the peered network
+// PeeringPrefix defines prefixes to be exposed to the peered network
 type PeeringPrefix struct {
 	// Name is the semantical name of the peering prefixes
 	Name string `json:"name"`

@@ -3825,7 +3825,7 @@ func schema_ironcore_net_api_core_v1alpha1_PeeringPrefix(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PeeringPrefixes defines prefixes to be exposed to the peered network",
+				Description: "PeeringPrefix defines prefixes to be exposed to the peered network",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"name": {
