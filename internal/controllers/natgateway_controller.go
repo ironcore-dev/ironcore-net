@@ -336,13 +336,13 @@ func (r *NATGatewayReconciler) applyNATTable(
 		for _, alloc := range allocs {
 			natIP.Sections = append(natIP.Sections, alloc)
 		}
-		slices.SortFunc(natIP.Sections, func(a, b v1alpha1.NATIPSection) bool {
-			return a.Port < b.Port
+		slices.SortFunc(natIP.Sections, func(a, b v1alpha1.NATIPSection) int {
+			return int(a.Port - b.Port)
 		})
 		natTable.IPs = append(natTable.IPs, natIP)
 	}
-	slices.SortFunc(natTable.IPs, func(a, b v1alpha1.NATIP) bool {
-		return a.IP.Compare(b.IP.Addr) < 0
+	slices.SortFunc(natTable.IPs, func(a, b v1alpha1.NATIP) int {
+		return a.IP.Compare(b.IP.Addr)
 	})
 
 	if err := r.Patch(ctx, natTable, client.Apply, fieldOwner, client.ForceOwnership); err != nil {
