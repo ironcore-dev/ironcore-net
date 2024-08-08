@@ -192,8 +192,8 @@ func (r *DaemonSetReconciler) instancesShouldBeOnNode(
 			nodesNeedingDaemonInsts = append(nodesNeedingDaemonInsts, node.Name)
 		} else if len(filtered) > 1 {
 			// Delete any unnecessary instance, keeping the oldest ones.
-			slices.SortFunc(filtered, func(a, b *v1alpha1.Instance) bool {
-				return a.CreationTimestamp.Compare(b.CreationTimestamp.Time) < 0
+			slices.SortFunc(filtered, func(a, b *v1alpha1.Instance) int {
+				return a.CreationTimestamp.Compare(b.CreationTimestamp.Time)
 			})
 			for _, inst := range filtered[1:] {
 				instsToDelete = append(instsToDelete, inst.Name)

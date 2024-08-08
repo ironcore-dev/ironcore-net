@@ -164,7 +164,7 @@ func (r *NetworkInterfaceReconciler) getLoadBalancerTargetsForNetworkInterface(c
 	}
 
 	ips := ipSet.UnsortedList()
-	slices.SortFunc(ips, func(ip1, ip2 net.IP) bool { return ip1.Compare(ip2.Addr) < 0 })
+	slices.SortFunc(ips, func(ip1, ip2 net.IP) int { return ip1.Compare(ip2.Addr) })
 	return ips, nil
 }
 
