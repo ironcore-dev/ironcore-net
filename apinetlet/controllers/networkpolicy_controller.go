@@ -467,7 +467,7 @@ func (r *NetworkPolicyReconciler) enqueueByNetwork() handler.EventHandler {
 		apiNetNetwork := obj.(*apinetv1alpha1.Network)
 
 		networkPolicyList := &apinetv1alpha1.NetworkPolicyList{}
-		if err := r.List(ctx, networkPolicyList,
+		if err := r.APINetClient.List(ctx, networkPolicyList,
 			client.InNamespace(apiNetNetwork.Namespace),
 			client.MatchingFields{apinetletclient.NetworkPolicyNetworkNameField: apiNetNetwork.Name},
 		); err != nil {
@@ -487,7 +487,7 @@ func (r *NetworkPolicyReconciler) enqueueByNetworkInterface() handler.EventHandl
 			client.InNamespace(nic.Namespace),
 			client.MatchingFields{apinetletclient.NetworkPolicyNetworkNameField: nic.Spec.NetworkRef.Name},
 		); err != nil {
-			log.Error(err, "Error listing apinent network policies for nic")
+			log.Error(err, "Error listing apinet network policies for nic")
 			return nil
 		}
 
