@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
-	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/handler"
@@ -67,7 +66,7 @@ func (r *NATGatewayReconciler) deleteGone(ctx context.Context, log logr.Logger, 
 	log.V(1).Info("Delete gone")
 
 	log.V(1).Info("Deleting any APINet NAT gateway by key")
-	if err := r.APINetClient.DeleteAllOf(ctx, &v1alpha1.NATGateway{},
+	if err := r.APINetClient.DeleteAllOf(ctx, &apinetv1alpha1.NATGateway{},
 		client.InNamespace(r.APINetNamespace),
 		apinetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), key, &networkingv1alpha1.NATGateway{}),
 	); err != nil {
@@ -95,7 +94,7 @@ func (r *NATGatewayReconciler) delete(ctx context.Context, log logr.Logger, natG
 	log.V(1).Info("Finalizer present, running cleanup")
 
 	log.V(1).Info("Deleting APINet NAT gateway")
-	apiNetNATGateway := &v1alpha1.NATGateway{
+	apiNetNATGateway := &apinetv1alpha1.NATGateway{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: r.APINetNamespace,
 			Name:      string(natGateway.UID),
@@ -160,7 +159,7 @@ func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 		return ctrl.Result{}, fmt.Errorf("error applying apinet nat gateway: %w", err)
 	}
 
-	apiNetNATGatewayAutoscaler := &v1alpha1.NATGatewayAutoscaler{
+	apiNetNATGatewayAutoscaler := &apinetv1alpha1.NATGatewayAutoscaler{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: apinetv1alpha1.SchemeGroupVersion.String(),
 			Kind:       "NATGatewayAutoscaler",
@@ -170,7 +169,7 @@ func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 			Name:      string(natGateway.UID),
 			Labels:    apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), natGateway),
 		},
-		Spec: v1alpha1.NATGatewayAutoscalerSpec{
+		Spec: apinetv1alpha1.NATGatewayAutoscalerSpec{
 			NATGatewayRef: corev1.LocalObjectReference{Name: apiNetNATGateway.Name},
 			MinPublicIPs:  generic.Pointer[int32](1),  // TODO: Make this configurable via ironcore NAT gateway
 			MaxPublicIPs:  generic.Pointer[int32](10), // TODO: Configure depending on ironcore NAT gateway
@@ -181,7 +180,7 @@ func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 		return ctrl.Result{}, fmt.Errorf("error applying apinet NAT gateway autoscaler: %w", err)
 	}
 
-	natGatewayIPs := apiNetIPsToIPs(v1alpha1.GetNATGatewayIPs(apiNetNATGateway))
+	natGatewayIPs := apiNetIPsToIPs(apinetv1alpha1.GetNATGatewayIPs(apiNetNATGateway))
 	if !slices.Equal(natGateway.Status.IPs, natGatewayIPs) {
 		if err := r.updateNATGatewayStatus(ctx, natGateway, natGatewayIPs); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error updating NAT gateway status IPs: %w", err)
@@ -215,11 +214,11 @@ func (r *NATGatewayReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache ca
 			),
 		).
 		WatchesRawSource(
-			source.Kind(apiNetCache, &v1alpha1.NATGateway{}),
+			source.Kind(apiNetCache, &apinetv1alpha1.NATGateway{}),
 			handler.EnqueueRequestForSource(mgr.GetScheme(), mgr.GetRESTMapper(), &networkingv1alpha1.NATGateway{}),
 		).
 		WatchesRawSource(
-			source.Kind(apiNetCache, &v1alpha1.NATGatewayAutoscaler{}),
+			source.Kind(apiNetCache, &apinetv1alpha1.NATGatewayAutoscaler{}),
 			handler.EnqueueRequestForSource(mgr.GetScheme(), mgr.GetRESTMapper(), &networkingv1alpha1.NATGateway{}),
 		).
 		Complete(r)

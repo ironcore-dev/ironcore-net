@@ -32,11 +32,17 @@ When creating network peering both `ironcore` `Network`s has to specify matching
 multiple `network`s in any namespcae.
 
 The `apinetlet` `NetworkController` checks if there are any `peeringClaimRefs` 
-present in `ironcore` `Network`. If yes then get `ironcore-net` `Network` using `UID` of `peeringClaimRef` 
-and add `spec.ID` of that `ironcore-net` `Network` into `spec.peeredIDs` of current `ironcore-net` `Network`.
+present in `ironcore` `Network`. If yes then get `ironcore-net` `Network` 
+using `UID` of `peeringClaimRef` and add `spec.ID` of that `ironcore-net` `Network` 
+along with corresponding peering name and peering prefixes into `spec.peerings` 
+of current `ironcore-net` `Network`.
 
-The `apinetlet` `NetworkController` also checks for `status.peerings` in `ironcore` `Network`.
-If yes then update `ironcore-net` `Network`s `status.peerings` with `ironcore` `Network`s `status.peerings`
+Once `ironcore-net` `Network` is updated with `spec.peerings`, `metalnetlet` `NetworkController` 
+updates `metalnet` `Network`'s `spec.peeredIDs` and `spec.peeredPrefixes` 
+from corresponding `ironcore-net` `Network` `spec.peerings`
 
-Once `ironcore-net` `Network` is updated with `spec.peeredIDs`, `metalnetlet` `NetworkController` 
-updates `metalnet` `Network` `spec.peeredIDs` with corresponding `ironcore-net` `Network` `spec.peeredIDs`
+The `metalnetlet` `NetworkController` also translates `status.peerings` 
+in `metalnet` `Network` to `ironcore-net` `Network`'s `status.peerings`.
+
+Then the `apinetlet` `NetworkController` also translates `status.peerings` 
+in `ironcore-net` `Network` to `ironcore` `Network`'s `status.peerings`.

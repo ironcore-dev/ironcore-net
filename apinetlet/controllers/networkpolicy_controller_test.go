@@ -31,7 +31,6 @@ var _ = Describe("NetworkPolicyController", func() {
 	network, apiNetNetwork := SetupNetwork(ns, apiNetNs)
 
 	It("should manage and reconcile the APINet network policy and its rules without target apinet nic", func(ctx SpecContext) {
-
 		By("creating an apinet nic for ingress")
 		ingressApiNetNic := &apinetv1alpha1.NetworkInterface{
 			ObjectMeta: metav1.ObjectMeta{
@@ -305,7 +304,6 @@ var _ = Describe("NetworkPolicyController", func() {
 	})
 
 	It("should manage and reconcile the APINet network policy and its rules with available target apinet nic ", func(ctx SpecContext) {
-
 		By("creating a target apinet nic")
 		targetApiNetNic1 := &apinetv1alpha1.NetworkInterface{
 			ObjectMeta: metav1.ObjectMeta{

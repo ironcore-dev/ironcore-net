@@ -9,7 +9,6 @@ import (
 
 	"github.com/ironcore-dev/controller-utils/configutils"
 	ironcorenetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	apinetclient "github.com/ironcore-dev/ironcore-net/internal/client"
 
 	"github.com/ironcore-dev/ironcore-net/internal/controllers"
@@ -178,11 +177,6 @@ func main() {
 
 	if err := apinetclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
 		setupLog.Error(err, "unable to setup field indexer", "field", apinetclient.NetworkInterfaceSpecNetworkRefNameField)
-		os.Exit(1)
-	}
-
-	if err := apinetletclient.SetupNetworkPolicyNetworkNameFieldIndexer(ctx, mgr.GetFieldIndexer()); err != nil {
-		setupLog.Error(err, "unable to setup field indexer", "field", apinetletclient.NetworkPolicyNetworkNameField)
 		os.Exit(1)
 	}
 

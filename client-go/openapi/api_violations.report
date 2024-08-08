@@ -17,6 +17,7 @@ API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/c
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NetworkInterfaceStatus,NATIPs
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NetworkInterfaceStatus,Prefixes
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NetworkInterfaceStatus,PublicIPs
+API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NetworkPeering,Prefixes
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NetworkPolicyEgressRule,Ports
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NetworkPolicyEgressRule,To
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NetworkPolicyIngressRule,From
