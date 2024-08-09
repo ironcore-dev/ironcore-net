@@ -9,14 +9,17 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/controller-utils/clientutils"
-	"github.com/ironcore-dev/controller-utils/metautils"
+	"golang.org/x/exp/slices"
+
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	apinetlethandler "github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
 	utilgeneric "github.com/ironcore-dev/ironcore-net/utils/generic"
+
+	"github.com/ironcore-dev/controller-utils/clientutils"
+	"github.com/ironcore-dev/controller-utils/metautils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -24,7 +27,6 @@ import (
 	"github.com/ironcore-dev/ironcore/utils/generic"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
-	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -68,7 +70,7 @@ func (r *NetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		}
 
 		if err := r.releaseNetworkInterfaceKeyAPINetInterfaces(ctx, req.NamespacedName); err != nil {
-			return ctrl.Result{}, fmt.Errorf("error releasing apinet network interfaces by key: %w", err)
+			return ctrl.Result{}, fmt.Errorf("error releasing APINet network interfaces by key: %w", err)
 		}
 		return ctrl.Result{}, nil
 	}
@@ -89,7 +91,7 @@ func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceKeyAPINetInterfaces(
 		client.InNamespace(r.APINetNamespace),
 		apinetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), nicKey, &networkingv1alpha1.NetworkInterface{}),
 	); err != nil {
-		return fmt.Errorf("error listing apinet network interfaces: %w", err)
+		return fmt.Errorf("error listing APINet network interfaces: %w", err)
 	}
 
 	var errs []error
@@ -114,7 +116,7 @@ func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceAPINetNetworkInterfa
 		client.InNamespace(r.APINetNamespace),
 		apinetletclient.MatchingSourceLabels(r.Scheme(), r.RESTMapper(), nic),
 	); err != nil {
-		return fmt.Errorf("error listing apinet network interfaces: %w", err)
+		return fmt.Errorf("error listing APINet network interfaces: %w", err)
 	}
 
 	// create a shallow copy of the network interface with the
@@ -174,7 +176,7 @@ func (r *NetworkInterfaceReconciler) delete(ctx context.Context, log logr.Logger
 	}
 
 	if err := r.releaseNetworkInterfaceAPINetNetworkInterfaces(ctx, nic); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error releasing apinet network interfaces: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error releasing APINet network interfaces: %w", err)
 	}
 	log.V(1).Info("Released APINet network interfaces")
 
@@ -328,16 +330,12 @@ func (r *NetworkInterfaceReconciler) networkInterfaceAPINetNetworkInterfaceSelec
 	})
 }
 
-func (r *NetworkInterfaceReconciler) getAPINetNetworkInterfaceForNetworkInterface(
-	ctx context.Context,
-	log logr.Logger,
-	nic *networkingv1alpha1.NetworkInterface,
-) (*apinetv1alpha1.NetworkInterface, error) {
+func (r *NetworkInterfaceReconciler) getAPINetNetworkInterfaceForNetworkInterface(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (*apinetv1alpha1.NetworkInterface, error) {
 	apiNetNicList := &apinetv1alpha1.NetworkInterfaceList{}
 	if err := r.APINetClient.List(ctx, apiNetNicList,
 		client.InNamespace(r.APINetNamespace),
 	); err != nil {
-		return nil, fmt.Errorf("error listing apinet network interfaces: %w", err)
+		return nil, fmt.Errorf("error listing APINet network interfaces: %w", err)
 	}
 
 	var (
@@ -361,10 +359,7 @@ func (r *NetworkInterfaceReconciler) getAPINetNetworkInterfaceForNetworkInterfac
 	return foundAPINetNic, errors.Join(errs...)
 }
 
-func (r *NetworkInterfaceReconciler) getPrefixesForNetworkInterface(
-	ctx context.Context,
-	nic *networkingv1alpha1.NetworkInterface,
-) ([]net.IPPrefix, error) {
+func (r *NetworkInterfaceReconciler) getPrefixesForNetworkInterface(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) ([]net.IPPrefix, error) {
 	var res []net.IPPrefix
 	for idx, prefixSrc := range nic.Spec.Prefixes {
 		switch {
@@ -390,13 +385,7 @@ func (r *NetworkInterfaceReconciler) getPrefixesForNetworkInterface(
 	return res, nil
 }
 
-func (r *NetworkInterfaceReconciler) manageAPINetNetworkInterface(
-	ctx context.Context,
-	nic *networkingv1alpha1.NetworkInterface,
-	apiNetNic *apinetv1alpha1.NetworkInterface,
-	vips []networkingv1alpha1.VirtualIP,
-	prefixes []net.IPPrefix,
-) error {
+func (r *NetworkInterfaceReconciler) manageAPINetNetworkInterface(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, apiNetNic *apinetv1alpha1.NetworkInterface, vips []networkingv1alpha1.VirtualIP, prefixes []net.IPPrefix) error {
 	_ = nic
 
 	var (
@@ -432,10 +421,7 @@ func (r *NetworkInterfaceReconciler) manageAPINetNetworkInterface(
 	return r.APINetClient.Patch(ctx, apiNetNic, client.StrategicMergeFrom(base))
 }
 
-func (r *NetworkInterfaceReconciler) setNetworkInterfacePending(
-	ctx context.Context,
-	nic *networkingv1alpha1.NetworkInterface,
-) error {
+func (r *NetworkInterfaceReconciler) setNetworkInterfacePending(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) error {
 	now := metav1.Now()
 
 	base := nic.DeepCopy()
@@ -493,7 +479,7 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	}
 
 	if err := r.manageAPINetNetworkInterface(ctx, nic, apiNetNic, vips, prefixes); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error managing apinet network interface: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error managing APINet network interface: %w", err)
 	}
 
 	var (
@@ -513,14 +499,7 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	return ctrl.Result{}, nil
 }
 
-func (r *NetworkInterfaceReconciler) updateNetworkInterfaceStatus(
-	ctx context.Context,
-	nic *networkingv1alpha1.NetworkInterface,
-	state networkingv1alpha1.NetworkInterfaceState,
-	ips []commonv1alpha1.IP,
-	prefixes []commonv1alpha1.IPPrefix,
-	virtualIP *commonv1alpha1.IP,
-) error {
+func (r *NetworkInterfaceReconciler) updateNetworkInterfaceStatus(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, state networkingv1alpha1.NetworkInterfaceState, ips []commonv1alpha1.IP, prefixes []commonv1alpha1.IPPrefix, virtualIP *commonv1alpha1.IP) error {
 	now := metav1.Now()
 	base := nic.DeepCopy()
 
@@ -538,13 +517,7 @@ func (r *NetworkInterfaceReconciler) updateNetworkInterfaceStatus(
 	return nil
 }
 
-func NetworkInterfaceStatusUpToDate(
-	nic *networkingv1alpha1.NetworkInterface,
-	expectedState networkingv1alpha1.NetworkInterfaceState,
-	expectedIPs []commonv1alpha1.IP,
-	expectedIPPrefixes []commonv1alpha1.IPPrefix,
-	expectedVirtualIP *commonv1alpha1.IP,
-) bool {
+func NetworkInterfaceStatusUpToDate(nic *networkingv1alpha1.NetworkInterface, expectedState networkingv1alpha1.NetworkInterfaceState, expectedIPs []commonv1alpha1.IP, expectedIPPrefixes []commonv1alpha1.IPPrefix, expectedVirtualIP *commonv1alpha1.IP) bool {
 	return nic.Status.State == expectedState &&
 		slices.Equal(nic.Status.IPs, expectedIPs) &&
 		slices.Equal(nic.Status.Prefixes, expectedIPPrefixes) &&

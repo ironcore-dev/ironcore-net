@@ -8,12 +8,8 @@ import (
 	"fmt"
 	"net/netip"
 
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/util/workqueue"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
-
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/controller-utils/clientutils"
+
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
@@ -21,19 +17,23 @@ import (
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
 	apinetclient "github.com/ironcore-dev/ironcore-net/internal/client"
+
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/klog/v2"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/util/workqueue"
+	klog "k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
@@ -42,9 +42,7 @@ const (
 	networkPolicyFinalizer = "apinet.ironcore.dev/networkpolicy"
 )
 
-var (
-	networkPolicyFieldOwner = client.FieldOwner(networkingv1alpha1.Resource("networkpolicies").String())
-)
+var networkPolicyFieldOwner = client.FieldOwner(networkingv1alpha1.Resource("networkpolicies").String())
 
 type NetworkPolicyReconciler struct {
 	client.Client
@@ -82,12 +80,12 @@ func (r *NetworkPolicyReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 func (r *NetworkPolicyReconciler) deleteGone(ctx context.Context, log logr.Logger, networkPolicyKey client.ObjectKey) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
-	log.V(1).Info("Deleting any matching apinet network policies")
+	log.V(1).Info("Deleting any matching APINet network policies")
 	if err := r.APINetClient.DeleteAllOf(ctx, &apinetv1alpha1.NetworkPolicy{},
 		client.InNamespace(r.APINetNamespace),
 		apinetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), networkPolicyKey, &networkingv1alpha1.NetworkPolicy{}),
 	); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error deleting apinet network policies: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error deleting APINet network policies: %w", err)
 	}
 
 	log.V(1).Info("Deleted any leftover APINet network policy")
@@ -118,7 +116,7 @@ func (r *NetworkPolicyReconciler) delete(ctx context.Context, log logr.Logger, n
 	}
 	if err := r.APINetClient.Delete(ctx, apiNetNetworkPolicy); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return ctrl.Result{}, fmt.Errorf("error deleting apinet network policy: %w", err)
+			return ctrl.Result{}, fmt.Errorf("error deleting APINet network policy: %w", err)
 		}
 	}
 
@@ -164,7 +162,7 @@ func (r *NetworkPolicyReconciler) reconcile(ctx context.Context, log logr.Logger
 	log.V(1).Info("Applying APINet network policy")
 	apiNetNetworkPolicy, err := r.applyAPINetNetworkPolicy(ctx, networkPolicy, apiNetNetworkName)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error applying apinet network policy: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error applying APINet network policy: %w", err)
 	}
 
 	log.V(1).Info("Finding APINet network interface targets")
@@ -187,7 +185,7 @@ func (r *NetworkPolicyReconciler) reconcile(ctx context.Context, log logr.Logger
 
 	log.V(1).Info("Applying APINet network policy rule", "targets", targets, "Network", klog.KObj(apiNetNetwork))
 	if err := r.applyNetworkPolicyRule(ctx, networkPolicy, apiNetNetworkPolicy, targets, apiNetNetwork, ingressRules, egressRules); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error applying apinet network policy rule: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error applying APINet network policy rule: %w", err)
 	}
 
 	log.V(1).Info("Reconciled")
@@ -206,7 +204,7 @@ func (r *NetworkPolicyReconciler) findTargets(ctx context.Context, apiNetNetwork
 		client.MatchingLabelsSelector{Selector: sel},
 		client.MatchingFields{apinetclient.NetworkInterfaceSpecNetworkRefNameField: apiNetNetworkPolicy.Spec.NetworkRef.Name},
 	); err != nil {
-		return nil, fmt.Errorf("error listing apinet network interfaces: %w", err)
+		return nil, fmt.Errorf("error listing APINet network interfaces: %w", err)
 	}
 
 	// Make slice non-nil so omitempty does not file.
@@ -300,7 +298,7 @@ func (r *NetworkPolicyReconciler) processObjectSelector(ctx context.Context, np 
 		return r.fetchIPsFromNetworkInterfaces(ctx, np, objectSelector)
 	case "LoadBalancer":
 		return r.fetchIPsFromLoadBalancers(ctx, np, objectSelector)
-	//TODO: add more objects selector support if needed
+	// TODO: add more objects selector support if needed
 	default:
 		return nil, fmt.Errorf("unsupported object kind: %s", objectSelector.Kind)
 	}
@@ -318,7 +316,7 @@ func (r *NetworkPolicyReconciler) fetchIPsFromNetworkInterfaces(ctx context.Cont
 		client.MatchingLabelsSelector{Selector: sel},
 		client.MatchingFields{apinetclient.NetworkInterfaceSpecNetworkRefNameField: np.Spec.NetworkRef.Name},
 	); err != nil {
-		return nil, fmt.Errorf("error listing apinet network interfaces: %w", err)
+		return nil, fmt.Errorf("error listing APINet network interfaces: %w", err)
 	}
 
 	var ips []apinetv1alpha1.ObjectIP
@@ -349,7 +347,7 @@ func (r *NetworkPolicyReconciler) fetchIPsFromLoadBalancers(ctx context.Context,
 		return nil, err
 	}
 
-	//TODO: apinet load balancer need to inherit labels from ironcore load balancer
+	// TODO: apinet load balancer need to inherit labels from ironcore load balancer
 	lbList := &apinetv1alpha1.LoadBalancerList{}
 	if err := r.List(ctx, lbList,
 		client.InNamespace(np.Namespace),
@@ -361,7 +359,7 @@ func (r *NetworkPolicyReconciler) fetchIPsFromLoadBalancers(ctx context.Context,
 	var ips []apinetv1alpha1.ObjectIP
 
 	for _, lb := range lbList.Items {
-		//TODO: handle loadbalancer ports
+		// TODO: handle loadbalancer ports
 		for _, ip := range lb.Spec.IPs {
 			// TODO: handle LoadBalancerIP when only IPFamily is specified to allocate a random IP.
 			ips = append(ips, apinetv1alpha1.ObjectIP{
@@ -374,14 +372,7 @@ func (r *NetworkPolicyReconciler) fetchIPsFromLoadBalancers(ctx context.Context,
 	return ips, nil
 }
 
-func (r *NetworkPolicyReconciler) applyNetworkPolicyRule(
-	ctx context.Context,
-	networkPolicy *networkingv1alpha1.NetworkPolicy,
-	apiNetNetworkPolicy *apinetv1alpha1.NetworkPolicy,
-	targets []apinetv1alpha1.TargetNetworkInterface,
-	network *apinetv1alpha1.Network,
-	ingressRules, egressRules []apinetv1alpha1.Rule,
-) error {
+func (r *NetworkPolicyReconciler) applyNetworkPolicyRule(ctx context.Context, networkPolicy *networkingv1alpha1.NetworkPolicy, apiNetNetworkPolicy *apinetv1alpha1.NetworkPolicy, targets []apinetv1alpha1.TargetNetworkInterface, network *apinetv1alpha1.Network, ingressRules, egressRules []apinetv1alpha1.Rule) error {
 	networkPolicyRule := &apinetv1alpha1.NetworkPolicyRule{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "NetworkPolicyRule",
@@ -441,22 +432,21 @@ func (r *NetworkPolicyReconciler) applyAPINetNetworkPolicy(ctx context.Context, 
 
 	nicSelector := translateLabelSelector(networkPolicy.Spec.NetworkInterfaceSelector)
 
-	apiNetNetworkPolicyApplyCfg :=
-		apinetv1alpha1ac.NetworkPolicy(string(networkPolicy.UID), r.APINetNamespace).
-			WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), networkPolicy)).
-			WithSpec(apinetv1alpha1ac.NetworkPolicySpec().
-				WithNetworkRef(corev1.LocalObjectReference{Name: apiNetNetworkName}).
-				WithNetworkInterfaceSelector(nicSelector).
-				WithPriority(1000). // set default value since networkingv1alpha1.NetworkPolicy does not have this field
-				WithIngress(apiNetIngressRules...).
-				WithEgress(apiNetEgressRules...).
-				WithPolicyTypes(apiNetNetworkPolicyTypes...),
-			)
+	apiNetNetworkPolicyApplyCfg := apinetv1alpha1ac.NetworkPolicy(string(networkPolicy.UID), r.APINetNamespace).
+		WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), networkPolicy)).
+		WithSpec(apinetv1alpha1ac.NetworkPolicySpec().
+			WithNetworkRef(corev1.LocalObjectReference{Name: apiNetNetworkName}).
+			WithNetworkInterfaceSelector(nicSelector).
+			WithPriority(1000). // set default value since networkingv1alpha1.NetworkPolicy does not have this field
+			WithIngress(apiNetIngressRules...).
+			WithEgress(apiNetEgressRules...).
+			WithPolicyTypes(apiNetNetworkPolicyTypes...),
+		)
 	apiNetNetworkPolicy, err := r.APINetInterface.CoreV1alpha1().
 		NetworkPolicies(r.APINetNamespace).
 		Apply(ctx, apiNetNetworkPolicyApplyCfg, metav1.ApplyOptions{FieldManager: string(fieldOwner), Force: true})
 	if err != nil {
-		return nil, fmt.Errorf("error applying apinet network policy: %w", err)
+		return nil, fmt.Errorf("error applying APINet network policy: %w", err)
 	}
 	return apiNetNetworkPolicy, nil
 }
@@ -487,7 +477,7 @@ func (r *NetworkPolicyReconciler) enqueueByNetworkInterface() handler.EventHandl
 			client.InNamespace(nic.Namespace),
 			client.MatchingFields{apinetletclient.NetworkPolicyNetworkNameField: nic.Spec.NetworkRef.Name},
 		); err != nil {
-			log.Error(err, "Error listing apinet network policies for nic")
+			log.Error(err, "Error listing APINet network policies for nic")
 			return nil
 		}
 
