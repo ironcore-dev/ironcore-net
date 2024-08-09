@@ -9,12 +9,14 @@ import (
 	"net/netip"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/controller-utils/clientutils"
+
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
+
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
@@ -153,13 +155,12 @@ func (r *VirtualIPReconciler) reconcile(ctx context.Context, log logr.Logger, vi
 }
 
 func (r *VirtualIPReconciler) applyIP(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (netip.Addr, error) {
-	apiNetIPApplyCfg :=
-		apinetv1alpha1ac.IP(string(virtualIP.UID), r.APINetNamespace).
-			WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), virtualIP)).
-			WithSpec(apinetv1alpha1ac.IPSpec().
-				WithType(apinetv1alpha1.IPTypePublic).
-				WithIPFamily(virtualIP.Spec.IPFamily),
-			)
+	apiNetIPApplyCfg := apinetv1alpha1ac.IP(string(virtualIP.UID), r.APINetNamespace).
+		WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), virtualIP)).
+		WithSpec(apinetv1alpha1ac.IPSpec().
+			WithType(apinetv1alpha1.IPTypePublic).
+			WithIPFamily(virtualIP.Spec.IPFamily),
+		)
 
 	apiNetIP, err := r.APINetInterface.CoreV1alpha1().
 		IPs(r.APINetNamespace).
