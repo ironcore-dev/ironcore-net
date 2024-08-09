@@ -300,7 +300,7 @@ func (r *NetworkPolicyReconciler) processObjectSelector(ctx context.Context, np 
 		return r.fetchIPsFromNetworkInterfaces(ctx, np, objectSelector)
 	case "LoadBalancer":
 		return r.fetchIPsFromLoadBalancers(ctx, np, objectSelector)
-	//TODO: add more objects selector support if needed
+	// TODO: add more objects selector support if needed
 	default:
 		return nil, fmt.Errorf("unsupported object kind: %s", objectSelector.Kind)
 	}
@@ -349,7 +349,7 @@ func (r *NetworkPolicyReconciler) fetchIPsFromLoadBalancers(ctx context.Context,
 		return nil, err
 	}
 
-	//TODO: apinet load balancer need to inherit labels from ironcore load balancer
+	// TODO: apinet load balancer need to inherit labels from ironcore load balancer
 	lbList := &apinetv1alpha1.LoadBalancerList{}
 	if err := r.List(ctx, lbList,
 		client.InNamespace(np.Namespace),
@@ -361,7 +361,7 @@ func (r *NetworkPolicyReconciler) fetchIPsFromLoadBalancers(ctx context.Context,
 	var ips []apinetv1alpha1.ObjectIP
 
 	for _, lb := range lbList.Items {
-		//TODO: handle loadbalancer ports
+		// TODO: handle loadbalancer ports
 		for _, ip := range lb.Spec.IPs {
 			// TODO: handle LoadBalancerIP when only IPFamily is specified to allocate a random IP.
 			ips = append(ips, apinetv1alpha1.ObjectIP{
@@ -374,14 +374,7 @@ func (r *NetworkPolicyReconciler) fetchIPsFromLoadBalancers(ctx context.Context,
 	return ips, nil
 }
 
-func (r *NetworkPolicyReconciler) applyNetworkPolicyRule(
-	ctx context.Context,
-	networkPolicy *networkingv1alpha1.NetworkPolicy,
-	apiNetNetworkPolicy *apinetv1alpha1.NetworkPolicy,
-	targets []apinetv1alpha1.TargetNetworkInterface,
-	network *apinetv1alpha1.Network,
-	ingressRules, egressRules []apinetv1alpha1.Rule,
-) error {
+func (r *NetworkPolicyReconciler) applyNetworkPolicyRule(ctx context.Context, networkPolicy *networkingv1alpha1.NetworkPolicy, apiNetNetworkPolicy *apinetv1alpha1.NetworkPolicy, targets []apinetv1alpha1.TargetNetworkInterface, network *apinetv1alpha1.Network, ingressRules, egressRules []apinetv1alpha1.Rule) error {
 	networkPolicyRule := &apinetv1alpha1.NetworkPolicyRule{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "NetworkPolicyRule",
@@ -441,17 +434,16 @@ func (r *NetworkPolicyReconciler) applyAPINetNetworkPolicy(ctx context.Context, 
 
 	nicSelector := translateLabelSelector(networkPolicy.Spec.NetworkInterfaceSelector)
 
-	apiNetNetworkPolicyApplyCfg :=
-		apinetv1alpha1ac.NetworkPolicy(string(networkPolicy.UID), r.APINetNamespace).
-			WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), networkPolicy)).
-			WithSpec(apinetv1alpha1ac.NetworkPolicySpec().
-				WithNetworkRef(corev1.LocalObjectReference{Name: apiNetNetworkName}).
-				WithNetworkInterfaceSelector(nicSelector).
-				WithPriority(1000). // set default value since networkingv1alpha1.NetworkPolicy does not have this field
-				WithIngress(apiNetIngressRules...).
-				WithEgress(apiNetEgressRules...).
-				WithPolicyTypes(apiNetNetworkPolicyTypes...),
-			)
+	apiNetNetworkPolicyApplyCfg := apinetv1alpha1ac.NetworkPolicy(string(networkPolicy.UID), r.APINetNamespace).
+		WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), networkPolicy)).
+		WithSpec(apinetv1alpha1ac.NetworkPolicySpec().
+			WithNetworkRef(corev1.LocalObjectReference{Name: apiNetNetworkName}).
+			WithNetworkInterfaceSelector(nicSelector).
+			WithPriority(1000). // set default value since networkingv1alpha1.NetworkPolicy does not have this field
+			WithIngress(apiNetIngressRules...).
+			WithEgress(apiNetEgressRules...).
+			WithPolicyTypes(apiNetNetworkPolicyTypes...),
+		)
 	apiNetNetworkPolicy, err := r.APINetInterface.CoreV1alpha1().
 		NetworkPolicies(r.APINetNamespace).
 		Apply(ctx, apiNetNetworkPolicyApplyCfg, metav1.ApplyOptions{FieldManager: string(fieldOwner), Force: true})
