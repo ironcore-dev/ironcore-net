@@ -9,14 +9,17 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/controller-utils/clientutils"
-	"github.com/ironcore-dev/controller-utils/metautils"
+	"golang.org/x/exp/slices"
+
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	apinetlethandler "github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
 	utilgeneric "github.com/ironcore-dev/ironcore-net/utils/generic"
+
+	"github.com/ironcore-dev/controller-utils/clientutils"
+	"github.com/ironcore-dev/controller-utils/metautils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -24,7 +27,6 @@ import (
 	"github.com/ironcore-dev/ironcore/utils/generic"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
-	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
