@@ -9,11 +9,13 @@ import (
 	"slices"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/controller-utils/clientutils"
+
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
+
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
@@ -235,8 +237,7 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 	return apiNetNetwork, nil
 }
 
-func (r *NetworkReconciler) getAPINetNetworkPeeringPrefixes(ctx context.Context, peeringPrefixes []networkingv1alpha1.PeeringPrefix,
-	networkNamespace string) ([]apinetv1alpha1.PeeringPrefix, error) {
+func (r *NetworkReconciler) getAPINetNetworkPeeringPrefixes(ctx context.Context, peeringPrefixes []networkingv1alpha1.PeeringPrefix, networkNamespace string) ([]apinetv1alpha1.PeeringPrefix, error) {
 	apinetPeeringPrefixes := []apinetv1alpha1.PeeringPrefix{}
 	for _, prefix := range peeringPrefixes {
 		if prefix.Prefix != nil {
