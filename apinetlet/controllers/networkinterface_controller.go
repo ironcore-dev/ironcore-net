@@ -70,7 +70,7 @@ func (r *NetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		}
 
 		if err := r.releaseNetworkInterfaceKeyAPINetInterfaces(ctx, req.NamespacedName); err != nil {
-			return ctrl.Result{}, fmt.Errorf("error releasing apinet network interfaces by key: %w", err)
+			return ctrl.Result{}, fmt.Errorf("error releasing APINet network interfaces by key: %w", err)
 		}
 		return ctrl.Result{}, nil
 	}
@@ -91,7 +91,7 @@ func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceKeyAPINetInterfaces(
 		client.InNamespace(r.APINetNamespace),
 		apinetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), nicKey, &networkingv1alpha1.NetworkInterface{}),
 	); err != nil {
-		return fmt.Errorf("error listing apinet network interfaces: %w", err)
+		return fmt.Errorf("error listing APINet network interfaces: %w", err)
 	}
 
 	var errs []error
@@ -116,7 +116,7 @@ func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceAPINetNetworkInterfa
 		client.InNamespace(r.APINetNamespace),
 		apinetletclient.MatchingSourceLabels(r.Scheme(), r.RESTMapper(), nic),
 	); err != nil {
-		return fmt.Errorf("error listing apinet network interfaces: %w", err)
+		return fmt.Errorf("error listing APINet network interfaces: %w", err)
 	}
 
 	// create a shallow copy of the network interface with the
@@ -176,7 +176,7 @@ func (r *NetworkInterfaceReconciler) delete(ctx context.Context, log logr.Logger
 	}
 
 	if err := r.releaseNetworkInterfaceAPINetNetworkInterfaces(ctx, nic); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error releasing apinet network interfaces: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error releasing APINet network interfaces: %w", err)
 	}
 	log.V(1).Info("Released APINet network interfaces")
 
@@ -335,7 +335,7 @@ func (r *NetworkInterfaceReconciler) getAPINetNetworkInterfaceForNetworkInterfac
 	if err := r.APINetClient.List(ctx, apiNetNicList,
 		client.InNamespace(r.APINetNamespace),
 	); err != nil {
-		return nil, fmt.Errorf("error listing apinet network interfaces: %w", err)
+		return nil, fmt.Errorf("error listing APINet network interfaces: %w", err)
 	}
 
 	var (
@@ -479,7 +479,7 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	}
 
 	if err := r.manageAPINetNetworkInterface(ctx, nic, apiNetNic, vips, prefixes); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error managing apinet network interface: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error managing APINet network interface: %w", err)
 	}
 
 	var (

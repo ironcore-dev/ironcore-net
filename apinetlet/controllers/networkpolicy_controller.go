@@ -42,9 +42,7 @@ const (
 	networkPolicyFinalizer = "apinet.ironcore.dev/networkpolicy"
 )
 
-var (
-	networkPolicyFieldOwner = client.FieldOwner(networkingv1alpha1.Resource("networkpolicies").String())
-)
+var networkPolicyFieldOwner = client.FieldOwner(networkingv1alpha1.Resource("networkpolicies").String())
 
 type NetworkPolicyReconciler struct {
 	client.Client
@@ -82,12 +80,12 @@ func (r *NetworkPolicyReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 func (r *NetworkPolicyReconciler) deleteGone(ctx context.Context, log logr.Logger, networkPolicyKey client.ObjectKey) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
-	log.V(1).Info("Deleting any matching apinet network policies")
+	log.V(1).Info("Deleting any matching APINet network policies")
 	if err := r.APINetClient.DeleteAllOf(ctx, &apinetv1alpha1.NetworkPolicy{},
 		client.InNamespace(r.APINetNamespace),
 		apinetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), networkPolicyKey, &networkingv1alpha1.NetworkPolicy{}),
 	); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error deleting apinet network policies: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error deleting APINet network policies: %w", err)
 	}
 
 	log.V(1).Info("Deleted any leftover APINet network policy")
@@ -118,7 +116,7 @@ func (r *NetworkPolicyReconciler) delete(ctx context.Context, log logr.Logger, n
 	}
 	if err := r.APINetClient.Delete(ctx, apiNetNetworkPolicy); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return ctrl.Result{}, fmt.Errorf("error deleting apinet network policy: %w", err)
+			return ctrl.Result{}, fmt.Errorf("error deleting APINet network policy: %w", err)
 		}
 	}
 
@@ -164,7 +162,7 @@ func (r *NetworkPolicyReconciler) reconcile(ctx context.Context, log logr.Logger
 	log.V(1).Info("Applying APINet network policy")
 	apiNetNetworkPolicy, err := r.applyAPINetNetworkPolicy(ctx, networkPolicy, apiNetNetworkName)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error applying apinet network policy: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error applying APINet network policy: %w", err)
 	}
 
 	log.V(1).Info("Finding APINet network interface targets")
@@ -187,7 +185,7 @@ func (r *NetworkPolicyReconciler) reconcile(ctx context.Context, log logr.Logger
 
 	log.V(1).Info("Applying APINet network policy rule", "targets", targets, "Network", klog.KObj(apiNetNetwork))
 	if err := r.applyNetworkPolicyRule(ctx, networkPolicy, apiNetNetworkPolicy, targets, apiNetNetwork, ingressRules, egressRules); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error applying apinet network policy rule: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error applying APINet network policy rule: %w", err)
 	}
 
 	log.V(1).Info("Reconciled")
@@ -206,7 +204,7 @@ func (r *NetworkPolicyReconciler) findTargets(ctx context.Context, apiNetNetwork
 		client.MatchingLabelsSelector{Selector: sel},
 		client.MatchingFields{apinetclient.NetworkInterfaceSpecNetworkRefNameField: apiNetNetworkPolicy.Spec.NetworkRef.Name},
 	); err != nil {
-		return nil, fmt.Errorf("error listing apinet network interfaces: %w", err)
+		return nil, fmt.Errorf("error listing APINet network interfaces: %w", err)
 	}
 
 	// Make slice non-nil so omitempty does not file.
@@ -318,7 +316,7 @@ func (r *NetworkPolicyReconciler) fetchIPsFromNetworkInterfaces(ctx context.Cont
 		client.MatchingLabelsSelector{Selector: sel},
 		client.MatchingFields{apinetclient.NetworkInterfaceSpecNetworkRefNameField: np.Spec.NetworkRef.Name},
 	); err != nil {
-		return nil, fmt.Errorf("error listing apinet network interfaces: %w", err)
+		return nil, fmt.Errorf("error listing APINet network interfaces: %w", err)
 	}
 
 	var ips []apinetv1alpha1.ObjectIP
@@ -448,7 +446,7 @@ func (r *NetworkPolicyReconciler) applyAPINetNetworkPolicy(ctx context.Context, 
 		NetworkPolicies(r.APINetNamespace).
 		Apply(ctx, apiNetNetworkPolicyApplyCfg, metav1.ApplyOptions{FieldManager: string(fieldOwner), Force: true})
 	if err != nil {
-		return nil, fmt.Errorf("error applying apinet network policy: %w", err)
+		return nil, fmt.Errorf("error applying APINet network policy: %w", err)
 	}
 	return apiNetNetworkPolicy, nil
 }
@@ -479,7 +477,7 @@ func (r *NetworkPolicyReconciler) enqueueByNetworkInterface() handler.EventHandl
 			client.InNamespace(nic.Namespace),
 			client.MatchingFields{apinetletclient.NetworkPolicyNetworkNameField: nic.Spec.NetworkRef.Name},
 		); err != nil {
-			log.Error(err, "Error listing apinet network policies for nic")
+			log.Error(err, "Error listing APINet network policies for nic")
 			return nil
 		}
 

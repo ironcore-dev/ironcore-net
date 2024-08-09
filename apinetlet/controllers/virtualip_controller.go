@@ -73,7 +73,7 @@ func (r *VirtualIPReconciler) deleteGone(ctx context.Context, log logr.Logger, v
 		client.InNamespace(r.APINetNamespace),
 		apinetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), virtualIPKey, &networkingv1alpha1.VirtualIP{}),
 	); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error deleting apinet ips: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error deleting APINet ips: %w", err)
 	}
 
 	log.V(1).Info("Issued delete for any leftover APINet ips")
@@ -109,7 +109,7 @@ func (r *VirtualIPReconciler) delete(ctx context.Context, log logr.Logger, virtu
 	}
 	if err := r.APINetClient.Delete(ctx, apiNetIP); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return ctrl.Result{}, fmt.Errorf("error deleting target apinet ip: %w", err)
+			return ctrl.Result{}, fmt.Errorf("error deleting target APINet ip: %w", err)
 		}
 
 		log.V(1).Info("Target APINet ip is gone, removing finalizer")
@@ -144,7 +144,7 @@ func (r *VirtualIPReconciler) reconcile(ctx context.Context, log logr.Logger, vi
 				log.Error(err, "Error patching virtual IP status")
 			}
 		}
-		return ctrl.Result{}, fmt.Errorf("error applying apinet ip: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error applying APINet ip: %w", err)
 	}
 
 	if err := r.patchStatusAllocated(ctx, virtualIP, ip); err != nil {
@@ -166,7 +166,7 @@ func (r *VirtualIPReconciler) applyIP(ctx context.Context, log logr.Logger, virt
 		IPs(r.APINetNamespace).
 		Apply(ctx, apiNetIPApplyCfg, metav1.ApplyOptions{FieldManager: string(fieldOwner), Force: true})
 	if err != nil {
-		return netip.Addr{}, fmt.Errorf("error applying apinet IP: %w", err)
+		return netip.Addr{}, fmt.Errorf("error applying APINet ip: %w", err)
 	}
 
 	log.V(1).Info("Applied APINet ip")
