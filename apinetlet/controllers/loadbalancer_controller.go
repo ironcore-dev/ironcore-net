@@ -174,11 +174,7 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 	return ctrl.Result{}, nil
 }
 
-func (r *LoadBalancerReconciler) manageAPINetLoadBalancerRouting(
-	ctx context.Context,
-	loadBalancer *networkingv1alpha1.LoadBalancer,
-	apiNetLoadBalancer *apinetv1alpha1.LoadBalancer,
-) error {
+func (r *LoadBalancerReconciler) manageAPINetLoadBalancerRouting(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, apiNetLoadBalancer *apinetv1alpha1.LoadBalancer) error {
 	loadBalancerRouting := &networkingv1alpha1.LoadBalancerRouting{}
 	if err := r.Get(ctx, client.ObjectKeyFromObject(loadBalancer), loadBalancerRouting); client.IgnoreNotFound(err) != nil {
 		return fmt.Errorf("error getting load balancer routing: %w", err)
@@ -227,9 +223,7 @@ func (r *LoadBalancerReconciler) manageAPINetLoadBalancerRouting(
 	return nil
 }
 
-func (r *LoadBalancerReconciler) getPublicLoadBalancerAPINetIPs(
-	loadBalancer *networkingv1alpha1.LoadBalancer,
-) []*apinetv1alpha1ac.LoadBalancerIPApplyConfiguration {
+func (r *LoadBalancerReconciler) getPublicLoadBalancerAPINetIPs(loadBalancer *networkingv1alpha1.LoadBalancer) []*apinetv1alpha1ac.LoadBalancerIPApplyConfiguration {
 	res := make([]*apinetv1alpha1ac.LoadBalancerIPApplyConfiguration, len(loadBalancer.Spec.IPFamilies))
 	for i, ipFamily := range loadBalancer.Spec.IPFamilies {
 		res[i] = apinetv1alpha1ac.LoadBalancerIP().
@@ -239,10 +233,7 @@ func (r *LoadBalancerReconciler) getPublicLoadBalancerAPINetIPs(
 	return res
 }
 
-func (r *LoadBalancerReconciler) getInternalLoadBalancerAPINetIPs(
-	ctx context.Context,
-	loadBalancer *networkingv1alpha1.LoadBalancer,
-) ([]*apinetv1alpha1ac.LoadBalancerIPApplyConfiguration, error) {
+func (r *LoadBalancerReconciler) getInternalLoadBalancerAPINetIPs(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer) ([]*apinetv1alpha1ac.LoadBalancerIPApplyConfiguration, error) {
 	var ips []*apinetv1alpha1ac.LoadBalancerIPApplyConfiguration
 	for i, ip := range loadBalancer.Spec.IPs {
 		switch {
