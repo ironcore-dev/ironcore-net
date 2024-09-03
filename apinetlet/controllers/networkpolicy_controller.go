@@ -311,7 +311,7 @@ func (r *NetworkPolicyReconciler) fetchIPsFromNetworkInterfaces(ctx context.Cont
 	}
 
 	nicList := &apinetv1alpha1.NetworkInterfaceList{}
-	if err := r.List(ctx, nicList,
+	if err := r.APINetClient.List(ctx, nicList,
 		client.InNamespace(np.Namespace),
 		client.MatchingLabelsSelector{Selector: sel},
 		client.MatchingFields{apinetclient.NetworkInterfaceSpecNetworkRefNameField: np.Spec.NetworkRef.Name},
@@ -349,7 +349,7 @@ func (r *NetworkPolicyReconciler) fetchIPsFromLoadBalancers(ctx context.Context,
 
 	// TODO: apinet load balancer need to inherit labels from ironcore load balancer
 	lbList := &apinetv1alpha1.LoadBalancerList{}
-	if err := r.List(ctx, lbList,
+	if err := r.APINetClient.List(ctx, lbList,
 		client.InNamespace(np.Namespace),
 		client.MatchingLabelsSelector{Selector: sel},
 	); err != nil {
@@ -400,7 +400,7 @@ func (r *NetworkPolicyReconciler) applyNetworkPolicyRule(ctx context.Context, ne
 		return fmt.Errorf("error setting controller reference: %w", err)
 	}
 
-	if err := r.Patch(ctx, networkPolicyRule, client.Apply, networkPolicyFieldOwner, client.ForceOwnership); err != nil {
+	if err := r.APINetClient.Patch(ctx, networkPolicyRule, client.Apply, networkPolicyFieldOwner, client.ForceOwnership); err != nil {
 		return fmt.Errorf("error applying network policy rule: %w", err)
 	}
 	return nil

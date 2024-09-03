@@ -14,6 +14,7 @@ import (
 	apinetletconfig "github.com/ironcore-dev/ironcore-net/apinetlet/client/config"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/controllers"
 	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
+	apinetclient "github.com/ironcore-dev/ironcore-net/internal/client"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -235,6 +236,10 @@ func main() {
 
 	if err := apinetletclient.SetupNetworkPolicyNetworkNameFieldIndexer(ctx, apiNetCluster.GetFieldIndexer()); err != nil {
 		setupLog.Error(err, "unable to setup field indexer", "field", apinetletclient.NetworkPolicyNetworkNameField)
+		os.Exit(1)
+	}
+	if err := apinetclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, apiNetCluster.GetFieldIndexer()); err != nil {
+		setupLog.Error(err, "unable to setup field indexer", "field", apinetclient.NetworkInterfaceSpecNetworkRefNameField)
 		os.Exit(1)
 	}
 
