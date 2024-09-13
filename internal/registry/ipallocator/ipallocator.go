@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"net/netip"
+	"strings"
 	"time"
 
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
@@ -89,7 +90,7 @@ func (a *Allocator) allocate(namespace string, claimRef v1alpha1.IPClaimRef, ip 
 func (a *Allocator) getIPFromLister(namespace string, addr netip.Addr) (*v1alpha1.IP, error) {
 	ips, err := a.ipLister.IPs(namespace).List(labels.SelectorFromSet(labels.Set{
 		v1alpha1.IPFamilyLabel: string(a.ipFamily),
-		v1alpha1.IPIPLabel:     addr.String(),
+		v1alpha1.IPIPLabel:     strings.ReplaceAll(addr.String(), ":", "-"),
 	}))
 	if err != nil {
 		return nil, err
