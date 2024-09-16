@@ -9,12 +9,14 @@ import (
 	"slices"
 
 	"github.com/go-logr/logr"
-	"github.com/ironcore-dev/controller-utils/clientutils"
+
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
+
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/generic"
@@ -102,7 +104,7 @@ func (r *NATGatewayReconciler) delete(ctx context.Context, log logr.Logger, natG
 	}
 	if err := r.APINetClient.Delete(ctx, apiNetNATGateway); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return ctrl.Result{}, fmt.Errorf("error deleting apinet NAT Gateway: %w", err)
+			return ctrl.Result{}, fmt.Errorf("error deleting APINet NAT Gateway: %w", err)
 		}
 
 		log.V(1).Info("APINet NAT gateway is gone, removing finalizer")
@@ -141,17 +143,16 @@ func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 		return ctrl.Result{}, nil
 	}
 
-	apiNetNATGatewayCfg :=
-		apinetv1alpha1ac.NATGateway(string(natGateway.UID), r.APINetNamespace).
-			WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), natGateway)).
-			WithSpec(apinetv1alpha1ac.NATGatewaySpec().
-				WithIPFamily(natGateway.Spec.IPFamily).
-				WithNetworkRef(corev1.LocalObjectReference{Name: networkName}).
-				WithPortsPerNetworkInterface(generic.Deref(
-					natGateway.Spec.PortsPerNetworkInterface,
-					networkingv1alpha1.DefaultPortsPerNetworkInterface,
-				)),
-			)
+	apiNetNATGatewayCfg := apinetv1alpha1ac.NATGateway(string(natGateway.UID), r.APINetNamespace).
+		WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), natGateway)).
+		WithSpec(apinetv1alpha1ac.NATGatewaySpec().
+			WithIPFamily(natGateway.Spec.IPFamily).
+			WithNetworkRef(corev1.LocalObjectReference{Name: networkName}).
+			WithPortsPerNetworkInterface(generic.Deref(
+				natGateway.Spec.PortsPerNetworkInterface,
+				networkingv1alpha1.DefaultPortsPerNetworkInterface,
+			)),
+		)
 	apiNetNATGateway, err := r.APINetInterface.CoreV1alpha1().
 		NATGateways(r.APINetNamespace).
 		Apply(ctx, apiNetNATGatewayCfg, metav1.ApplyOptions{FieldManager: string(fieldOwner), Force: true})
@@ -177,7 +178,7 @@ func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 	}
 	_ = ctrl.SetControllerReference(apiNetNATGateway, apiNetNATGatewayAutoscaler, r.Scheme())
 	if err := r.APINetClient.Patch(ctx, apiNetNATGatewayAutoscaler, client.Apply, client.ForceOwnership, fieldOwner); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error applying apinet NAT gateway autoscaler: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error applying APINet NAT gateway autoscaler: %w", err)
 	}
 
 	natGatewayIPs := apiNetIPsToIPs(apinetv1alpha1.GetNATGatewayIPs(apiNetNATGateway))

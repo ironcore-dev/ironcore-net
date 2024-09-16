@@ -6,6 +6,7 @@ package ip
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
@@ -64,7 +65,7 @@ func (r *REST) beginCreate(ctx context.Context, obj runtime.Object, opts *metav1
 		ip.Spec.IP = addr
 	}
 	metav1.SetMetaDataLabel(&ip.ObjectMeta, v1alpha1.IPFamilyLabel, string(alloc.IPFamily()))
-	metav1.SetMetaDataLabel(&ip.ObjectMeta, v1alpha1.IPIPLabel, addr.String())
+	metav1.SetMetaDataLabel(&ip.ObjectMeta, v1alpha1.IPIPLabel, strings.ReplaceAll(addr.String(), ":", "-"))
 
 	return func(ctx context.Context, success bool) {
 		if success {
