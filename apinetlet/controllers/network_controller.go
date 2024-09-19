@@ -6,6 +6,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"slices"
 
 	"github.com/go-logr/logr"
@@ -115,15 +116,20 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 	}
 
 	log.V(1).Info("Target APINet network is not yet gone, requeueing")
-	return ctrl.Result{Requeue: true}, nil
+	return ctrl.Result{}, nil
 }
 
-func (r *NetworkReconciler) updateNetworkStatus(ctx context.Context, network *networkingv1alpha1.Network, apiNetNetwork *apinetv1alpha1.Network, state networkingv1alpha1.NetworkState) error {
+func (r *NetworkReconciler) updateNetworkStatus(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network, apiNetNetwork *apinetv1alpha1.Network, state networkingv1alpha1.NetworkState) error {
 	networkBase := network.DeepCopy()
-	network.Status.State = state
-	network.Status.Peerings = apiNetNetworkPeeringsStatusToNetworkPeeringsStatus(apiNetNetwork.Status.Peerings, apiNetNetwork.Spec.Peerings)
-	if err := r.Status().Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
-		return fmt.Errorf("unable to patch network: %w", err)
+	statusPeerings := apiNetNetworkPeeringsStatusToNetworkPeeringsStatus(apiNetNetwork.Status.Peerings, apiNetNetwork.Spec.Peerings)
+	log.V(1).Info("netwrok status peerings", "old", network.Status.Peerings, "new", statusPeerings)
+	if network.Status.State != state || !reflect.DeepEqual(network.Status.Peerings, statusPeerings) {
+		log.V(1).Info("Patching network status")
+		network.Status.State = state
+		network.Status.Peerings = statusPeerings
+		if err := r.Status().Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
+			return fmt.Errorf("unable to patch network: %w", err)
+		}
 	}
 	return nil
 }
@@ -138,13 +144,13 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	}
 	if modified {
 		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{}, nil
 	}
 
 	apiNetNetwork, err := r.applyAPINetNetwork(ctx, log, network)
 	if err != nil {
 		if network.Status.State != networkingv1alpha1.NetworkStateAvailable {
-			if err := r.updateNetworkStatus(ctx, network, apiNetNetwork, networkingv1alpha1.NetworkStatePending); err != nil {
+			if err := r.updateNetworkStatus(ctx, log, network, apiNetNetwork, networkingv1alpha1.NetworkStatePending); err != nil {
 				log.Error(err, "Error updating network state")
 			}
 		}
@@ -160,11 +166,11 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 		}
 
 		log.V(1).Info("Set network provider id, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{}, nil
 	}
 
 	log.V(1).Info("Updating network status")
-	if err := r.updateNetworkStatus(ctx, network, apiNetNetwork, networkingv1alpha1.NetworkStateAvailable); err != nil {
+	if err := r.updateNetworkStatus(ctx, log, network, apiNetNetwork, networkingv1alpha1.NetworkStateAvailable); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error updating network status: %w", err)
 	}
 	log.V(1).Info("Updated network status")
@@ -187,16 +193,28 @@ func (r *NetworkReconciler) setNetworkProviderID(
 }
 
 func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (*apinetv1alpha1.Network, error) {
-	apiNetNetwork := &apinetv1alpha1.Network{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: apinetv1alpha1.SchemeGroupVersion.String(),
-			Kind:       "Network",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: r.APINetNamespace,
-			Name:      string(network.UID),
-			Labels:    apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), network),
-		},
+	isNetworkExist := false
+	apiNetNetwork := &apinetv1alpha1.Network{}
+	apiNetNetworkKey := client.ObjectKey{Namespace: r.APINetNamespace, Name: string(network.UID)}
+	log.V(1).Info("Check if APINet network already exists")
+	if err := r.APINetClient.Get(ctx, apiNetNetworkKey, apiNetNetwork); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return nil, fmt.Errorf("error getting apinet network %s: %w", apiNetNetworkKey.Name, err)
+		} else {
+			apiNetNetwork = &apinetv1alpha1.Network{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: apinetv1alpha1.SchemeGroupVersion.String(),
+					Kind:       "Network",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: r.APINetNamespace,
+					Name:      string(network.UID),
+					Labels:    apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), network),
+				},
+			}
+		}
+	} else {
+		isNetworkExist = true
 	}
 
 	var peerings []apinetv1alpha1.NetworkPeering
@@ -228,17 +246,28 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 			})
 		}
 	}
-	apiNetNetwork.Spec.Peerings = peerings
+	// apiNetNetwork.Spec.Peerings = peerings
 
-	log.V(1).Info("Applying APINet network")
-	if err := r.APINetClient.Patch(ctx, apiNetNetwork, client.Apply, fieldOwner, client.ForceOwnership); err != nil {
-		return nil, fmt.Errorf("error applying APINet network: %w", err)
+	log.V(1).Info("APINet network spec peerings", "old", apiNetNetwork.Spec.Peerings, "new", peerings)
+	log.V(1).Info("APINet network status", "old", apiNetNetwork.Status.Peerings)
+	isPeeringsEqual := reflect.DeepEqual(apiNetNetwork.Spec.Peerings, peerings)
+
+	if !isNetworkExist || !isPeeringsEqual {
+		log.V(1).Info("Applying APINet network")
+
+		if !isPeeringsEqual {
+			apiNetNetwork.Spec.Peerings = peerings
+		}
+		apiNetNetwork.ManagedFields = nil
+		if err := r.APINetClient.Patch(ctx, apiNetNetwork, client.Apply, fieldOwner, client.ForceOwnership); err != nil {
+			return nil, fmt.Errorf("error applying apinet network: %w", err)
+		}
 	}
 	return apiNetNetwork, nil
 }
 
 func (r *NetworkReconciler) getAPINetNetworkPeeringPrefixes(ctx context.Context, peeringPrefixes []networkingv1alpha1.PeeringPrefix, networkNamespace string) ([]apinetv1alpha1.PeeringPrefix, error) {
-	apinetPeeringPrefixes := []apinetv1alpha1.PeeringPrefix{}
+	var apinetPeeringPrefixes []apinetv1alpha1.PeeringPrefix
 	for _, prefix := range peeringPrefixes {
 		if prefix.Prefix != nil {
 			apinetPeeringPrefixes = append(apinetPeeringPrefixes, apinetv1alpha1.PeeringPrefix{

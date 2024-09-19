@@ -6,6 +6,8 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"reflect"
+	"slices"
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
@@ -18,9 +20,12 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
@@ -111,11 +116,17 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 	return ctrl.Result{}, nil
 }
 
-func (r *NetworkReconciler) updateApinetNetworkStatus(ctx context.Context, network *apinetv1alpha1.Network, metalnetNetwork *metalnetv1alpha1.Network) error {
-	networkBase := network.DeepCopy()
-	network.Status.Peerings = metalnetNetworkPeeringsStatusToNetworkPeeringsStatus(metalnetNetwork.Status.Peerings)
-	if err := r.Status().Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
-		return fmt.Errorf("unable to patch network: %w", err)
+func (r *NetworkReconciler) updateApinetNetworkStatus(ctx context.Context, log logr.Logger, network *apinetv1alpha1.Network, metalnetNetwork *metalnetv1alpha1.Network) error {
+	newStatusPeerings := metalnetNetworkPeeringsStatusToNetworkPeeringsStatus(metalnetNetwork.Status.Peerings)
+	log.V(1).Info("apinet status", "old", network.Status.Peerings, "new", newStatusPeerings)
+	if network.Spec.Peerings != nil && newStatusPeerings != nil && !slices.Equal(network.Status.Peerings, newStatusPeerings) {
+		log.V(1).Info("Patching apinet network status", "status", newStatusPeerings)
+		networkBase := network.DeepCopy()
+		network.Status.Peerings = newStatusPeerings
+		if err := r.Status().Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
+			return fmt.Errorf("unable to patch network: %w", err)
+		}
+		log.V(1).Info("Patched apinet network status")
 	}
 	return nil
 }
@@ -136,34 +147,46 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	}
 	if modified {
 		log.V(1).Info("Added finalizer")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{}, nil
 	}
 	log.V(1).Info("Finalizer is present")
 
-	log.V(1).Info("Applying metalnet network")
-	metalnetNetwork := &metalnetv1alpha1.Network{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: metalnetv1alpha1.GroupVersion.String(),
-			Kind:       "Network",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: r.MetalnetNamespace,
-			Name:      string(network.UID),
-			Labels:    metalnetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), network),
-		},
-		Spec: metalnetv1alpha1.NetworkSpec{
-			ID: vni,
-		},
+	log.V(1).Info("Check if metalnet network already present")
+	isNetworkExist := false
+	metalnetNetwork := &metalnetv1alpha1.Network{}
+	metalnetNetworkKey := client.ObjectKey{Namespace: r.MetalnetNamespace, Name: string(network.UID)}
+	if err := r.MetalnetClient.Get(ctx, metalnetNetworkKey, metalnetNetwork); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return ctrl.Result{}, fmt.Errorf("error getting metalnet network %s: %w", metalnetNetworkKey.Name, err)
+		} else {
+			metalnetNetwork = &metalnetv1alpha1.Network{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: metalnetv1alpha1.GroupVersion.String(),
+					Kind:       "Network",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: r.MetalnetNamespace,
+					Name:      string(network.UID),
+					Labels:    metalnetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), network),
+				},
+				Spec: metalnetv1alpha1.NetworkSpec{
+					ID: vni,
+				},
+			}
+		}
+	} else {
+		isNetworkExist = true
 	}
-
-	peeredPrefixes := []metalnetv1alpha1.PeeredPrefix{}
+	var peeredIDs []int32
+	var peeredPrefixes []metalnetv1alpha1.PeeredPrefix
 	for _, peering := range network.Spec.Peerings {
 		id, err := networkid.ParseVNI(peering.ID)
 		if err != nil {
 			return ctrl.Result{}, fmt.Errorf("failed to parse peered network ID: %w", err)
 		}
 
-		metalnetNetwork.Spec.PeeredIDs = append(metalnetNetwork.Spec.PeeredIDs, id)
+		// metalnetNetwork.Spec.PeeredIDs = append(metalnetNetwork.Spec.PeeredIDs, id)
+		peeredIDs = append(peeredIDs, id)
 
 		if len(peering.Prefixes) > 0 {
 			ipPrefixes := getIPPrefixes(peering.Prefixes)
@@ -174,15 +197,33 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 			peeredPrefixes = append(peeredPrefixes, peeredPrefix)
 		}
 	}
-	metalnetNetwork.Spec.PeeredPrefixes = peeredPrefixes
+	// metalnetNetwork.Spec.PeeredPrefixes = peeredPrefixes
+	isPeeredIDsEqual := slices.Equal(metalnetNetwork.Spec.PeeredIDs, peeredIDs)
+	isPeeredPrefixesEqual := reflect.DeepEqual(metalnetNetwork.Spec.PeeredPrefixes, peeredPrefixes)
 
-	if err := r.MetalnetClient.Patch(ctx, metalnetNetwork, client.Apply, MetalnetFieldOwner, client.ForceOwnership); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error applying network: %w", err)
+	log.V(1).Info("Peered IDs", "old", metalnetNetwork.Spec.PeeredIDs, "new", peeredIDs)
+	log.V(1).Info("Peered Prefixes", "old", metalnetNetwork.Spec.PeeredPrefixes, "new", peeredPrefixes)
+	log.V(1).Info("Is equal", "peered ids", isPeeredIDsEqual, "peered prefixes", isPeeredPrefixesEqual)
+
+	if !isNetworkExist || !isPeeredIDsEqual || !isPeeredPrefixesEqual {
+		log.V(1).Info("Applying metalnet network")
+
+		if !isPeeredIDsEqual {
+			metalnetNetwork.Spec.PeeredIDs = peeredIDs
+		}
+		if !isPeeredPrefixesEqual {
+			metalnetNetwork.Spec.PeeredPrefixes = peeredPrefixes
+		}
+		metalnetNetwork.ManagedFields = nil
+		if err := r.MetalnetClient.Patch(ctx, metalnetNetwork, client.Apply, MetalnetFieldOwner, client.ForceOwnership); err != nil {
+			return ctrl.Result{}, fmt.Errorf("error applying metalnet network: %w", err)
+		}
+		log.V(1).Info("Applied metalnet network")
 	}
-	log.V(1).Info("Applied metalnet network")
 
 	log.V(1).Info("Updating apinet network status")
-	if err := r.updateApinetNetworkStatus(ctx, network, metalnetNetwork); err != nil {
+	log.V(1).Info("network status", "apinet", network.Status, "metalnet", metalnetNetwork.Status)
+	if err := r.updateApinetNetworkStatus(ctx, log, network, metalnetNetwork); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error updating apinet networkstatus: %w", err)
 	}
 	log.V(1).Info("Updated apinet network status")
@@ -205,10 +246,21 @@ func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, metalnetCache cac
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
 			&apinetv1alpha1.Network{},
+			builder.WithPredicates(r.networkStatusChangedPredicate()),
 		).
 		WatchesRawSource(
 			source.Kind(metalnetCache, &metalnetv1alpha1.Network{}),
 			metalnetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &apinetv1alpha1.Network{}),
 		).
 		Complete(r)
+}
+
+func (r *NetworkReconciler) networkStatusChangedPredicate() predicate.Predicate {
+	return predicate.Funcs{
+		UpdateFunc: func(evt event.UpdateEvent) bool {
+			oldNetwork := evt.ObjectOld.(*apinetv1alpha1.Network)
+			newNetwork := evt.ObjectNew.(*apinetv1alpha1.Network)
+			return !slices.Equal(oldNetwork.Status.Peerings, newNetwork.Status.Peerings) && newNetwork.Status.Peerings != nil
+		},
+	}
 }
