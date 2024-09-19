@@ -122,7 +122,7 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 func (r *NetworkReconciler) updateNetworkStatus(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network, apiNetNetwork *apinetv1alpha1.Network, state networkingv1alpha1.NetworkState) error {
 	networkBase := network.DeepCopy()
 	statusPeerings := apiNetNetworkPeeringsStatusToNetworkPeeringsStatus(apiNetNetwork.Status.Peerings, apiNetNetwork.Spec.Peerings)
-	log.V(1).Info("netwrok status peerings", "old", network.Status.Peerings, "new", statusPeerings)
+	log.V(1).Info("network status peerings", "old", network.Status.Peerings, "new", statusPeerings)
 	if network.Status.State != state || !reflect.DeepEqual(network.Status.Peerings, statusPeerings) {
 		log.V(1).Info("Patching network status")
 		network.Status.State = state

@@ -20,12 +20,9 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
@@ -119,7 +116,7 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 func (r *NetworkReconciler) updateApinetNetworkStatus(ctx context.Context, log logr.Logger, network *apinetv1alpha1.Network, metalnetNetwork *metalnetv1alpha1.Network) error {
 	newStatusPeerings := metalnetNetworkPeeringsStatusToNetworkPeeringsStatus(metalnetNetwork.Status.Peerings)
 	log.V(1).Info("apinet status", "old", network.Status.Peerings, "new", newStatusPeerings)
-	if network.Spec.Peerings != nil && newStatusPeerings != nil && !slices.Equal(network.Status.Peerings, newStatusPeerings) {
+	if !slices.Equal(network.Status.Peerings, newStatusPeerings) {
 		log.V(1).Info("Patching apinet network status", "status", newStatusPeerings)
 		networkBase := network.DeepCopy()
 		network.Status.Peerings = newStatusPeerings
@@ -246,7 +243,7 @@ func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, metalnetCache cac
 	return ctrl.NewControllerManagedBy(mgr).
 		For(
 			&apinetv1alpha1.Network{},
-			builder.WithPredicates(r.networkStatusChangedPredicate()),
+			// builder.WithPredicates(r.networkStatusChangedPredicate()),
 		).
 		WatchesRawSource(
 			source.Kind(metalnetCache, &metalnetv1alpha1.Network{}),
@@ -255,12 +252,12 @@ func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, metalnetCache cac
 		Complete(r)
 }
 
-func (r *NetworkReconciler) networkStatusChangedPredicate() predicate.Predicate {
-	return predicate.Funcs{
-		UpdateFunc: func(evt event.UpdateEvent) bool {
-			oldNetwork := evt.ObjectOld.(*apinetv1alpha1.Network)
-			newNetwork := evt.ObjectNew.(*apinetv1alpha1.Network)
-			return !slices.Equal(oldNetwork.Status.Peerings, newNetwork.Status.Peerings) && newNetwork.Status.Peerings != nil
-		},
-	}
-}
+// func (r *NetworkReconciler) networkStatusChangedPredicate() predicate.Predicate {
+// 	return predicate.Funcs{
+// 		UpdateFunc: func(evt event.UpdateEvent) bool {
+// 			oldNetwork := evt.ObjectOld.(*apinetv1alpha1.Network)
+// 			newNetwork := evt.ObjectNew.(*apinetv1alpha1.Network)
+// 			return !slices.Equal(oldNetwork.Status.Peerings, newNetwork.Status.Peerings)
+// 		},
+// 	}
+// }
