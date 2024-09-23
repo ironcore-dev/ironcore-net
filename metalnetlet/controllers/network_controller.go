@@ -7,12 +7,12 @@ import (
 	"context"
 	"fmt"
 	"reflect"
-	"slices"
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/equality"
 	metalnetletclient "github.com/ironcore-dev/ironcore-net/metalnetlet/client"
 	metalnetlethandler "github.com/ironcore-dev/ironcore-net/metalnetlet/handler"
 	"github.com/ironcore-dev/ironcore-net/networkid"
@@ -116,7 +116,7 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 func (r *NetworkReconciler) updateApinetNetworkStatus(ctx context.Context, log logr.Logger, network *apinetv1alpha1.Network, metalnetNetwork *metalnetv1alpha1.Network) error {
 	newStatusPeerings := metalnetNetworkPeeringsStatusToNetworkPeeringsStatus(metalnetNetwork.Status.Peerings)
 	log.V(1).Info("apinet status", "old", network.Status.Peerings, "new", newStatusPeerings)
-	if !slices.Equal(network.Status.Peerings, newStatusPeerings) {
+	if !equality.Semantic.DeepEqual(network.Status.Peerings, newStatusPeerings) {
 		log.V(1).Info("Patching apinet network status", "status", newStatusPeerings)
 		networkBase := network.DeepCopy()
 		network.Status.Peerings = newStatusPeerings
@@ -144,7 +144,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	}
 	if modified {
 		log.V(1).Info("Added finalizer")
-		return ctrl.Result{}, nil
+		return ctrl.Result{Requeue: true}, nil
 	}
 	log.V(1).Info("Finalizer is present")
 
@@ -195,7 +195,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 		}
 	}
 	// metalnetNetwork.Spec.PeeredPrefixes = peeredPrefixes
-	isPeeredIDsEqual := slices.Equal(metalnetNetwork.Spec.PeeredIDs, peeredIDs)
+	isPeeredIDsEqual := equality.Semantic.DeepEqual(metalnetNetwork.Spec.PeeredIDs, peeredIDs)
 	isPeeredPrefixesEqual := reflect.DeepEqual(metalnetNetwork.Spec.PeeredPrefixes, peeredPrefixes)
 
 	log.V(1).Info("Peered IDs", "old", metalnetNetwork.Spec.PeeredIDs, "new", peeredIDs)

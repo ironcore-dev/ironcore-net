@@ -12,6 +12,7 @@ import (
 	"github.com/go-logr/logr"
 
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/equality"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
@@ -116,7 +117,7 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 	}
 
 	log.V(1).Info("Target APINet network is not yet gone, requeueing")
-	return ctrl.Result{}, nil
+	return ctrl.Result{Requeue: true}, nil
 }
 
 func (r *NetworkReconciler) updateNetworkStatus(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network, apiNetNetwork *apinetv1alpha1.Network, state networkingv1alpha1.NetworkState) error {
@@ -144,7 +145,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	}
 	if modified {
 		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{}, nil
+		return ctrl.Result{Requeue: true}, nil
 	}
 
 	apiNetNetwork, err := r.applyAPINetNetwork(ctx, log, network)
@@ -166,7 +167,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 		}
 
 		log.V(1).Info("Set network provider id, requeueing")
-		return ctrl.Result{}, nil
+		return ctrl.Result{Requeue: true}, nil
 	}
 
 	log.V(1).Info("Updating network status")
@@ -214,6 +215,7 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 			}
 		}
 	} else {
+		log.V(1).Info("APINet network already exists")
 		isNetworkExist = true
 	}
 
@@ -250,7 +252,7 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 
 	log.V(1).Info("APINet network spec peerings", "old", apiNetNetwork.Spec.Peerings, "new", peerings)
 	log.V(1).Info("APINet network status", "old", apiNetNetwork.Status.Peerings)
-	isPeeringsEqual := reflect.DeepEqual(apiNetNetwork.Spec.Peerings, peerings)
+	isPeeringsEqual := equality.Semantic.DeepEqual(apiNetNetwork.Spec.Peerings, peerings)
 
 	if !isNetworkExist || !isPeeringsEqual {
 		log.V(1).Info("Applying APINet network")
