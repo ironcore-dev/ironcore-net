@@ -5,8 +5,10 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"net/netip"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
@@ -85,6 +87,13 @@ var _ = BeforeSuite(func() {
 			filepath.Join(modutils.Dir("github.com/ironcore-dev/metalnet", "config", "crd", "bases")),
 		},
 		ErrorIfCRDPathMissing: true,
+		// The BinaryAssetsDirectory is only required if you want to run the tests directly
+		// without call the makefile target test. If not informed it will look for the
+		// default path defined in controller-runtime which is /usr/local/kubebuilder/.
+		// Note that you must have the required binaries setup under the bin directory to perform
+		// the tests directly. When we run make test it will be setup and used automatically.
+		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
+			fmt.Sprintf("1.29.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
 	}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
 		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "config", "apiserver", "apiservice", "bases")},

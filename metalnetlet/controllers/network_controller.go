@@ -165,10 +165,10 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 
 		metalnetNetwork.Spec.PeeredIDs = append(metalnetNetwork.Spec.PeeredIDs, id)
 
-		if peering.Prefixes != nil && len(peering.Prefixes) > 0 {
+		if len(peering.Prefixes) > 0 {
 			ipPrefixes := getIPPrefixes(peering.Prefixes)
 			peeredPrefix := metalnetv1alpha1.PeeredPrefix{
-				ID:       int32(id),
+				ID:       id,
 				Prefixes: ipPrefixesToMetalnetPrefixes(ipPrefixes),
 			}
 			peeredPrefixes = append(peeredPrefixes, peeredPrefix)
