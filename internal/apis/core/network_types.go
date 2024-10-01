@@ -35,7 +35,7 @@ type PeeringPrefix struct {
 }
 type NetworkStatus struct {
 	// Peerings contains the states of the network peerings for the network.
-	Peerings []NetworkPeeringStatus
+	Peerings map[string][]NetworkPeeringStatus
 }
 
 // NetworkState is the state of a network.

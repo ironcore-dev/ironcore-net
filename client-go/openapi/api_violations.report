@@ -29,7 +29,6 @@ API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/c
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NetworkPolicySpec,Ingress
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NetworkPolicySpec,PolicyTypes
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NetworkSpec,Peerings
-API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NetworkStatus,Peerings
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NodeSelector,NodeSelectorTerms
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NodeSelectorRequirement,Values
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NodeSelectorTerm,MatchExpressions

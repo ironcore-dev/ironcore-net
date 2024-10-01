@@ -114,12 +114,14 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 }
 
 func (r *NetworkReconciler) updateApinetNetworkStatus(ctx context.Context, log logr.Logger, network *apinetv1alpha1.Network, metalnetNetwork *metalnetv1alpha1.Network) error {
-	newStatusPeerings := metalnetNetworkPeeringsStatusToNetworkPeeringsStatus(metalnetNetwork.Status.Peerings)
-	log.V(1).Info("apinet status", "old", network.Status.Peerings, "new", newStatusPeerings)
-	if !equality.Semantic.DeepEqual(network.Status.Peerings, newStatusPeerings) {
-		log.V(1).Info("Patching apinet network status", "status", newStatusPeerings)
+	apinetStatusPeerings := metalnetNetworkPeeringsStatusToNetworkPeeringsStatus(metalnetNetwork.Status.Peerings)
+	if !equality.Semantic.DeepEqual(network.Status.Peerings[r.PartitionName], apinetStatusPeerings) {
+		log.V(1).Info("Patching apinet network status", "status", apinetStatusPeerings)
 		networkBase := network.DeepCopy()
-		network.Status.Peerings = newStatusPeerings
+		if network.Status.Peerings == nil {
+			network.Status.Peerings = make(map[string][]apinetv1alpha1.NetworkPeeringStatus, 0)
+		}
+		network.Status.Peerings[r.PartitionName] = apinetStatusPeerings
 		if err := r.Status().Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
 			return fmt.Errorf("unable to patch network: %w", err)
 		}
@@ -219,7 +221,6 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	}
 
 	log.V(1).Info("Updating apinet network status")
-	log.V(1).Info("network status", "apinet", network.Status, "metalnet", metalnetNetwork.Status)
 	if err := r.updateApinetNetworkStatus(ctx, log, network, metalnetNetwork); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error updating apinet networkstatus: %w", err)
 	}
@@ -251,13 +252,3 @@ func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, metalnetCache cac
 		).
 		Complete(r)
 }
-
-// func (r *NetworkReconciler) networkStatusChangedPredicate() predicate.Predicate {
-// 	return predicate.Funcs{
-// 		UpdateFunc: func(evt event.UpdateEvent) bool {
-// 			oldNetwork := evt.ObjectOld.(*apinetv1alpha1.Network)
-// 			newNetwork := evt.ObjectNew.(*apinetv1alpha1.Network)
-// 			return !slices.Equal(oldNetwork.Status.Peerings, newNetwork.Status.Peerings)
-// 		},
-// 	}
-// }

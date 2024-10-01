@@ -248,10 +248,7 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 			})
 		}
 	}
-	// apiNetNetwork.Spec.Peerings = peerings
 
-	log.V(1).Info("APINet network spec peerings", "old", apiNetNetwork.Spec.Peerings, "new", peerings)
-	log.V(1).Info("APINet network status", "old", apiNetNetwork.Status.Peerings)
 	isPeeringsEqual := equality.Semantic.DeepEqual(apiNetNetwork.Spec.Peerings, peerings)
 
 	if !isNetworkExist || !isPeeringsEqual {
