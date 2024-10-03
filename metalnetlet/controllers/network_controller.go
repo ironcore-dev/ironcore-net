@@ -119,7 +119,7 @@ func (r *NetworkReconciler) updateApinetNetworkStatus(ctx context.Context, log l
 		log.V(1).Info("Patching apinet network status", "status", apinetStatusPeerings)
 		networkBase := network.DeepCopy()
 		if network.Status.Peerings == nil {
-			network.Status.Peerings = make(map[string][]apinetv1alpha1.NetworkPeeringStatus, 0)
+			network.Status.Peerings = make(map[string][]apinetv1alpha1.NetworkPeeringStatus)
 		}
 		network.Status.Peerings[r.PartitionName] = apinetStatusPeerings
 		if err := r.Status().Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
