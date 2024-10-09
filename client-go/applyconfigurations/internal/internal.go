@@ -972,10 +972,12 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: peerings
       type:
-        list:
+        map:
           elementType:
-            namedType: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeeringStatus
-          elementRelationship: atomic
+            list:
+              elementType:
+                namedType: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeeringStatus
+              elementRelationship: atomic
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Node
   map:
     fields:

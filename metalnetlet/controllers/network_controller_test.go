@@ -114,17 +114,17 @@ var _ = Describe("NetworkController", func() {
 
 		By("ensuring apinet network status peerings are also updated")
 		Eventually(Object(network1)).Should(SatisfyAll(
-			HaveField("Status.Peerings", []apinetv1alpha1.NetworkPeeringStatus{{
+			HaveField("Status.Peerings", HaveKeyWithValue(partitionName, []apinetv1alpha1.NetworkPeeringStatus{{
 				ID:    network2Vni,
 				State: apinetv1alpha1.NetworkPeeringStateReady,
-			}}),
+			}})),
 		))
 
 		Eventually(Object(network2)).Should(SatisfyAll(
-			HaveField("Status.Peerings", []apinetv1alpha1.NetworkPeeringStatus{{
+			HaveField("Status.Peerings", HaveKeyWithValue(partitionName, []apinetv1alpha1.NetworkPeeringStatus{{
 				ID:    network1Vni,
 				State: apinetv1alpha1.NetworkPeeringStateReady,
-			}}),
+			}})),
 		))
 
 		By("deleting the networks")

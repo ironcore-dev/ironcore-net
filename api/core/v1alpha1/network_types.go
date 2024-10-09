@@ -36,7 +36,7 @@ type PeeringPrefix struct {
 
 type NetworkStatus struct {
 	// Peerings contains the states of the network peerings for the network.
-	Peerings []NetworkPeeringStatus `json:"peerings,omitempty"`
+	Peerings map[string][]NetworkPeeringStatus `json:"peerings,omitempty"`
 }
 
 // NetworkState is the state of a network.

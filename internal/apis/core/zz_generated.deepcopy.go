@@ -1929,8 +1929,18 @@ func (in *NetworkStatus) DeepCopyInto(out *NetworkStatus) {
 	*out = *in
 	if in.Peerings != nil {
 		in, out := &in.Peerings, &out.Peerings
-		*out = make([]NetworkPeeringStatus, len(*in))
-		copy(*out, *in)
+		*out = make(map[string][]NetworkPeeringStatus, len(*in))
+		for key, val := range *in {
+			var outVal []NetworkPeeringStatus
+			if val == nil {
+				(*out)[key] = nil
+			} else {
+				in, out := &val, &outVal
+				*out = make([]NetworkPeeringStatus, len(*in))
+				copy(*out, *in)
+			}
+			(*out)[key] = outVal
+		}
 	}
 	return
 }

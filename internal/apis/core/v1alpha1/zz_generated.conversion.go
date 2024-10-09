@@ -2694,7 +2694,7 @@ func Convert_core_NetworkSpec_To_v1alpha1_NetworkSpec(in *core.NetworkSpec, out 
 }
 
 func autoConvert_v1alpha1_NetworkStatus_To_core_NetworkStatus(in *v1alpha1.NetworkStatus, out *core.NetworkStatus, s conversion.Scope) error {
-	out.Peerings = *(*[]core.NetworkPeeringStatus)(unsafe.Pointer(&in.Peerings))
+	out.Peerings = *(*map[string][]core.NetworkPeeringStatus)(unsafe.Pointer(&in.Peerings))
 	return nil
 }
 
@@ -2704,7 +2704,7 @@ func Convert_v1alpha1_NetworkStatus_To_core_NetworkStatus(in *v1alpha1.NetworkSt
 }
 
 func autoConvert_core_NetworkStatus_To_v1alpha1_NetworkStatus(in *core.NetworkStatus, out *v1alpha1.NetworkStatus, s conversion.Scope) error {
-	out.Peerings = *(*[]v1alpha1.NetworkPeeringStatus)(unsafe.Pointer(&in.Peerings))
+	out.Peerings = *(*map[string][]v1alpha1.NetworkPeeringStatus)(unsafe.Pointer(&in.Peerings))
 	return nil
 }
 

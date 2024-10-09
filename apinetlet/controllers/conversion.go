@@ -80,27 +80,32 @@ func apiNetNetworkInterfaceStateToNetworkInterfaceState(state apinetv1alpha1.Net
 	}
 }
 
-func apiNetNetworkPeeringsStatusToNetworkPeeringsStatus(peerings []apinetv1alpha1.NetworkPeeringStatus, specPeerings []apinetv1alpha1.NetworkPeering) []networkingv1alpha1.NetworkPeeringStatus {
-	networkPeeringsStatus := []networkingv1alpha1.NetworkPeeringStatus{}
-	for _, peering := range peerings {
-		idx := slices.IndexFunc(specPeerings, func(specPeering apinetv1alpha1.NetworkPeering) bool {
-			return specPeering.ID == strconv.Itoa(int(peering.ID))
-		})
-		if idx != -1 {
-			prefixStatus := []networkingv1alpha1.PeeringPrefixStatus{}
-			if peering.State == apinetv1alpha1.NetworkPeeringStateReady {
-				for _, peeringPrefix := range specPeerings[idx].Prefixes {
-					prefixStatus = append(prefixStatus, networkingv1alpha1.PeeringPrefixStatus{
-						Name:   peeringPrefix.Name,
-						Prefix: (*commonv1alpha1.IPPrefix)(peeringPrefix.Prefix),
-					})
-				}
-			}
-			networkPeeringsStatus = append(networkPeeringsStatus, networkingv1alpha1.NetworkPeeringStatus{
-				Name:     specPeerings[idx].Name,
-				State:    networkingv1alpha1.NetworkPeeringState(peering.State),
-				Prefixes: prefixStatus,
+func apiNetNetworkPeeringsStatusToNetworkPeeringsStatus(partitionPeeringsMap map[string][]apinetv1alpha1.NetworkPeeringStatus, specPeerings []apinetv1alpha1.NetworkPeering) []networkingv1alpha1.NetworkPeeringStatus {
+	var networkPeeringsStatus []networkingv1alpha1.NetworkPeeringStatus
+	for _, peerings := range partitionPeeringsMap {
+		if len(peerings) == 0 {
+			continue
+		}
+		for _, peering := range peerings {
+			idx := slices.IndexFunc(specPeerings, func(specPeering apinetv1alpha1.NetworkPeering) bool {
+				return specPeering.ID == strconv.Itoa(int(peering.ID))
 			})
+			if idx != -1 {
+				var prefixStatus []networkingv1alpha1.PeeringPrefixStatus
+				if peering.State == apinetv1alpha1.NetworkPeeringStateReady {
+					for _, peeringPrefix := range specPeerings[idx].Prefixes {
+						prefixStatus = append(prefixStatus, networkingv1alpha1.PeeringPrefixStatus{
+							Name:   peeringPrefix.Name,
+							Prefix: (*commonv1alpha1.IPPrefix)(peeringPrefix.Prefix),
+						})
+					}
+				}
+				networkPeeringsStatus = append(networkPeeringsStatus, networkingv1alpha1.NetworkPeeringStatus{
+					Name:     specPeerings[idx].Name,
+					State:    networkingv1alpha1.NetworkPeeringState(peering.State),
+					Prefixes: prefixStatus,
+				})
+			}
 		}
 	}
 	return networkPeeringsStatus
