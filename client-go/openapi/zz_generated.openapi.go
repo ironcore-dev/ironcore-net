@@ -3430,12 +3430,20 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkStatus(ref common.ReferenceCal
 					"peerings": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Peerings contains the states of the network peerings for the network.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPeeringStatus"),
+										Type: []string{"array"},
+										Items: &spec.SchemaOrArray{
+											Schema: &spec.Schema{
+												SchemaProps: spec.SchemaProps{
+													Default: map[string]interface{}{},
+													Ref:     ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPeeringStatus"),
+												},
+											},
+										},
 									},
 								},
 							},

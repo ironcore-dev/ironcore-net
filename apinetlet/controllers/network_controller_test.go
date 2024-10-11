@@ -201,7 +201,8 @@ var _ = Describe("NetworkController", func() {
 		By("patching apinet network peering status")
 		apiNetNetwork2ID, _ := strconv.Atoi(apiNetNetwork2.Spec.ID)
 		Eventually(UpdateStatus(apiNetNetwork1, func() {
-			apiNetNetwork1.Status.Peerings = []apinetv1alpha1.NetworkPeeringStatus{{
+			apiNetNetwork1.Status.Peerings = make(map[string][]apinetv1alpha1.NetworkPeeringStatus)
+			apiNetNetwork1.Status.Peerings["partition1"] = []apinetv1alpha1.NetworkPeeringStatus{{
 				ID:    int32(apiNetNetwork2ID),
 				State: apinetv1alpha1.NetworkPeeringStateReady,
 			}}
@@ -209,7 +210,8 @@ var _ = Describe("NetworkController", func() {
 
 		apiNetNetwork1ID, _ := strconv.Atoi(apiNetNetwork1.Spec.ID)
 		Eventually(UpdateStatus(apiNetNetwork2, func() {
-			apiNetNetwork2.Status.Peerings = []apinetv1alpha1.NetworkPeeringStatus{{
+			apiNetNetwork2.Status.Peerings = make(map[string][]apinetv1alpha1.NetworkPeeringStatus)
+			apiNetNetwork2.Status.Peerings["partition1"] = []apinetv1alpha1.NetworkPeeringStatus{{
 				ID:    int32(apiNetNetwork1ID),
 				State: apinetv1alpha1.NetworkPeeringStateReady,
 			}}
@@ -377,7 +379,8 @@ var _ = Describe("NetworkController", func() {
 		By("patching apinet network peering status")
 		apiNetNetwork2ID, _ := strconv.Atoi(apiNetNetwork2.Spec.ID)
 		Eventually(UpdateStatus(apiNetNetwork1, func() {
-			apiNetNetwork1.Status.Peerings = []apinetv1alpha1.NetworkPeeringStatus{{
+			apiNetNetwork1.Status.Peerings = make(map[string][]apinetv1alpha1.NetworkPeeringStatus)
+			apiNetNetwork1.Status.Peerings["partition1"] = []apinetv1alpha1.NetworkPeeringStatus{{
 				ID:    int32(apiNetNetwork2ID),
 				State: apinetv1alpha1.NetworkPeeringStateReady,
 			}}
@@ -385,7 +388,8 @@ var _ = Describe("NetworkController", func() {
 
 		apiNetNetwork1ID, _ := strconv.Atoi(apiNetNetwork1.Spec.ID)
 		Eventually(UpdateStatus(apiNetNetwork2, func() {
-			apiNetNetwork2.Status.Peerings = []apinetv1alpha1.NetworkPeeringStatus{{
+			apiNetNetwork2.Status.Peerings = make(map[string][]apinetv1alpha1.NetworkPeeringStatus)
+			apiNetNetwork2.Status.Peerings["partition1"] = []apinetv1alpha1.NetworkPeeringStatus{{
 				ID:    int32(apiNetNetwork1ID),
 				State: apinetv1alpha1.NetworkPeeringStateReady,
 			}}

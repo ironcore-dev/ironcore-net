@@ -5,10 +5,14 @@
 
 package v1alpha1
 
+import (
+	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+)
+
 // NetworkStatusApplyConfiguration represents an declarative configuration of the NetworkStatus type for use
 // with apply.
 type NetworkStatusApplyConfiguration struct {
-	Peerings []NetworkPeeringStatusApplyConfiguration `json:"peerings,omitempty"`
+	Peerings map[string][]v1alpha1.NetworkPeeringStatus `json:"peerings,omitempty"`
 }
 
 // NetworkStatusApplyConfiguration constructs an declarative configuration of the NetworkStatus type for use with
@@ -17,15 +21,16 @@ func NetworkStatus() *NetworkStatusApplyConfiguration {
 	return &NetworkStatusApplyConfiguration{}
 }
 
-// WithPeerings adds the given value to the Peerings field in the declarative configuration
+// WithPeerings puts the entries into the Peerings field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
-// If called multiple times, values provided by each call will be appended to the Peerings field.
-func (b *NetworkStatusApplyConfiguration) WithPeerings(values ...*NetworkPeeringStatusApplyConfiguration) *NetworkStatusApplyConfiguration {
-	for i := range values {
-		if values[i] == nil {
-			panic("nil value passed to WithPeerings")
-		}
-		b.Peerings = append(b.Peerings, *values[i])
+// If called multiple times, the entries provided by each call will be put on the Peerings field,
+// overwriting an existing map entries in Peerings field with the same key.
+func (b *NetworkStatusApplyConfiguration) WithPeerings(entries map[string][]v1alpha1.NetworkPeeringStatus) *NetworkStatusApplyConfiguration {
+	if b.Peerings == nil && len(entries) > 0 {
+		b.Peerings = make(map[string][]v1alpha1.NetworkPeeringStatus, len(entries))
+	}
+	for k, v := range entries {
+		b.Peerings[k] = v
 	}
 	return b
 }

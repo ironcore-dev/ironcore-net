@@ -1556,7 +1556,7 @@ LocalUIDReference
 </em>
 </td>
 <td>
-<p>NetworkRef is the network the load balancer is assigned to.</p>
+<p>NetworkRef is the network to which network policy is applied.</p>
 </td>
 </tr>
 <tr>
@@ -3800,9 +3800,6 @@ to the peered network, if no prefixes are specified no filtering will be done.</
 </table>
 <h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus
 </h3>
-<p>
-(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkStatus">NetworkStatus</a>)
-</p>
 <div>
 <p>NetworkPeeringStatus is the status of a network peering.</p>
 </div>
@@ -4201,8 +4198,8 @@ string
 <td>
 <code>peerings</code><br/>
 <em>
-<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeeringStatus">
-[]NetworkPeeringStatus
+<a href="#core.apinet.ironcore.dev/v1alpha1.[]ironcore-net/api/core/v1alpha1.NetworkPeeringStatus">
+map[string][]ironcore-net/api/core/v1alpha1.NetworkPeeringStatus
 </a>
 </em>
 </td>
@@ -4570,7 +4567,7 @@ string
 (<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeering">NetworkPeering</a>)
 </p>
 <div>
-<p>PeeringPrefixes defines prefixes to be exposed to the peered network</p>
+<p>PeeringPrefix defines prefixes to be exposed to the peered network</p>
 </div>
 <table>
 <thead>
