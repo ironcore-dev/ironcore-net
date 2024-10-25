@@ -129,7 +129,6 @@ func main() {
 		},
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionConfig:   apiNetCfg,
 		LeaderElectionID:       "fa89daf5.apinetlet.apinet.ironcore.dev",
 		Cache: cache.Options{
 			DefaultNamespaces: cacheDefaultNamespaces,
