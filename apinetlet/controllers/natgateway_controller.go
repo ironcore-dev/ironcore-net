@@ -14,7 +14,7 @@ import (
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
-	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
+	ironcorenet "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
@@ -215,12 +215,18 @@ func (r *NATGatewayReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache ca
 			),
 		).
 		WatchesRawSource(
-			source.Kind(apiNetCache, &apinetv1alpha1.NATGateway{}),
-			handler.EnqueueRequestForSource(mgr.GetScheme(), mgr.GetRESTMapper(), &networkingv1alpha1.NATGateway{}),
+			source.Kind[client.Object](
+				apiNetCache,
+				&apinetv1alpha1.NATGateway{},
+				handler.EnqueueRequestForSource(mgr.GetScheme(), mgr.GetRESTMapper(), &networkingv1alpha1.NATGateway{}),
+			),
 		).
 		WatchesRawSource(
-			source.Kind(apiNetCache, &apinetv1alpha1.NATGatewayAutoscaler{}),
-			handler.EnqueueRequestForSource(mgr.GetScheme(), mgr.GetRESTMapper(), &networkingv1alpha1.NATGateway{}),
+			source.Kind[client.Object](
+				apiNetCache,
+				&apinetv1alpha1.NATGatewayAutoscaler{},
+				handler.EnqueueRequestForSource(mgr.GetScheme(), mgr.GetRESTMapper(), &networkingv1alpha1.NATGateway{}),
+			),
 		).
 		Complete(r)
 }

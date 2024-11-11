@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	v1alpha1informers "github.com/ironcore-dev/ironcore-net/client-go/informers/core/v1alpha1"
-	v1alpha1client "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/typed/core/v1alpha1"
+	v1alpha1informers "github.com/ironcore-dev/ironcore-net/client-go/informers/externalversions/core/v1alpha1"
+	v1alpha1client "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned/typed/core/v1alpha1"
 	v1alpha1listers "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/generic"
 	corev1 "k8s.io/api/core/v1"

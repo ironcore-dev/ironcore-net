@@ -13,7 +13,7 @@ import (
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	apinetletconfig "github.com/ironcore-dev/ironcore-net/apinetlet/client/config"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/controllers"
-	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
+	ironcorenet "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
 	apinetclient "github.com/ironcore-dev/ironcore-net/internal/client"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"

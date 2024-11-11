@@ -247,8 +247,11 @@ func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, metalnetCache cac
 			// builder.WithPredicates(r.networkStatusChangedPredicate()),
 		).
 		WatchesRawSource(
-			source.Kind(metalnetCache, &metalnetv1alpha1.Network{}),
-			metalnetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &apinetv1alpha1.Network{}),
+			source.Kind[client.Object](
+				metalnetCache,
+				&metalnetv1alpha1.Network{},
+				metalnetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &apinetv1alpha1.Network{}),
+			),
 		).
 		Complete(r)
 }

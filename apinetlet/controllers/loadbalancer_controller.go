@@ -17,8 +17,8 @@ import (
 	apinetlethandler "github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
-	metav1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/meta/v1"
-	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
+	ironcorenet "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
+	metav1ac "k8s.io/client-go/applyconfigurations/meta/v1"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
@@ -342,8 +342,11 @@ func (r *LoadBalancerReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache 
 			),
 		).
 		WatchesRawSource(
-			source.Kind(apiNetCache, &apinetv1alpha1.LoadBalancer{}),
-			apinetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.LoadBalancer{}),
+			source.Kind[client.Object](
+				apiNetCache,
+				&apinetv1alpha1.LoadBalancer{},
+				apinetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.LoadBalancer{}),
+			),
 		).
 		Owns(&ipamv1alpha1.Prefix{}).
 		Watches(

@@ -189,8 +189,11 @@ func (r *MetalnetNodeReconciler) SetupWithManager(mgr ctrl.Manager, metalnetCach
 		Named("metalnetnode").
 		WithLogConstructor(r.logConstructor(mgr)).
 		WatchesRawSource(
-			source.Kind(metalnetCache, &corev1.Node{}),
-			r.enqueueByMetalnetNode(),
+			source.Kind[client.Object](
+				metalnetCache,
+				&corev1.Node{},
+				r.enqueueByMetalnetNode(),
+			),
 		).
 		Watches(
 			&v1alpha1.Node{},

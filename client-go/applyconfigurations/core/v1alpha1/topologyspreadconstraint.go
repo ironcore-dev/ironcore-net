@@ -7,7 +7,7 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	v1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/meta/v1"
+	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // TopologySpreadConstraintApplyConfiguration represents an declarative configuration of the TopologySpreadConstraint type for use

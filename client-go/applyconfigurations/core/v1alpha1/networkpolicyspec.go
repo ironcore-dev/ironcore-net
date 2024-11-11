@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	metav1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/meta/v1"
 	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // NetworkPolicySpecApplyConfiguration represents an declarative configuration of the NetworkPolicySpec type for use

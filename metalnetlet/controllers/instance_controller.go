@@ -335,8 +335,11 @@ func (r *InstanceReconciler) SetupWithManager(mgr ctrl.Manager, metalnetCache ca
 			builder.WithPredicates(r.isPartitionLoadBalancerInstance()),
 		).
 		WatchesRawSource(
-			source.Kind(metalnetCache, &metalnetv1alpha1.LoadBalancer{}),
-			utilhandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &v1alpha1.Instance{}),
+			source.Kind[client.Object](
+				metalnetCache,
+				&metalnetv1alpha1.LoadBalancer{},
+				utilhandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &v1alpha1.Instance{}),
+			),
 		).
 		Complete(r)
 }

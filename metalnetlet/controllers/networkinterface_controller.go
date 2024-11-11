@@ -729,12 +729,18 @@ func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager, metalnet
 			r.enqueueByNetworkPolicyRule(),
 		).
 		WatchesRawSource(
-			source.Kind(metalnetCache, &metalnetv1alpha1.NetworkInterface{}),
-			utilhandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &v1alpha1.NetworkInterface{}),
+			source.Kind[client.Object](
+				metalnetCache,
+				&metalnetv1alpha1.NetworkInterface{},
+				utilhandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &v1alpha1.NetworkInterface{}),
+			),
 		).
 		WatchesRawSource(
-			source.Kind(metalnetCache, &corev1.Node{}),
-			r.enqueueByMetalnetNode(),
+			source.Kind[client.Object](
+				metalnetCache,
+				&corev1.Node{},
+				r.enqueueByMetalnetNode(),
+			),
 		).
 		Complete(r)
 }

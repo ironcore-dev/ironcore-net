@@ -8,10 +8,10 @@ package v1alpha1
 import (
 	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	internal "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/internal"
-	v1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
+	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // NetworkIDApplyConfiguration represents an declarative configuration of the NetworkID type for use

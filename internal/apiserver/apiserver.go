@@ -7,8 +7,8 @@ import (
 	"net/netip"
 
 	"github.com/ironcore-dev/ironcore-net/apimachinery/equality"
-	"github.com/ironcore-dev/ironcore-net/client-go/informers"
-	v1alpha1client "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/typed/core/v1alpha1"
+	informers "github.com/ironcore-dev/ironcore-net/client-go/informers/externalversions"
+	v1alpha1client "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned/typed/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/internal/apis/core"
 	"github.com/ironcore-dev/ironcore-net/internal/apis/core/install"
 	"github.com/ironcore-dev/ironcore-net/internal/registry/daemonset"

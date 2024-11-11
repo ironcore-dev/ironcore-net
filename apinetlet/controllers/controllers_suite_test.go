@@ -17,7 +17,7 @@ import (
 	apinetclient "github.com/ironcore-dev/ironcore-net/internal/client"
 
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
+	ironcorenet "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	envtestutils "github.com/ironcore-dev/ironcore/utils/envtest"

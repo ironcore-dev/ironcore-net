@@ -13,8 +13,8 @@ import (
 	"k8s.io/apiserver/pkg/endpoints/openapi"
 
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	"github.com/ironcore-dev/ironcore-net/client-go/informers"
-	clientset "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
+	informers "github.com/ironcore-dev/ironcore-net/client-go/informers/externalversions"
+	clientset "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
 	"github.com/ironcore-dev/ironcore-net/internal/apiserver"
 	netflag "github.com/ironcore-dev/ironcore-net/utils/flag"
 	"github.com/spf13/cobra"

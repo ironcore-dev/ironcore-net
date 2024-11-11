@@ -11,7 +11,7 @@ import (
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
-	apinetmetav1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/meta/v1"
+	metav1ac "k8s.io/client-go/applyconfigurations/meta/v1"
 
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
@@ -163,10 +163,10 @@ func translateObjectSelector(objSel *corev1alpha1.ObjectSelector) *apinetv1alpha
 		WithMatchExpressions(translateLabelSelectorRequirements(objSel.MatchExpressions)...)
 }
 
-func translateLabelSelectorRequirements(reqs []metav1.LabelSelectorRequirement) []*apinetmetav1ac.LabelSelectorRequirementApplyConfiguration {
-	var translated []*apinetmetav1ac.LabelSelectorRequirementApplyConfiguration
+func translateLabelSelectorRequirements(reqs []metav1.LabelSelectorRequirement) []*metav1ac.LabelSelectorRequirementApplyConfiguration {
+	var translated []*metav1ac.LabelSelectorRequirementApplyConfiguration
 	for _, req := range reqs {
-		translated = append(translated, apinetmetav1ac.LabelSelectorRequirement().
+		translated = append(translated, metav1ac.LabelSelectorRequirement().
 			WithKey(req.Key).
 			WithOperator(req.Operator).
 			WithValues(req.Values...))
@@ -174,8 +174,8 @@ func translateLabelSelectorRequirements(reqs []metav1.LabelSelectorRequirement) 
 	return translated
 }
 
-func translateLabelSelector(labelSelector metav1.LabelSelector) *apinetmetav1ac.LabelSelectorApplyConfiguration {
-	return apinetmetav1ac.LabelSelector().
+func translateLabelSelector(labelSelector metav1.LabelSelector) *metav1ac.LabelSelectorApplyConfiguration {
+	return metav1ac.LabelSelector().
 		WithMatchLabels(labelSelector.MatchLabels).
 		WithMatchExpressions(translateLabelSelectorRequirements(labelSelector.MatchExpressions)...)
 }
