@@ -9,7 +9,7 @@ require (
 	github.com/ironcore-dev/controller-utils v0.9.4
 	github.com/ironcore-dev/ironcore v0.2.0
 	github.com/ironcore-dev/metalnet v0.3.9-0.20240502160212-b55083c9fb6b
-	github.com/onsi/ginkgo/v2 v2.21.0
+	github.com/onsi/ginkgo/v2 v2.22.0
 	github.com/onsi/gomega v1.35.1
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
