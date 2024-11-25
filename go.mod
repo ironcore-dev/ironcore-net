@@ -3,7 +3,7 @@ module github.com/ironcore-dev/ironcore-net
 go 1.23.0
 
 require (
-	github.com/bits-and-blooms/bitset v1.15.0
+	github.com/bits-and-blooms/bitset v1.17.0
 	github.com/go-logr/logr v1.4.2
 	github.com/google/uuid v1.6.0
 	github.com/ironcore-dev/controller-utils v0.9.4
