@@ -8,8 +8,6 @@ package applyconfigurations
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
-	metav1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/meta/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 )
 
@@ -156,20 +154,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &corev1alpha1.TargetNetworkInterfaceApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("TopologySpreadConstraint"):
 		return &corev1alpha1.TopologySpreadConstraintApplyConfiguration{}
-
-		// Group=meta.k8s.io, Version=v1
-	case v1.SchemeGroupVersion.WithKind("LabelSelector"):
-		return &metav1.LabelSelectorApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("LabelSelectorRequirement"):
-		return &metav1.LabelSelectorRequirementApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("ManagedFieldsEntry"):
-		return &metav1.ManagedFieldsEntryApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("ObjectMeta"):
-		return &metav1.ObjectMetaApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("OwnerReference"):
-		return &metav1.OwnerReferenceApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("TypeMeta"):
-		return &metav1.TypeMetaApplyConfiguration{}
 
 	}
 	return nil

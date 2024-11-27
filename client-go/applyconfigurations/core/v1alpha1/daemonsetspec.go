@@ -6,7 +6,7 @@
 package v1alpha1
 
 import (
-	v1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/meta/v1"
+	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
 // DaemonSetSpecApplyConfiguration represents an declarative configuration of the DaemonSetSpec type for use

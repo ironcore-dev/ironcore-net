@@ -15,7 +15,7 @@ import (
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	apinetlethandler "github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
-	"github.com/ironcore-dev/ironcore-net/client-go/ironcorenet"
+	ironcorenet "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
 	apinetclient "github.com/ironcore-dev/ironcore-net/internal/client"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
@@ -576,17 +576,26 @@ func (r *NetworkPolicyReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache
 			),
 		).
 		WatchesRawSource(
-			source.Kind(apiNetCache, &apinetv1alpha1.NetworkPolicy{}),
-			apinetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.NetworkPolicy{}),
+			source.Kind[client.Object](
+				apiNetCache,
+				&apinetv1alpha1.NetworkPolicy{},
+				apinetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.NetworkPolicy{}),
+			),
 		).
 		WatchesRawSource(
-			source.Kind(apiNetCache, &apinetv1alpha1.Network{}),
-			r.enqueueByNetwork(),
+			source.Kind[client.Object](
+				apiNetCache,
+				&apinetv1alpha1.Network{},
+				r.enqueueByNetwork(),
+			),
 		).
 		WatchesRawSource(
-			source.Kind(apiNetCache, &apinetv1alpha1.NetworkInterface{}),
-			r.enqueueByNetworkInterface(),
-			builder.WithPredicates(r.networkInterfaceReadyPredicate()),
+			source.Kind[client.Object](
+				apiNetCache,
+				&apinetv1alpha1.NetworkInterface{},
+				r.enqueueByNetworkInterface(),
+				r.networkInterfaceReadyPredicate(),
+			),
 		).
 		Complete(r)
 }
