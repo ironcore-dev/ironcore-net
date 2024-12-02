@@ -17,14 +17,14 @@ require (
 	go4.org/netipx v0.0.0-20220812043211-3cc044ffd68d
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
 	k8s.io/api v0.30.4
-	k8s.io/apimachinery v0.30.4
+	k8s.io/apimachinery v0.31.3
 	k8s.io/apiserver v0.30.4
 	k8s.io/client-go v0.30.4
-	k8s.io/code-generator v0.30.4
+	k8s.io/code-generator v0.31.3
 	k8s.io/component-base v0.30.4
 	k8s.io/klog/v2 v2.130.1
 	k8s.io/kube-openapi v0.0.0-20240228011516-70dd3763d340
-	k8s.io/utils v0.0.0-20240102154912-e7106e64919e
+	k8s.io/utils v0.0.0-20240711033017-18e509b52bc8
 	sigs.k8s.io/controller-runtime v0.18.5
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1
 )
@@ -45,6 +45,7 @@ require (
 	github.com/evanphx/json-patch/v5 v5.9.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-logr/zapr v1.3.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
@@ -75,6 +76,7 @@ require (
 	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
+	github.com/x448/float16 v0.8.4 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.10 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.10 // indirect
 	go.etcd.io/etcd/client/v3 v3.5.10 // indirect
