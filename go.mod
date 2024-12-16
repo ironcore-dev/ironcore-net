@@ -7,21 +7,21 @@ require (
 	github.com/go-logr/logr v1.4.2
 	github.com/gogo/protobuf v1.3.2
 	github.com/google/uuid v1.6.0
-	github.com/ironcore-dev/controller-utils v0.9.5
+	github.com/ironcore-dev/controller-utils v0.9.6
 	github.com/ironcore-dev/ironcore v0.2.0
 	github.com/ironcore-dev/metalnet v0.3.10
 	github.com/onsi/ginkgo/v2 v2.22.0
-	github.com/onsi/gomega v1.36.0
+	github.com/onsi/gomega v1.36.1
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	go4.org/netipx v0.0.0-20220812043211-3cc044ffd68d
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
-	k8s.io/api v0.30.4
-	k8s.io/apimachinery v0.30.4
-	k8s.io/apiserver v0.30.4
-	k8s.io/client-go v0.30.4
-	k8s.io/code-generator v0.30.4
-	k8s.io/component-base v0.30.4
+	k8s.io/api v0.30.6
+	k8s.io/apimachinery v0.30.6
+	k8s.io/apiserver v0.30.6
+	k8s.io/client-go v0.30.6
+	k8s.io/code-generator v0.30.6
+	k8s.io/component-base v0.30.6
 	k8s.io/klog/v2 v2.130.1
 	k8s.io/kube-openapi v0.0.0-20240228011516-70dd3763d340
 	k8s.io/utils v0.0.0-20240102154912-e7106e64919e
@@ -108,9 +108,9 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiextensions-apiserver v0.30.1 // indirect
+	k8s.io/apiextensions-apiserver v0.30.6 // indirect
 	k8s.io/gengo/v2 v2.0.0-20240228010128-51d4e06bde70 // indirect
-	k8s.io/kms v0.30.4 // indirect
+	k8s.io/kms v0.30.6 // indirect
 	k8s.io/kube-aggregator v0.29.4 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.29.0 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
