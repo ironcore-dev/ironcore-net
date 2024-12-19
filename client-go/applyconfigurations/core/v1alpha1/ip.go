@@ -14,7 +14,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// IPApplyConfiguration represents an declarative configuration of the IP type for use
+// IPApplyConfiguration represents a declarative configuration of the IP type for use
 // with apply.
 type IPApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type IPApplyConfiguration struct {
 	Status                           *corev1alpha1.IPStatus    `json:"status,omitempty"`
 }
 
-// IP constructs an declarative configuration of the IP type for use with
+// IP constructs a declarative configuration of the IP type for use with
 // apply.
 func IP(name, namespace string) *IPApplyConfiguration {
 	b := &IPApplyConfiguration{}
@@ -242,4 +242,10 @@ func (b *IPApplyConfiguration) WithSpec(value *IPSpecApplyConfiguration) *IPAppl
 func (b *IPApplyConfiguration) WithStatus(value corev1alpha1.IPStatus) *IPApplyConfiguration {
 	b.Status = &value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *IPApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

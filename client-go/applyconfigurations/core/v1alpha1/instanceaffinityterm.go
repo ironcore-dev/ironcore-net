@@ -9,14 +9,14 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// InstanceAffinityTermApplyConfiguration represents an declarative configuration of the InstanceAffinityTerm type for use
+// InstanceAffinityTermApplyConfiguration represents a declarative configuration of the InstanceAffinityTerm type for use
 // with apply.
 type InstanceAffinityTermApplyConfiguration struct {
 	LabelSelector *v1.LabelSelectorApplyConfiguration `json:"labelSelector,omitempty"`
 	TopologyKey   *string                             `json:"topologyKey,omitempty"`
 }
 
-// InstanceAffinityTermApplyConfiguration constructs an declarative configuration of the InstanceAffinityTerm type for use with
+// InstanceAffinityTermApplyConfiguration constructs a declarative configuration of the InstanceAffinityTerm type for use with
 // apply.
 func InstanceAffinityTerm() *InstanceAffinityTermApplyConfiguration {
 	return &InstanceAffinityTermApplyConfiguration{}

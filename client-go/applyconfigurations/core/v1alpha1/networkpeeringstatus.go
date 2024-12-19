@@ -9,14 +9,14 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 )
 
-// NetworkPeeringStatusApplyConfiguration represents an declarative configuration of the NetworkPeeringStatus type for use
+// NetworkPeeringStatusApplyConfiguration represents a declarative configuration of the NetworkPeeringStatus type for use
 // with apply.
 type NetworkPeeringStatusApplyConfiguration struct {
 	ID    *int32                        `json:"id,omitempty"`
 	State *v1alpha1.NetworkPeeringState `json:"state,omitempty"`
 }
 
-// NetworkPeeringStatusApplyConfiguration constructs an declarative configuration of the NetworkPeeringStatus type for use with
+// NetworkPeeringStatusApplyConfiguration constructs a declarative configuration of the NetworkPeeringStatus type for use with
 // apply.
 func NetworkPeeringStatus() *NetworkPeeringStatusApplyConfiguration {
 	return &NetworkPeeringStatusApplyConfiguration{}

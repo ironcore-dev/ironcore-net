@@ -9,14 +9,14 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// DaemonSetSpecApplyConfiguration represents an declarative configuration of the DaemonSetSpec type for use
+// DaemonSetSpecApplyConfiguration represents a declarative configuration of the DaemonSetSpec type for use
 // with apply.
 type DaemonSetSpecApplyConfiguration struct {
 	Selector *v1.LabelSelectorApplyConfiguration `json:"nodeSelector,omitempty"`
 	Template *InstanceTemplateApplyConfiguration `json:"template,omitempty"`
 }
 
-// DaemonSetSpecApplyConfiguration constructs an declarative configuration of the DaemonSetSpec type for use with
+// DaemonSetSpecApplyConfiguration constructs a declarative configuration of the DaemonSetSpec type for use with
 // apply.
 func DaemonSetSpec() *DaemonSetSpecApplyConfiguration {
 	return &DaemonSetSpecApplyConfiguration{}

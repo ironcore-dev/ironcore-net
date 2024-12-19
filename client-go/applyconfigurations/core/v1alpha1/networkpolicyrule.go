@@ -14,7 +14,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// NetworkPolicyRuleApplyConfiguration represents an declarative configuration of the NetworkPolicyRule type for use
+// NetworkPolicyRuleApplyConfiguration represents a declarative configuration of the NetworkPolicyRule type for use
 // with apply.
 type NetworkPolicyRuleApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -26,7 +26,7 @@ type NetworkPolicyRuleApplyConfiguration struct {
 	EgressRules                      []RuleApplyConfiguration                   `json:"egressRule,omitempty"`
 }
 
-// NetworkPolicyRule constructs an declarative configuration of the NetworkPolicyRule type for use with
+// NetworkPolicyRule constructs a declarative configuration of the NetworkPolicyRule type for use with
 // apply.
 func NetworkPolicyRule(name, namespace string) *NetworkPolicyRuleApplyConfiguration {
 	b := &NetworkPolicyRuleApplyConfiguration{}
@@ -284,4 +284,10 @@ func (b *NetworkPolicyRuleApplyConfiguration) WithEgressRules(values ...*RuleApp
 		b.EgressRules = append(b.EgressRules, *values[i])
 	}
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *NetworkPolicyRuleApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

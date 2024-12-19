@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -25,25 +25,17 @@ type NATTableLister interface {
 
 // nATTableLister implements the NATTableLister interface.
 type nATTableLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.NATTable]
 }
 
 // NewNATTableLister returns a new NATTableLister.
 func NewNATTableLister(indexer cache.Indexer) NATTableLister {
-	return &nATTableLister{indexer: indexer}
-}
-
-// List lists all NATTables in the indexer.
-func (s *nATTableLister) List(selector labels.Selector) (ret []*v1alpha1.NATTable, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.NATTable))
-	})
-	return ret, err
+	return &nATTableLister{listers.New[*v1alpha1.NATTable](indexer, v1alpha1.Resource("nattable"))}
 }
 
 // NATTables returns an object that can list and get NATTables.
 func (s *nATTableLister) NATTables(namespace string) NATTableNamespaceLister {
-	return nATTableNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return nATTableNamespaceLister{listers.NewNamespaced[*v1alpha1.NATTable](s.ResourceIndexer, namespace)}
 }
 
 // NATTableNamespaceLister helps list and get NATTables.
@@ -61,26 +53,5 @@ type NATTableNamespaceLister interface {
 // nATTableNamespaceLister implements the NATTableNamespaceLister
 // interface.
 type nATTableNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all NATTables in the indexer for a given namespace.
-func (s nATTableNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.NATTable, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.NATTable))
-	})
-	return ret, err
-}
-
-// Get retrieves the NATTable from the indexer for a given namespace and name.
-func (s nATTableNamespaceLister) Get(name string) (*v1alpha1.NATTable, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("nattable"), name)
-	}
-	return obj.(*v1alpha1.NATTable), nil
+	listers.ResourceIndexer[*v1alpha1.NATTable]
 }

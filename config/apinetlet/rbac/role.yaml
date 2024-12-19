@@ -42,122 +42,10 @@ rules:
   - networking.ironcore.dev
   resources:
   - loadbalancers
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
-  - loadbalancers/finalizers
-  verbs:
-  - patch
-  - update
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
-  - loadbalancers/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
   - natgateways
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
-  - natgateways/finalizers
-  verbs:
-  - patch
-  - update
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
-  - natgateways/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
   - networkinterfaces
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
-  - networkinterfaces/finalizers
-  verbs:
-  - patch
-  - update
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
-  - networkinterfaces/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
   - networkpolicies
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
-  - networkpolicies/finalizers
-  verbs:
-  - patch
-  - update
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
   - networks
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
-  - networks/finalizers
-  verbs:
-  - patch
-  - update
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
-  - networks/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - networking.ironcore.dev
-  resources:
   - virtualips
   verbs:
   - get
@@ -168,6 +56,11 @@ rules:
 - apiGroups:
   - networking.ironcore.dev
   resources:
+  - loadbalancers/finalizers
+  - natgateways/finalizers
+  - networkinterfaces/finalizers
+  - networkpolicies/finalizers
+  - networks/finalizers
   - virtualips/finalizers
   verbs:
   - patch
@@ -175,6 +68,10 @@ rules:
 - apiGroups:
   - networking.ironcore.dev
   resources:
+  - loadbalancers/status
+  - natgateways/status
+  - networkinterfaces/status
+  - networks/status
   - virtualips/status
   verbs:
   - get

@@ -9,7 +9,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 )
 
-// IPClaimRefApplyConfiguration represents an declarative configuration of the IPClaimRef type for use
+// IPClaimRefApplyConfiguration represents a declarative configuration of the IPClaimRef type for use
 // with apply.
 type IPClaimRefApplyConfiguration struct {
 	Group    *string    `json:"group,omitempty"`
@@ -18,7 +18,7 @@ type IPClaimRefApplyConfiguration struct {
 	UID      *types.UID `json:"uid,omitempty"`
 }
 
-// IPClaimRefApplyConfiguration constructs an declarative configuration of the IPClaimRef type for use with
+// IPClaimRefApplyConfiguration constructs a declarative configuration of the IPClaimRef type for use with
 // apply.
 func IPClaimRef() *IPClaimRefApplyConfiguration {
 	return &IPClaimRefApplyConfiguration{}

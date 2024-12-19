@@ -5,14 +5,14 @@
 
 package v1alpha1
 
-// NATGatewayStatusApplyConfiguration represents an declarative configuration of the NATGatewayStatus type for use
+// NATGatewayStatusApplyConfiguration represents a declarative configuration of the NATGatewayStatus type for use
 // with apply.
 type NATGatewayStatusApplyConfiguration struct {
 	UsedNATIPs      *int64 `json:"usedNATIPs,omitempty"`
 	RequestedNATIPs *int64 `json:"requestedNATIPs,omitempty"`
 }
 
-// NATGatewayStatusApplyConfiguration constructs an declarative configuration of the NATGatewayStatus type for use with
+// NATGatewayStatusApplyConfiguration constructs a declarative configuration of the NATGatewayStatus type for use with
 // apply.
 func NATGatewayStatus() *NATGatewayStatusApplyConfiguration {
 	return &NATGatewayStatusApplyConfiguration{}

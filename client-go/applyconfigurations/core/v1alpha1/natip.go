@@ -9,14 +9,14 @@ import (
 	net "github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 )
 
-// NATIPApplyConfiguration represents an declarative configuration of the NATIP type for use
+// NATIPApplyConfiguration represents a declarative configuration of the NATIP type for use
 // with apply.
 type NATIPApplyConfiguration struct {
 	IP       *net.IP                          `json:"ip,omitempty"`
 	Sections []NATIPSectionApplyConfiguration `json:"sections,omitempty"`
 }
 
-// NATIPApplyConfiguration constructs an declarative configuration of the NATIP type for use with
+// NATIPApplyConfiguration constructs a declarative configuration of the NATIP type for use with
 // apply.
 func NATIP() *NATIPApplyConfiguration {
 	return &NATIPApplyConfiguration{}

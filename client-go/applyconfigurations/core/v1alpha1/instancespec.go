@@ -11,7 +11,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// InstanceSpecApplyConfiguration represents an declarative configuration of the InstanceSpec type for use
+// InstanceSpecApplyConfiguration represents a declarative configuration of the InstanceSpec type for use
 // with apply.
 type InstanceSpecApplyConfiguration struct {
 	Type                      *v1alpha1.InstanceType                       `json:"type,omitempty"`
@@ -24,7 +24,7 @@ type InstanceSpecApplyConfiguration struct {
 	NodeRef                   *v1.LocalObjectReference                     `json:"nodeRef,omitempty"`
 }
 
-// InstanceSpecApplyConfiguration constructs an declarative configuration of the InstanceSpec type for use with
+// InstanceSpecApplyConfiguration constructs a declarative configuration of the InstanceSpec type for use with
 // apply.
 func InstanceSpec() *InstanceSpecApplyConfiguration {
 	return &InstanceSpecApplyConfiguration{}

@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -25,25 +25,17 @@ type InstanceLister interface {
 
 // instanceLister implements the InstanceLister interface.
 type instanceLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.Instance]
 }
 
 // NewInstanceLister returns a new InstanceLister.
 func NewInstanceLister(indexer cache.Indexer) InstanceLister {
-	return &instanceLister{indexer: indexer}
-}
-
-// List lists all Instances in the indexer.
-func (s *instanceLister) List(selector labels.Selector) (ret []*v1alpha1.Instance, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Instance))
-	})
-	return ret, err
+	return &instanceLister{listers.New[*v1alpha1.Instance](indexer, v1alpha1.Resource("instance"))}
 }
 
 // Instances returns an object that can list and get Instances.
 func (s *instanceLister) Instances(namespace string) InstanceNamespaceLister {
-	return instanceNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return instanceNamespaceLister{listers.NewNamespaced[*v1alpha1.Instance](s.ResourceIndexer, namespace)}
 }
 
 // InstanceNamespaceLister helps list and get Instances.
@@ -61,26 +53,5 @@ type InstanceNamespaceLister interface {
 // instanceNamespaceLister implements the InstanceNamespaceLister
 // interface.
 type instanceNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all Instances in the indexer for a given namespace.
-func (s instanceNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.Instance, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Instance))
-	})
-	return ret, err
-}
-
-// Get retrieves the Instance from the indexer for a given namespace and name.
-func (s instanceNamespaceLister) Get(name string) (*v1alpha1.Instance, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("instance"), name)
-	}
-	return obj.(*v1alpha1.Instance), nil
+	listers.ResourceIndexer[*v1alpha1.Instance]
 }

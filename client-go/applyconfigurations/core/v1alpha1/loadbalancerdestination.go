@@ -9,14 +9,14 @@ import (
 	net "github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 )
 
-// LoadBalancerDestinationApplyConfiguration represents an declarative configuration of the LoadBalancerDestination type for use
+// LoadBalancerDestinationApplyConfiguration represents a declarative configuration of the LoadBalancerDestination type for use
 // with apply.
 type LoadBalancerDestinationApplyConfiguration struct {
 	IP        *net.IP                                  `json:"ip,omitempty"`
 	TargetRef *LoadBalancerTargetRefApplyConfiguration `json:"targetRef,omitempty"`
 }
 
-// LoadBalancerDestinationApplyConfiguration constructs an declarative configuration of the LoadBalancerDestination type for use with
+// LoadBalancerDestinationApplyConfiguration constructs a declarative configuration of the LoadBalancerDestination type for use with
 // apply.
 func LoadBalancerDestination() *LoadBalancerDestinationApplyConfiguration {
 	return &LoadBalancerDestinationApplyConfiguration{}

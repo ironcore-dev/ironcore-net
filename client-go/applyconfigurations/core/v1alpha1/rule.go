@@ -5,7 +5,7 @@
 
 package v1alpha1
 
-// RuleApplyConfiguration represents an declarative configuration of the Rule type for use
+// RuleApplyConfiguration represents a declarative configuration of the Rule type for use
 // with apply.
 type RuleApplyConfiguration struct {
 	CIDRBlock          []IPBlockApplyConfiguration           `json:"ipBlock,omitempty"`
@@ -13,7 +13,7 @@ type RuleApplyConfiguration struct {
 	NetworkPolicyPorts []NetworkPolicyPortApplyConfiguration `json:"networkPolicyPorts,omitempty"`
 }
 
-// RuleApplyConfiguration constructs an declarative configuration of the Rule type for use with
+// RuleApplyConfiguration constructs a declarative configuration of the Rule type for use with
 // apply.
 func Rule() *RuleApplyConfiguration {
 	return &RuleApplyConfiguration{}

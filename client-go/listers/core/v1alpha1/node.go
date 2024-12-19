@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -26,30 +26,10 @@ type NodeLister interface {
 
 // nodeLister implements the NodeLister interface.
 type nodeLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.Node]
 }
 
 // NewNodeLister returns a new NodeLister.
 func NewNodeLister(indexer cache.Indexer) NodeLister {
-	return &nodeLister{indexer: indexer}
-}
-
-// List lists all Nodes in the indexer.
-func (s *nodeLister) List(selector labels.Selector) (ret []*v1alpha1.Node, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.Node))
-	})
-	return ret, err
-}
-
-// Get retrieves the Node from the index for a given name.
-func (s *nodeLister) Get(name string) (*v1alpha1.Node, error) {
-	obj, exists, err := s.indexer.GetByKey(name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("node"), name)
-	}
-	return obj.(*v1alpha1.Node), nil
+	return &nodeLister{listers.New[*v1alpha1.Node](indexer, v1alpha1.Resource("node"))}
 }

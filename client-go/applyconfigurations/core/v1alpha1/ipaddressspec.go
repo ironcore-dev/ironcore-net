@@ -9,14 +9,14 @@ import (
 	net "github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 )
 
-// IPAddressSpecApplyConfiguration represents an declarative configuration of the IPAddressSpec type for use
+// IPAddressSpecApplyConfiguration represents a declarative configuration of the IPAddressSpec type for use
 // with apply.
 type IPAddressSpecApplyConfiguration struct {
 	IP       *net.IP                              `json:"ip,omitempty"`
 	ClaimRef *IPAddressClaimRefApplyConfiguration `json:"claimRef,omitempty"`
 }
 
-// IPAddressSpecApplyConfiguration constructs an declarative configuration of the IPAddressSpec type for use with
+// IPAddressSpecApplyConfiguration constructs a declarative configuration of the IPAddressSpec type for use with
 // apply.
 func IPAddressSpec() *IPAddressSpecApplyConfiguration {
 	return &IPAddressSpecApplyConfiguration{}

@@ -9,14 +9,14 @@ import (
 	net "github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 )
 
-// TargetNetworkInterfaceApplyConfiguration represents an declarative configuration of the TargetNetworkInterface type for use
+// TargetNetworkInterfaceApplyConfiguration represents a declarative configuration of the TargetNetworkInterface type for use
 // with apply.
 type TargetNetworkInterfaceApplyConfiguration struct {
 	IP        *net.IP                              `json:"ip,omitempty"`
 	TargetRef *LocalUIDReferenceApplyConfiguration `json:"targetRef,omitempty"`
 }
 
-// TargetNetworkInterfaceApplyConfiguration constructs an declarative configuration of the TargetNetworkInterface type for use with
+// TargetNetworkInterfaceApplyConfiguration constructs a declarative configuration of the TargetNetworkInterface type for use with
 // apply.
 func TargetNetworkInterface() *TargetNetworkInterfaceApplyConfiguration {
 	return &TargetNetworkInterfaceApplyConfiguration{}

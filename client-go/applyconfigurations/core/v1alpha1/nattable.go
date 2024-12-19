@@ -14,7 +14,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// NATTableApplyConfiguration represents an declarative configuration of the NATTable type for use
+// NATTableApplyConfiguration represents a declarative configuration of the NATTable type for use
 // with apply.
 type NATTableApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -22,7 +22,7 @@ type NATTableApplyConfiguration struct {
 	IPs                              []NATIPApplyConfiguration `json:"ips,omitempty"`
 }
 
-// NATTable constructs an declarative configuration of the NATTable type for use with
+// NATTable constructs a declarative configuration of the NATTable type for use with
 // apply.
 func NATTable(name, namespace string) *NATTableApplyConfiguration {
 	b := &NATTableApplyConfiguration{}
@@ -238,4 +238,10 @@ func (b *NATTableApplyConfiguration) WithIPs(values ...*NATIPApplyConfiguration)
 		b.IPs = append(b.IPs, *values[i])
 	}
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *NATTableApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

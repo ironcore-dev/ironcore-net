@@ -9,7 +9,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// NATGatewayAutoscalerSpecApplyConfiguration represents an declarative configuration of the NATGatewayAutoscalerSpec type for use
+// NATGatewayAutoscalerSpecApplyConfiguration represents a declarative configuration of the NATGatewayAutoscalerSpec type for use
 // with apply.
 type NATGatewayAutoscalerSpecApplyConfiguration struct {
 	NATGatewayRef *v1.LocalObjectReference `json:"natGatewayRef,omitempty"`
@@ -17,7 +17,7 @@ type NATGatewayAutoscalerSpecApplyConfiguration struct {
 	MaxPublicIPs  *int32                   `json:"maxPublicIPs,omitempty"`
 }
 
-// NATGatewayAutoscalerSpecApplyConfiguration constructs an declarative configuration of the NATGatewayAutoscalerSpec type for use with
+// NATGatewayAutoscalerSpecApplyConfiguration constructs a declarative configuration of the NATGatewayAutoscalerSpec type for use with
 // apply.
 func NATGatewayAutoscalerSpec() *NATGatewayAutoscalerSpecApplyConfiguration {
 	return &NATGatewayAutoscalerSpecApplyConfiguration{}

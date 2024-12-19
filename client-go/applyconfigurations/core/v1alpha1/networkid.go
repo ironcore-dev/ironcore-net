@@ -14,7 +14,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// NetworkIDApplyConfiguration represents an declarative configuration of the NetworkID type for use
+// NetworkIDApplyConfiguration represents a declarative configuration of the NetworkID type for use
 // with apply.
 type NetworkIDApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -22,7 +22,7 @@ type NetworkIDApplyConfiguration struct {
 	Spec                             *NetworkIDSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
-// NetworkID constructs an declarative configuration of the NetworkID type for use with
+// NetworkID constructs a declarative configuration of the NetworkID type for use with
 // apply.
 func NetworkID(name string) *NetworkIDApplyConfiguration {
 	b := &NetworkIDApplyConfiguration{}
@@ -231,4 +231,10 @@ func (b *NetworkIDApplyConfiguration) ensureObjectMetaApplyConfigurationExists()
 func (b *NetworkIDApplyConfiguration) WithSpec(value *NetworkIDSpecApplyConfiguration) *NetworkIDApplyConfiguration {
 	b.Spec = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *NetworkIDApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

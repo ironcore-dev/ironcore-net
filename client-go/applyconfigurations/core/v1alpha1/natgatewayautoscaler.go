@@ -14,7 +14,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// NATGatewayAutoscalerApplyConfiguration represents an declarative configuration of the NATGatewayAutoscaler type for use
+// NATGatewayAutoscalerApplyConfiguration represents a declarative configuration of the NATGatewayAutoscaler type for use
 // with apply.
 type NATGatewayAutoscalerApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -23,7 +23,7 @@ type NATGatewayAutoscalerApplyConfiguration struct {
 	Status                           *corev1alpha1.NATGatewayAutoscalerStatus    `json:"status,omitempty"`
 }
 
-// NATGatewayAutoscaler constructs an declarative configuration of the NATGatewayAutoscaler type for use with
+// NATGatewayAutoscaler constructs a declarative configuration of the NATGatewayAutoscaler type for use with
 // apply.
 func NATGatewayAutoscaler(name, namespace string) *NATGatewayAutoscalerApplyConfiguration {
 	b := &NATGatewayAutoscalerApplyConfiguration{}
@@ -242,4 +242,10 @@ func (b *NATGatewayAutoscalerApplyConfiguration) WithSpec(value *NATGatewayAutos
 func (b *NATGatewayAutoscalerApplyConfiguration) WithStatus(value corev1alpha1.NATGatewayAutoscalerStatus) *NATGatewayAutoscalerApplyConfiguration {
 	b.Status = &value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *NATGatewayAutoscalerApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

@@ -11,7 +11,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// IPSpecApplyConfiguration represents an declarative configuration of the IPSpec type for use
+// IPSpecApplyConfiguration represents a declarative configuration of the IPSpec type for use
 // with apply.
 type IPSpecApplyConfiguration struct {
 	Type     *v1alpha1.IPType              `json:"type,omitempty"`
@@ -20,7 +20,7 @@ type IPSpecApplyConfiguration struct {
 	ClaimRef *IPClaimRefApplyConfiguration `json:"claimRef,omitempty"`
 }
 
-// IPSpecApplyConfiguration constructs an declarative configuration of the IPSpec type for use with
+// IPSpecApplyConfiguration constructs a declarative configuration of the IPSpec type for use with
 // apply.
 func IPSpec() *IPSpecApplyConfiguration {
 	return &IPSpecApplyConfiguration{}

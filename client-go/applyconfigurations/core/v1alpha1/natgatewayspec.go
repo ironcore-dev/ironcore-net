@@ -9,7 +9,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// NATGatewaySpecApplyConfiguration represents an declarative configuration of the NATGatewaySpec type for use
+// NATGatewaySpecApplyConfiguration represents a declarative configuration of the NATGatewaySpec type for use
 // with apply.
 type NATGatewaySpecApplyConfiguration struct {
 	IPFamily                 *v1.IPFamily                     `json:"ipFamily,omitempty"`
@@ -18,7 +18,7 @@ type NATGatewaySpecApplyConfiguration struct {
 	PortsPerNetworkInterface *int32                           `json:"portsPerNetworkInterface,omitempty"`
 }
 
-// NATGatewaySpecApplyConfiguration constructs an declarative configuration of the NATGatewaySpec type for use with
+// NATGatewaySpecApplyConfiguration constructs a declarative configuration of the NATGatewaySpec type for use with
 // apply.
 func NATGatewaySpec() *NATGatewaySpecApplyConfiguration {
 	return &NATGatewaySpecApplyConfiguration{}

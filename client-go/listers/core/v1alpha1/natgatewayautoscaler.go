@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -25,25 +25,17 @@ type NATGatewayAutoscalerLister interface {
 
 // nATGatewayAutoscalerLister implements the NATGatewayAutoscalerLister interface.
 type nATGatewayAutoscalerLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.NATGatewayAutoscaler]
 }
 
 // NewNATGatewayAutoscalerLister returns a new NATGatewayAutoscalerLister.
 func NewNATGatewayAutoscalerLister(indexer cache.Indexer) NATGatewayAutoscalerLister {
-	return &nATGatewayAutoscalerLister{indexer: indexer}
-}
-
-// List lists all NATGatewayAutoscalers in the indexer.
-func (s *nATGatewayAutoscalerLister) List(selector labels.Selector) (ret []*v1alpha1.NATGatewayAutoscaler, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.NATGatewayAutoscaler))
-	})
-	return ret, err
+	return &nATGatewayAutoscalerLister{listers.New[*v1alpha1.NATGatewayAutoscaler](indexer, v1alpha1.Resource("natgatewayautoscaler"))}
 }
 
 // NATGatewayAutoscalers returns an object that can list and get NATGatewayAutoscalers.
 func (s *nATGatewayAutoscalerLister) NATGatewayAutoscalers(namespace string) NATGatewayAutoscalerNamespaceLister {
-	return nATGatewayAutoscalerNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return nATGatewayAutoscalerNamespaceLister{listers.NewNamespaced[*v1alpha1.NATGatewayAutoscaler](s.ResourceIndexer, namespace)}
 }
 
 // NATGatewayAutoscalerNamespaceLister helps list and get NATGatewayAutoscalers.
@@ -61,26 +53,5 @@ type NATGatewayAutoscalerNamespaceLister interface {
 // nATGatewayAutoscalerNamespaceLister implements the NATGatewayAutoscalerNamespaceLister
 // interface.
 type nATGatewayAutoscalerNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all NATGatewayAutoscalers in the indexer for a given namespace.
-func (s nATGatewayAutoscalerNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.NATGatewayAutoscaler, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.NATGatewayAutoscaler))
-	})
-	return ret, err
-}
-
-// Get retrieves the NATGatewayAutoscaler from the indexer for a given namespace and name.
-func (s nATGatewayAutoscalerNamespaceLister) Get(name string) (*v1alpha1.NATGatewayAutoscaler, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("natgatewayautoscaler"), name)
-	}
-	return obj.(*v1alpha1.NATGatewayAutoscaler), nil
+	listers.ResourceIndexer[*v1alpha1.NATGatewayAutoscaler]
 }

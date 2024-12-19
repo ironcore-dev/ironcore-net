@@ -31,22 +31,24 @@ var natgatewayautoscalersKind = v1alpha1.SchemeGroupVersion.WithKind("NATGateway
 
 // Get takes name of the nATGatewayAutoscaler, and returns the corresponding nATGatewayAutoscaler object, and an error if there is any.
 func (c *FakeNATGatewayAutoscalers) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.NATGatewayAutoscaler, err error) {
+	emptyResult := &v1alpha1.NATGatewayAutoscaler{}
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(natgatewayautoscalersResource, c.ns, name), &v1alpha1.NATGatewayAutoscaler{})
+		Invokes(testing.NewGetActionWithOptions(natgatewayautoscalersResource, c.ns, name, options), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.NATGatewayAutoscaler), err
 }
 
 // List takes label and field selectors, and returns the list of NATGatewayAutoscalers that match those selectors.
 func (c *FakeNATGatewayAutoscalers) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.NATGatewayAutoscalerList, err error) {
+	emptyResult := &v1alpha1.NATGatewayAutoscalerList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(natgatewayautoscalersResource, natgatewayautoscalersKind, c.ns, opts), &v1alpha1.NATGatewayAutoscalerList{})
+		Invokes(testing.NewListActionWithOptions(natgatewayautoscalersResource, natgatewayautoscalersKind, c.ns, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -65,40 +67,43 @@ func (c *FakeNATGatewayAutoscalers) List(ctx context.Context, opts v1.ListOption
 // Watch returns a watch.Interface that watches the requested nATGatewayAutoscalers.
 func (c *FakeNATGatewayAutoscalers) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(natgatewayautoscalersResource, c.ns, opts))
+		InvokesWatch(testing.NewWatchActionWithOptions(natgatewayautoscalersResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a nATGatewayAutoscaler and creates it.  Returns the server's representation of the nATGatewayAutoscaler, and an error, if there is any.
 func (c *FakeNATGatewayAutoscalers) Create(ctx context.Context, nATGatewayAutoscaler *v1alpha1.NATGatewayAutoscaler, opts v1.CreateOptions) (result *v1alpha1.NATGatewayAutoscaler, err error) {
+	emptyResult := &v1alpha1.NATGatewayAutoscaler{}
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(natgatewayautoscalersResource, c.ns, nATGatewayAutoscaler), &v1alpha1.NATGatewayAutoscaler{})
+		Invokes(testing.NewCreateActionWithOptions(natgatewayautoscalersResource, c.ns, nATGatewayAutoscaler, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.NATGatewayAutoscaler), err
 }
 
 // Update takes the representation of a nATGatewayAutoscaler and updates it. Returns the server's representation of the nATGatewayAutoscaler, and an error, if there is any.
 func (c *FakeNATGatewayAutoscalers) Update(ctx context.Context, nATGatewayAutoscaler *v1alpha1.NATGatewayAutoscaler, opts v1.UpdateOptions) (result *v1alpha1.NATGatewayAutoscaler, err error) {
+	emptyResult := &v1alpha1.NATGatewayAutoscaler{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(natgatewayautoscalersResource, c.ns, nATGatewayAutoscaler), &v1alpha1.NATGatewayAutoscaler{})
+		Invokes(testing.NewUpdateActionWithOptions(natgatewayautoscalersResource, c.ns, nATGatewayAutoscaler, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.NATGatewayAutoscaler), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeNATGatewayAutoscalers) UpdateStatus(ctx context.Context, nATGatewayAutoscaler *v1alpha1.NATGatewayAutoscaler, opts v1.UpdateOptions) (*v1alpha1.NATGatewayAutoscaler, error) {
+func (c *FakeNATGatewayAutoscalers) UpdateStatus(ctx context.Context, nATGatewayAutoscaler *v1alpha1.NATGatewayAutoscaler, opts v1.UpdateOptions) (result *v1alpha1.NATGatewayAutoscaler, err error) {
+	emptyResult := &v1alpha1.NATGatewayAutoscaler{}
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(natgatewayautoscalersResource, "status", c.ns, nATGatewayAutoscaler), &v1alpha1.NATGatewayAutoscaler{})
+		Invokes(testing.NewUpdateSubresourceActionWithOptions(natgatewayautoscalersResource, "status", c.ns, nATGatewayAutoscaler, opts), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.NATGatewayAutoscaler), err
 }
@@ -113,7 +118,7 @@ func (c *FakeNATGatewayAutoscalers) Delete(ctx context.Context, name string, opt
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeNATGatewayAutoscalers) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(natgatewayautoscalersResource, c.ns, listOpts)
+	action := testing.NewDeleteCollectionActionWithOptions(natgatewayautoscalersResource, c.ns, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.NATGatewayAutoscalerList{})
 	return err
@@ -121,11 +126,12 @@ func (c *FakeNATGatewayAutoscalers) DeleteCollection(ctx context.Context, opts v
 
 // Patch applies the patch and returns the patched nATGatewayAutoscaler.
 func (c *FakeNATGatewayAutoscalers) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.NATGatewayAutoscaler, err error) {
+	emptyResult := &v1alpha1.NATGatewayAutoscaler{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(natgatewayautoscalersResource, c.ns, name, pt, data, subresources...), &v1alpha1.NATGatewayAutoscaler{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(natgatewayautoscalersResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.NATGatewayAutoscaler), err
 }
@@ -143,11 +149,12 @@ func (c *FakeNATGatewayAutoscalers) Apply(ctx context.Context, nATGatewayAutosca
 	if name == nil {
 		return nil, fmt.Errorf("nATGatewayAutoscaler.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.NATGatewayAutoscaler{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(natgatewayautoscalersResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha1.NATGatewayAutoscaler{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(natgatewayautoscalersResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.NATGatewayAutoscaler), err
 }
@@ -166,11 +173,12 @@ func (c *FakeNATGatewayAutoscalers) ApplyStatus(ctx context.Context, nATGatewayA
 	if name == nil {
 		return nil, fmt.Errorf("nATGatewayAutoscaler.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.NATGatewayAutoscaler{}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(natgatewayautoscalersResource, c.ns, *name, types.ApplyPatchType, data, "status"), &v1alpha1.NATGatewayAutoscaler{})
+		Invokes(testing.NewPatchSubresourceActionWithOptions(natgatewayautoscalersResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
 
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.NATGatewayAutoscaler), err
 }

@@ -10,7 +10,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 )
 
-// LoadBalancerTargetRefApplyConfiguration represents an declarative configuration of the LoadBalancerTargetRef type for use
+// LoadBalancerTargetRefApplyConfiguration represents a declarative configuration of the LoadBalancerTargetRef type for use
 // with apply.
 type LoadBalancerTargetRefApplyConfiguration struct {
 	UID     *types.UID               `json:"uid,omitempty"`
@@ -18,7 +18,7 @@ type LoadBalancerTargetRefApplyConfiguration struct {
 	NodeRef *v1.LocalObjectReference `json:"nodeRef,omitempty"`
 }
 
-// LoadBalancerTargetRefApplyConfiguration constructs an declarative configuration of the LoadBalancerTargetRef type for use with
+// LoadBalancerTargetRefApplyConfiguration constructs a declarative configuration of the LoadBalancerTargetRef type for use with
 // apply.
 func LoadBalancerTargetRef() *LoadBalancerTargetRefApplyConfiguration {
 	return &LoadBalancerTargetRefApplyConfiguration{}

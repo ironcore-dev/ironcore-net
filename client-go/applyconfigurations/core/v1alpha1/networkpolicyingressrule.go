@@ -5,14 +5,14 @@
 
 package v1alpha1
 
-// NetworkPolicyIngressRuleApplyConfiguration represents an declarative configuration of the NetworkPolicyIngressRule type for use
+// NetworkPolicyIngressRuleApplyConfiguration represents a declarative configuration of the NetworkPolicyIngressRule type for use
 // with apply.
 type NetworkPolicyIngressRuleApplyConfiguration struct {
 	From  []NetworkPolicyPeerApplyConfiguration `json:"from,omitempty"`
 	Ports []NetworkPolicyPortApplyConfiguration `json:"ports,omitempty"`
 }
 
-// NetworkPolicyIngressRuleApplyConfiguration constructs an declarative configuration of the NetworkPolicyIngressRule type for use with
+// NetworkPolicyIngressRuleApplyConfiguration constructs a declarative configuration of the NetworkPolicyIngressRule type for use with
 // apply.
 func NetworkPolicyIngressRule() *NetworkPolicyIngressRuleApplyConfiguration {
 	return &NetworkPolicyIngressRuleApplyConfiguration{}

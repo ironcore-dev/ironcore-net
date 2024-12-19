@@ -5,13 +5,13 @@
 
 package v1alpha1
 
-// InstanceAntiAffinityApplyConfiguration represents an declarative configuration of the InstanceAntiAffinity type for use
+// InstanceAntiAffinityApplyConfiguration represents a declarative configuration of the InstanceAntiAffinity type for use
 // with apply.
 type InstanceAntiAffinityApplyConfiguration struct {
 	RequiredDuringSchedulingIgnoredDuringExecution []InstanceAffinityTermApplyConfiguration `json:"requiredDuringSchedulingIgnoredDuringExecution,omitempty"`
 }
 
-// InstanceAntiAffinityApplyConfiguration constructs an declarative configuration of the InstanceAntiAffinity type for use with
+// InstanceAntiAffinityApplyConfiguration constructs a declarative configuration of the InstanceAntiAffinity type for use with
 // apply.
 func InstanceAntiAffinity() *InstanceAntiAffinityApplyConfiguration {
 	return &InstanceAntiAffinityApplyConfiguration{}

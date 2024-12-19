@@ -49,6 +49,9 @@ rules:
   - core.apinet.ironcore.dev
   resources:
   - daemonsets/status
+  - loadbalancers/status
+  - natgatewayautoscalers/status
+  - natgateways/status
   verbs:
   - get
   - patch
@@ -70,96 +73,6 @@ rules:
   - core.apinet.ironcore.dev
   resources:
   - ipaddresses
-  verbs:
-  - delete
-  - get
-  - list
-  - watch
-- apiGroups:
-  - core.apinet.ironcore.dev
-  resources:
-  - ips
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - core.apinet.ironcore.dev
-  resources:
-  - loadbalancerroutings
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - core.apinet.ironcore.dev
-  resources:
-  - loadbalancers
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - core.apinet.ironcore.dev
-  resources:
-  - loadbalancers/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - core.apinet.ironcore.dev
-  resources:
-  - natgatewayautoscalers
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - core.apinet.ironcore.dev
-  resources:
-  - natgatewayautoscalers/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - core.apinet.ironcore.dev
-  resources:
-  - natgateways
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - core.apinet.ironcore.dev
-  resources:
-  - natgateways/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - core.apinet.ironcore.dev
-  resources:
-  - nattables
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - core.apinet.ironcore.dev
-  resources:
   - networkids
   verbs:
   - delete
@@ -169,17 +82,12 @@ rules:
 - apiGroups:
   - core.apinet.ironcore.dev
   resources:
-  - networkinterfaces
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - core.apinet.ironcore.dev
-  resources:
+  - ips
+  - loadbalancers
+  - natgatewayautoscalers
   - networkpolicies
+  - networks
+  - nodes
   verbs:
   - get
   - list
@@ -187,6 +95,8 @@ rules:
 - apiGroups:
   - core.apinet.ironcore.dev
   resources:
+  - loadbalancerroutings
+  - nattables
   - networkpolicyrules
   verbs:
   - create
@@ -199,16 +109,11 @@ rules:
 - apiGroups:
   - core.apinet.ironcore.dev
   resources:
-  - networks
+  - natgateways
+  - networkinterfaces
   verbs:
   - get
   - list
-  - watch
-- apiGroups:
-  - core.apinet.ironcore.dev
-  resources:
-  - nodes
-  verbs:
-  - get
-  - list
+  - patch
+  - update
   - watch
