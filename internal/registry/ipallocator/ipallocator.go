@@ -16,6 +16,7 @@ import (
 	v1alpha1client "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned/typed/core/v1alpha1"
 	v1alpha1listers "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/generic"
+
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -198,6 +199,7 @@ func (a *Allocator) createEphemeralIP(
 		Spec: v1alpha1.IPSpec{
 			Type:     v1alpha1.IPTypePublic,
 			IPFamily: a.ipFamily,
+			ClaimRef: &claimRef,
 		},
 	}, metav1.CreateOptions{})
 	if err != nil {
