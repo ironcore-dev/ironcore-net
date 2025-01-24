@@ -8,11 +8,12 @@ import (
 	"fmt"
 	"net/netip"
 
+	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	"github.com/ironcore-dev/ironcore-net/internal/apis/core"
 	"github.com/ironcore-dev/ironcore-net/internal/registry/ipallocator"
-	"github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
+
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
