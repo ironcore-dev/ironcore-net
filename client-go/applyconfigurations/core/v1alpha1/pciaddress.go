@@ -5,7 +5,7 @@
 
 package v1alpha1
 
-// PCIAddressApplyConfiguration represents an declarative configuration of the PCIAddress type for use
+// PCIAddressApplyConfiguration represents a declarative configuration of the PCIAddress type for use
 // with apply.
 type PCIAddressApplyConfiguration struct {
 	Domain   *string `json:"domain,omitempty"`
@@ -14,7 +14,7 @@ type PCIAddressApplyConfiguration struct {
 	Function *string `json:"function,omitempty"`
 }
 
-// PCIAddressApplyConfiguration constructs an declarative configuration of the PCIAddress type for use with
+// PCIAddressApplyConfiguration constructs a declarative configuration of the PCIAddress type for use with
 // apply.
 func PCIAddress() *PCIAddressApplyConfiguration {
 	return &PCIAddressApplyConfiguration{}

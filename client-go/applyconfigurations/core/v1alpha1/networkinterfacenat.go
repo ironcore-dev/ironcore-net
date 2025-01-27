@@ -9,14 +9,14 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// NetworkInterfaceNATApplyConfiguration represents an declarative configuration of the NetworkInterfaceNAT type for use
+// NetworkInterfaceNATApplyConfiguration represents a declarative configuration of the NetworkInterfaceNAT type for use
 // with apply.
 type NetworkInterfaceNATApplyConfiguration struct {
 	IPFamily *v1.IPFamily                                   `json:"ipFamily,omitempty"`
 	ClaimRef *NetworkInterfaceNATClaimRefApplyConfiguration `json:"claimRef,omitempty"`
 }
 
-// NetworkInterfaceNATApplyConfiguration constructs an declarative configuration of the NetworkInterfaceNAT type for use with
+// NetworkInterfaceNATApplyConfiguration constructs a declarative configuration of the NetworkInterfaceNAT type for use with
 // apply.
 func NetworkInterfaceNAT() *NetworkInterfaceNATApplyConfiguration {
 	return &NetworkInterfaceNATApplyConfiguration{}

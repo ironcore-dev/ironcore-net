@@ -9,7 +9,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 )
 
-// NetworkIDClaimRefApplyConfiguration represents an declarative configuration of the NetworkIDClaimRef type for use
+// NetworkIDClaimRefApplyConfiguration represents a declarative configuration of the NetworkIDClaimRef type for use
 // with apply.
 type NetworkIDClaimRefApplyConfiguration struct {
 	Group     *string    `json:"group,omitempty"`
@@ -19,7 +19,7 @@ type NetworkIDClaimRefApplyConfiguration struct {
 	UID       *types.UID `json:"uid,omitempty"`
 }
 
-// NetworkIDClaimRefApplyConfiguration constructs an declarative configuration of the NetworkIDClaimRef type for use with
+// NetworkIDClaimRefApplyConfiguration constructs a declarative configuration of the NetworkIDClaimRef type for use with
 // apply.
 func NetworkIDClaimRef() *NetworkIDClaimRefApplyConfiguration {
 	return &NetworkIDClaimRefApplyConfiguration{}

@@ -9,14 +9,14 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 )
 
-// NetworkInterfaceNATClaimRefApplyConfiguration represents an declarative configuration of the NetworkInterfaceNATClaimRef type for use
+// NetworkInterfaceNATClaimRefApplyConfiguration represents a declarative configuration of the NetworkInterfaceNATClaimRef type for use
 // with apply.
 type NetworkInterfaceNATClaimRefApplyConfiguration struct {
 	Name *string    `json:"name,omitempty"`
 	UID  *types.UID `json:"uid,omitempty"`
 }
 
-// NetworkInterfaceNATClaimRefApplyConfiguration constructs an declarative configuration of the NetworkInterfaceNATClaimRef type for use with
+// NetworkInterfaceNATClaimRefApplyConfiguration constructs a declarative configuration of the NetworkInterfaceNATClaimRef type for use with
 // apply.
 func NetworkInterfaceNATClaimRef() *NetworkInterfaceNATClaimRefApplyConfiguration {
 	return &NetworkInterfaceNATClaimRefApplyConfiguration{}

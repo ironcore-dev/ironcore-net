@@ -9,14 +9,14 @@ import (
 	net "github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 )
 
-// NATGatewayIPApplyConfiguration represents an declarative configuration of the NATGatewayIP type for use
+// NATGatewayIPApplyConfiguration represents a declarative configuration of the NATGatewayIP type for use
 // with apply.
 type NATGatewayIPApplyConfiguration struct {
 	Name *string `json:"name,omitempty"`
 	IP   *net.IP `json:"ip,omitempty"`
 }
 
-// NATGatewayIPApplyConfiguration constructs an declarative configuration of the NATGatewayIP type for use with
+// NATGatewayIPApplyConfiguration constructs a declarative configuration of the NATGatewayIP type for use with
 // apply.
 func NATGatewayIP() *NATGatewayIPApplyConfiguration {
 	return &NATGatewayIPApplyConfiguration{}

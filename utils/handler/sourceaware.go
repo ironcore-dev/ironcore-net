@@ -18,6 +18,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 var log = ctrl.Log.WithName("eventhandler").WithName("enqueueRequestForSource")
@@ -100,13 +101,13 @@ func (e *enqueueRequestForSource) addRequests(
 	reqs.Insert(ctrl.Request{NamespacedName: client.ObjectKey{Namespace: namespace, Name: name}})
 }
 
-func (e *enqueueRequestForSource) enqueueRequests(reqs sets.Set[ctrl.Request], queue workqueue.RateLimitingInterface) {
+func (e *enqueueRequestForSource) enqueueRequests(reqs sets.Set[ctrl.Request], queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	for req := range reqs {
 		queue.Add(req)
 	}
 }
 
-func (e *enqueueRequestForSource) Create(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+func (e *enqueueRequestForSource) Create(ctx context.Context, evt event.CreateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	namespaceLabel, nameLabel, err := e.getLabels()
 	if err != nil {
 		log.Error(err, "Error getting labels")
@@ -118,7 +119,7 @@ func (e *enqueueRequestForSource) Create(ctx context.Context, evt event.CreateEv
 	e.enqueueRequests(reqs, queue)
 }
 
-func (e *enqueueRequestForSource) Update(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+func (e *enqueueRequestForSource) Update(ctx context.Context, evt event.UpdateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	namespaceLabel, nameLabel, err := e.getLabels()
 	if err != nil {
 		log.Error(err, "Error getting labels")
@@ -131,7 +132,7 @@ func (e *enqueueRequestForSource) Update(ctx context.Context, evt event.UpdateEv
 	e.enqueueRequests(reqs, queue)
 }
 
-func (e *enqueueRequestForSource) Delete(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+func (e *enqueueRequestForSource) Delete(ctx context.Context, evt event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	namespaceLabel, nameLabel, err := e.getLabels()
 	if err != nil {
 		log.Error(err, "Error getting labels")
@@ -143,7 +144,7 @@ func (e *enqueueRequestForSource) Delete(ctx context.Context, evt event.DeleteEv
 	e.enqueueRequests(reqs, queue)
 }
 
-func (e *enqueueRequestForSource) Generic(ctx context.Context, evt event.GenericEvent, queue workqueue.RateLimitingInterface) {
+func (e *enqueueRequestForSource) Generic(ctx context.Context, evt event.GenericEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	namespaceLabel, nameLabel, err := e.getLabels()
 	if err != nil {
 		log.Error(err, "Error getting labels")

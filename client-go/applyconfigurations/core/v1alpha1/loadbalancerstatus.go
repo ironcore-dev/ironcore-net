@@ -5,13 +5,13 @@
 
 package v1alpha1
 
-// LoadBalancerStatusApplyConfiguration represents an declarative configuration of the LoadBalancerStatus type for use
+// LoadBalancerStatusApplyConfiguration represents a declarative configuration of the LoadBalancerStatus type for use
 // with apply.
 type LoadBalancerStatusApplyConfiguration struct {
 	CollisionCount *int32 `json:"collisionCount,omitempty"`
 }
 
-// LoadBalancerStatusApplyConfiguration constructs an declarative configuration of the LoadBalancerStatus type for use with
+// LoadBalancerStatusApplyConfiguration constructs a declarative configuration of the LoadBalancerStatus type for use with
 // apply.
 func LoadBalancerStatus() *LoadBalancerStatusApplyConfiguration {
 	return &LoadBalancerStatusApplyConfiguration{}

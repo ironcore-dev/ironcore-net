@@ -7,8 +7,8 @@ package v1alpha1
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/listers"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -25,25 +25,17 @@ type NetworkPolicyRuleLister interface {
 
 // networkPolicyRuleLister implements the NetworkPolicyRuleLister interface.
 type networkPolicyRuleLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*v1alpha1.NetworkPolicyRule]
 }
 
 // NewNetworkPolicyRuleLister returns a new NetworkPolicyRuleLister.
 func NewNetworkPolicyRuleLister(indexer cache.Indexer) NetworkPolicyRuleLister {
-	return &networkPolicyRuleLister{indexer: indexer}
-}
-
-// List lists all NetworkPolicyRules in the indexer.
-func (s *networkPolicyRuleLister) List(selector labels.Selector) (ret []*v1alpha1.NetworkPolicyRule, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.NetworkPolicyRule))
-	})
-	return ret, err
+	return &networkPolicyRuleLister{listers.New[*v1alpha1.NetworkPolicyRule](indexer, v1alpha1.Resource("networkpolicyrule"))}
 }
 
 // NetworkPolicyRules returns an object that can list and get NetworkPolicyRules.
 func (s *networkPolicyRuleLister) NetworkPolicyRules(namespace string) NetworkPolicyRuleNamespaceLister {
-	return networkPolicyRuleNamespaceLister{indexer: s.indexer, namespace: namespace}
+	return networkPolicyRuleNamespaceLister{listers.NewNamespaced[*v1alpha1.NetworkPolicyRule](s.ResourceIndexer, namespace)}
 }
 
 // NetworkPolicyRuleNamespaceLister helps list and get NetworkPolicyRules.
@@ -61,26 +53,5 @@ type NetworkPolicyRuleNamespaceLister interface {
 // networkPolicyRuleNamespaceLister implements the NetworkPolicyRuleNamespaceLister
 // interface.
 type networkPolicyRuleNamespaceLister struct {
-	indexer   cache.Indexer
-	namespace string
-}
-
-// List lists all NetworkPolicyRules in the indexer for a given namespace.
-func (s networkPolicyRuleNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.NetworkPolicyRule, err error) {
-	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.NetworkPolicyRule))
-	})
-	return ret, err
-}
-
-// Get retrieves the NetworkPolicyRule from the indexer for a given namespace and name.
-func (s networkPolicyRuleNamespaceLister) Get(name string) (*v1alpha1.NetworkPolicyRule, error) {
-	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("networkpolicyrule"), name)
-	}
-	return obj.(*v1alpha1.NetworkPolicyRule), nil
+	listers.ResourceIndexer[*v1alpha1.NetworkPolicyRule]
 }

@@ -19,6 +19,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 type NetworkIDGCReconciler struct {
@@ -114,7 +115,7 @@ func (r *NetworkIDGCReconciler) networkIDClaimerExists(ctx context.Context, netw
 }
 
 func (r *NetworkIDGCReconciler) enqueueByClaimer() handler.EventHandler {
-	mapAndEnqueue := func(ctx context.Context, claimer client.Object, queue workqueue.RateLimitingInterface) {
+	mapAndEnqueue := func(ctx context.Context, claimer client.Object, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 		log := ctrl.LoggerFrom(ctx)
 
 		networkIDList := &v1alpha1.NetworkIDList{}
@@ -131,10 +132,10 @@ func (r *NetworkIDGCReconciler) enqueueByClaimer() handler.EventHandler {
 	}
 
 	return &handler.Funcs{
-		DeleteFunc: func(ctx context.Context, event event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+		DeleteFunc: func(ctx context.Context, event event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			mapAndEnqueue(ctx, event.Object, queue)
 		},
-		GenericFunc: func(ctx context.Context, event event.GenericEvent, queue workqueue.RateLimitingInterface) {
+		GenericFunc: func(ctx context.Context, event event.GenericEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			if !event.Object.GetDeletionTimestamp().IsZero() {
 				mapAndEnqueue(ctx, event.Object, queue)
 			}

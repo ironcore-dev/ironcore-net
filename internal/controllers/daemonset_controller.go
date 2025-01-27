@@ -26,6 +26,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 type DaemonSetReconciler struct {
@@ -366,7 +367,7 @@ func (r *DaemonSetReconciler) reconcile(
 }
 
 func (r *DaemonSetReconciler) enqueueByNode() handler.EventHandler {
-	enqueueAllDaemonSets := func(ctx context.Context, queue workqueue.RateLimitingInterface) {
+	enqueueAllDaemonSets := func(ctx context.Context, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 		log := ctrl.LoggerFrom(ctx)
 		dsList := &v1alpha1.DaemonSetList{}
 
@@ -381,10 +382,10 @@ func (r *DaemonSetReconciler) enqueueByNode() handler.EventHandler {
 	}
 
 	return handler.Funcs{
-		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			enqueueAllDaemonSets(ctx, queue)
 		},
-		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			enqueueAllDaemonSets(ctx, queue)
 		},
 	}

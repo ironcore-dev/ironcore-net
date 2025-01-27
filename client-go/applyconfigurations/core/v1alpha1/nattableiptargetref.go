@@ -10,7 +10,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 )
 
-// NATTableIPTargetRefApplyConfiguration represents an declarative configuration of the NATTableIPTargetRef type for use
+// NATTableIPTargetRefApplyConfiguration represents a declarative configuration of the NATTableIPTargetRef type for use
 // with apply.
 type NATTableIPTargetRefApplyConfiguration struct {
 	UID     *types.UID               `json:"uid,omitempty"`
@@ -18,7 +18,7 @@ type NATTableIPTargetRefApplyConfiguration struct {
 	NodeRef *v1.LocalObjectReference `json:"nodeRef,omitempty"`
 }
 
-// NATTableIPTargetRefApplyConfiguration constructs an declarative configuration of the NATTableIPTargetRef type for use with
+// NATTableIPTargetRefApplyConfiguration constructs a declarative configuration of the NATTableIPTargetRef type for use with
 // apply.
 func NATTableIPTargetRef() *NATTableIPTargetRefApplyConfiguration {
 	return &NATTableIPTargetRefApplyConfiguration{}

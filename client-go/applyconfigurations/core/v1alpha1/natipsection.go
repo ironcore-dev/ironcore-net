@@ -9,7 +9,7 @@ import (
 	net "github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 )
 
-// NATIPSectionApplyConfiguration represents an declarative configuration of the NATIPSection type for use
+// NATIPSectionApplyConfiguration represents a declarative configuration of the NATIPSection type for use
 // with apply.
 type NATIPSectionApplyConfiguration struct {
 	IP        *net.IP                                `json:"ip,omitempty"`
@@ -18,7 +18,7 @@ type NATIPSectionApplyConfiguration struct {
 	TargetRef *NATTableIPTargetRefApplyConfiguration `json:"targetRef,omitempty"`
 }
 
-// NATIPSectionApplyConfiguration constructs an declarative configuration of the NATIPSection type for use with
+// NATIPSectionApplyConfiguration constructs a declarative configuration of the NATIPSection type for use with
 // apply.
 func NATIPSection() *NATIPSectionApplyConfiguration {
 	return &NATIPSectionApplyConfiguration{}

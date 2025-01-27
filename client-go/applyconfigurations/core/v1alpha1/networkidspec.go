@@ -5,13 +5,13 @@
 
 package v1alpha1
 
-// NetworkIDSpecApplyConfiguration represents an declarative configuration of the NetworkIDSpec type for use
+// NetworkIDSpecApplyConfiguration represents a declarative configuration of the NetworkIDSpec type for use
 // with apply.
 type NetworkIDSpecApplyConfiguration struct {
 	ClaimRef *NetworkIDClaimRefApplyConfiguration `json:"claimRef,omitempty"`
 }
 
-// NetworkIDSpecApplyConfiguration constructs an declarative configuration of the NetworkIDSpec type for use with
+// NetworkIDSpecApplyConfiguration constructs a declarative configuration of the NetworkIDSpec type for use with
 // apply.
 func NetworkIDSpec() *NetworkIDSpecApplyConfiguration {
 	return &NetworkIDSpecApplyConfiguration{}

@@ -11,14 +11,14 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// InstanceTemplateApplyConfiguration represents an declarative configuration of the InstanceTemplate type for use
+// InstanceTemplateApplyConfiguration represents a declarative configuration of the InstanceTemplate type for use
 // with apply.
 type InstanceTemplateApplyConfiguration struct {
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *InstanceSpecApplyConfiguration `json:"spec,omitempty"`
 }
 
-// InstanceTemplateApplyConfiguration constructs an declarative configuration of the InstanceTemplate type for use with
+// InstanceTemplateApplyConfiguration constructs a declarative configuration of the InstanceTemplate type for use with
 // apply.
 func InstanceTemplate() *InstanceTemplateApplyConfiguration {
 	return &InstanceTemplateApplyConfiguration{}
@@ -172,4 +172,10 @@ func (b *InstanceTemplateApplyConfiguration) ensureObjectMetaApplyConfigurationE
 func (b *InstanceTemplateApplyConfiguration) WithSpec(value *InstanceSpecApplyConfiguration) *InstanceTemplateApplyConfiguration {
 	b.Spec = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *InstanceTemplateApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.Name
 }

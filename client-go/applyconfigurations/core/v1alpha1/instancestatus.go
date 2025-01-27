@@ -9,14 +9,14 @@ import (
 	net "github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 )
 
-// InstanceStatusApplyConfiguration represents an declarative configuration of the InstanceStatus type for use
+// InstanceStatusApplyConfiguration represents a declarative configuration of the InstanceStatus type for use
 // with apply.
 type InstanceStatusApplyConfiguration struct {
 	IPs            []net.IP `json:"ips,omitempty"`
 	CollisionCount *int32   `json:"collisionCount,omitempty"`
 }
 
-// InstanceStatusApplyConfiguration constructs an declarative configuration of the InstanceStatus type for use with
+// InstanceStatusApplyConfiguration constructs a declarative configuration of the InstanceStatus type for use with
 // apply.
 func InstanceStatus() *InstanceStatusApplyConfiguration {
 	return &InstanceStatusApplyConfiguration{}

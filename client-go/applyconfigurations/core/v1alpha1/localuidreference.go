@@ -9,14 +9,14 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 )
 
-// LocalUIDReferenceApplyConfiguration represents an declarative configuration of the LocalUIDReference type for use
+// LocalUIDReferenceApplyConfiguration represents a declarative configuration of the LocalUIDReference type for use
 // with apply.
 type LocalUIDReferenceApplyConfiguration struct {
 	Name *string    `json:"name,omitempty"`
 	UID  *types.UID `json:"uid,omitempty"`
 }
 
-// LocalUIDReferenceApplyConfiguration constructs an declarative configuration of the LocalUIDReference type for use with
+// LocalUIDReferenceApplyConfiguration constructs a declarative configuration of the LocalUIDReference type for use with
 // apply.
 func LocalUIDReference() *LocalUIDReferenceApplyConfiguration {
 	return &LocalUIDReferenceApplyConfiguration{}

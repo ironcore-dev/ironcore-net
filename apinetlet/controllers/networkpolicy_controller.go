@@ -35,6 +35,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
@@ -470,7 +471,7 @@ func (r *NetworkPolicyReconciler) enqueueByNetwork() handler.EventHandler {
 }
 
 func (r *NetworkPolicyReconciler) enqueueByNetworkInterface() handler.EventHandler {
-	getEnqueueFunc := func(ctx context.Context, nic *apinetv1alpha1.NetworkInterface) func(nics []*apinetv1alpha1.NetworkInterface, queue workqueue.RateLimitingInterface) {
+	getEnqueueFunc := func(ctx context.Context, nic *apinetv1alpha1.NetworkInterface) func(nics []*apinetv1alpha1.NetworkInterface, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 		log := ctrl.LoggerFrom(ctx)
 		networkPolicyList := &apinetv1alpha1.NetworkPolicyList{}
 		if err := r.APINetClient.List(ctx, networkPolicyList,
@@ -481,7 +482,7 @@ func (r *NetworkPolicyReconciler) enqueueByNetworkInterface() handler.EventHandl
 			return nil
 		}
 
-		return func(nics []*apinetv1alpha1.NetworkInterface, queue workqueue.RateLimitingInterface) {
+		return func(nics []*apinetv1alpha1.NetworkInterface, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			for _, networkPolicy := range networkPolicyList.Items {
 				networkPolicyKey := client.ObjectKeyFromObject(&networkPolicy)
 				log := log.WithValues("networkPolicyKey", networkPolicyKey)
@@ -507,14 +508,14 @@ func (r *NetworkPolicyReconciler) enqueueByNetworkInterface() handler.EventHandl
 	}
 
 	return handler.Funcs{
-		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			nic := evt.Object.(*apinetv1alpha1.NetworkInterface)
 			enqueueFunc := getEnqueueFunc(ctx, nic)
 			if enqueueFunc != nil {
 				enqueueFunc([]*apinetv1alpha1.NetworkInterface{nic}, queue)
 			}
 		},
-		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			newNic := evt.ObjectNew.(*apinetv1alpha1.NetworkInterface)
 			oldNic := evt.ObjectOld.(*apinetv1alpha1.NetworkInterface)
 			enqueueFunc := getEnqueueFunc(ctx, newNic)
@@ -522,14 +523,14 @@ func (r *NetworkPolicyReconciler) enqueueByNetworkInterface() handler.EventHandl
 				enqueueFunc([]*apinetv1alpha1.NetworkInterface{newNic, oldNic}, queue)
 			}
 		},
-		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			nic := evt.Object.(*apinetv1alpha1.NetworkInterface)
 			enqueueFunc := getEnqueueFunc(ctx, nic)
 			if enqueueFunc != nil {
 				enqueueFunc([]*apinetv1alpha1.NetworkInterface{nic}, queue)
 			}
 		},
-		GenericFunc: func(ctx context.Context, evt event.GenericEvent, queue workqueue.RateLimitingInterface) {
+		GenericFunc: func(ctx context.Context, evt event.GenericEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			nic := evt.Object.(*apinetv1alpha1.NetworkInterface)
 			enqueueFunc := getEnqueueFunc(ctx, nic)
 			if enqueueFunc != nil {

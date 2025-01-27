@@ -10,7 +10,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// LoadBalancerIPApplyConfiguration represents an declarative configuration of the LoadBalancerIP type for use
+// LoadBalancerIPApplyConfiguration represents a declarative configuration of the LoadBalancerIP type for use
 // with apply.
 type LoadBalancerIPApplyConfiguration struct {
 	Name     *string      `json:"name,omitempty"`
@@ -18,7 +18,7 @@ type LoadBalancerIPApplyConfiguration struct {
 	IP       *net.IP      `json:"ip,omitempty"`
 }
 
-// LoadBalancerIPApplyConfiguration constructs an declarative configuration of the LoadBalancerIP type for use with
+// LoadBalancerIPApplyConfiguration constructs a declarative configuration of the LoadBalancerIP type for use with
 // apply.
 func LoadBalancerIP() *LoadBalancerIPApplyConfiguration {
 	return &LoadBalancerIPApplyConfiguration{}

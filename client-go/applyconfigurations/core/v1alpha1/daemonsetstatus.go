@@ -5,13 +5,13 @@
 
 package v1alpha1
 
-// DaemonSetStatusApplyConfiguration represents an declarative configuration of the DaemonSetStatus type for use
+// DaemonSetStatusApplyConfiguration represents a declarative configuration of the DaemonSetStatus type for use
 // with apply.
 type DaemonSetStatusApplyConfiguration struct {
 	CollisionCount *int32 `json:"collisionCount,omitempty"`
 }
 
-// DaemonSetStatusApplyConfiguration constructs an declarative configuration of the DaemonSetStatus type for use with
+// DaemonSetStatusApplyConfiguration constructs a declarative configuration of the DaemonSetStatus type for use with
 // apply.
 func DaemonSetStatus() *DaemonSetStatusApplyConfiguration {
 	return &DaemonSetStatusApplyConfiguration{}

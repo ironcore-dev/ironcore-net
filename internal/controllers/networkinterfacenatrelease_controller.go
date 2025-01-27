@@ -16,6 +16,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 type NetworkInterfaceNATReleaseReconciler struct {
@@ -100,7 +101,7 @@ func (r *NetworkInterfaceNATReleaseReconciler) Reconcile(ctx context.Context, re
 }
 
 func (r *NetworkInterfaceNATReleaseReconciler) enqueueByNATGateway() handler.EventHandler {
-	mapAndEnqueue := func(ctx context.Context, natGateway *v1alpha1.NATGateway, queue workqueue.RateLimitingInterface) {
+	mapAndEnqueue := func(ctx context.Context, natGateway *v1alpha1.NATGateway, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 		log := ctrl.LoggerFrom(ctx)
 
 		nicList := &v1alpha1.NetworkInterfaceList{}
@@ -119,11 +120,11 @@ func (r *NetworkInterfaceNATReleaseReconciler) enqueueByNATGateway() handler.Eve
 	}
 
 	return &handler.Funcs{
-		DeleteFunc: func(ctx context.Context, event event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+		DeleteFunc: func(ctx context.Context, event event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			natGateway := event.Object.(*v1alpha1.NATGateway)
 			mapAndEnqueue(ctx, natGateway, queue)
 		},
-		GenericFunc: func(ctx context.Context, event event.GenericEvent, queue workqueue.RateLimitingInterface) {
+		GenericFunc: func(ctx context.Context, event event.GenericEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			natGateway := event.Object.(*v1alpha1.NATGateway)
 			if !natGateway.GetDeletionTimestamp().IsZero() {
 				mapAndEnqueue(ctx, natGateway, queue)

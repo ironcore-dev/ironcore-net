@@ -5,14 +5,14 @@
 
 package v1alpha1
 
-// AffinityApplyConfiguration represents an declarative configuration of the Affinity type for use
+// AffinityApplyConfiguration represents a declarative configuration of the Affinity type for use
 // with apply.
 type AffinityApplyConfiguration struct {
 	NodeAffinity         *NodeAffinityApplyConfiguration         `json:"nodeAffinity,omitempty"`
 	InstanceAntiAffinity *InstanceAntiAffinityApplyConfiguration `json:"instanceAntiAffinity,omitempty"`
 }
 
-// AffinityApplyConfiguration constructs an declarative configuration of the Affinity type for use with
+// AffinityApplyConfiguration constructs a declarative configuration of the Affinity type for use with
 // apply.
 func Affinity() *AffinityApplyConfiguration {
 	return &AffinityApplyConfiguration{}

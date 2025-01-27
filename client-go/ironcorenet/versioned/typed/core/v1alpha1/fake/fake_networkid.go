@@ -30,20 +30,22 @@ var networkidsKind = v1alpha1.SchemeGroupVersion.WithKind("NetworkID")
 
 // Get takes name of the networkID, and returns the corresponding networkID object, and an error if there is any.
 func (c *FakeNetworkIDs) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.NetworkID, err error) {
+	emptyResult := &v1alpha1.NetworkID{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootGetAction(networkidsResource, name), &v1alpha1.NetworkID{})
+		Invokes(testing.NewRootGetActionWithOptions(networkidsResource, name, options), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.NetworkID), err
 }
 
 // List takes label and field selectors, and returns the list of NetworkIDs that match those selectors.
 func (c *FakeNetworkIDs) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.NetworkIDList, err error) {
+	emptyResult := &v1alpha1.NetworkIDList{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootListAction(networkidsResource, networkidsKind, opts), &v1alpha1.NetworkIDList{})
+		Invokes(testing.NewRootListActionWithOptions(networkidsResource, networkidsKind, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 
 	label, _, _ := testing.ExtractFromListOptions(opts)
@@ -62,25 +64,27 @@ func (c *FakeNetworkIDs) List(ctx context.Context, opts v1.ListOptions) (result 
 // Watch returns a watch.Interface that watches the requested networkIDs.
 func (c *FakeNetworkIDs) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewRootWatchAction(networkidsResource, opts))
+		InvokesWatch(testing.NewRootWatchActionWithOptions(networkidsResource, opts))
 }
 
 // Create takes the representation of a networkID and creates it.  Returns the server's representation of the networkID, and an error, if there is any.
 func (c *FakeNetworkIDs) Create(ctx context.Context, networkID *v1alpha1.NetworkID, opts v1.CreateOptions) (result *v1alpha1.NetworkID, err error) {
+	emptyResult := &v1alpha1.NetworkID{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(networkidsResource, networkID), &v1alpha1.NetworkID{})
+		Invokes(testing.NewRootCreateActionWithOptions(networkidsResource, networkID, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.NetworkID), err
 }
 
 // Update takes the representation of a networkID and updates it. Returns the server's representation of the networkID, and an error, if there is any.
 func (c *FakeNetworkIDs) Update(ctx context.Context, networkID *v1alpha1.NetworkID, opts v1.UpdateOptions) (result *v1alpha1.NetworkID, err error) {
+	emptyResult := &v1alpha1.NetworkID{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateAction(networkidsResource, networkID), &v1alpha1.NetworkID{})
+		Invokes(testing.NewRootUpdateActionWithOptions(networkidsResource, networkID, opts), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.NetworkID), err
 }
@@ -94,7 +98,7 @@ func (c *FakeNetworkIDs) Delete(ctx context.Context, name string, opts v1.Delete
 
 // DeleteCollection deletes a collection of objects.
 func (c *FakeNetworkIDs) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionAction(networkidsResource, listOpts)
+	action := testing.NewRootDeleteCollectionActionWithOptions(networkidsResource, opts, listOpts)
 
 	_, err := c.Fake.Invokes(action, &v1alpha1.NetworkIDList{})
 	return err
@@ -102,10 +106,11 @@ func (c *FakeNetworkIDs) DeleteCollection(ctx context.Context, opts v1.DeleteOpt
 
 // Patch applies the patch and returns the patched networkID.
 func (c *FakeNetworkIDs) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.NetworkID, err error) {
+	emptyResult := &v1alpha1.NetworkID{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(networkidsResource, name, pt, data, subresources...), &v1alpha1.NetworkID{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(networkidsResource, name, pt, data, opts, subresources...), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.NetworkID), err
 }
@@ -123,10 +128,11 @@ func (c *FakeNetworkIDs) Apply(ctx context.Context, networkID *corev1alpha1.Netw
 	if name == nil {
 		return nil, fmt.Errorf("networkID.Name must be provided to Apply")
 	}
+	emptyResult := &v1alpha1.NetworkID{}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(networkidsResource, *name, types.ApplyPatchType, data), &v1alpha1.NetworkID{})
+		Invokes(testing.NewRootPatchSubresourceActionWithOptions(networkidsResource, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
 	if obj == nil {
-		return nil, err
+		return emptyResult, err
 	}
 	return obj.(*v1alpha1.NetworkID), err
 }

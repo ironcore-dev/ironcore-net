@@ -25,6 +25,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 const (
@@ -538,7 +539,7 @@ func (r *SchedulerReconciler) instanceNotAssignedPredicate() predicate.Predicate
 
 func (r *SchedulerReconciler) handleNode() handler.EventHandler {
 	return handler.Funcs{
-		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			node := evt.Object.(*v1alpha1.Node)
 			log := ctrl.LoggerFrom(ctx)
 
@@ -562,12 +563,12 @@ func (r *SchedulerReconciler) handleNode() handler.EventHandler {
 				queue.Add(ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&instance)})
 			}
 		},
-		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			oldNode := evt.ObjectOld.(*v1alpha1.Node)
 			newNode := evt.ObjectNew.(*v1alpha1.Node)
 			r.Cache.UpdateContainer(oldNode, newNode)
 		},
-		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			node := evt.Object.(*v1alpha1.Node)
 			log := ctrl.LoggerFrom(ctx)
 
@@ -587,7 +588,7 @@ func (r *SchedulerReconciler) isInstanceAssigned() predicate.Predicate {
 
 func (r *SchedulerReconciler) handleAssignedInstances() handler.EventHandler {
 	return handler.Funcs{
-		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			instance := evt.Object.(*v1alpha1.Instance)
 			log := ctrl.LoggerFrom(ctx)
 
@@ -595,7 +596,7 @@ func (r *SchedulerReconciler) handleAssignedInstances() handler.EventHandler {
 				log.Error(err, "Error adding instance to cache")
 			}
 		},
-		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			oldInstance := evt.ObjectOld.(*v1alpha1.Instance)
 			newInstance := evt.ObjectNew.(*v1alpha1.Instance)
 			log := ctrl.LoggerFrom(ctx)
@@ -615,7 +616,7 @@ func (r *SchedulerReconciler) handleAssignedInstances() handler.EventHandler {
 				}
 			}
 		},
-		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.RateLimitingInterface) {
+		DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			instance := evt.Object.(*v1alpha1.Instance)
 			log := ctrl.LoggerFrom(ctx)
 
@@ -628,11 +629,11 @@ func (r *SchedulerReconciler) handleAssignedInstances() handler.EventHandler {
 
 func (r *SchedulerReconciler) handleUnassignedInstance() handler.EventHandler {
 	return handler.Funcs{
-		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.RateLimitingInterface) {
+		CreateFunc: func(ctx context.Context, evt event.CreateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			instance := evt.Object.(*v1alpha1.Instance)
 			queue.Add(ctrl.Request{NamespacedName: client.ObjectKeyFromObject(instance)})
 		},
-		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.RateLimitingInterface) {
+		UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 			oldInstance := evt.ObjectOld.(*v1alpha1.Instance)
 			newInstance := evt.ObjectNew.(*v1alpha1.Instance)
 			log := ctrl.LoggerFrom(ctx)

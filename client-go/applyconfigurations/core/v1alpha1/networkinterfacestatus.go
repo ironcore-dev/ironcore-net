@@ -10,7 +10,7 @@ import (
 	net "github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 )
 
-// NetworkInterfaceStatusApplyConfiguration represents an declarative configuration of the NetworkInterfaceStatus type for use
+// NetworkInterfaceStatusApplyConfiguration represents a declarative configuration of the NetworkInterfaceStatus type for use
 // with apply.
 type NetworkInterfaceStatusApplyConfiguration struct {
 	State      *v1alpha1.NetworkInterfaceState `json:"state,omitempty"`
@@ -20,7 +20,7 @@ type NetworkInterfaceStatusApplyConfiguration struct {
 	NATIPs     []net.IP                        `json:"natIPs,omitempty"`
 }
 
-// NetworkInterfaceStatusApplyConfiguration constructs an declarative configuration of the NetworkInterfaceStatus type for use with
+// NetworkInterfaceStatusApplyConfiguration constructs a declarative configuration of the NetworkInterfaceStatus type for use with
 // apply.
 func NetworkInterfaceStatus() *NetworkInterfaceStatusApplyConfiguration {
 	return &NetworkInterfaceStatusApplyConfiguration{}

@@ -9,7 +9,7 @@ import (
 	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 )
 
-// NodeSelectorRequirementApplyConfiguration represents an declarative configuration of the NodeSelectorRequirement type for use
+// NodeSelectorRequirementApplyConfiguration represents a declarative configuration of the NodeSelectorRequirement type for use
 // with apply.
 type NodeSelectorRequirementApplyConfiguration struct {
 	Key      *string                        `json:"key,omitempty"`
@@ -17,7 +17,7 @@ type NodeSelectorRequirementApplyConfiguration struct {
 	Values   []string                       `json:"values,omitempty"`
 }
 
-// NodeSelectorRequirementApplyConfiguration constructs an declarative configuration of the NodeSelectorRequirement type for use with
+// NodeSelectorRequirementApplyConfiguration constructs a declarative configuration of the NodeSelectorRequirement type for use with
 // apply.
 func NodeSelectorRequirement() *NodeSelectorRequirementApplyConfiguration {
 	return &NodeSelectorRequirementApplyConfiguration{}

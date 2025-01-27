@@ -10,7 +10,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// NetworkInterfacePublicIPApplyConfiguration represents an declarative configuration of the NetworkInterfacePublicIP type for use
+// NetworkInterfacePublicIPApplyConfiguration represents a declarative configuration of the NetworkInterfacePublicIP type for use
 // with apply.
 type NetworkInterfacePublicIPApplyConfiguration struct {
 	Name     *string      `json:"name,omitempty"`
@@ -18,7 +18,7 @@ type NetworkInterfacePublicIPApplyConfiguration struct {
 	IP       *net.IP      `json:"ip,omitempty"`
 }
 
-// NetworkInterfacePublicIPApplyConfiguration constructs an declarative configuration of the NetworkInterfacePublicIP type for use with
+// NetworkInterfacePublicIPApplyConfiguration constructs a declarative configuration of the NetworkInterfacePublicIP type for use with
 // apply.
 func NetworkInterfacePublicIP() *NetworkInterfacePublicIPApplyConfiguration {
 	return &NetworkInterfacePublicIPApplyConfiguration{}

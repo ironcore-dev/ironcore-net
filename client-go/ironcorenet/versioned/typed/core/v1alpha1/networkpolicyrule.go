@@ -7,9 +7,6 @@ package v1alpha1
 
 import (
 	"context"
-	json "encoding/json"
-	"fmt"
-	"time"
 
 	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
@@ -17,7 +14,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
-	rest "k8s.io/client-go/rest"
+	gentype "k8s.io/client-go/gentype"
 )
 
 // NetworkPolicyRulesGetter has a method to return a NetworkPolicyRuleInterface.
@@ -42,154 +39,18 @@ type NetworkPolicyRuleInterface interface {
 
 // networkPolicyRules implements NetworkPolicyRuleInterface
 type networkPolicyRules struct {
-	client rest.Interface
-	ns     string
+	*gentype.ClientWithListAndApply[*v1alpha1.NetworkPolicyRule, *v1alpha1.NetworkPolicyRuleList, *corev1alpha1.NetworkPolicyRuleApplyConfiguration]
 }
 
 // newNetworkPolicyRules returns a NetworkPolicyRules
 func newNetworkPolicyRules(c *CoreV1alpha1Client, namespace string) *networkPolicyRules {
 	return &networkPolicyRules{
-		client: c.RESTClient(),
-		ns:     namespace,
+		gentype.NewClientWithListAndApply[*v1alpha1.NetworkPolicyRule, *v1alpha1.NetworkPolicyRuleList, *corev1alpha1.NetworkPolicyRuleApplyConfiguration](
+			"networkpolicyrules",
+			c.RESTClient(),
+			scheme.ParameterCodec,
+			namespace,
+			func() *v1alpha1.NetworkPolicyRule { return &v1alpha1.NetworkPolicyRule{} },
+			func() *v1alpha1.NetworkPolicyRuleList { return &v1alpha1.NetworkPolicyRuleList{} }),
 	}
-}
-
-// Get takes name of the networkPolicyRule, and returns the corresponding networkPolicyRule object, and an error if there is any.
-func (c *networkPolicyRules) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.NetworkPolicyRule, err error) {
-	result = &v1alpha1.NetworkPolicyRule{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("networkpolicyrules").
-		Name(name).
-		VersionedParams(&options, scheme.ParameterCodec).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// List takes label and field selectors, and returns the list of NetworkPolicyRules that match those selectors.
-func (c *networkPolicyRules) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.NetworkPolicyRuleList, err error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	result = &v1alpha1.NetworkPolicyRuleList{}
-	err = c.client.Get().
-		Namespace(c.ns).
-		Resource("networkpolicyrules").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Watch returns a watch.Interface that watches the requested networkPolicyRules.
-func (c *networkPolicyRules) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	opts.Watch = true
-	return c.client.Get().
-		Namespace(c.ns).
-		Resource("networkpolicyrules").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Watch(ctx)
-}
-
-// Create takes the representation of a networkPolicyRule and creates it.  Returns the server's representation of the networkPolicyRule, and an error, if there is any.
-func (c *networkPolicyRules) Create(ctx context.Context, networkPolicyRule *v1alpha1.NetworkPolicyRule, opts v1.CreateOptions) (result *v1alpha1.NetworkPolicyRule, err error) {
-	result = &v1alpha1.NetworkPolicyRule{}
-	err = c.client.Post().
-		Namespace(c.ns).
-		Resource("networkpolicyrules").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(networkPolicyRule).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Update takes the representation of a networkPolicyRule and updates it. Returns the server's representation of the networkPolicyRule, and an error, if there is any.
-func (c *networkPolicyRules) Update(ctx context.Context, networkPolicyRule *v1alpha1.NetworkPolicyRule, opts v1.UpdateOptions) (result *v1alpha1.NetworkPolicyRule, err error) {
-	result = &v1alpha1.NetworkPolicyRule{}
-	err = c.client.Put().
-		Namespace(c.ns).
-		Resource("networkpolicyrules").
-		Name(networkPolicyRule.Name).
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(networkPolicyRule).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Delete takes name of the networkPolicyRule and deletes it. Returns an error if one occurs.
-func (c *networkPolicyRules) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	return c.client.Delete().
-		Namespace(c.ns).
-		Resource("networkpolicyrules").
-		Name(name).
-		Body(&opts).
-		Do(ctx).
-		Error()
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *networkPolicyRules) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	var timeout time.Duration
-	if listOpts.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
-	}
-	return c.client.Delete().
-		Namespace(c.ns).
-		Resource("networkpolicyrules").
-		VersionedParams(&listOpts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Body(&opts).
-		Do(ctx).
-		Error()
-}
-
-// Patch applies the patch and returns the patched networkPolicyRule.
-func (c *networkPolicyRules) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.NetworkPolicyRule, err error) {
-	result = &v1alpha1.NetworkPolicyRule{}
-	err = c.client.Patch(pt).
-		Namespace(c.ns).
-		Resource("networkpolicyrules").
-		Name(name).
-		SubResource(subresources...).
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied networkPolicyRule.
-func (c *networkPolicyRules) Apply(ctx context.Context, networkPolicyRule *corev1alpha1.NetworkPolicyRuleApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.NetworkPolicyRule, err error) {
-	if networkPolicyRule == nil {
-		return nil, fmt.Errorf("networkPolicyRule provided to Apply must not be nil")
-	}
-	patchOpts := opts.ToPatchOptions()
-	data, err := json.Marshal(networkPolicyRule)
-	if err != nil {
-		return nil, err
-	}
-	name := networkPolicyRule.Name
-	if name == nil {
-		return nil, fmt.Errorf("networkPolicyRule.Name must be provided to Apply")
-	}
-	result = &v1alpha1.NetworkPolicyRule{}
-	err = c.client.Patch(types.ApplyPatchType).
-		Namespace(c.ns).
-		Resource("networkpolicyrules").
-		Name(*name).
-		VersionedParams(&patchOpts, scheme.ParameterCodec).
-		Body(data).
-		Do(ctx).
-		Into(result)
-	return
 }

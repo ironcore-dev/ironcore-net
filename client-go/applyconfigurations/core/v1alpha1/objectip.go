@@ -10,14 +10,14 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// ObjectIPApplyConfiguration represents an declarative configuration of the ObjectIP type for use
+// ObjectIPApplyConfiguration represents a declarative configuration of the ObjectIP type for use
 // with apply.
 type ObjectIPApplyConfiguration struct {
 	IPFamily *v1.IPFamily  `json:"ipFamily,omitempty"`
 	Prefix   *net.IPPrefix `json:"prefix,omitempty"`
 }
 
-// ObjectIPApplyConfiguration constructs an declarative configuration of the ObjectIP type for use with
+// ObjectIPApplyConfiguration constructs a declarative configuration of the ObjectIP type for use with
 // apply.
 func ObjectIP() *ObjectIPApplyConfiguration {
 	return &ObjectIPApplyConfiguration{}

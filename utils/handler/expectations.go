@@ -18,6 +18,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 var observeExpectationsForControllerLog = ctrl.Log.WithName("eventhandler").WithName("observeExpectationsForController")
@@ -118,17 +119,17 @@ func (o *observeExpectationsForController) add(obj client.Object) {
 	o.expectations.CreationObserved(*ctrlKey, client.ObjectKeyFromObject(obj))
 }
 
-func (o *observeExpectationsForController) Create(_ context.Context, evt event.CreateEvent, _ workqueue.RateLimitingInterface) {
+func (o *observeExpectationsForController) Create(_ context.Context, evt event.CreateEvent, _ workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	o.add(evt.Object)
 }
 
-func (o *observeExpectationsForController) Update(_ context.Context, _ event.UpdateEvent, _ workqueue.RateLimitingInterface) {
+func (o *observeExpectationsForController) Update(_ context.Context, _ event.UpdateEvent, _ workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 }
 
-func (o *observeExpectationsForController) Delete(_ context.Context, evt event.DeleteEvent, _ workqueue.RateLimitingInterface) {
+func (o *observeExpectationsForController) Delete(_ context.Context, evt event.DeleteEvent, _ workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	o.delete(evt.Object)
 }
 
-func (o *observeExpectationsForController) Generic(_ context.Context, evt event.GenericEvent, _ workqueue.RateLimitingInterface) {
+func (o *observeExpectationsForController) Generic(_ context.Context, evt event.GenericEvent, _ workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	o.add(evt.Object)
 }

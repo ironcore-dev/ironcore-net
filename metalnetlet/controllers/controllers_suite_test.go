@@ -25,8 +25,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	ctrlconfig "sigs.k8s.io/controller-runtime/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -93,7 +95,7 @@ var _ = BeforeSuite(func() {
 		// Note that you must have the required binaries setup under the bin directory to perform
 		// the tests directly. When we run make test it will be setup and used automatically.
 		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
-			fmt.Sprintf("1.29.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
+			fmt.Sprintf("1.31.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
 	}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
 		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "config", "apiserver", "apiservice", "bases")},
@@ -142,6 +144,7 @@ func SetupTest(metalnetNs *corev1.Namespace) {
 			Metrics: metricsserver.Options{
 				BindAddress: "0",
 			},
+			Controller: ctrlconfig.Controller{SkipNameValidation: ptr.To(true)},
 		})
 		Expect(err).ToNot(HaveOccurred())
 
