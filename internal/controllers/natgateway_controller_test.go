@@ -6,11 +6,14 @@ package controllers
 import (
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
+
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+
 	. "github.com/ironcore-dev/ironcore/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
@@ -37,6 +40,16 @@ var _ = Describe("NATGatewayController", func() {
 		}
 		Expect(k8sClient.Create(ctx, natGateway)).To(Succeed())
 		natGatewayIP := natGateway.Spec.IPs[0].IP
+
+		ipaddressForNGW := &v1alpha1.IPAddress{}
+		err := k8sClient.Get(ctx, types.NamespacedName{Name: natGatewayIP.String()}, ipaddressForNGW)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(ipaddressForNGW.Spec.ClaimRef.Name).ToNot(BeEmpty())
+
+		ipForNGW := &v1alpha1.IP{}
+		err = k8sClient.Get(ctx, types.NamespacedName{Name: ipaddressForNGW.Spec.ClaimRef.Name, Namespace: ipaddressForNGW.Spec.ClaimRef.Namespace}, ipForNGW)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(ipForNGW.Spec.ClaimRef).ToNot(BeNil())
 
 		By("creating a network interface as potential target")
 		nic := &v1alpha1.NetworkInterface{

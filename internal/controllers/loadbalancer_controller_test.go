@@ -5,11 +5,14 @@ package controllers
 
 import (
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+
 	. "github.com/ironcore-dev/ironcore/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
@@ -45,6 +48,18 @@ var _ = Describe("LoadBalancerController", func() {
 		}
 		Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())
 		ips := v1alpha1.GetLoadBalancerIPs(loadBalancer)
+
+		for i := range ips {
+			ipaddressForLB := &v1alpha1.IPAddress{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Name: ips[i].String()}, ipaddressForLB)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(ipaddressForLB.Spec.ClaimRef.Name).ToNot(BeEmpty())
+
+			ipForLB := &v1alpha1.IP{}
+			err = k8sClient.Get(ctx, types.NamespacedName{Name: ipaddressForLB.Spec.ClaimRef.Name, Namespace: ipaddressForLB.Spec.ClaimRef.Namespace}, ipForLB)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(ipForLB.Spec.ClaimRef).ToNot(BeNil())
+		}
 
 		By("waiting for the load balancer to create a daemon set")
 		daemonSet := &v1alpha1.DaemonSet{

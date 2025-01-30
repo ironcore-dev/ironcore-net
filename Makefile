@@ -121,7 +121,7 @@ docs: gen-crd-api-reference-docs ## Run go generate to generate API reference do
 
 .PHONY: build-ironcore-net
 build-ironcore-net: generate fmt addlicense lint ## Build ironcore-net binary.
-	go build -o bin/manager ./cmd/controller-manger/main.go
+	go build -o bin/manager ./cmd/controller-manager/main.go
 	go build -o bin/apiserver ./cmd/apiserver/main.go
 
 .PHONY: build-apinetlet
