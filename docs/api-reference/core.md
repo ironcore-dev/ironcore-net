@@ -3647,6 +3647,7 @@ Can only be set if there is no matching IP family in PublicIPs.</p>
 (<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterface">NetworkInterface</a>)
 </p>
 <div>
+<p>NetworkInterfaceStatus defines the observed state of NetworkInterface.</p>
 </div>
 <table>
 <thead>
@@ -3666,6 +3667,7 @@ NetworkInterfaceState
 </em>
 </td>
 <td>
+<p>State is the state of the network interface.</p>
 </td>
 </tr>
 <tr>
@@ -3678,6 +3680,20 @@ PCIAddress
 </em>
 </td>
 <td>
+<p>PCIAddress is the PCI address of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tapDevice</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.TAPDevice">
+TAPDevice
+</a>
+</em>
+</td>
+<td>
+<p>TAPDevice is the TAP device of the network interface.</p>
 </td>
 </tr>
 <tr>
@@ -3690,6 +3706,7 @@ PCIAddress
 </em>
 </td>
 <td>
+<p>Prefixes are the prefixes of the network interface.</p>
 </td>
 </tr>
 <tr>
@@ -3702,6 +3719,7 @@ PCIAddress
 </em>
 </td>
 <td>
+<p>PublicIPs are the public IPs of the network interface.</p>
 </td>
 </tr>
 <tr>
@@ -3714,6 +3732,7 @@ PCIAddress
 </em>
 </td>
 <td>
+<p>NATIPs are the NAT IPs of the network interface.</p>
 </td>
 </tr>
 </tbody>
@@ -4198,8 +4217,8 @@ string
 <td>
 <code>peerings</code><br/>
 <em>
-<a href="#core.apinet.ironcore.dev/v1alpha1.[]ironcore-net/api/core/v1alpha1.NetworkPeeringStatus">
-map[string][]ironcore-net/api/core/v1alpha1.NetworkPeeringStatus
+<a href="#core.apinet.ironcore.dev/v1alpha1.[]./api/core/v1alpha1.NetworkPeeringStatus">
+map[string][]./api/core/v1alpha1.NetworkPeeringStatus
 </a>
 </em>
 </td>
@@ -4678,6 +4697,35 @@ github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix
 </td>
 <td>
 <p>NetworkPolicyPorts are the protocol type and ports.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.TAPDevice">TAPDevice
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
+</p>
+<div>
+<p>TAPDevice is a TAP device.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the TAP device.</p>
 </td>
 </tr>
 </tbody>

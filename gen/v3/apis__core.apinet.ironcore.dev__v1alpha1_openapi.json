@@ -22914,31 +22914,49 @@
 				}
 			},
 			"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterfaceStatus": {
+				"description": "NetworkInterfaceStatus defines the observed state of NetworkInterface.",
 				"type": "object",
 				"properties": {
 					"natIPs": {
+						"description": "NATIPs are the NAT IPs of the network interface.",
 						"type": "array",
 						"items": {
 							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
 						}
 					},
 					"pciAddress": {
-						"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.PCIAddress"
+						"description": "PCIAddress is the PCI address of the network interface.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.PCIAddress"
+							}
+						]
 					},
 					"prefixes": {
+						"description": "Prefixes are the prefixes of the network interface.",
 						"type": "array",
 						"items": {
 							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IPPrefix"
 						}
 					},
 					"publicIPs": {
+						"description": "PublicIPs are the public IPs of the network interface.",
 						"type": "array",
 						"items": {
 							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IP"
 						}
 					},
 					"state": {
+						"description": "State is the state of the network interface.",
 						"type": "string"
+					},
+					"tapDevice": {
+						"description": "TAPDevice is the TAP device of the network interface.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.TAPDevice"
+							}
+						]
 					}
 				}
 			},
@@ -23002,6 +23020,18 @@
 						"description": "Name is the semantical name of the network peering.",
 						"type": "string",
 						"default": ""
+					},
+					"prefixes": {
+						"description": "Prefixes is a list of prefixes that we want only to be exposed to the peered network, if no prefixes are specified no filtering will be done.",
+						"type": "array",
+						"items": {
+							"default": {},
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.PeeringPrefix"
+								}
+							]
+						}
 					}
 				}
 			},
@@ -23426,14 +23456,17 @@
 				"properties": {
 					"peerings": {
 						"description": "Peerings contains the states of the network peerings for the network.",
-						"type": "array",
-						"items": {
-							"default": {},
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeeringStatus"
-								}
-							]
+						"type": "object",
+						"additionalProperties": {
+							"type": "array",
+							"items": {
+								"default": {},
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeeringStatus"
+									}
+								]
+							}
 						}
 					}
 				}
@@ -23663,7 +23696,8 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement"
 								}
 							]
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					},
 					"matchLabels": {
 						"description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -23690,6 +23724,28 @@
 					},
 					"slot": {
 						"type": "string"
+					}
+				}
+			},
+			"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.PeeringPrefix": {
+				"description": "PeeringPrefix defines prefixes to be exposed to the peered network",
+				"type": "object",
+				"required": [
+					"name"
+				],
+				"properties": {
+					"name": {
+						"description": "Name is the semantical name of the peering prefixes",
+						"type": "string",
+						"default": ""
+					},
+					"prefix": {
+						"description": "CIDR to be exposed to the peered network",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore-net.apimachinery.api.net.IPPrefix"
+							}
+						]
 					}
 				}
 			},
@@ -23731,6 +23787,16 @@
 								}
 							]
 						}
+					}
+				}
+			},
+			"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.TAPDevice": {
+				"description": "TAPDevice is a TAP device.",
+				"type": "object",
+				"properties": {
+					"name": {
+						"description": "Name is the name of the TAP device.",
+						"type": "string"
 					}
 				}
 			},
@@ -23809,8 +23875,9 @@
 				"type": "object",
 				"properties": {
 					"name": {
-						"description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
-						"type": "string"
+						"description": "Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+						"type": "string",
+						"default": ""
 					}
 				},
 				"x-kubernetes-map-type": "atomic"
@@ -23832,7 +23899,8 @@
 						"items": {
 							"type": "string",
 							"default": ""
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					},
 					"group": {
 						"description": "group is the preferred group of the resource.  Empty implies the group of the containing resource list. For subresources, this may have a different value, for example: Scale\".",
@@ -23859,7 +23927,8 @@
 						"items": {
 							"type": "string",
 							"default": ""
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					},
 					"singularName": {
 						"description": "singularName is the singular name of the resource.  This allows clients to handle plural and singular opaquely. The singularName is more correct for reporting status on a single item and both singular and plural are allowed from the kubectl CLI interface.",
@@ -23915,7 +23984,8 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.APIResource"
 								}
 							]
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					}
 				},
 				"x-kubernetes-group-version-kind": [
@@ -23940,7 +24010,8 @@
 						"items": {
 							"type": "string",
 							"default": ""
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					},
 					"gracePeriodSeconds": {
 						"description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
@@ -23999,7 +24070,8 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement"
 								}
 							]
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					},
 					"matchLabels": {
 						"description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -24036,7 +24108,8 @@
 						"items": {
 							"type": "string",
 							"default": ""
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					}
 				}
 			},
@@ -24145,6 +24218,7 @@
 							"type": "string",
 							"default": ""
 						},
+						"x-kubernetes-list-type": "set",
 						"x-kubernetes-patch-strategy": "merge"
 					},
 					"generateName": {
@@ -24174,7 +24248,8 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ManagedFieldsEntry"
 								}
 							]
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					},
 					"name": {
 						"description": "Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names",
@@ -24195,6 +24270,10 @@
 								}
 							]
 						},
+						"x-kubernetes-list-map-keys": [
+							"uid"
+						],
+						"x-kubernetes-list-type": "map",
 						"x-kubernetes-patch-merge-key": "uid",
 						"x-kubernetes-patch-strategy": "merge"
 					},
@@ -24290,7 +24369,8 @@
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails"
 							}
-						]
+						],
+						"x-kubernetes-list-type": "atomic"
 					},
 					"kind": {
 						"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
@@ -24358,7 +24438,8 @@
 									"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusCause"
 								}
 							]
-						}
+						},
+						"x-kubernetes-list-type": "atomic"
 					},
 					"group": {
 						"description": "The group attribute of the resource associated with the status StatusReason.",

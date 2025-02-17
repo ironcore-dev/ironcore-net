@@ -445,4 +445,71 @@ var _ = Describe("NetworkInterfaceController", func() {
 		By("waiting for the metalnet network interface to be gone")
 		Eventually(Get(metalnetNic)).Should(Satisfy(apierrors.IsNotFound))
 	})
+
+	It("should create a metalnet network interface using a TAP device network interface", func(ctx SpecContext) {
+		By("creating a network")
+
+		By("creating a network interface")
+		nic := &v1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "nic-",
+				Labels: map[string]string{
+					"app": "target",
+				},
+			},
+			Spec: v1alpha1.NetworkInterfaceSpec{
+				NodeRef: corev1.LocalObjectReference{
+					Name: PartitionNodeName(partitionName, metalnetNode.Name),
+				},
+				NetworkRef: corev1.LocalObjectReference{
+					Name: network.Name,
+				},
+				IPs: []net.IP{
+					net.MustParseIP("10.0.0.1"),
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+
+		By("waiting for the network interface to have a finalizer")
+		Eventually(Object(nic)).Should(HaveField("Finalizers", []string{PartitionFinalizer(partitionName)}))
+
+		By("waiting for the metalnet network interface to be present with the expected values")
+		metalnetNic := &metalnetv1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: metalnetNs.Name,
+				Name:      string(nic.UID),
+			},
+		}
+
+		Eventually(Object(metalnetNic)).Should(SatisfyAll(
+			HaveField("Spec.NetworkRef", Equal(corev1.LocalObjectReference{Name: string(network.UID)})),
+			HaveField("Spec.IPFamilies", ConsistOf(corev1.IPv4Protocol)),
+			HaveField("Spec.IPs", ConsistOf(metalnetv1alpha1.MustParseIP("10.0.0.1"))),
+			HaveField("Spec.NodeName", Equal(&metalnetNode.Name)),
+		))
+
+		By("updating the metalnet network interface's status")
+		Eventually(UpdateStatus(metalnetNic, func() {
+			metalnetNic.Status.State = metalnetv1alpha1.NetworkInterfaceStateReady
+			metalnetNic.Status.TAPDevice = &metalnetv1alpha1.TAPDevice{
+				Name: "foo",
+			}
+		})).Should(Succeed())
+
+		By("waiting for the network interface to reflect the status values")
+		Eventually(Object(nic)).Should(HaveField("Status", v1alpha1.NetworkInterfaceStatus{
+			State: v1alpha1.NetworkInterfaceStateReady,
+			TAPDevice: &v1alpha1.TAPDevice{
+				Name: "foo",
+			},
+		}))
+
+		By("deleting the network interface")
+		Expect(k8sClient.Delete(ctx, nic)).To(Succeed())
+
+		By("waiting for the metalnet network interface to be gone")
+		Eventually(Get(metalnetNic)).Should(Satisfy(apierrors.IsNotFound))
+	})
 })

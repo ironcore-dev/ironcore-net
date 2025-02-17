@@ -78,12 +78,26 @@ type PCIAddress struct {
 	Function string `json:"function,omitempty"`
 }
 
+// TAPDevice is a TAP device.
+type TAPDevice struct {
+	// Name is the name of the TAP device.
+	Name string `json:"name,omitempty"`
+}
+
+// NetworkInterfaceStatus defines the observed state of NetworkInterface.
 type NetworkInterfaceStatus struct {
-	State      NetworkInterfaceState `json:"state,omitempty"`
-	PCIAddress *PCIAddress           `json:"pciAddress,omitempty"`
-	Prefixes   []net.IPPrefix        `json:"prefixes,omitempty"`
-	PublicIPs  []net.IP              `json:"publicIPs,omitempty"`
-	NATIPs     []net.IP              `json:"natIPs,omitempty"`
+	// State is the state of the network interface.
+	State NetworkInterfaceState `json:"state,omitempty"`
+	// PCIAddress is the PCI address of the network interface.
+	PCIAddress *PCIAddress `json:"pciAddress,omitempty"`
+	// TAPDevice is the TAP device of the network interface.
+	TAPDevice *TAPDevice `json:"tapDevice,omitempty"`
+	// Prefixes are the prefixes of the network interface.
+	Prefixes []net.IPPrefix `json:"prefixes,omitempty"`
+	// PublicIPs are the public IPs of the network interface.
+	PublicIPs []net.IP `json:"publicIPs,omitempty"`
+	// NATIPs are the NAT IPs of the network interface.
+	NATIPs []net.IP `json:"natIPs,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
