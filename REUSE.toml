@@ -1,0 +1,16 @@
+version = 1
+SPDX-PackageName = "ironcore-net"
+SPDX-PackageSupplier = "IronCore authors <ospo@sap.com>"
+SPDX-PackageDownloadLocation = "https://github.com/ironcore-dev/ironcore-net"
+
+[[annotations]]
+path = [".github/**", ".gitignore", ".golangci.yaml", "CODEOWNERS", "Dockerfile", "Makefile", "PROJECT", "config/**", "gen/**", "go.mod", "go.sum", "hack/**", "client-go/openapi/api_violations.report", "models-schema/main.go.tmpl"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 SAP SE or an SAP affiliate company and IronCore contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["docs/**", "README.md"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 SAP SE or an SAP affiliate company and IronCore contributors"
+SPDX-License-Identifier = "Apache-2.0"
