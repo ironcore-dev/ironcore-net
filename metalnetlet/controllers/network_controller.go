@@ -26,6 +26,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
+type NetworkPeeringControllingType string
+
+const (
+	NetworkPeeringControllingTypeNative = "Native"
+	NetworkPeeringControllingTypeNone   = "None"
+)
+
 type NetworkReconciler struct {
 	client.Client
 	MetalnetClient client.Client
@@ -33,6 +40,8 @@ type NetworkReconciler struct {
 	PartitionName string
 
 	MetalnetNamespace string
+
+	NetworkPeeringControllingType NetworkPeeringControllingType
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
@@ -114,18 +123,20 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 }
 
 func (r *NetworkReconciler) updateApinetNetworkStatus(ctx context.Context, log logr.Logger, network *apinetv1alpha1.Network, metalnetNetwork *metalnetv1alpha1.Network) error {
-	apinetStatusPeerings := metalnetNetworkPeeringsStatusToNetworkPeeringsStatus(metalnetNetwork.Status.Peerings)
-	if !equality.Semantic.DeepEqual(network.Status.Peerings[r.PartitionName], apinetStatusPeerings) {
-		log.V(1).Info("Patching apinet network status", "status", apinetStatusPeerings)
-		networkBase := network.DeepCopy()
-		if network.Status.Peerings == nil {
-			network.Status.Peerings = make(map[string][]apinetv1alpha1.NetworkPeeringStatus)
+	if r.NetworkPeeringControllingType != NetworkPeeringControllingTypeNone {
+		apinetStatusPeerings := metalnetNetworkPeeringsStatusToNetworkPeeringsStatus(metalnetNetwork.Status.Peerings)
+		if !equality.Semantic.DeepEqual(network.Status.Peerings[r.PartitionName], apinetStatusPeerings) {
+			log.V(1).Info("Patching apinet network status", "status", apinetStatusPeerings)
+			networkBase := network.DeepCopy()
+			if network.Status.Peerings == nil {
+				network.Status.Peerings = make(map[string][]apinetv1alpha1.NetworkPeeringStatus)
+			}
+			network.Status.Peerings[r.PartitionName] = apinetStatusPeerings
+			if err := r.Status().Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
+				return fmt.Errorf("unable to patch network: %w", err)
+			}
+			log.V(1).Info("Patched apinet network status")
 		}
-		network.Status.Peerings[r.PartitionName] = apinetStatusPeerings
-		if err := r.Status().Patch(ctx, network, client.MergeFrom(networkBase)); err != nil {
-			return fmt.Errorf("unable to patch network: %w", err)
-		}
-		log.V(1).Info("Patched apinet network status")
 	}
 	return nil
 }
@@ -178,22 +189,24 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	}
 	var peeredIDs []int32
 	var peeredPrefixes []metalnetv1alpha1.PeeredPrefix
-	for _, peering := range network.Spec.Peerings {
-		id, err := networkid.ParseVNI(peering.ID)
-		if err != nil {
-			return ctrl.Result{}, fmt.Errorf("failed to parse peered network ID: %w", err)
-		}
-
-		// metalnetNetwork.Spec.PeeredIDs = append(metalnetNetwork.Spec.PeeredIDs, id)
-		peeredIDs = append(peeredIDs, id)
-
-		if len(peering.Prefixes) > 0 {
-			ipPrefixes := getIPPrefixes(peering.Prefixes)
-			peeredPrefix := metalnetv1alpha1.PeeredPrefix{
-				ID:       id,
-				Prefixes: ipPrefixesToMetalnetPrefixes(ipPrefixes),
+	if r.NetworkPeeringControllingType != NetworkPeeringControllingTypeNone {
+		for _, peering := range network.Spec.Peerings {
+			id, err := networkid.ParseVNI(peering.ID)
+			if err != nil {
+				return ctrl.Result{}, fmt.Errorf("failed to parse peered network ID: %w", err)
 			}
-			peeredPrefixes = append(peeredPrefixes, peeredPrefix)
+
+			// metalnetNetwork.Spec.PeeredIDs = append(metalnetNetwork.Spec.PeeredIDs, id)
+			peeredIDs = append(peeredIDs, id)
+
+			if len(peering.Prefixes) > 0 {
+				ipPrefixes := getIPPrefixes(peering.Prefixes)
+				peeredPrefix := metalnetv1alpha1.PeeredPrefix{
+					ID:       id,
+					Prefixes: ipPrefixesToMetalnetPrefixes(ipPrefixes),
+				}
+				peeredPrefixes = append(peeredPrefixes, peeredPrefix)
+			}
 		}
 	}
 	// metalnetNetwork.Spec.PeeredPrefixes = peeredPrefixes
