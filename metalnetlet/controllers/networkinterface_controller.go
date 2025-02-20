@@ -371,6 +371,13 @@ func (r *NetworkInterfaceReconciler) updateStatus(
 	} else {
 		nic.Status.PCIAddress = nil
 	}
+	if tapDevice := metalnetNic.Status.TAPDevice; tapDevice != nil {
+		nic.Status.TAPDevice = &v1alpha1.TAPDevice{
+			Name: tapDevice.Name,
+		}
+	} else {
+		nic.Status.TAPDevice = nil
+	}
 	nic.Status.PublicIPs = metalnetIPsToIPs(workaroundMetalnetNoIPv6IPToIPs(metalnetNic.Status.VirtualIP))
 	nic.Status.NATIPs = metalnetIPsToIPs(workaroundMetalnetNoIPv6NATIPToIPs(metalnetNic.Status.NatIP))
 	nic.Status.Prefixes = metalnetIPPrefixesToIPPrefixes(metalnetNic.Spec.Prefixes)

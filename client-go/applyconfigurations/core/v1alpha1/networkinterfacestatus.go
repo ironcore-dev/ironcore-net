@@ -15,6 +15,7 @@ import (
 type NetworkInterfaceStatusApplyConfiguration struct {
 	State      *v1alpha1.NetworkInterfaceState `json:"state,omitempty"`
 	PCIAddress *PCIAddressApplyConfiguration   `json:"pciAddress,omitempty"`
+	TAPDevice  *TAPDeviceApplyConfiguration    `json:"tapDevice,omitempty"`
 	Prefixes   []net.IPPrefix                  `json:"prefixes,omitempty"`
 	PublicIPs  []net.IP                        `json:"publicIPs,omitempty"`
 	NATIPs     []net.IP                        `json:"natIPs,omitempty"`
@@ -39,6 +40,14 @@ func (b *NetworkInterfaceStatusApplyConfiguration) WithState(value v1alpha1.Netw
 // If called multiple times, the PCIAddress field is set to the value of the last call.
 func (b *NetworkInterfaceStatusApplyConfiguration) WithPCIAddress(value *PCIAddressApplyConfiguration) *NetworkInterfaceStatusApplyConfiguration {
 	b.PCIAddress = value
+	return b
+}
+
+// WithTAPDevice sets the TAPDevice field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the TAPDevice field is set to the value of the last call.
+func (b *NetworkInterfaceStatusApplyConfiguration) WithTAPDevice(value *TAPDeviceApplyConfiguration) *NetworkInterfaceStatusApplyConfiguration {
+	b.TAPDevice = value
 	return b
 }
 

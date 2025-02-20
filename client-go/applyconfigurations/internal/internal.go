@@ -790,6 +790,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
+    - name: tapDevice
+      type:
+        namedType: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.TAPDevice
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPeering
   map:
     fields:
@@ -1143,6 +1146,12 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyPort
           elementRelationship: atomic
+- name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.TAPDevice
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.TargetNetworkInterface
   map:
     fields:

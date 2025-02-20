@@ -105,6 +105,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.PCIAddress":                  schema_ironcore_net_api_core_v1alpha1_PCIAddress(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.PeeringPrefix":               schema_ironcore_net_api_core_v1alpha1_PeeringPrefix(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.Rule":                        schema_ironcore_net_api_core_v1alpha1_Rule(ref),
+		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.TAPDevice":                   schema_ironcore_net_api_core_v1alpha1_TAPDevice(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.TargetNetworkInterface":      schema_ironcore_net_api_core_v1alpha1_TargetNetworkInterface(ref),
 		"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.TopologySpreadConstraint":    schema_ironcore_net_api_core_v1alpha1_TopologySpreadConstraint(ref),
 		"github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP":                       schema_ironcore_net_apimachinery_api_net_IP(ref),
@@ -2755,22 +2756,32 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkInterfaceStatus(ref common.Ref
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "NetworkInterfaceStatus defines the observed state of NetworkInterface.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"state": {
 						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
+							Description: "State is the state of the network interface.",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 					"pciAddress": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.PCIAddress"),
+							Description: "PCIAddress is the PCI address of the network interface.",
+							Ref:         ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.PCIAddress"),
+						},
+					},
+					"tapDevice": {
+						SchemaProps: spec.SchemaProps{
+							Description: "TAPDevice is the TAP device of the network interface.",
+							Ref:         ref("github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.TAPDevice"),
 						},
 					},
 					"prefixes": {
 						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
+							Description: "Prefixes are the prefixes of the network interface.",
+							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
@@ -2782,7 +2793,8 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkInterfaceStatus(ref common.Ref
 					},
 					"publicIPs": {
 						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
+							Description: "PublicIPs are the public IPs of the network interface.",
+							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
@@ -2794,7 +2806,8 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkInterfaceStatus(ref common.Ref
 					},
 					"natIPs": {
 						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
+							Description: "NATIPs are the NAT IPs of the network interface.",
+							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
@@ -2808,7 +2821,7 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkInterfaceStatus(ref common.Ref
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.PCIAddress", "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP", "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"},
+			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.PCIAddress", "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.TAPDevice", "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP", "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"},
 	}
 }
 
@@ -3925,6 +3938,26 @@ func schema_ironcore_net_api_core_v1alpha1_Rule(ref common.ReferenceCallback) co
 		},
 		Dependencies: []string{
 			"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.IPBlock", "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.NetworkPolicyPort", "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1.ObjectIP"},
+	}
+}
+
+func schema_ironcore_net_api_core_v1alpha1_TAPDevice(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "TAPDevice is a TAP device.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the TAP device.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
 	}
 }
 
