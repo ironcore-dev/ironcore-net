@@ -26,11 +26,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
-type NetworkPeeringControllingType string
+type NetworkPeeringProviderType string
 
 const (
-	NetworkPeeringControllingTypeNative = "Native"
-	NetworkPeeringControllingTypeNone   = "None"
+	BuiltInNetworkPeeringProvider  = "BuiltIn"
+	ExternalNetworkPeeringProvider = "External"
 )
 
 type NetworkReconciler struct {
@@ -41,7 +41,7 @@ type NetworkReconciler struct {
 
 	MetalnetNamespace string
 
-	NetworkPeeringControllingType NetworkPeeringControllingType
+	NetworkPeeringControllingType NetworkPeeringProviderType
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
@@ -123,7 +123,7 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 }
 
 func (r *NetworkReconciler) updateApinetNetworkStatus(ctx context.Context, log logr.Logger, network *apinetv1alpha1.Network, metalnetNetwork *metalnetv1alpha1.Network) error {
-	if r.NetworkPeeringControllingType != NetworkPeeringControllingTypeNone {
+	if r.NetworkPeeringControllingType != ExternalNetworkPeeringProvider {
 		apinetStatusPeerings := metalnetNetworkPeeringsStatusToNetworkPeeringsStatus(metalnetNetwork.Status.Peerings)
 		if !equality.Semantic.DeepEqual(network.Status.Peerings[r.PartitionName], apinetStatusPeerings) {
 			log.V(1).Info("Patching apinet network status", "status", apinetStatusPeerings)
@@ -189,7 +189,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	}
 	var peeredIDs []int32
 	var peeredPrefixes []metalnetv1alpha1.PeeredPrefix
-	if r.NetworkPeeringControllingType != NetworkPeeringControllingTypeNone {
+	if r.NetworkPeeringControllingType != ExternalNetworkPeeringProvider {
 		for _, peering := range network.Spec.Peerings {
 			id, err := networkid.ParseVNI(peering.ID)
 			if err != nil {

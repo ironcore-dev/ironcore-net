@@ -202,7 +202,7 @@ func SetupTestWithNetworkPeeringControllingTypeNone(metalnetNs *corev1.Namespace
 			MetalnetClient:                k8sManager.GetClient(),
 			PartitionName:                 partitionName,
 			MetalnetNamespace:             metalnetNs.Name,
-			NetworkPeeringControllingType: NetworkPeeringControllingTypeNone,
+			NetworkPeeringControllingType: ExternalNetworkPeeringProvider,
 		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
 
 		Expect((&MetalnetNodeReconciler{

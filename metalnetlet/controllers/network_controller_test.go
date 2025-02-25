@@ -146,7 +146,7 @@ var _ = Describe("NetworkController", func() {
 		metalnetNs := SetupNamespace(&k8sClient)
 		SetupTestWithNetworkPeeringControllingTypeNone(metalnetNs)
 
-		It("should create metalnet networks for apinet networks without peerings information if NetworkPeeringControllingType is set to None", func(ctx SpecContext) {
+		It("should create metalnet networks for apinet networks without peerings information if NetworkPeeringProviderType is set to External", func(ctx SpecContext) {
 			By("creating a apinet network-1")
 			network1 := &apinetv1alpha1.Network{
 				ObjectMeta: metav1.ObjectMeta{
@@ -266,7 +266,6 @@ var _ = Describe("NetworkController", func() {
 			By("asserting the corresponding apinet network is gone as well")
 			Expect(k8sClient.Get(ctx, client.ObjectKeyFromObject(metalnetNetwork1), metalnetNetwork1)).To(Satisfy(apierrors.IsNotFound))
 			Expect(k8sClient.Get(ctx, client.ObjectKeyFromObject(metalnetNetwork2), metalnetNetwork2)).To(Satisfy(apierrors.IsNotFound))
-
 		})
 	})
 })
