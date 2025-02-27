@@ -57,7 +57,7 @@ func main() {
 	var configOptions config.GetConfigOptions
 	var metalnetKubeconfig string
 	var metalnetNamespace string
-	var networkPeeringProvider string
+	var disableNetworkPeering bool
 
 	flag.StringVar(&name, "name", "", "The name of the partition the metalnetlet represents (required).")
 	flag.StringToStringVar(&nodeLabels, "node-label", nodeLabels, "Additional labels to add to the nodes.")
@@ -70,10 +70,9 @@ func main() {
 	configOptions.BindFlags(flag.CommandLine)
 	flag.StringVar(&metalnetKubeconfig, "metalnet-kubeconfig", "", "Metalnet kubeconfig to use.")
 	flag.StringVar(&metalnetNamespace, "metalnet-namespace", corev1.NamespaceDefault, "Metalnet namespace to use.")
-	flag.StringVar(&networkPeeringProvider, "network-peering-provider", "BuiltIn",
+	flag.BoolVar(&disableNetworkPeering, "disable-network-peering", false,
 		"Whether to use metalnet for populating the peered prefixes or not. "+
-			"If unset or 'BuiltIn' is passed metalnetlet will populate the peered prefixes for the lowlevel Network resources."+
-			"If 'External' is passed, metalnetlet will not populate any peered prefixes for the metalnet-related Network resources.")
+			"If disabled, metalnetlet will not populate any peered prefixes for the metalnet-related Network resources.")
 
 	opts := zap.Options{
 		Development: true,
@@ -158,11 +157,11 @@ func main() {
 	}
 
 	if err := (&controllers.NetworkReconciler{
-		Client:                        mgr.GetClient(),
-		MetalnetClient:                metalnetCluster.GetClient(),
-		PartitionName:                 name,
-		MetalnetNamespace:             metalnetNamespace,
-		NetworkPeeringControllingType: controllers.NetworkPeeringProviderType(networkPeeringProvider),
+		Client:                mgr.GetClient(),
+		MetalnetClient:        metalnetCluster.GetClient(),
+		PartitionName:         name,
+		MetalnetNamespace:     metalnetNamespace,
+		DisableNetworkPeering: disableNetworkPeering,
 	}).SetupWithManager(mgr, metalnetCluster.GetCache()); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Network")
 		os.Exit(1)
