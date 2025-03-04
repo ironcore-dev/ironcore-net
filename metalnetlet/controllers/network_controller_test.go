@@ -144,9 +144,9 @@ var _ = Describe("NetworkController", func() {
 	var _ = Describe("NetworkPeeringController", func() {
 		ns := SetupNamespace(&k8sClient)
 		metalnetNs := SetupNamespace(&k8sClient)
-		SetupTestWithNetworkPeeringControllingTypeNone(metalnetNs)
+		SetupTestWithNetworkPeeringDisabled(metalnetNs)
 
-		It("should create metalnet networks for apinet networks without peerings information if NetworkPeeringProviderType is set to External", func(ctx SpecContext) {
+		It("should create metalnet networks for apinet networks without peerings information if NetworkPeeringDisabled is set to true", func(ctx SpecContext) {
 			By("creating a apinet network-1")
 			network1 := &apinetv1alpha1.Network{
 				ObjectMeta: metav1.ObjectMeta{

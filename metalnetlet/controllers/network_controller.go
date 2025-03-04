@@ -34,7 +34,7 @@ type NetworkReconciler struct {
 
 	MetalnetNamespace string
 
-	DisableNetworkPeering bool
+	NetworkPeeringDisabled bool
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
@@ -116,7 +116,7 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 }
 
 func (r *NetworkReconciler) updateApinetNetworkStatus(ctx context.Context, log logr.Logger, network *apinetv1alpha1.Network, metalnetNetwork *metalnetv1alpha1.Network) error {
-	if !r.DisableNetworkPeering {
+	if !r.NetworkPeeringDisabled {
 		apinetStatusPeerings := metalnetNetworkPeeringsStatusToNetworkPeeringsStatus(metalnetNetwork.Status.Peerings)
 		if !equality.Semantic.DeepEqual(network.Status.Peerings[r.PartitionName], apinetStatusPeerings) {
 			log.V(1).Info("Patching apinet network status", "status", apinetStatusPeerings)
@@ -182,7 +182,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	}
 	var peeredIDs []int32
 	var peeredPrefixes []metalnetv1alpha1.PeeredPrefix
-	if !r.DisableNetworkPeering {
+	if !r.NetworkPeeringDisabled {
 		for _, peering := range network.Spec.Peerings {
 			id, err := networkid.ParseVNI(peering.ID)
 			if err != nil {

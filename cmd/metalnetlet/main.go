@@ -71,8 +71,7 @@ func main() {
 	flag.StringVar(&metalnetKubeconfig, "metalnet-kubeconfig", "", "Metalnet kubeconfig to use.")
 	flag.StringVar(&metalnetNamespace, "metalnet-namespace", corev1.NamespaceDefault, "Metalnet namespace to use.")
 	flag.BoolVar(&disableNetworkPeering, "disable-network-peering", false,
-		"Whether to use metalnet for populating the peered prefixes or not. "+
-			"If disabled, metalnetlet will not populate any peered prefixes for the metalnet-related Network resources.")
+		"Disable the metalnet based network peering. If set to true the network peering is handled externally.")
 
 	opts := zap.Options{
 		Development: true,
@@ -157,11 +156,11 @@ func main() {
 	}
 
 	if err := (&controllers.NetworkReconciler{
-		Client:                mgr.GetClient(),
-		MetalnetClient:        metalnetCluster.GetClient(),
-		PartitionName:         name,
-		MetalnetNamespace:     metalnetNamespace,
-		DisableNetworkPeering: disableNetworkPeering,
+		Client:                 mgr.GetClient(),
+		MetalnetClient:         metalnetCluster.GetClient(),
+		PartitionName:          name,
+		MetalnetNamespace:      metalnetNamespace,
+		NetworkPeeringDisabled: disableNetworkPeering,
 	}).SetupWithManager(mgr, metalnetCluster.GetCache()); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Network")
 		os.Exit(1)
