@@ -186,6 +186,55 @@ func SetupTest(metalnetNs *corev1.Namespace) {
 	})
 }
 
+func SetupTestWithNetworkPeeringDisabled(metalnetNs *corev1.Namespace) {
+	BeforeEach(func(ctx SpecContext) {
+		k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
+			Scheme: scheme.Scheme,
+			Metrics: metricsserver.Options{
+				BindAddress: "0",
+			},
+		})
+		Expect(err).ToNot(HaveOccurred())
+
+		// register reconciler here
+		Expect((&NetworkReconciler{
+			Client:                 k8sManager.GetClient(),
+			MetalnetClient:         k8sManager.GetClient(),
+			PartitionName:          partitionName,
+			MetalnetNamespace:      metalnetNs.Name,
+			NetworkPeeringDisabled: true,
+		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
+
+		Expect((&MetalnetNodeReconciler{
+			Client:         k8sManager.GetClient(),
+			MetalnetClient: k8sManager.GetClient(),
+			PartitionName:  partitionName,
+			NodeLabels:     nodeLabels,
+		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
+
+		Expect((&NetworkInterfaceReconciler{
+			Client:            k8sManager.GetClient(),
+			MetalnetClient:    k8sManager.GetClient(),
+			PartitionName:     partitionName,
+			MetalnetNamespace: metalnetNs.Name,
+		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
+
+		Expect((&InstanceReconciler{
+			Client:            k8sManager.GetClient(),
+			MetalnetClient:    k8sManager.GetClient(),
+			PartitionName:     partitionName,
+			MetalnetNamespace: metalnetNs.Name,
+		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
+
+		mgrCtx, cancel := context.WithCancel(context.Background())
+		DeferCleanup(cancel)
+		go func() {
+			defer GinkgoRecover()
+			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
+		}()
+	})
+}
+
 func SetupMetalnetNode() *corev1.Node {
 	return SetupObjectStruct[*corev1.Node](&k8sClient, func(node *corev1.Node) {
 		*node = corev1.Node{
