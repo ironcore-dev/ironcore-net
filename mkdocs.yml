@@ -1,0 +1,65 @@
+site_name: IronCore / ironcore-net
+repo_url: https://github.com/ironcore-dev/ironcore-net/
+edit_uri: edit/main/docs/
+theme:
+  icon:
+    repo: fontawesome/brands/github
+  features:
+  - navigation.instant
+  - navigation.tracking
+  - navigation.indexes
+  - navigation.top
+  name: material
+  logo: https://raw.githubusercontent.com/ironcore-dev/ironcore/main/docs/assets/logo.svg
+  favicon: https://raw.githubusercontent.com/ironcore-dev/ironcore/main/docs/assets/favicon/favicon.ico
+  palette:
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: white
+    toggle:
+      icon: material/weather-night
+      name: Switch to dark mode
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: black
+    toggle:
+      icon: material/weather-sunny
+      name: Switch to light mode
+  font:
+    text: 'Work Sans'
+
+plugins:
+- search
+
+markdown_extensions:
+- pymdownx.highlight
+- pymdownx.superfences:
+    custom_fences:
+    - name: mermaid
+      class: mermaid
+      format: !!python/name:pymdownx.superfences.fence_code_format
+- pymdownx.snippets
+- codehilite
+- admonition
+- toc:
+    permalink: true
+
+nav:
+- Home: README.md
+
+- Concepts:
+  - IP lifecycle: concepts/ip-lifecycle.md
+  - Ironcore integration: concepts/ironcore-integration.md
+  - Network lifecycle: concepts/network-lifecycle.md
+  - Objects: concepts/objects.md
+
+- Developer Guide:
+  - Local Setup: development/setup.md
+
+- API Reference:
+  - Core: api-reference/core.md
+
+extra:
+  social:
+  - icon: fontawesome/brands/github
+    link: https://github.com/ironcore-dev/ironcore-net
