@@ -11,8 +11,8 @@ present, it means it's taken. Otherwise, at least during the time of
 inspection, the `NetworkID` is vacant and ready to be claimed.
 
 The `NetworkID` and `Network` are tied together in the
-[`Network`'s store `BeforeCreate` hook](../../internal/registry/network/storage.go) using
-the [`networkidallocator`](../../internal/registry/network/networkidallocator/networkidallocator.go).
+[`Network`'s store `BeforeCreate` hook](https://github.com/ironcore-dev/ironcore-net/blob/main/internal/registry/network/storage.go) using
+the [`networkidallocator`](https://github.com/ironcore-dev/ironcore-net/blob/main/internal/registry/network/networkidallocator/networkidallocator.go).
 
 The `Allocator` tries to create `NetworkID`s with the `claimRef` pointing
 to the `Network` about to be created. It continues to do so until it either
