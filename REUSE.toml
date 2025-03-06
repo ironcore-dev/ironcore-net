@@ -19,7 +19,8 @@ path = [
     "hack/**",
     "client-go/openapi/api_violations.report",
     "models-schema/main.go.tmpl",
-    "REUSE.toml"
+    "REUSE.toml",
+    "mkdocs.yml"
 ]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2023 SAP SE or an SAP affiliate company and IronCore contributors"
