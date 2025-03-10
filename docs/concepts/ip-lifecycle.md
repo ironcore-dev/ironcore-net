@@ -62,7 +62,7 @@ metadata:
   name: my-public-nic
 spec:
   networkRef:
-    name: my-networ
+    name: my-network
   nodeRef:
     name: my-node
   ips:
