@@ -1,11 +1,11 @@
 name: Publish docs via GitHub Pages 
 on:
+  pull_request:
+    types: [ assigned, opened, synchronize, reopened ]
   push:
     branches:
       - main
       - osc/enh/mkdocs_base_doc 
-  pull_request:
-    types: [ assigned, opened, synchronize, reopened ]
 permissions:
   contents: write
 jobs:
@@ -13,7 +13,7 @@ jobs:
     name: Deploy docs
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main branch
+      - name: Checkout main
         uses: actions/checkout@v4
       - name: Configure Git Credentials
         run: |
