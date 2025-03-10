@@ -1,7 +1,7 @@
 name: Publish docs via GitHub Pages 
 on:
-  pull_request:
-    types: [ assigned, opened, synchronize, reopened ]
+  pull_request_target:
+    types: [ opened, reopened, synchronize ]
   push:
     branches:
       - main
@@ -31,5 +31,5 @@ jobs:
             mkdocs-material-
       - run: pip install mkdocs-material 
       - run: mkdocs gh-deploy --force
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
