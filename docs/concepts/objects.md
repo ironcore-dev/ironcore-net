@@ -15,6 +15,8 @@ Upon its creation, a public IP object gets assigned an available
 IP. When deleting the IP, the corresponding public IP is released
 again.
 
+Example manifest:
+
 ```yaml
 apiVersion: core.apinet.ironcore.dev/v1alpha1
 kind: IP
@@ -28,7 +30,7 @@ spec:
   #   name: my-nic
 ```
 
-## `Network`
+## Network
 
 To set up a networking infrastructure, the primary object to create
 is a `Network`. A `Network` is an isolated networking domain.
@@ -50,7 +52,7 @@ metadata:
 
 When creating a `Network`, its `spec.id` is automatically allocated.
 
-## `NetworkInterface`
+## NetworkInterface
 
 A `NetworkInterface` is the 'default' peer inside a `Network`. To
 create a `NetworkInterface`, the target `Node` and primary internal
@@ -96,7 +98,7 @@ status:
   state: Ready
 ```
 
-## `Instance`
+## Instance
 
 An `Instance` allows deploying dynamic network functions onto `Node`s
 inside the cluster. Currently, only `Instance`s of `type: LoadBalancer`
@@ -109,7 +111,7 @@ If the `nodeRef` field is empty, the `scheduler` automatically
 determines a suitable `Node` for the `Instance` to run on. Scheduling
 of `Instance`s can be influenced by using `spec.affinity`, allowing
 for node-affinity and instance anti-affinity. This is especially
-useful when deploying load balancer instances when there should only
+useful while deploying loadbalancer instances, when there should only
 be a single instance per topology domain.
 
 Example manifest:
@@ -129,7 +131,7 @@ spec:
   - 10.0.0.2
 ```
 
-## `LoadBalancer`
+## LoadBalancer
 
 A `LoadBalancer` manages its `Instance`s and declares its routing
 by its corresponding `LoadBalancerRouting`. Under the hood, a
@@ -141,6 +143,8 @@ per `LoadBalancer` a requirement.
 
 For now, everytime the IPs of a `LoadBalancer` are updated,
 all its `Instance`s are updated (done by the `DaemonSet` controller).
+
+Example manifest:
 
 ```yaml
 apiVersion: core.apinet.ironcore.dev/v1alpha1
@@ -158,7 +162,7 @@ spec:
   template: {}
 ```
 
-### `NetworkPolicy`
+## NetworkPolicy
 
 A `NetworkPolicy` limits traffic to and from various objects like `NetworkInterfaces`, `LoadBalancers` etc. for the target objects within a specific network. 
 
@@ -205,7 +209,7 @@ spec:
       port: 8080
 ```
 
-## `NATGateway`
+## NATGateway
 
 A `NATGateway` allows NAT-ing external IPs to multiple target
 `NetworkInterface`s inside a network. The NATed IPs are managed

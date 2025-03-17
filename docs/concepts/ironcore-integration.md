@@ -1,4 +1,4 @@
-# `ironcore` integration
+# IronCore integration
 
 `ironcore-net` controls networking over multiple peers
 and intelligently manages functions. It can be operated and
@@ -7,14 +7,14 @@ is only realized via `apinetlet`.
 
 ## Mapped objects / interaction
 
-The `apinetlet` is a controller that has access to an `ironcore`-enabled
-cluster and an `ironcore-net`-enabled cluster. It maps objects of
+The `apinetlet` is a controller that has access to an `ironcore` enabled
+cluster and an `ironcore-net` enabled cluster. It maps objects of
 `ironcore`'s `networking` group to corresponding entities in
 `ironcore-net`, if possible.
 
-### `Network`
+## Network
 
-When an `networking.ironcore.dev/Network` is created, a corresponding
+When a `networking.ironcore.dev/Network` is created, a corresponding
 `core.apinet.ironcore.dev/Network` is created in the `apinet` cluster.
 The name of the `Network` in the `apinet` cluster is the `uid` of the
 `Network` in the `ironcore` cluster.
@@ -22,13 +22,13 @@ The name of the `Network` in the `apinet` cluster is the `uid` of the
 Once created and with an allocated `ID`, the `ironcore` `Network` will
 be patched with the corresponding provider ID of the `apinet` `Network` and
 set to `state: Available`.
-The provider ID format & parsing can be found in [`provider.go`](../../apinetlet/provider/provider.go).
+The provider ID format & parsing can be found in [`provider.go`](https://github.com/ironcore-dev/ironcore-net/blob/main/apinetlet/provider/provider.go).
 
 If `ironcore` `Network` has peerings, then they will be translated and 
 patched into `apinet` `Network`. More details can be found here 
 [`Network Peering`](./network-lifecycle.md#network-peering)
 
-### `LoadBalancer`
+## LoadBalancer
 
 For a `networking.ironcore.dev/LoadBalancer` a corresponding
 `core.apinet.ironcore.dev/LoadBalancer` is created, also having the
@@ -45,7 +45,7 @@ For its instances, the `apinet` `LoadBalancer` is created with a `template`
 that specifies instance anti-affinity to ensure instances are distributed
 cross-zone.
 
-### `NetworkPolicy`
+## NetworkPolicy
 
 For a `networking.ironcore.dev/NetworkPolicy` a corresponding
 `core.apinet.ironcore.dev/NetworkPolicy` is created in the `apinet` cluster.
@@ -60,7 +60,7 @@ When a `NetworkPolicy` is applied, a `NetworkPolicyRule` object is created with 
 for example refer to [NetworkPolicy object](./objects.md#networkpolicy)
 
 
-### `NATGateway`
+## NATGateway
 
 For a `networking.ironcore.dev/NATGateway` a corresponding
 `core.apinet.ironcore.dev/NATGateway` is created, also having the
@@ -72,7 +72,7 @@ The `apinet` `NATGateway` will try to target all `NetworkInterface`s
 in its `Network` that share an `IPFamily` but don't have a public
 IP for that family and no other `NATGateway` claiming it.
 
-### `NetworkInterface`
+## NetworkInterface
 
 Since the location of an `apinet` `NetworkInterface` depends on an
 `apinet` `Node`, `apinetlet` can *not* create a mapping `apinet`
@@ -85,7 +85,7 @@ an `apinet` `NetworkInterface` for each desired `ironcore`
 the `MachinePool` implementor has to patch the `ironcore`'s
 `NetworkInterface` `spec.providerID` to the provider ID of the
 `apinet` `NetworkInterface` (again, see
-[`provider.go`](../../apinetlet/provider/provider.go) on how to obtain
+[`provider.go`](https://github.com/ironcore-dev/ironcore-net/blob/main/apinetlet/provider/provider.go) on how to obtain
 / format the provider ID correctly).
 
 Once the `providerID` of the `ironcore` `NetworkInterface` is set,

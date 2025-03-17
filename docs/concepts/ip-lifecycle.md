@@ -15,8 +15,8 @@ present, it means it's taken. Otherwise, at least during the time of
 inspection, the `IPAddress` is vacant and ready to be claimed.
 
 The `IPAddress` and `IP` are tied together in the
-[`IP`'s store `BeforeCreate` hook](../../internal/registry/ip/storage.go) using
-the [`ipaddressallocator`](../../internal/registry/ip/ipaddressallocator/ipaddressallocator.go).
+[`IP`'s store `BeforeCreate` hook](https://github.com/ironcore-dev/ironcore-net/blob/main/internal/registry/ip/storage.go) using
+the [`ipaddressallocator`](https://github.com/ironcore-dev/ironcore-net/blob/main/internal/registry/ip/ipaddressallocator/ipaddressallocator.go).
 
 The `Allocator` tries to create `IPAddress`es with the `claimRef` pointing
 to the `IP` about to be created. It continues to do so until it either
@@ -62,7 +62,7 @@ metadata:
   name: my-public-nic
 spec:
   networkRef:
-    name: my-networ
+    name: my-network
   nodeRef:
     name: my-node
   ips:
