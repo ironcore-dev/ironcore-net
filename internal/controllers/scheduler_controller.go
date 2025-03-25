@@ -468,7 +468,7 @@ func (r *SchedulerReconciler) reconcileExists(
 		return ctrl.Result{}, fmt.Errorf("error getting nodes for instance: %w", err)
 	}
 	if len(nodes) == 0 {
-		r.EventRecorder.Event(inst, corev1.EventTypeNormal, outOfCapacity, "No nodes available to schedule instance on")
+		r.Event(inst, corev1.EventTypeNormal, outOfCapacity, "No nodes available to schedule instance on")
 		return ctrl.Result{}, nil
 	}
 

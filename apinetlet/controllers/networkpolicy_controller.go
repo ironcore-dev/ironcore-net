@@ -329,11 +329,11 @@ func (r *NetworkPolicyReconciler) fetchIPsFromNetworkInterfaces(ctx context.Cont
 
 		for _, ip := range nic.Spec.IPs {
 			ipFamily := corev1.IPv4Protocol
-			if ip.Addr.Is6() {
+			if ip.Is6() {
 				ipFamily = corev1.IPv6Protocol
 			}
 			ips = append(ips, apinetv1alpha1.ObjectIP{
-				Prefix:   net.IPPrefix{Prefix: netip.PrefixFrom(ip.Addr, ip.Addr.BitLen())},
+				Prefix:   net.IPPrefix{Prefix: netip.PrefixFrom(ip.Addr, ip.BitLen())},
 				IPFamily: ipFamily,
 			})
 		}
@@ -364,7 +364,7 @@ func (r *NetworkPolicyReconciler) fetchIPsFromLoadBalancers(ctx context.Context,
 		for _, ip := range lb.Spec.IPs {
 			// TODO: handle LoadBalancerIP when only IPFamily is specified to allocate a random IP.
 			ips = append(ips, apinetv1alpha1.ObjectIP{
-				Prefix:   net.IPPrefix{Prefix: netip.PrefixFrom(ip.IP.Addr, ip.IP.Addr.BitLen())},
+				Prefix:   net.IPPrefix{Prefix: netip.PrefixFrom(ip.IP.Addr, ip.IP.BitLen())},
 				IPFamily: ip.IPFamily,
 			})
 		}

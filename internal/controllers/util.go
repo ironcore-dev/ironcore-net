@@ -101,7 +101,7 @@ func ReplaceDaemonSetInstanceNodeNameNodeAffinity(affinity *v1alpha1.Affinity, n
 // avoid bad words.
 func ComputeHash(template *v1alpha1.InstanceTemplate, collisionCount *int32) string {
 	podTemplateSpecHasher := fnv.New32a()
-	_, _ = podTemplateSpecHasher.Write([]byte(fmt.Sprintf("%#+v", *template)))
+	_, _ = fmt.Fprintf(podTemplateSpecHasher, "%#+v", *template)
 
 	// Add collisionCount in the hash if it exists.
 	if collisionCount != nil {
