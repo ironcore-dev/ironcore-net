@@ -26,7 +26,7 @@ import (
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/apiserver/pkg/server/options"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
-	utilversion "k8s.io/apiserver/pkg/util/version"
+	"k8s.io/component-base/version"
 	netutils "k8s.io/utils/net"
 )
 
@@ -119,7 +119,7 @@ func (o *IronCoreNetServerOptions) Config() (*apiserver.Config, error) {
 
 	serverConfig := genericapiserver.NewRecommendedConfig(apiserver.Codecs)
 
-	serverConfig.EffectiveVersion = utilversion.NewEffectiveVersion("1.0")
+	serverConfig.EffectiveVersion = version.NewEffectiveVersion("1.0")
 
 	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(apinetopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(apiserver.Scheme))
 	serverConfig.OpenAPIConfig.Info.Title = "ironcore-net-api"

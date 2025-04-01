@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	applyconfigurationscorev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,32 +25,33 @@ type NATTablesGetter interface {
 
 // NATTableInterface has methods to work with NATTable resources.
 type NATTableInterface interface {
-	Create(ctx context.Context, nATTable *v1alpha1.NATTable, opts v1.CreateOptions) (*v1alpha1.NATTable, error)
-	Update(ctx context.Context, nATTable *v1alpha1.NATTable, opts v1.UpdateOptions) (*v1alpha1.NATTable, error)
+	Create(ctx context.Context, nATTable *corev1alpha1.NATTable, opts v1.CreateOptions) (*corev1alpha1.NATTable, error)
+	Update(ctx context.Context, nATTable *corev1alpha1.NATTable, opts v1.UpdateOptions) (*corev1alpha1.NATTable, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.NATTable, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.NATTableList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*corev1alpha1.NATTable, error)
+	List(ctx context.Context, opts v1.ListOptions) (*corev1alpha1.NATTableList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.NATTable, err error)
-	Apply(ctx context.Context, nATTable *corev1alpha1.NATTableApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.NATTable, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1alpha1.NATTable, err error)
+	Apply(ctx context.Context, nATTable *applyconfigurationscorev1alpha1.NATTableApplyConfiguration, opts v1.ApplyOptions) (result *corev1alpha1.NATTable, err error)
 	NATTableExpansion
 }
 
 // nATTables implements NATTableInterface
 type nATTables struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.NATTable, *v1alpha1.NATTableList, *corev1alpha1.NATTableApplyConfiguration]
+	*gentype.ClientWithListAndApply[*corev1alpha1.NATTable, *corev1alpha1.NATTableList, *applyconfigurationscorev1alpha1.NATTableApplyConfiguration]
 }
 
 // newNATTables returns a NATTables
 func newNATTables(c *CoreV1alpha1Client, namespace string) *nATTables {
 	return &nATTables{
-		gentype.NewClientWithListAndApply[*v1alpha1.NATTable, *v1alpha1.NATTableList, *corev1alpha1.NATTableApplyConfiguration](
+		gentype.NewClientWithListAndApply[*corev1alpha1.NATTable, *corev1alpha1.NATTableList, *applyconfigurationscorev1alpha1.NATTableApplyConfiguration](
 			"nattables",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.NATTable { return &v1alpha1.NATTable{} },
-			func() *v1alpha1.NATTableList { return &v1alpha1.NATTableList{} }),
+			func() *corev1alpha1.NATTable { return &corev1alpha1.NATTable{} },
+			func() *corev1alpha1.NATTableList { return &corev1alpha1.NATTableList{} },
+		),
 	}
 }

@@ -6,142 +6,33 @@
 package fake
 
 import (
-	"context"
-	json "encoding/json"
-	"fmt"
-
 	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	testing "k8s.io/client-go/testing"
+	typedcorev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned/typed/core/v1alpha1"
+	gentype "k8s.io/client-go/gentype"
 )
 
-// FakeNATTables implements NATTableInterface
-type FakeNATTables struct {
+// fakeNATTables implements NATTableInterface
+type fakeNATTables struct {
+	*gentype.FakeClientWithListAndApply[*v1alpha1.NATTable, *v1alpha1.NATTableList, *corev1alpha1.NATTableApplyConfiguration]
 	Fake *FakeCoreV1alpha1
-	ns   string
 }
 
-var nattablesResource = v1alpha1.SchemeGroupVersion.WithResource("nattables")
-
-var nattablesKind = v1alpha1.SchemeGroupVersion.WithKind("NATTable")
-
-// Get takes name of the nATTable, and returns the corresponding nATTable object, and an error if there is any.
-func (c *FakeNATTables) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.NATTable, err error) {
-	emptyResult := &v1alpha1.NATTable{}
-	obj, err := c.Fake.
-		Invokes(testing.NewGetActionWithOptions(nattablesResource, c.ns, name, options), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
+func newFakeNATTables(fake *FakeCoreV1alpha1, namespace string) typedcorev1alpha1.NATTableInterface {
+	return &fakeNATTables{
+		gentype.NewFakeClientWithListAndApply[*v1alpha1.NATTable, *v1alpha1.NATTableList, *corev1alpha1.NATTableApplyConfiguration](
+			fake.Fake,
+			namespace,
+			v1alpha1.SchemeGroupVersion.WithResource("nattables"),
+			v1alpha1.SchemeGroupVersion.WithKind("NATTable"),
+			func() *v1alpha1.NATTable { return &v1alpha1.NATTable{} },
+			func() *v1alpha1.NATTableList { return &v1alpha1.NATTableList{} },
+			func(dst, src *v1alpha1.NATTableList) { dst.ListMeta = src.ListMeta },
+			func(list *v1alpha1.NATTableList) []*v1alpha1.NATTable { return gentype.ToPointerSlice(list.Items) },
+			func(list *v1alpha1.NATTableList, items []*v1alpha1.NATTable) {
+				list.Items = gentype.FromPointerSlice(items)
+			},
+		),
+		fake,
 	}
-	return obj.(*v1alpha1.NATTable), err
-}
-
-// List takes label and field selectors, and returns the list of NATTables that match those selectors.
-func (c *FakeNATTables) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.NATTableList, err error) {
-	emptyResult := &v1alpha1.NATTableList{}
-	obj, err := c.Fake.
-		Invokes(testing.NewListActionWithOptions(nattablesResource, nattablesKind, c.ns, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-
-	label, _, _ := testing.ExtractFromListOptions(opts)
-	if label == nil {
-		label = labels.Everything()
-	}
-	list := &v1alpha1.NATTableList{ListMeta: obj.(*v1alpha1.NATTableList).ListMeta}
-	for _, item := range obj.(*v1alpha1.NATTableList).Items {
-		if label.Matches(labels.Set(item.Labels)) {
-			list.Items = append(list.Items, item)
-		}
-	}
-	return list, err
-}
-
-// Watch returns a watch.Interface that watches the requested nATTables.
-func (c *FakeNATTables) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return c.Fake.
-		InvokesWatch(testing.NewWatchActionWithOptions(nattablesResource, c.ns, opts))
-
-}
-
-// Create takes the representation of a nATTable and creates it.  Returns the server's representation of the nATTable, and an error, if there is any.
-func (c *FakeNATTables) Create(ctx context.Context, nATTable *v1alpha1.NATTable, opts v1.CreateOptions) (result *v1alpha1.NATTable, err error) {
-	emptyResult := &v1alpha1.NATTable{}
-	obj, err := c.Fake.
-		Invokes(testing.NewCreateActionWithOptions(nattablesResource, c.ns, nATTable, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.NATTable), err
-}
-
-// Update takes the representation of a nATTable and updates it. Returns the server's representation of the nATTable, and an error, if there is any.
-func (c *FakeNATTables) Update(ctx context.Context, nATTable *v1alpha1.NATTable, opts v1.UpdateOptions) (result *v1alpha1.NATTable, err error) {
-	emptyResult := &v1alpha1.NATTable{}
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateActionWithOptions(nattablesResource, c.ns, nATTable, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.NATTable), err
-}
-
-// Delete takes name of the nATTable and deletes it. Returns an error if one occurs.
-func (c *FakeNATTables) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(nattablesResource, c.ns, name, opts), &v1alpha1.NATTable{})
-
-	return err
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *FakeNATTables) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionActionWithOptions(nattablesResource, c.ns, opts, listOpts)
-
-	_, err := c.Fake.Invokes(action, &v1alpha1.NATTableList{})
-	return err
-}
-
-// Patch applies the patch and returns the patched nATTable.
-func (c *FakeNATTables) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.NATTable, err error) {
-	emptyResult := &v1alpha1.NATTable{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(nattablesResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.NATTable), err
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied nATTable.
-func (c *FakeNATTables) Apply(ctx context.Context, nATTable *corev1alpha1.NATTableApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.NATTable, err error) {
-	if nATTable == nil {
-		return nil, fmt.Errorf("nATTable provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(nATTable)
-	if err != nil {
-		return nil, err
-	}
-	name := nATTable.Name
-	if name == nil {
-		return nil, fmt.Errorf("nATTable.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.NATTable{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(nattablesResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.NATTable), err
 }

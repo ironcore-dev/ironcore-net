@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apicorev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore-net/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // NATGateways.
 type NATGatewayInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.NATGatewayLister
+	Lister() corev1alpha1.NATGatewayLister
 }
 
 type nATGatewayInformer struct {
@@ -58,7 +58,7 @@ func NewFilteredNATGatewayInformer(client versioned.Interface, namespace string,
 				return client.CoreV1alpha1().NATGateways(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&corev1alpha1.NATGateway{},
+		&apicorev1alpha1.NATGateway{},
 		resyncPeriod,
 		indexers,
 	)
@@ -69,9 +69,9 @@ func (f *nATGatewayInformer) defaultInformer(client versioned.Interface, resyncP
 }
 
 func (f *nATGatewayInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&corev1alpha1.NATGateway{}, f.defaultInformer)
+	return f.factory.InformerFor(&apicorev1alpha1.NATGateway{}, f.defaultInformer)
 }
 
-func (f *nATGatewayInformer) Lister() v1alpha1.NATGatewayLister {
-	return v1alpha1.NewNATGatewayLister(f.Informer().GetIndexer())
+func (f *nATGatewayInformer) Lister() corev1alpha1.NATGatewayLister {
+	return corev1alpha1.NewNATGatewayLister(f.Informer().GetIndexer())
 }

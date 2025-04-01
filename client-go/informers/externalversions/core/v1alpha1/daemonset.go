@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apicorev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore-net/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // DaemonSets.
 type DaemonSetInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.DaemonSetLister
+	Lister() corev1alpha1.DaemonSetLister
 }
 
 type daemonSetInformer struct {
@@ -58,7 +58,7 @@ func NewFilteredDaemonSetInformer(client versioned.Interface, namespace string, 
 				return client.CoreV1alpha1().DaemonSets(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&corev1alpha1.DaemonSet{},
+		&apicorev1alpha1.DaemonSet{},
 		resyncPeriod,
 		indexers,
 	)
@@ -69,9 +69,9 @@ func (f *daemonSetInformer) defaultInformer(client versioned.Interface, resyncPe
 }
 
 func (f *daemonSetInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&corev1alpha1.DaemonSet{}, f.defaultInformer)
+	return f.factory.InformerFor(&apicorev1alpha1.DaemonSet{}, f.defaultInformer)
 }
 
-func (f *daemonSetInformer) Lister() v1alpha1.DaemonSetLister {
-	return v1alpha1.NewDaemonSetLister(f.Informer().GetIndexer())
+func (f *daemonSetInformer) Lister() corev1alpha1.DaemonSetLister {
+	return corev1alpha1.NewDaemonSetLister(f.Informer().GetIndexer())
 }

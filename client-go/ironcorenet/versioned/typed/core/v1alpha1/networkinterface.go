@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	applyconfigurationscorev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type NetworkInterfacesGetter interface {
 
 // NetworkInterfaceInterface has methods to work with NetworkInterface resources.
 type NetworkInterfaceInterface interface {
-	Create(ctx context.Context, networkInterface *v1alpha1.NetworkInterface, opts v1.CreateOptions) (*v1alpha1.NetworkInterface, error)
-	Update(ctx context.Context, networkInterface *v1alpha1.NetworkInterface, opts v1.UpdateOptions) (*v1alpha1.NetworkInterface, error)
+	Create(ctx context.Context, networkInterface *corev1alpha1.NetworkInterface, opts v1.CreateOptions) (*corev1alpha1.NetworkInterface, error)
+	Update(ctx context.Context, networkInterface *corev1alpha1.NetworkInterface, opts v1.UpdateOptions) (*corev1alpha1.NetworkInterface, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, networkInterface *v1alpha1.NetworkInterface, opts v1.UpdateOptions) (*v1alpha1.NetworkInterface, error)
+	UpdateStatus(ctx context.Context, networkInterface *corev1alpha1.NetworkInterface, opts v1.UpdateOptions) (*corev1alpha1.NetworkInterface, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.NetworkInterface, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.NetworkInterfaceList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*corev1alpha1.NetworkInterface, error)
+	List(ctx context.Context, opts v1.ListOptions) (*corev1alpha1.NetworkInterfaceList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.NetworkInterface, err error)
-	Apply(ctx context.Context, networkInterface *corev1alpha1.NetworkInterfaceApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.NetworkInterface, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1alpha1.NetworkInterface, err error)
+	Apply(ctx context.Context, networkInterface *applyconfigurationscorev1alpha1.NetworkInterfaceApplyConfiguration, opts v1.ApplyOptions) (result *corev1alpha1.NetworkInterface, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, networkInterface *corev1alpha1.NetworkInterfaceApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.NetworkInterface, err error)
+	ApplyStatus(ctx context.Context, networkInterface *applyconfigurationscorev1alpha1.NetworkInterfaceApplyConfiguration, opts v1.ApplyOptions) (result *corev1alpha1.NetworkInterface, err error)
 	NetworkInterfaceExpansion
 }
 
 // networkInterfaces implements NetworkInterfaceInterface
 type networkInterfaces struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.NetworkInterface, *v1alpha1.NetworkInterfaceList, *corev1alpha1.NetworkInterfaceApplyConfiguration]
+	*gentype.ClientWithListAndApply[*corev1alpha1.NetworkInterface, *corev1alpha1.NetworkInterfaceList, *applyconfigurationscorev1alpha1.NetworkInterfaceApplyConfiguration]
 }
 
 // newNetworkInterfaces returns a NetworkInterfaces
 func newNetworkInterfaces(c *CoreV1alpha1Client, namespace string) *networkInterfaces {
 	return &networkInterfaces{
-		gentype.NewClientWithListAndApply[*v1alpha1.NetworkInterface, *v1alpha1.NetworkInterfaceList, *corev1alpha1.NetworkInterfaceApplyConfiguration](
+		gentype.NewClientWithListAndApply[*corev1alpha1.NetworkInterface, *corev1alpha1.NetworkInterfaceList, *applyconfigurationscorev1alpha1.NetworkInterfaceApplyConfiguration](
 			"networkinterfaces",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.NetworkInterface { return &v1alpha1.NetworkInterface{} },
-			func() *v1alpha1.NetworkInterfaceList { return &v1alpha1.NetworkInterfaceList{} }),
+			func() *corev1alpha1.NetworkInterface { return &corev1alpha1.NetworkInterface{} },
+			func() *corev1alpha1.NetworkInterfaceList { return &corev1alpha1.NetworkInterfaceList{} },
+		),
 	}
 }

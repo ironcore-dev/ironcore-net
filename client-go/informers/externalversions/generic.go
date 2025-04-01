@@ -6,7 +6,7 @@
 package externalversions
 
 import (
-	"fmt"
+	fmt "fmt"
 
 	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"

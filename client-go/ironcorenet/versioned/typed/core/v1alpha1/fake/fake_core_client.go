@@ -16,63 +16,63 @@ type FakeCoreV1alpha1 struct {
 }
 
 func (c *FakeCoreV1alpha1) DaemonSets(namespace string) v1alpha1.DaemonSetInterface {
-	return &FakeDaemonSets{c, namespace}
+	return newFakeDaemonSets(c, namespace)
 }
 
 func (c *FakeCoreV1alpha1) IPs(namespace string) v1alpha1.IPInterface {
-	return &FakeIPs{c, namespace}
+	return newFakeIPs(c, namespace)
 }
 
 func (c *FakeCoreV1alpha1) IPAddresses() v1alpha1.IPAddressInterface {
-	return &FakeIPAddresses{c}
+	return newFakeIPAddresses(c)
 }
 
 func (c *FakeCoreV1alpha1) Instances(namespace string) v1alpha1.InstanceInterface {
-	return &FakeInstances{c, namespace}
+	return newFakeInstances(c, namespace)
 }
 
 func (c *FakeCoreV1alpha1) LoadBalancers(namespace string) v1alpha1.LoadBalancerInterface {
-	return &FakeLoadBalancers{c, namespace}
+	return newFakeLoadBalancers(c, namespace)
 }
 
 func (c *FakeCoreV1alpha1) LoadBalancerRoutings(namespace string) v1alpha1.LoadBalancerRoutingInterface {
-	return &FakeLoadBalancerRoutings{c, namespace}
+	return newFakeLoadBalancerRoutings(c, namespace)
 }
 
 func (c *FakeCoreV1alpha1) NATGateways(namespace string) v1alpha1.NATGatewayInterface {
-	return &FakeNATGateways{c, namespace}
+	return newFakeNATGateways(c, namespace)
 }
 
 func (c *FakeCoreV1alpha1) NATGatewayAutoscalers(namespace string) v1alpha1.NATGatewayAutoscalerInterface {
-	return &FakeNATGatewayAutoscalers{c, namespace}
+	return newFakeNATGatewayAutoscalers(c, namespace)
 }
 
 func (c *FakeCoreV1alpha1) NATTables(namespace string) v1alpha1.NATTableInterface {
-	return &FakeNATTables{c, namespace}
+	return newFakeNATTables(c, namespace)
 }
 
 func (c *FakeCoreV1alpha1) Networks(namespace string) v1alpha1.NetworkInterface {
-	return &FakeNetworks{c, namespace}
+	return newFakeNetworks(c, namespace)
 }
 
 func (c *FakeCoreV1alpha1) NetworkIDs() v1alpha1.NetworkIDInterface {
-	return &FakeNetworkIDs{c}
+	return newFakeNetworkIDs(c)
 }
 
 func (c *FakeCoreV1alpha1) NetworkInterfaces(namespace string) v1alpha1.NetworkInterfaceInterface {
-	return &FakeNetworkInterfaces{c, namespace}
+	return newFakeNetworkInterfaces(c, namespace)
 }
 
 func (c *FakeCoreV1alpha1) NetworkPolicies(namespace string) v1alpha1.NetworkPolicyInterface {
-	return &FakeNetworkPolicies{c, namespace}
+	return newFakeNetworkPolicies(c, namespace)
 }
 
 func (c *FakeCoreV1alpha1) NetworkPolicyRules(namespace string) v1alpha1.NetworkPolicyRuleInterface {
-	return &FakeNetworkPolicyRules{c, namespace}
+	return newFakeNetworkPolicyRules(c, namespace)
 }
 
 func (c *FakeCoreV1alpha1) Nodes() v1alpha1.NodeInterface {
-	return &FakeNodes{c}
+	return newFakeNodes(c)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

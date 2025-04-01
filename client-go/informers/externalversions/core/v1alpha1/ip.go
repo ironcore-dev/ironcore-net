@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apicorev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore-net/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // IPs.
 type IPInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.IPLister
+	Lister() corev1alpha1.IPLister
 }
 
 type iPInformer struct {
@@ -58,7 +58,7 @@ func NewFilteredIPInformer(client versioned.Interface, namespace string, resyncP
 				return client.CoreV1alpha1().IPs(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&corev1alpha1.IP{},
+		&apicorev1alpha1.IP{},
 		resyncPeriod,
 		indexers,
 	)
@@ -69,9 +69,9 @@ func (f *iPInformer) defaultInformer(client versioned.Interface, resyncPeriod ti
 }
 
 func (f *iPInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&corev1alpha1.IP{}, f.defaultInformer)
+	return f.factory.InformerFor(&apicorev1alpha1.IP{}, f.defaultInformer)
 }
 
-func (f *iPInformer) Lister() v1alpha1.IPLister {
-	return v1alpha1.NewIPLister(f.Informer().GetIndexer())
+func (f *iPInformer) Lister() corev1alpha1.IPLister {
+	return corev1alpha1.NewIPLister(f.Informer().GetIndexer())
 }

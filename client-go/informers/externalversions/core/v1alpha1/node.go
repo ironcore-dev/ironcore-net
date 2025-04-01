@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apicorev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore-net/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // Nodes.
 type NodeInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.NodeLister
+	Lister() corev1alpha1.NodeLister
 }
 
 type nodeInformer struct {
@@ -57,7 +57,7 @@ func NewFilteredNodeInformer(client versioned.Interface, resyncPeriod time.Durat
 				return client.CoreV1alpha1().Nodes().Watch(context.TODO(), options)
 			},
 		},
-		&corev1alpha1.Node{},
+		&apicorev1alpha1.Node{},
 		resyncPeriod,
 		indexers,
 	)
@@ -68,9 +68,9 @@ func (f *nodeInformer) defaultInformer(client versioned.Interface, resyncPeriod 
 }
 
 func (f *nodeInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&corev1alpha1.Node{}, f.defaultInformer)
+	return f.factory.InformerFor(&apicorev1alpha1.Node{}, f.defaultInformer)
 }
 
-func (f *nodeInformer) Lister() v1alpha1.NodeLister {
-	return v1alpha1.NewNodeLister(f.Informer().GetIndexer())
+func (f *nodeInformer) Lister() corev1alpha1.NodeLister {
+	return corev1alpha1.NewNodeLister(f.Informer().GetIndexer())
 }

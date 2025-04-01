@@ -2,8 +2,6 @@ module github.com/ironcore-dev/ironcore-net
 
 go 1.24.0
 
-toolchain go1.24.1
-
 require (
 	github.com/bits-and-blooms/bitset v1.22.0
 	github.com/go-logr/logr v1.4.2

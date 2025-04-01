@@ -6,7 +6,7 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	net "github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	v1 "k8s.io/api/core/v1"
 )
@@ -14,8 +14,8 @@ import (
 // InstanceSpecApplyConfiguration represents a declarative configuration of the InstanceSpec type for use
 // with apply.
 type InstanceSpecApplyConfiguration struct {
-	Type                      *v1alpha1.InstanceType                       `json:"type,omitempty"`
-	LoadBalancerType          *v1alpha1.LoadBalancerType                   `json:"loadBalancerType,omitempty"`
+	Type                      *corev1alpha1.InstanceType                   `json:"type,omitempty"`
+	LoadBalancerType          *corev1alpha1.LoadBalancerType               `json:"loadBalancerType,omitempty"`
 	NetworkRef                *v1.LocalObjectReference                     `json:"networkRef,omitempty"`
 	IPs                       []net.IP                                     `json:"ips,omitempty"`
 	LoadBalancerPorts         []LoadBalancerPortApplyConfiguration         `json:"loadBalancerPorts,omitempty"`
@@ -33,7 +33,7 @@ func InstanceSpec() *InstanceSpecApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *InstanceSpecApplyConfiguration) WithType(value v1alpha1.InstanceType) *InstanceSpecApplyConfiguration {
+func (b *InstanceSpecApplyConfiguration) WithType(value corev1alpha1.InstanceType) *InstanceSpecApplyConfiguration {
 	b.Type = &value
 	return b
 }
@@ -41,7 +41,7 @@ func (b *InstanceSpecApplyConfiguration) WithType(value v1alpha1.InstanceType) *
 // WithLoadBalancerType sets the LoadBalancerType field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the LoadBalancerType field is set to the value of the last call.
-func (b *InstanceSpecApplyConfiguration) WithLoadBalancerType(value v1alpha1.LoadBalancerType) *InstanceSpecApplyConfiguration {
+func (b *InstanceSpecApplyConfiguration) WithLoadBalancerType(value corev1alpha1.LoadBalancerType) *InstanceSpecApplyConfiguration {
 	b.LoadBalancerType = &value
 	return b
 }

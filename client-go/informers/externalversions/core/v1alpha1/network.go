@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apicorev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore-net/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // Networks.
 type NetworkInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.NetworkLister
+	Lister() corev1alpha1.NetworkLister
 }
 
 type networkInformer struct {
@@ -58,7 +58,7 @@ func NewFilteredNetworkInformer(client versioned.Interface, namespace string, re
 				return client.CoreV1alpha1().Networks(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&corev1alpha1.Network{},
+		&apicorev1alpha1.Network{},
 		resyncPeriod,
 		indexers,
 	)
@@ -69,9 +69,9 @@ func (f *networkInformer) defaultInformer(client versioned.Interface, resyncPeri
 }
 
 func (f *networkInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&corev1alpha1.Network{}, f.defaultInformer)
+	return f.factory.InformerFor(&apicorev1alpha1.Network{}, f.defaultInformer)
 }
 
-func (f *networkInformer) Lister() v1alpha1.NetworkLister {
-	return v1alpha1.NewNetworkLister(f.Informer().GetIndexer())
+func (f *networkInformer) Lister() corev1alpha1.NetworkLister {
+	return corev1alpha1.NewNetworkLister(f.Informer().GetIndexer())
 }

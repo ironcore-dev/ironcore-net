@@ -6,19 +6,19 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	net "github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 )
 
 // NetworkInterfaceStatusApplyConfiguration represents a declarative configuration of the NetworkInterfaceStatus type for use
 // with apply.
 type NetworkInterfaceStatusApplyConfiguration struct {
-	State      *v1alpha1.NetworkInterfaceState `json:"state,omitempty"`
-	PCIAddress *PCIAddressApplyConfiguration   `json:"pciAddress,omitempty"`
-	TAPDevice  *TAPDeviceApplyConfiguration    `json:"tapDevice,omitempty"`
-	Prefixes   []net.IPPrefix                  `json:"prefixes,omitempty"`
-	PublicIPs  []net.IP                        `json:"publicIPs,omitempty"`
-	NATIPs     []net.IP                        `json:"natIPs,omitempty"`
+	State      *corev1alpha1.NetworkInterfaceState `json:"state,omitempty"`
+	PCIAddress *PCIAddressApplyConfiguration       `json:"pciAddress,omitempty"`
+	TAPDevice  *TAPDeviceApplyConfiguration        `json:"tapDevice,omitempty"`
+	Prefixes   []net.IPPrefix                      `json:"prefixes,omitempty"`
+	PublicIPs  []net.IP                            `json:"publicIPs,omitempty"`
+	NATIPs     []net.IP                            `json:"natIPs,omitempty"`
 }
 
 // NetworkInterfaceStatusApplyConfiguration constructs a declarative configuration of the NetworkInterfaceStatus type for use with
@@ -30,7 +30,7 @@ func NetworkInterfaceStatus() *NetworkInterfaceStatusApplyConfiguration {
 // WithState sets the State field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the State field is set to the value of the last call.
-func (b *NetworkInterfaceStatusApplyConfiguration) WithState(value v1alpha1.NetworkInterfaceState) *NetworkInterfaceStatusApplyConfiguration {
+func (b *NetworkInterfaceStatusApplyConfiguration) WithState(value corev1alpha1.NetworkInterfaceState) *NetworkInterfaceStatusApplyConfiguration {
 	b.State = &value
 	return b
 }

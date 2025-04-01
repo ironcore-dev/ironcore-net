@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
 )
 
 // NetworkPolicyRuleLister helps list NetworkPolicyRules.
@@ -17,7 +17,7 @@ import (
 type NetworkPolicyRuleLister interface {
 	// List lists all NetworkPolicyRules in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.NetworkPolicyRule, err error)
+	List(selector labels.Selector) (ret []*corev1alpha1.NetworkPolicyRule, err error)
 	// NetworkPolicyRules returns an object that can list and get NetworkPolicyRules.
 	NetworkPolicyRules(namespace string) NetworkPolicyRuleNamespaceLister
 	NetworkPolicyRuleListerExpansion
@@ -25,17 +25,17 @@ type NetworkPolicyRuleLister interface {
 
 // networkPolicyRuleLister implements the NetworkPolicyRuleLister interface.
 type networkPolicyRuleLister struct {
-	listers.ResourceIndexer[*v1alpha1.NetworkPolicyRule]
+	listers.ResourceIndexer[*corev1alpha1.NetworkPolicyRule]
 }
 
 // NewNetworkPolicyRuleLister returns a new NetworkPolicyRuleLister.
 func NewNetworkPolicyRuleLister(indexer cache.Indexer) NetworkPolicyRuleLister {
-	return &networkPolicyRuleLister{listers.New[*v1alpha1.NetworkPolicyRule](indexer, v1alpha1.Resource("networkpolicyrule"))}
+	return &networkPolicyRuleLister{listers.New[*corev1alpha1.NetworkPolicyRule](indexer, corev1alpha1.Resource("networkpolicyrule"))}
 }
 
 // NetworkPolicyRules returns an object that can list and get NetworkPolicyRules.
 func (s *networkPolicyRuleLister) NetworkPolicyRules(namespace string) NetworkPolicyRuleNamespaceLister {
-	return networkPolicyRuleNamespaceLister{listers.NewNamespaced[*v1alpha1.NetworkPolicyRule](s.ResourceIndexer, namespace)}
+	return networkPolicyRuleNamespaceLister{listers.NewNamespaced[*corev1alpha1.NetworkPolicyRule](s.ResourceIndexer, namespace)}
 }
 
 // NetworkPolicyRuleNamespaceLister helps list and get NetworkPolicyRules.
@@ -43,15 +43,15 @@ func (s *networkPolicyRuleLister) NetworkPolicyRules(namespace string) NetworkPo
 type NetworkPolicyRuleNamespaceLister interface {
 	// List lists all NetworkPolicyRules in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.NetworkPolicyRule, err error)
+	List(selector labels.Selector) (ret []*corev1alpha1.NetworkPolicyRule, err error)
 	// Get retrieves the NetworkPolicyRule from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.NetworkPolicyRule, error)
+	Get(name string) (*corev1alpha1.NetworkPolicyRule, error)
 	NetworkPolicyRuleNamespaceListerExpansion
 }
 
 // networkPolicyRuleNamespaceLister implements the NetworkPolicyRuleNamespaceLister
 // interface.
 type networkPolicyRuleNamespaceLister struct {
-	listers.ResourceIndexer[*v1alpha1.NetworkPolicyRule]
+	listers.ResourceIndexer[*corev1alpha1.NetworkPolicyRule]
 }

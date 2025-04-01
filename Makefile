@@ -7,7 +7,7 @@ METALNETLET_IMG ?= metalnetlet:latest
 KIND_CLUSTER_NAME ?= kind
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION = 1.31
+ENVTEST_K8S_VERSION = 1.32
 
 # Docker image name for the mkdocs based local development setup
 IMAGE=ironcore-net/documentation
@@ -346,12 +346,13 @@ GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.1.1
 VGOPATH_VERSION ?= v0.1.5
-CONTROLLER_TOOLS_VERSION ?= v0.16.0
+CONTROLLER_TOOLS_VERSION ?= v0.17.2
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.1
-GOIMPORTS_VERSION ?= v0.25.0
+GOIMPORTS_VERSION ?= v0.31.0
 GOLANGCI_LINT_VERSION ?= v2.0
 OPENAPI_EXTRACTOR_VERSION ?= v0.1.9
+SETUP_ENVTEST_VERSION ?= release-0.20
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 .PHONY: kustomize
@@ -388,7 +389,7 @@ $(VGOPATH): $(LOCALBIN)
 .PHONY: envtest
 envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
 $(ENVTEST): $(LOCALBIN)
-	test -s $(LOCALBIN)/setup-envtest || GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
+	test -s $(LOCALBIN)/setup-envtest || GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-runtime/tools/setup-envtest@$(SETUP_ENVTEST_VERSION)
 
 .PHONY: openapi-extractor
 openapi-extractor: $(OPENAPI_EXTRACTOR) ## Download openapi-extractor locally if necessary.

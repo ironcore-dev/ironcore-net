@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	applyconfigurationscorev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,32 +25,33 @@ type NetworkPolicyRulesGetter interface {
 
 // NetworkPolicyRuleInterface has methods to work with NetworkPolicyRule resources.
 type NetworkPolicyRuleInterface interface {
-	Create(ctx context.Context, networkPolicyRule *v1alpha1.NetworkPolicyRule, opts v1.CreateOptions) (*v1alpha1.NetworkPolicyRule, error)
-	Update(ctx context.Context, networkPolicyRule *v1alpha1.NetworkPolicyRule, opts v1.UpdateOptions) (*v1alpha1.NetworkPolicyRule, error)
+	Create(ctx context.Context, networkPolicyRule *corev1alpha1.NetworkPolicyRule, opts v1.CreateOptions) (*corev1alpha1.NetworkPolicyRule, error)
+	Update(ctx context.Context, networkPolicyRule *corev1alpha1.NetworkPolicyRule, opts v1.UpdateOptions) (*corev1alpha1.NetworkPolicyRule, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.NetworkPolicyRule, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.NetworkPolicyRuleList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*corev1alpha1.NetworkPolicyRule, error)
+	List(ctx context.Context, opts v1.ListOptions) (*corev1alpha1.NetworkPolicyRuleList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.NetworkPolicyRule, err error)
-	Apply(ctx context.Context, networkPolicyRule *corev1alpha1.NetworkPolicyRuleApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.NetworkPolicyRule, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1alpha1.NetworkPolicyRule, err error)
+	Apply(ctx context.Context, networkPolicyRule *applyconfigurationscorev1alpha1.NetworkPolicyRuleApplyConfiguration, opts v1.ApplyOptions) (result *corev1alpha1.NetworkPolicyRule, err error)
 	NetworkPolicyRuleExpansion
 }
 
 // networkPolicyRules implements NetworkPolicyRuleInterface
 type networkPolicyRules struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.NetworkPolicyRule, *v1alpha1.NetworkPolicyRuleList, *corev1alpha1.NetworkPolicyRuleApplyConfiguration]
+	*gentype.ClientWithListAndApply[*corev1alpha1.NetworkPolicyRule, *corev1alpha1.NetworkPolicyRuleList, *applyconfigurationscorev1alpha1.NetworkPolicyRuleApplyConfiguration]
 }
 
 // newNetworkPolicyRules returns a NetworkPolicyRules
 func newNetworkPolicyRules(c *CoreV1alpha1Client, namespace string) *networkPolicyRules {
 	return &networkPolicyRules{
-		gentype.NewClientWithListAndApply[*v1alpha1.NetworkPolicyRule, *v1alpha1.NetworkPolicyRuleList, *corev1alpha1.NetworkPolicyRuleApplyConfiguration](
+		gentype.NewClientWithListAndApply[*corev1alpha1.NetworkPolicyRule, *corev1alpha1.NetworkPolicyRuleList, *applyconfigurationscorev1alpha1.NetworkPolicyRuleApplyConfiguration](
 			"networkpolicyrules",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.NetworkPolicyRule { return &v1alpha1.NetworkPolicyRule{} },
-			func() *v1alpha1.NetworkPolicyRuleList { return &v1alpha1.NetworkPolicyRuleList{} }),
+			func() *corev1alpha1.NetworkPolicyRule { return &corev1alpha1.NetworkPolicyRule{} },
+			func() *corev1alpha1.NetworkPolicyRuleList { return &corev1alpha1.NetworkPolicyRuleList{} },
+		),
 	}
 }

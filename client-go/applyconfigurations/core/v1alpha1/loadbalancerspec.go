@@ -6,7 +6,7 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
@@ -14,7 +14,7 @@ import (
 // LoadBalancerSpecApplyConfiguration represents a declarative configuration of the LoadBalancerSpec type for use
 // with apply.
 type LoadBalancerSpecApplyConfiguration struct {
-	Type       *v1alpha1.LoadBalancerType              `json:"type,omitempty"`
+	Type       *corev1alpha1.LoadBalancerType          `json:"type,omitempty"`
 	NetworkRef *v1.LocalObjectReference                `json:"networkRef,omitempty"`
 	IPs        []LoadBalancerIPApplyConfiguration      `json:"ips,omitempty"`
 	Ports      []LoadBalancerPortApplyConfiguration    `json:"ports,omitempty"`
@@ -31,7 +31,7 @@ func LoadBalancerSpec() *LoadBalancerSpecApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *LoadBalancerSpecApplyConfiguration) WithType(value v1alpha1.LoadBalancerType) *LoadBalancerSpecApplyConfiguration {
+func (b *LoadBalancerSpecApplyConfiguration) WithType(value corev1alpha1.LoadBalancerType) *LoadBalancerSpecApplyConfiguration {
 	b.Type = &value
 	return b
 }
