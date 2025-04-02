@@ -26,6 +26,12 @@ func ValidateNetworkInterface(networkInterface *core.NetworkInterface) field.Err
 func ValidateNetworkInterfaceSpec(spec *core.NetworkInterfaceSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
+	if hostname := spec.Hostname; hostname != "" {
+		for _, msg := range validation.NameIsDNSLabel(hostname, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("hostname"), hostname, msg))
+		}
+	}
+
 	if spec.NodeRef.Name == "" {
 		allErrs = append(allErrs, field.Required(fldPath.Child("nodeRef", "name"), "must specify target node"))
 	}
@@ -81,6 +87,7 @@ func ValidateNetworkInterfaceSpecUpdate(newSpec, oldSpec *core.NetworkInterfaceS
 
 	allErrs = append(allErrs, validation.ValidateImmutableField(newSpec.NetworkRef, oldSpec.NetworkRef, fldPath.Child("networkRef"))...)
 	allErrs = append(allErrs, validation.ValidateImmutableField(newSpec.NodeRef, oldSpec.NodeRef, fldPath.Child("nodeRef"))...)
+	allErrs = append(allErrs, validation.ValidateImmutableField(newSpec.Hostname, oldSpec.Hostname, fldPath.Child("hostname"))...)
 	if !slices.Equal(newSpec.IPs, oldSpec.IPs) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("ips"), newSpec.IPs, validation.FieldImmutableErrorMsg))
 	}
