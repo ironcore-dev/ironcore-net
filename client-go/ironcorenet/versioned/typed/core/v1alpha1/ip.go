@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	applyconfigurationscorev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type IPsGetter interface {
 
 // IPInterface has methods to work with IP resources.
 type IPInterface interface {
-	Create(ctx context.Context, iP *v1alpha1.IP, opts v1.CreateOptions) (*v1alpha1.IP, error)
-	Update(ctx context.Context, iP *v1alpha1.IP, opts v1.UpdateOptions) (*v1alpha1.IP, error)
+	Create(ctx context.Context, iP *corev1alpha1.IP, opts v1.CreateOptions) (*corev1alpha1.IP, error)
+	Update(ctx context.Context, iP *corev1alpha1.IP, opts v1.UpdateOptions) (*corev1alpha1.IP, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, iP *v1alpha1.IP, opts v1.UpdateOptions) (*v1alpha1.IP, error)
+	UpdateStatus(ctx context.Context, iP *corev1alpha1.IP, opts v1.UpdateOptions) (*corev1alpha1.IP, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.IP, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.IPList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*corev1alpha1.IP, error)
+	List(ctx context.Context, opts v1.ListOptions) (*corev1alpha1.IPList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.IP, err error)
-	Apply(ctx context.Context, iP *corev1alpha1.IPApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.IP, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1alpha1.IP, err error)
+	Apply(ctx context.Context, iP *applyconfigurationscorev1alpha1.IPApplyConfiguration, opts v1.ApplyOptions) (result *corev1alpha1.IP, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, iP *corev1alpha1.IPApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.IP, err error)
+	ApplyStatus(ctx context.Context, iP *applyconfigurationscorev1alpha1.IPApplyConfiguration, opts v1.ApplyOptions) (result *corev1alpha1.IP, err error)
 	IPExpansion
 }
 
 // iPs implements IPInterface
 type iPs struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.IP, *v1alpha1.IPList, *corev1alpha1.IPApplyConfiguration]
+	*gentype.ClientWithListAndApply[*corev1alpha1.IP, *corev1alpha1.IPList, *applyconfigurationscorev1alpha1.IPApplyConfiguration]
 }
 
 // newIPs returns a IPs
 func newIPs(c *CoreV1alpha1Client, namespace string) *iPs {
 	return &iPs{
-		gentype.NewClientWithListAndApply[*v1alpha1.IP, *v1alpha1.IPList, *corev1alpha1.IPApplyConfiguration](
+		gentype.NewClientWithListAndApply[*corev1alpha1.IP, *corev1alpha1.IPList, *applyconfigurationscorev1alpha1.IPApplyConfiguration](
 			"ips",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.IP { return &v1alpha1.IP{} },
-			func() *v1alpha1.IPList { return &v1alpha1.IPList{} }),
+			func() *corev1alpha1.IP { return &corev1alpha1.IP{} },
+			func() *corev1alpha1.IPList { return &corev1alpha1.IPList{} },
+		),
 	}
 }

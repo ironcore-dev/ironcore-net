@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	applyconfigurationscorev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,32 +25,33 @@ type IPAddressesGetter interface {
 
 // IPAddressInterface has methods to work with IPAddress resources.
 type IPAddressInterface interface {
-	Create(ctx context.Context, iPAddress *v1alpha1.IPAddress, opts v1.CreateOptions) (*v1alpha1.IPAddress, error)
-	Update(ctx context.Context, iPAddress *v1alpha1.IPAddress, opts v1.UpdateOptions) (*v1alpha1.IPAddress, error)
+	Create(ctx context.Context, iPAddress *corev1alpha1.IPAddress, opts v1.CreateOptions) (*corev1alpha1.IPAddress, error)
+	Update(ctx context.Context, iPAddress *corev1alpha1.IPAddress, opts v1.UpdateOptions) (*corev1alpha1.IPAddress, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.IPAddress, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.IPAddressList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*corev1alpha1.IPAddress, error)
+	List(ctx context.Context, opts v1.ListOptions) (*corev1alpha1.IPAddressList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.IPAddress, err error)
-	Apply(ctx context.Context, iPAddress *corev1alpha1.IPAddressApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.IPAddress, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1alpha1.IPAddress, err error)
+	Apply(ctx context.Context, iPAddress *applyconfigurationscorev1alpha1.IPAddressApplyConfiguration, opts v1.ApplyOptions) (result *corev1alpha1.IPAddress, err error)
 	IPAddressExpansion
 }
 
 // iPAddresses implements IPAddressInterface
 type iPAddresses struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.IPAddress, *v1alpha1.IPAddressList, *corev1alpha1.IPAddressApplyConfiguration]
+	*gentype.ClientWithListAndApply[*corev1alpha1.IPAddress, *corev1alpha1.IPAddressList, *applyconfigurationscorev1alpha1.IPAddressApplyConfiguration]
 }
 
 // newIPAddresses returns a IPAddresses
 func newIPAddresses(c *CoreV1alpha1Client) *iPAddresses {
 	return &iPAddresses{
-		gentype.NewClientWithListAndApply[*v1alpha1.IPAddress, *v1alpha1.IPAddressList, *corev1alpha1.IPAddressApplyConfiguration](
+		gentype.NewClientWithListAndApply[*corev1alpha1.IPAddress, *corev1alpha1.IPAddressList, *applyconfigurationscorev1alpha1.IPAddressApplyConfiguration](
 			"ipaddresses",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			"",
-			func() *v1alpha1.IPAddress { return &v1alpha1.IPAddress{} },
-			func() *v1alpha1.IPAddressList { return &v1alpha1.IPAddressList{} }),
+			func() *corev1alpha1.IPAddress { return &corev1alpha1.IPAddress{} },
+			func() *corev1alpha1.IPAddressList { return &corev1alpha1.IPAddressList{} },
+		),
 	}
 }

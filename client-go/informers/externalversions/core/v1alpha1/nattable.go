@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apicorev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore-net/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // NATTables.
 type NATTableInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.NATTableLister
+	Lister() corev1alpha1.NATTableLister
 }
 
 type nATTableInformer struct {
@@ -58,7 +58,7 @@ func NewFilteredNATTableInformer(client versioned.Interface, namespace string, r
 				return client.CoreV1alpha1().NATTables(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&corev1alpha1.NATTable{},
+		&apicorev1alpha1.NATTable{},
 		resyncPeriod,
 		indexers,
 	)
@@ -69,9 +69,9 @@ func (f *nATTableInformer) defaultInformer(client versioned.Interface, resyncPer
 }
 
 func (f *nATTableInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&corev1alpha1.NATTable{}, f.defaultInformer)
+	return f.factory.InformerFor(&apicorev1alpha1.NATTable{}, f.defaultInformer)
 }
 
-func (f *nATTableInformer) Lister() v1alpha1.NATTableLister {
-	return v1alpha1.NewNATTableLister(f.Informer().GetIndexer())
+func (f *nATTableInformer) Lister() corev1alpha1.NATTableLister {
+	return corev1alpha1.NewNATTableLister(f.Informer().GetIndexer())
 }

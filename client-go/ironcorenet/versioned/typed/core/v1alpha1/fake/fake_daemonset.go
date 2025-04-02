@@ -6,179 +6,33 @@
 package fake
 
 import (
-	"context"
-	json "encoding/json"
-	"fmt"
-
 	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	testing "k8s.io/client-go/testing"
+	typedcorev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned/typed/core/v1alpha1"
+	gentype "k8s.io/client-go/gentype"
 )
 
-// FakeDaemonSets implements DaemonSetInterface
-type FakeDaemonSets struct {
+// fakeDaemonSets implements DaemonSetInterface
+type fakeDaemonSets struct {
+	*gentype.FakeClientWithListAndApply[*v1alpha1.DaemonSet, *v1alpha1.DaemonSetList, *corev1alpha1.DaemonSetApplyConfiguration]
 	Fake *FakeCoreV1alpha1
-	ns   string
 }
 
-var daemonsetsResource = v1alpha1.SchemeGroupVersion.WithResource("daemonsets")
-
-var daemonsetsKind = v1alpha1.SchemeGroupVersion.WithKind("DaemonSet")
-
-// Get takes name of the daemonSet, and returns the corresponding daemonSet object, and an error if there is any.
-func (c *FakeDaemonSets) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.DaemonSet, err error) {
-	emptyResult := &v1alpha1.DaemonSet{}
-	obj, err := c.Fake.
-		Invokes(testing.NewGetActionWithOptions(daemonsetsResource, c.ns, name, options), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
+func newFakeDaemonSets(fake *FakeCoreV1alpha1, namespace string) typedcorev1alpha1.DaemonSetInterface {
+	return &fakeDaemonSets{
+		gentype.NewFakeClientWithListAndApply[*v1alpha1.DaemonSet, *v1alpha1.DaemonSetList, *corev1alpha1.DaemonSetApplyConfiguration](
+			fake.Fake,
+			namespace,
+			v1alpha1.SchemeGroupVersion.WithResource("daemonsets"),
+			v1alpha1.SchemeGroupVersion.WithKind("DaemonSet"),
+			func() *v1alpha1.DaemonSet { return &v1alpha1.DaemonSet{} },
+			func() *v1alpha1.DaemonSetList { return &v1alpha1.DaemonSetList{} },
+			func(dst, src *v1alpha1.DaemonSetList) { dst.ListMeta = src.ListMeta },
+			func(list *v1alpha1.DaemonSetList) []*v1alpha1.DaemonSet { return gentype.ToPointerSlice(list.Items) },
+			func(list *v1alpha1.DaemonSetList, items []*v1alpha1.DaemonSet) {
+				list.Items = gentype.FromPointerSlice(items)
+			},
+		),
+		fake,
 	}
-	return obj.(*v1alpha1.DaemonSet), err
-}
-
-// List takes label and field selectors, and returns the list of DaemonSets that match those selectors.
-func (c *FakeDaemonSets) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.DaemonSetList, err error) {
-	emptyResult := &v1alpha1.DaemonSetList{}
-	obj, err := c.Fake.
-		Invokes(testing.NewListActionWithOptions(daemonsetsResource, daemonsetsKind, c.ns, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-
-	label, _, _ := testing.ExtractFromListOptions(opts)
-	if label == nil {
-		label = labels.Everything()
-	}
-	list := &v1alpha1.DaemonSetList{ListMeta: obj.(*v1alpha1.DaemonSetList).ListMeta}
-	for _, item := range obj.(*v1alpha1.DaemonSetList).Items {
-		if label.Matches(labels.Set(item.Labels)) {
-			list.Items = append(list.Items, item)
-		}
-	}
-	return list, err
-}
-
-// Watch returns a watch.Interface that watches the requested daemonSets.
-func (c *FakeDaemonSets) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return c.Fake.
-		InvokesWatch(testing.NewWatchActionWithOptions(daemonsetsResource, c.ns, opts))
-
-}
-
-// Create takes the representation of a daemonSet and creates it.  Returns the server's representation of the daemonSet, and an error, if there is any.
-func (c *FakeDaemonSets) Create(ctx context.Context, daemonSet *v1alpha1.DaemonSet, opts v1.CreateOptions) (result *v1alpha1.DaemonSet, err error) {
-	emptyResult := &v1alpha1.DaemonSet{}
-	obj, err := c.Fake.
-		Invokes(testing.NewCreateActionWithOptions(daemonsetsResource, c.ns, daemonSet, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.DaemonSet), err
-}
-
-// Update takes the representation of a daemonSet and updates it. Returns the server's representation of the daemonSet, and an error, if there is any.
-func (c *FakeDaemonSets) Update(ctx context.Context, daemonSet *v1alpha1.DaemonSet, opts v1.UpdateOptions) (result *v1alpha1.DaemonSet, err error) {
-	emptyResult := &v1alpha1.DaemonSet{}
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateActionWithOptions(daemonsetsResource, c.ns, daemonSet, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.DaemonSet), err
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeDaemonSets) UpdateStatus(ctx context.Context, daemonSet *v1alpha1.DaemonSet, opts v1.UpdateOptions) (result *v1alpha1.DaemonSet, err error) {
-	emptyResult := &v1alpha1.DaemonSet{}
-	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceActionWithOptions(daemonsetsResource, "status", c.ns, daemonSet, opts), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.DaemonSet), err
-}
-
-// Delete takes name of the daemonSet and deletes it. Returns an error if one occurs.
-func (c *FakeDaemonSets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(daemonsetsResource, c.ns, name, opts), &v1alpha1.DaemonSet{})
-
-	return err
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *FakeDaemonSets) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionActionWithOptions(daemonsetsResource, c.ns, opts, listOpts)
-
-	_, err := c.Fake.Invokes(action, &v1alpha1.DaemonSetList{})
-	return err
-}
-
-// Patch applies the patch and returns the patched daemonSet.
-func (c *FakeDaemonSets) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.DaemonSet, err error) {
-	emptyResult := &v1alpha1.DaemonSet{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(daemonsetsResource, c.ns, name, pt, data, opts, subresources...), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.DaemonSet), err
-}
-
-// Apply takes the given apply declarative configuration, applies it and returns the applied daemonSet.
-func (c *FakeDaemonSets) Apply(ctx context.Context, daemonSet *corev1alpha1.DaemonSetApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.DaemonSet, err error) {
-	if daemonSet == nil {
-		return nil, fmt.Errorf("daemonSet provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(daemonSet)
-	if err != nil {
-		return nil, err
-	}
-	name := daemonSet.Name
-	if name == nil {
-		return nil, fmt.Errorf("daemonSet.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.DaemonSet{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(daemonsetsResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions()), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.DaemonSet), err
-}
-
-// ApplyStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *FakeDaemonSets) ApplyStatus(ctx context.Context, daemonSet *corev1alpha1.DaemonSetApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.DaemonSet, err error) {
-	if daemonSet == nil {
-		return nil, fmt.Errorf("daemonSet provided to Apply must not be nil")
-	}
-	data, err := json.Marshal(daemonSet)
-	if err != nil {
-		return nil, err
-	}
-	name := daemonSet.Name
-	if name == nil {
-		return nil, fmt.Errorf("daemonSet.Name must be provided to Apply")
-	}
-	emptyResult := &v1alpha1.DaemonSet{}
-	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceActionWithOptions(daemonsetsResource, c.ns, *name, types.ApplyPatchType, data, opts.ToPatchOptions(), "status"), emptyResult)
-
-	if obj == nil {
-		return emptyResult, err
-	}
-	return obj.(*v1alpha1.DaemonSet), err
 }

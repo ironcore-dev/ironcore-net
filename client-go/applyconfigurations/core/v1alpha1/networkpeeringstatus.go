@@ -6,14 +6,14 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 )
 
 // NetworkPeeringStatusApplyConfiguration represents a declarative configuration of the NetworkPeeringStatus type for use
 // with apply.
 type NetworkPeeringStatusApplyConfiguration struct {
-	ID    *int32                        `json:"id,omitempty"`
-	State *v1alpha1.NetworkPeeringState `json:"state,omitempty"`
+	ID    *int32                            `json:"id,omitempty"`
+	State *corev1alpha1.NetworkPeeringState `json:"state,omitempty"`
 }
 
 // NetworkPeeringStatusApplyConfiguration constructs a declarative configuration of the NetworkPeeringStatus type for use with
@@ -33,7 +33,7 @@ func (b *NetworkPeeringStatusApplyConfiguration) WithID(value int32) *NetworkPee
 // WithState sets the State field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the State field is set to the value of the last call.
-func (b *NetworkPeeringStatusApplyConfiguration) WithState(value v1alpha1.NetworkPeeringState) *NetworkPeeringStatusApplyConfiguration {
+func (b *NetworkPeeringStatusApplyConfiguration) WithState(value corev1alpha1.NetworkPeeringState) *NetworkPeeringStatusApplyConfiguration {
 	b.State = &value
 	return b
 }

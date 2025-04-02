@@ -9,7 +9,7 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -17,48 +17,50 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
-	scheme.AddTypeDefaultingFunc(&v1alpha1.IP{}, func(obj interface{}) { SetObjectDefaults_IP(obj.(*v1alpha1.IP)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.IPList{}, func(obj interface{}) { SetObjectDefaults_IPList(obj.(*v1alpha1.IPList)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.LoadBalancer{}, func(obj interface{}) { SetObjectDefaults_LoadBalancer(obj.(*v1alpha1.LoadBalancer)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.LoadBalancerList{}, func(obj interface{}) { SetObjectDefaults_LoadBalancerList(obj.(*v1alpha1.LoadBalancerList)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.NetworkInterface{}, func(obj interface{}) { SetObjectDefaults_NetworkInterface(obj.(*v1alpha1.NetworkInterface)) })
-	scheme.AddTypeDefaultingFunc(&v1alpha1.NetworkInterfaceList{}, func(obj interface{}) { SetObjectDefaults_NetworkInterfaceList(obj.(*v1alpha1.NetworkInterfaceList)) })
+	scheme.AddTypeDefaultingFunc(&corev1alpha1.IP{}, func(obj interface{}) { SetObjectDefaults_IP(obj.(*corev1alpha1.IP)) })
+	scheme.AddTypeDefaultingFunc(&corev1alpha1.IPList{}, func(obj interface{}) { SetObjectDefaults_IPList(obj.(*corev1alpha1.IPList)) })
+	scheme.AddTypeDefaultingFunc(&corev1alpha1.LoadBalancer{}, func(obj interface{}) { SetObjectDefaults_LoadBalancer(obj.(*corev1alpha1.LoadBalancer)) })
+	scheme.AddTypeDefaultingFunc(&corev1alpha1.LoadBalancerList{}, func(obj interface{}) { SetObjectDefaults_LoadBalancerList(obj.(*corev1alpha1.LoadBalancerList)) })
+	scheme.AddTypeDefaultingFunc(&corev1alpha1.NetworkInterface{}, func(obj interface{}) { SetObjectDefaults_NetworkInterface(obj.(*corev1alpha1.NetworkInterface)) })
+	scheme.AddTypeDefaultingFunc(&corev1alpha1.NetworkInterfaceList{}, func(obj interface{}) {
+		SetObjectDefaults_NetworkInterfaceList(obj.(*corev1alpha1.NetworkInterfaceList))
+	})
 	return nil
 }
 
-func SetObjectDefaults_IP(in *v1alpha1.IP) {
+func SetObjectDefaults_IP(in *corev1alpha1.IP) {
 	SetDefaults_IPSpec(&in.Spec)
 }
 
-func SetObjectDefaults_IPList(in *v1alpha1.IPList) {
+func SetObjectDefaults_IPList(in *corev1alpha1.IPList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_IP(a)
 	}
 }
 
-func SetObjectDefaults_LoadBalancer(in *v1alpha1.LoadBalancer) {
+func SetObjectDefaults_LoadBalancer(in *corev1alpha1.LoadBalancer) {
 	for i := range in.Spec.IPs {
 		a := &in.Spec.IPs[i]
 		SetDefaults_LoadBalancerIP(a)
 	}
 }
 
-func SetObjectDefaults_LoadBalancerList(in *v1alpha1.LoadBalancerList) {
+func SetObjectDefaults_LoadBalancerList(in *corev1alpha1.LoadBalancerList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_LoadBalancer(a)
 	}
 }
 
-func SetObjectDefaults_NetworkInterface(in *v1alpha1.NetworkInterface) {
+func SetObjectDefaults_NetworkInterface(in *corev1alpha1.NetworkInterface) {
 	for i := range in.Spec.PublicIPs {
 		a := &in.Spec.PublicIPs[i]
 		SetDefaults_NetworkInterfacePublicIP(a)
 	}
 }
 
-func SetObjectDefaults_NetworkInterfaceList(in *v1alpha1.NetworkInterfaceList) {
+func SetObjectDefaults_NetworkInterfaceList(in *corev1alpha1.NetworkInterfaceList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_NetworkInterface(a)

@@ -6,13 +6,13 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apicorev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	internalinterfaces "github.com/ironcore-dev/ironcore-net/client-go/informers/externalversions/internalinterfaces"
 	versioned "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -23,7 +23,7 @@ import (
 // NATGatewayAutoscalers.
 type NATGatewayAutoscalerInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.NATGatewayAutoscalerLister
+	Lister() corev1alpha1.NATGatewayAutoscalerLister
 }
 
 type nATGatewayAutoscalerInformer struct {
@@ -58,7 +58,7 @@ func NewFilteredNATGatewayAutoscalerInformer(client versioned.Interface, namespa
 				return client.CoreV1alpha1().NATGatewayAutoscalers(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&corev1alpha1.NATGatewayAutoscaler{},
+		&apicorev1alpha1.NATGatewayAutoscaler{},
 		resyncPeriod,
 		indexers,
 	)
@@ -69,9 +69,9 @@ func (f *nATGatewayAutoscalerInformer) defaultInformer(client versioned.Interfac
 }
 
 func (f *nATGatewayAutoscalerInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&corev1alpha1.NATGatewayAutoscaler{}, f.defaultInformer)
+	return f.factory.InformerFor(&apicorev1alpha1.NATGatewayAutoscaler{}, f.defaultInformer)
 }
 
-func (f *nATGatewayAutoscalerInformer) Lister() v1alpha1.NATGatewayAutoscalerLister {
-	return v1alpha1.NewNATGatewayAutoscalerLister(f.Informer().GetIndexer())
+func (f *nATGatewayAutoscalerInformer) Lister() corev1alpha1.NATGatewayAutoscalerLister {
+	return corev1alpha1.NewNATGatewayAutoscalerLister(f.Informer().GetIndexer())
 }

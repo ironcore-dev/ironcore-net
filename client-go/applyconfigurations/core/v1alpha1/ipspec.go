@@ -6,7 +6,7 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	net "github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	v1 "k8s.io/api/core/v1"
 )
@@ -14,7 +14,7 @@ import (
 // IPSpecApplyConfiguration represents a declarative configuration of the IPSpec type for use
 // with apply.
 type IPSpecApplyConfiguration struct {
-	Type     *v1alpha1.IPType              `json:"type,omitempty"`
+	Type     *corev1alpha1.IPType          `json:"type,omitempty"`
 	IPFamily *v1.IPFamily                  `json:"ipFamily,omitempty"`
 	IP       *net.IP                       `json:"ip,omitempty"`
 	ClaimRef *IPClaimRefApplyConfiguration `json:"claimRef,omitempty"`
@@ -29,7 +29,7 @@ func IPSpec() *IPSpecApplyConfiguration {
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *IPSpecApplyConfiguration) WithType(value v1alpha1.IPType) *IPSpecApplyConfiguration {
+func (b *IPSpecApplyConfiguration) WithType(value corev1alpha1.IPType) *IPSpecApplyConfiguration {
 	b.Type = &value
 	return b
 }

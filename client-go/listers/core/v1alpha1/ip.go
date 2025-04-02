@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
 )
 
 // IPLister helps list IPs.
@@ -17,7 +17,7 @@ import (
 type IPLister interface {
 	// List lists all IPs in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.IP, err error)
+	List(selector labels.Selector) (ret []*corev1alpha1.IP, err error)
 	// IPs returns an object that can list and get IPs.
 	IPs(namespace string) IPNamespaceLister
 	IPListerExpansion
@@ -25,17 +25,17 @@ type IPLister interface {
 
 // iPLister implements the IPLister interface.
 type iPLister struct {
-	listers.ResourceIndexer[*v1alpha1.IP]
+	listers.ResourceIndexer[*corev1alpha1.IP]
 }
 
 // NewIPLister returns a new IPLister.
 func NewIPLister(indexer cache.Indexer) IPLister {
-	return &iPLister{listers.New[*v1alpha1.IP](indexer, v1alpha1.Resource("ip"))}
+	return &iPLister{listers.New[*corev1alpha1.IP](indexer, corev1alpha1.Resource("ip"))}
 }
 
 // IPs returns an object that can list and get IPs.
 func (s *iPLister) IPs(namespace string) IPNamespaceLister {
-	return iPNamespaceLister{listers.NewNamespaced[*v1alpha1.IP](s.ResourceIndexer, namespace)}
+	return iPNamespaceLister{listers.NewNamespaced[*corev1alpha1.IP](s.ResourceIndexer, namespace)}
 }
 
 // IPNamespaceLister helps list and get IPs.
@@ -43,15 +43,15 @@ func (s *iPLister) IPs(namespace string) IPNamespaceLister {
 type IPNamespaceLister interface {
 	// List lists all IPs in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.IP, err error)
+	List(selector labels.Selector) (ret []*corev1alpha1.IP, err error)
 	// Get retrieves the IP from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.IP, error)
+	Get(name string) (*corev1alpha1.IP, error)
 	IPNamespaceListerExpansion
 }
 
 // iPNamespaceLister implements the IPNamespaceLister
 // interface.
 type iPNamespaceLister struct {
-	listers.ResourceIndexer[*v1alpha1.IP]
+	listers.ResourceIndexer[*corev1alpha1.IP]
 }

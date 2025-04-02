@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/listers"
-	"k8s.io/client-go/tools/cache"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
 )
 
 // IPAddressLister helps list IPAddresses.
@@ -17,19 +17,19 @@ import (
 type IPAddressLister interface {
 	// List lists all IPAddresses in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.IPAddress, err error)
+	List(selector labels.Selector) (ret []*corev1alpha1.IPAddress, err error)
 	// Get retrieves the IPAddress from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.IPAddress, error)
+	Get(name string) (*corev1alpha1.IPAddress, error)
 	IPAddressListerExpansion
 }
 
 // iPAddressLister implements the IPAddressLister interface.
 type iPAddressLister struct {
-	listers.ResourceIndexer[*v1alpha1.IPAddress]
+	listers.ResourceIndexer[*corev1alpha1.IPAddress]
 }
 
 // NewIPAddressLister returns a new IPAddressLister.
 func NewIPAddressLister(indexer cache.Indexer) IPAddressLister {
-	return &iPAddressLister{listers.New[*v1alpha1.IPAddress](indexer, v1alpha1.Resource("ipaddress"))}
+	return &iPAddressLister{listers.New[*corev1alpha1.IPAddress](indexer, corev1alpha1.Resource("ipaddress"))}
 }

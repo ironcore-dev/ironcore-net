@@ -6,10 +6,10 @@
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 
-	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	applyconfigurationscorev1alpha1 "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	scheme "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -25,36 +25,37 @@ type NATGatewayAutoscalersGetter interface {
 
 // NATGatewayAutoscalerInterface has methods to work with NATGatewayAutoscaler resources.
 type NATGatewayAutoscalerInterface interface {
-	Create(ctx context.Context, nATGatewayAutoscaler *v1alpha1.NATGatewayAutoscaler, opts v1.CreateOptions) (*v1alpha1.NATGatewayAutoscaler, error)
-	Update(ctx context.Context, nATGatewayAutoscaler *v1alpha1.NATGatewayAutoscaler, opts v1.UpdateOptions) (*v1alpha1.NATGatewayAutoscaler, error)
+	Create(ctx context.Context, nATGatewayAutoscaler *corev1alpha1.NATGatewayAutoscaler, opts v1.CreateOptions) (*corev1alpha1.NATGatewayAutoscaler, error)
+	Update(ctx context.Context, nATGatewayAutoscaler *corev1alpha1.NATGatewayAutoscaler, opts v1.UpdateOptions) (*corev1alpha1.NATGatewayAutoscaler, error)
 	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-	UpdateStatus(ctx context.Context, nATGatewayAutoscaler *v1alpha1.NATGatewayAutoscaler, opts v1.UpdateOptions) (*v1alpha1.NATGatewayAutoscaler, error)
+	UpdateStatus(ctx context.Context, nATGatewayAutoscaler *corev1alpha1.NATGatewayAutoscaler, opts v1.UpdateOptions) (*corev1alpha1.NATGatewayAutoscaler, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
-	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.NATGatewayAutoscaler, error)
-	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.NATGatewayAutoscalerList, error)
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*corev1alpha1.NATGatewayAutoscaler, error)
+	List(ctx context.Context, opts v1.ListOptions) (*corev1alpha1.NATGatewayAutoscalerList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
-	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.NATGatewayAutoscaler, err error)
-	Apply(ctx context.Context, nATGatewayAutoscaler *corev1alpha1.NATGatewayAutoscalerApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.NATGatewayAutoscaler, err error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1alpha1.NATGatewayAutoscaler, err error)
+	Apply(ctx context.Context, nATGatewayAutoscaler *applyconfigurationscorev1alpha1.NATGatewayAutoscalerApplyConfiguration, opts v1.ApplyOptions) (result *corev1alpha1.NATGatewayAutoscaler, err error)
 	// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-	ApplyStatus(ctx context.Context, nATGatewayAutoscaler *corev1alpha1.NATGatewayAutoscalerApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.NATGatewayAutoscaler, err error)
+	ApplyStatus(ctx context.Context, nATGatewayAutoscaler *applyconfigurationscorev1alpha1.NATGatewayAutoscalerApplyConfiguration, opts v1.ApplyOptions) (result *corev1alpha1.NATGatewayAutoscaler, err error)
 	NATGatewayAutoscalerExpansion
 }
 
 // nATGatewayAutoscalers implements NATGatewayAutoscalerInterface
 type nATGatewayAutoscalers struct {
-	*gentype.ClientWithListAndApply[*v1alpha1.NATGatewayAutoscaler, *v1alpha1.NATGatewayAutoscalerList, *corev1alpha1.NATGatewayAutoscalerApplyConfiguration]
+	*gentype.ClientWithListAndApply[*corev1alpha1.NATGatewayAutoscaler, *corev1alpha1.NATGatewayAutoscalerList, *applyconfigurationscorev1alpha1.NATGatewayAutoscalerApplyConfiguration]
 }
 
 // newNATGatewayAutoscalers returns a NATGatewayAutoscalers
 func newNATGatewayAutoscalers(c *CoreV1alpha1Client, namespace string) *nATGatewayAutoscalers {
 	return &nATGatewayAutoscalers{
-		gentype.NewClientWithListAndApply[*v1alpha1.NATGatewayAutoscaler, *v1alpha1.NATGatewayAutoscalerList, *corev1alpha1.NATGatewayAutoscalerApplyConfiguration](
+		gentype.NewClientWithListAndApply[*corev1alpha1.NATGatewayAutoscaler, *corev1alpha1.NATGatewayAutoscalerList, *applyconfigurationscorev1alpha1.NATGatewayAutoscalerApplyConfiguration](
 			"natgatewayautoscalers",
 			c.RESTClient(),
 			scheme.ParameterCodec,
 			namespace,
-			func() *v1alpha1.NATGatewayAutoscaler { return &v1alpha1.NATGatewayAutoscaler{} },
-			func() *v1alpha1.NATGatewayAutoscalerList { return &v1alpha1.NATGatewayAutoscalerList{} }),
+			func() *corev1alpha1.NATGatewayAutoscaler { return &corev1alpha1.NATGatewayAutoscaler{} },
+			func() *corev1alpha1.NATGatewayAutoscalerList { return &corev1alpha1.NATGatewayAutoscalerList{} },
+		),
 	}
 }

@@ -83,7 +83,7 @@ var _ = BeforeSuite(func() {
 		// Note that you must have the required binaries setup under the bin directory to perform
 		// the tests directly. When we run make test it will be setup and used automatically.
 		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
-			fmt.Sprintf("1.31.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
+			fmt.Sprintf("1.32.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
 	}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
 		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "config", "apiserver", "apiservice", "bases")},
@@ -119,7 +119,7 @@ var _ = BeforeSuite(func() {
 	Expect(apiSrv.Start()).To(Succeed())
 	DeferCleanup(apiSrv.Stop)
 
-	Expect(utilsenvtest.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, k8sClient, scheme.Scheme)).To(Succeed())
+	Expect(utilsenvtest.WaitUntilAPIServicesReadyWithTimeout(apiServiceTimeout, testEnvExt, cfg, k8sClient, scheme.Scheme)).To(Succeed())
 
 	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
 		Scheme: scheme.Scheme,
