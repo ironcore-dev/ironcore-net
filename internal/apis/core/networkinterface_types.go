@@ -27,6 +27,9 @@ type NetworkInterfaceSpec struct {
 	// Can only be set if there is no matching IP family in PublicIPs.
 	NATs []NetworkInterfaceNAT
 
+	// Hostname is the hostname which should be announced by the network interface.
+	Hostname string
+
 	// PublicIPs are the public IPs the network interface should have.
 	// +optional
 	// +patchMergeKey=name

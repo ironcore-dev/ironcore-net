@@ -10,6 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
+// NetworkInterfaceSpec defines the desired state of NetworkInterface.
 type NetworkInterfaceSpec struct {
 	// NodeRef is the node the network interface is hosted on.
 	NodeRef corev1.LocalObjectReference `json:"nodeRef"`
@@ -26,6 +27,9 @@ type NetworkInterfaceSpec struct {
 	// NATs specify the NAT of the network interface IP family.
 	// Can only be set if there is no matching IP family in PublicIPs.
 	NATs []NetworkInterfaceNAT `json:"natGateways,omitempty"`
+
+	// Hostname is the hostname which should be announced by the network interface.
+	Hostname string `json:"hostname,omitempty"`
 
 	// PublicIPs are the public IPs the network interface should have.
 	// +optional
