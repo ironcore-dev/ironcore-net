@@ -2667,7 +2667,8 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkInterfaceSpec(ref common.Refer
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
+				Description: "NetworkInterfaceSpec defines the desired state of NetworkInterface.",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"nodeRef": {
 						SchemaProps: spec.SchemaProps{
@@ -2721,6 +2722,13 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkInterfaceSpec(ref common.Refer
 									},
 								},
 							},
+						},
+					},
+					"hostname": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Hostname is the hostname which should be announced by the network interface.",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 					"publicIPs": {

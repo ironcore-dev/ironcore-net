@@ -18,6 +18,7 @@ type NetworkInterfaceSpecApplyConfiguration struct {
 	IPs        []net.IP                                     `json:"ips,omitempty"`
 	Prefixes   []net.IPPrefix                               `json:"prefixes,omitempty"`
 	NATs       []NetworkInterfaceNATApplyConfiguration      `json:"natGateways,omitempty"`
+	Hostname   *string                                      `json:"hostname,omitempty"`
 	PublicIPs  []NetworkInterfacePublicIPApplyConfiguration `json:"publicIPs,omitempty"`
 }
 
@@ -73,6 +74,14 @@ func (b *NetworkInterfaceSpecApplyConfiguration) WithNATs(values ...*NetworkInte
 		}
 		b.NATs = append(b.NATs, *values[i])
 	}
+	return b
+}
+
+// WithHostname sets the Hostname field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Hostname field is set to the value of the last call.
+func (b *NetworkInterfaceSpecApplyConfiguration) WithHostname(value string) *NetworkInterfaceSpecApplyConfiguration {
+	b.Hostname = &value
 	return b
 }
 

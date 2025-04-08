@@ -729,6 +729,9 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterfaceSpec
   map:
     fields:
+    - name: hostname
+      type:
+        scalar: string
     - name: ips
       type:
         list:
