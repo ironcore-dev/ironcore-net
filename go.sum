@@ -96,8 +96,8 @@ github.com/ironcore-dev/controller-utils v0.9.9 h1:SRVMjj+jh9yDZj//1hGG7U7S4fRuU
 github.com/ironcore-dev/controller-utils v0.9.9/go.mod h1:hNqQjd6JkRmKYH1MY1XkfT4Eew3P7etHTJjaHj+vK9Y=
 github.com/ironcore-dev/ironcore v0.2.3 h1:me2LuScaoekxSRtV7KhCqGZ/jOsU7fCuqt6LBxcx+ts=
 github.com/ironcore-dev/ironcore v0.2.3/go.mod h1:u39dlr8d3RfPCK4FLBLvFfmbDdh8Tu7a3R06nXkIJug=
-github.com/ironcore-dev/metalnet v0.3.11 h1:uTmtK2NgRXMjy7Dx694FflxMhGGpaFOyhtCTcusFjWk=
-github.com/ironcore-dev/metalnet v0.3.11/go.mod h1:1zaY6/trlx6n/nw2JuEpf7d3nlxXwRE/46kDlTKH/2c=
+github.com/ironcore-dev/metalnet v0.3.12 h1:sfd4e1RtqNKghs3qf5biYRIMQdfhoFnVZ2KmjZywzsE=
+github.com/ironcore-dev/metalnet v0.3.12/go.mod h1:tR8e5IhFRqZPHJTL5Z9aqPCVAQTqwkUqDWGlZV0IXLk=
 github.com/jonboulle/clockwork v0.4.0 h1:p4Cf1aMWXnXAUh8lVfewRBx1zaTSYKrKMF2g3ST4RZ4=
 github.com/jonboulle/clockwork v0.4.0/go.mod h1:xgRqUGwRcjKCO1vbZUEtSLrqKoPSsUpK7fnezOII0kc=
 github.com/josharian/intern v1.0.0 h1:vlS4z54oSdjm0bgjRigI+G1HpF+tI+9rE5LLzOg8HmY=
