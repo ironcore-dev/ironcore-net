@@ -32935,7 +32935,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionIPAddress",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"$ref": "#/parameters/continue-QfD61s0i"
@@ -33125,7 +33125,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1IPAddress",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"uniqueItems": true,
@@ -33628,7 +33628,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNamespacedDaemonSet",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"$ref": "#/parameters/continue-QfD61s0i"
@@ -33821,7 +33821,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1NamespacedDaemonSet",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"uniqueItems": true,
@@ -34298,7 +34298,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNamespacedInstance",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"$ref": "#/parameters/continue-QfD61s0i"
@@ -34491,7 +34491,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1NamespacedInstance",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"uniqueItems": true,
@@ -34968,7 +34968,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNamespacedIP",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"$ref": "#/parameters/continue-QfD61s0i"
@@ -35161,7 +35161,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1NamespacedIP",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"uniqueItems": true,
@@ -35451,7 +35451,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNamespacedLoadBalancerRouting",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"$ref": "#/parameters/continue-QfD61s0i"
@@ -35644,7 +35644,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1NamespacedLoadBalancerRouting",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"uniqueItems": true,
@@ -35934,7 +35934,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNamespacedLoadBalancer",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"$ref": "#/parameters/continue-QfD61s0i"
@@ -36127,7 +36127,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1NamespacedLoadBalancer",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"uniqueItems": true,
@@ -36604,7 +36604,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNamespacedNATGatewayAutoscaler",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"$ref": "#/parameters/continue-QfD61s0i"
@@ -36797,7 +36797,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1NamespacedNATGatewayAutoscaler",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"uniqueItems": true,
@@ -37274,7 +37274,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNamespacedNATGateway",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"$ref": "#/parameters/continue-QfD61s0i"
@@ -37467,7 +37467,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1NamespacedNATGateway",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"uniqueItems": true,
@@ -37944,7 +37944,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNamespacedNATTable",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"$ref": "#/parameters/continue-QfD61s0i"
@@ -38137,7 +38137,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1NamespacedNATTable",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"uniqueItems": true,
@@ -38427,7 +38427,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNamespacedNetworkInterface",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"$ref": "#/parameters/continue-QfD61s0i"
@@ -38620,7 +38620,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1NamespacedNetworkInterface",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"uniqueItems": true,
@@ -39097,7 +39097,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNamespacedNetworkPolicy",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"$ref": "#/parameters/continue-QfD61s0i"
@@ -39290,7 +39290,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicy",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"uniqueItems": true,
@@ -39580,7 +39580,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNamespacedNetworkPolicyRule",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"$ref": "#/parameters/continue-QfD61s0i"
@@ -39773,7 +39773,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1NamespacedNetworkPolicyRule",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"uniqueItems": true,
@@ -40063,7 +40063,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNamespacedNetwork",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"$ref": "#/parameters/continue-QfD61s0i"
@@ -40256,7 +40256,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1NamespacedNetwork",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"uniqueItems": true,
@@ -40949,7 +40949,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNetworkID",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"$ref": "#/parameters/continue-QfD61s0i"
@@ -41139,7 +41139,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1NetworkID",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"uniqueItems": true,
@@ -41714,7 +41714,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1CollectionNode",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"$ref": "#/parameters/continue-QfD61s0i"
@@ -41904,7 +41904,7 @@
 				"operationId": "deleteCoreApinetIroncoreDevV1alpha1Node",
 				"parameters": [
 					{
-						"$ref": "#/parameters/body-2Y1dVQaQ_v2"
+						"$ref": "#/parameters/body-2Y1dVQaQ"
 					},
 					{
 						"uniqueItems": true,
@@ -61861,12 +61861,17 @@
 			}
 		},
 		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterfaceSpec": {
+			"description": "NetworkInterfaceSpec defines the desired state of NetworkInterface.",
 			"type": "object",
 			"required": [
 				"nodeRef",
 				"networkRef"
 			],
 			"properties": {
+				"hostname": {
+					"description": "Hostname is the hostname which should be announced by the network interface.",
+					"type": "string"
+				},
 				"ips": {
 					"description": "IPs are the internal IPs of the network interface.",
 					"type": "array",
@@ -77972,6 +77977,11 @@
 					"version": "v1beta1"
 				},
 				{
+					"group": "core.apinet.ironcore.dev",
+					"kind": "DeleteOptions",
+					"version": "v1alpha1"
+				},
+				{
 					"group": "discovery.k8s.io",
 					"kind": "DeleteOptions",
 					"version": "v1"
@@ -78123,57 +78133,6 @@
 				},
 				{
 					"group": "storagemigration.k8s.io",
-					"kind": "DeleteOptions",
-					"version": "v1alpha1"
-				}
-			]
-		},
-		"io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions_v2": {
-			"description": "DeleteOptions may be provided when deleting an API object.",
-			"type": "object",
-			"properties": {
-				"apiVersion": {
-					"description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-					"type": "string"
-				},
-				"dryRun": {
-					"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
-					"type": "array",
-					"items": {
-						"type": "string"
-					},
-					"x-kubernetes-list-type": "atomic"
-				},
-				"gracePeriodSeconds": {
-					"description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
-					"type": "integer",
-					"format": "int64"
-				},
-				"kind": {
-					"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-					"type": "string"
-				},
-				"orphanDependents": {
-					"description": "Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7. Should the dependent objects be orphaned. If true/false, the \"orphan\" finalizer will be added to/removed from the object's finalizers list. Either this field or PropagationPolicy may be set, but not both.",
-					"type": "boolean"
-				},
-				"preconditions": {
-					"description": "Must be fulfilled before a deletion is carried out. If not possible, a 409 Conflict status will be returned.",
-					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Preconditions"
-				},
-				"propagationPolicy": {
-					"description": "Whether and how garbage collection will be performed. Either this field or OrphanDependents may be set, but not both. The default policy is decided by the existing finalizer set in the metadata.finalizers and the resource-specific default policy. Acceptable values are: 'Orphan' - orphan the dependents; 'Background' - allow the garbage collector to delete the dependents in the background; 'Foreground' - a cascading policy that deletes all dependents in the foreground.",
-					"type": "string"
-				}
-			},
-			"x-kubernetes-group-version-kind": [
-				{
-					"group": "",
-					"kind": "DeleteOptions",
-					"version": "v1"
-				},
-				{
-					"group": "core.apinet.ironcore.dev",
 					"kind": "DeleteOptions",
 					"version": "v1alpha1"
 				}
@@ -79181,13 +79140,6 @@
 			"in": "body",
 			"schema": {
 				"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions"
-			}
-		},
-		"body-2Y1dVQaQ_v2": {
-			"name": "body",
-			"in": "body",
-			"schema": {
-				"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions_v2"
 			}
 		},
 		"body-78PwaGsr": {
