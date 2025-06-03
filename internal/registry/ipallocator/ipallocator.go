@@ -36,7 +36,7 @@ var (
 )
 
 type Allocator struct {
-	prefix   netip.Prefix
+	prefixes []netip.Prefix
 	ipFamily corev1.IPFamily
 
 	client   v1alpha1client.CoreV1alpha1Interface
@@ -45,19 +45,29 @@ type Allocator struct {
 }
 
 func New(
-	prefix netip.Prefix,
+	prefixes []netip.Prefix,
 	client v1alpha1client.CoreV1alpha1Interface,
 	informer v1alpha1informers.IPInformer,
 ) (*Allocator, error) {
+	if len(prefixes) == 0 {
+		return nil, fmt.Errorf("at least one prefix must be provided")
+	}
+
 	var ipFamily corev1.IPFamily
-	if prefix.Addr().Is6() {
+	if prefixes[0].Addr().Is6() {
 		ipFamily = corev1.IPv6Protocol
 	} else {
 		ipFamily = corev1.IPv4Protocol
 	}
 
+	for _, prefix := range prefixes {
+		if prefix.Addr().Is6() != (ipFamily == corev1.IPv6Protocol) {
+			return nil, fmt.Errorf("all prefixes must be of the same IP family")
+		}
+	}
+
 	return &Allocator{
-		prefix:   prefix,
+		prefixes: prefixes,
 		ipFamily: ipFamily,
 		client:   client,
 		ipLister: informer.Lister(),
@@ -167,13 +177,24 @@ func (a *Allocator) allocateNext(
 		return netip.Addr{}, fmt.Errorf("allocator not ready")
 	}
 	if dryRun {
-		return a.prefix.Masked().Addr(), nil
+		return a.prefixes[0].Masked().Addr(), nil
 	}
 
 	trace := utiltrace.New("allocate dynamic IP")
 	defer trace.LogIfLong(500 * time.Millisecond)
 
-	return a.createEphemeralIP(namespace, claimRef, version, kind)
+	// Try each prefix in order
+	for range a.prefixes {
+		ip, err := a.createEphemeralIP(namespace, claimRef, version, kind)
+		if err == nil {
+			return ip, nil
+		}
+		if err != ErrAllocated {
+			return netip.Addr{}, err
+		}
+	}
+
+	return netip.Addr{}, ErrAllocated
 }
 
 func (a *Allocator) createEphemeralIP(

@@ -34,10 +34,10 @@ var (
 type Allocator struct {
 	family corev1.IPFamily
 
-	prefix  netip.Prefix
-	firstIP netip.Addr
-	lastIP  netip.Addr
-	size    int64
+	prefixes []netip.Prefix
+	firstIPs []netip.Addr
+	lastIPs  []netip.Addr
+	sizes    []int64
 
 	client          v1alpha1client.CoreV1alpha1Interface
 	ipAddressLister v1alpha1listers.IPAddressLister
@@ -45,27 +45,40 @@ type Allocator struct {
 }
 
 func New(
-	prefix netip.Prefix,
+	prefixes []netip.Prefix,
 	client v1alpha1client.CoreV1alpha1Interface,
 	informer v1alpha1informers.IPAddressInformer,
 ) (*Allocator, error) {
+	if len(prefixes) == 0 {
+		return nil, fmt.Errorf("at least one prefix must be provided")
+	}
+
 	var family corev1.IPFamily
-	if prefix.Addr().Is6() {
+	if prefixes[0].Addr().Is6() {
 		family = corev1.IPv6Protocol
 	} else {
 		family = corev1.IPv4Protocol
 	}
 
-	firstIP := prefix.Masked().Addr()
-	lastIP := netipx.PrefixLastIP(prefix)
-	size := netiputils.PrefixSize(prefix)
+	firstIPs := make([]netip.Addr, len(prefixes))
+	lastIPs := make([]netip.Addr, len(prefixes))
+	sizes := make([]int64, len(prefixes))
+
+	for i, prefix := range prefixes {
+		if prefix.Addr().Is6() != (family == corev1.IPv6Protocol) {
+			return nil, fmt.Errorf("all prefixes must be of the same IP family")
+		}
+		firstIPs[i] = prefix.Masked().Addr()
+		lastIPs[i] = netipx.PrefixLastIP(prefix)
+		sizes[i] = netiputils.PrefixSize(prefix)
+	}
 
 	return &Allocator{
 		family:          family,
-		prefix:          prefix,
-		firstIP:         firstIP,
-		lastIP:          lastIP,
-		size:            size,
+		prefixes:        prefixes,
+		firstIPs:        firstIPs,
+		lastIPs:         lastIPs,
+		sizes:           sizes,
 		client:          client,
 		ipAddressLister: informer.Lister(),
 		ipAddressSynced: informer.Informer().HasSynced,
@@ -88,14 +101,17 @@ func (a *Allocator) allocate(claimRef v1alpha1.IPAddressClaimRef, ip netip.Addr,
 		return fmt.Errorf("invalid IP")
 	}
 
-	if ip.Less(a.firstIP) || a.lastIP.Less(ip) {
-		return ErrNotInRange
-	}
-	if dryRun {
-		return nil
+	// Check if IP is in any of the prefixes
+	for i := range a.prefixes {
+		if !ip.Less(a.firstIPs[i]) && !a.lastIPs[i].Less(ip) {
+			if dryRun {
+				return nil
+			}
+			return a.createIPAddress(ip.String(), claimRef)
+		}
 	}
 
-	return a.createIPAddress(ip.String(), claimRef)
+	return ErrNotInRange
 }
 
 func (a *Allocator) createIPAddress(name string, claimRef v1alpha1.IPAddressClaimRef) error {
@@ -126,15 +142,26 @@ func (a *Allocator) allocateNext(claimRef v1alpha1.IPAddressClaimRef, dryRun boo
 		return netip.Addr{}, fmt.Errorf("allocator not ready")
 	}
 	if dryRun {
-		return a.prefix.Addr(), nil
+		return a.prefixes[0].Addr(), nil
 	}
 
 	trace := utiltrace.New("allocate dynamic IPAddress")
 	defer trace.LogIfLong(500 * time.Millisecond)
 
-	offset := rand.Int63n(a.size)
-	iterator := ipIterator(a.firstIP, a.lastIP, uint64(offset))
-	return a.allocateFromIterator(claimRef, iterator)
+	// Try each prefix in order
+	for i := range a.prefixes {
+		offset := rand.Int63n(a.sizes[i])
+		iterator := ipIterator(a.firstIPs[i], a.lastIPs[i], uint64(offset))
+		addr, err := a.allocateFromIterator(claimRef, iterator)
+		if err == nil {
+			return addr, nil
+		}
+		if err != ErrFull {
+			return netip.Addr{}, err
+		}
+	}
+
+	return netip.Addr{}, ErrFull
 }
 
 func (a *Allocator) allocateFromIterator(claimRef v1alpha1.IPAddressClaimRef, it func() netip.Addr) (netip.Addr, error) {
