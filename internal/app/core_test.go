@@ -57,6 +57,55 @@ var _ = Describe("Core", func() {
 	})
 
 	Context("IP", func() {
+		It("should handle multiple public prefixes of the same IP family", func(ctx SpecContext) {
+			By("creating IPs to exhaust the first prefix (10.0.0.0/29)")
+			var firstPrefixIPs []*v1alpha1.IP
+			for i := 0; i < 8; i++ { // /29 has 8 IPs
+				ip := &v1alpha1.IP{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace:    ns.Name,
+						GenerateName: "ip-",
+					},
+					Spec: v1alpha1.IPSpec{
+						Type:     v1alpha1.IPTypePublic,
+						IPFamily: corev1.IPv4Protocol,
+					},
+				}
+				Expect(k8sClient.Create(ctx, ip)).To(Succeed())
+				Expect(&ip.Spec.IP).To(Satisfy((*net.IP).IsValid))
+
+				By("verifying the new IP is from a different prefix")
+				ipAddr := ip.Spec.IP.Addr
+				Expect(ipAddr.Is4()).To(BeTrue())
+				Expect(ipAddr.String()).To(HavePrefix("10.0.0."))
+				firstPrefixIPs = append(firstPrefixIPs, ip)
+			}
+
+			By("creating another IP which should come from the second prefix (10.0.1.0/29)")
+			newIP := &v1alpha1.IP{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "ip-",
+				},
+				Spec: v1alpha1.IPSpec{
+					Type:     v1alpha1.IPTypePublic,
+					IPFamily: corev1.IPv4Protocol,
+				},
+			}
+			Expect(k8sClient.Create(ctx, newIP)).To(Succeed())
+			Expect(&newIP.Spec.IP).To(Satisfy((*net.IP).IsValid))
+
+			By("verifying the new IP is from a different prefix")
+			newIPAddr := newIP.Spec.IP.Addr
+			Expect(newIPAddr.Is4()).To(BeTrue())
+			Expect(newIPAddr.String()).To(HavePrefix("10.0.1."))
+
+			By("cleaning up all IPs")
+			for _, ip := range firstPrefixIPs {
+				Expect(k8sClient.Delete(ctx, ip)).To(Succeed())
+			}
+			Expect(k8sClient.Delete(ctx, newIP)).To(Succeed())
+		})
 		It("should maintain IP address allocations for IPs", func(ctx SpecContext) {
 			By("creating an IP")
 			ip := &v1alpha1.IP{

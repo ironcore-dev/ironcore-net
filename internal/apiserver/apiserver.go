@@ -115,12 +115,24 @@ func (c completedConfig) New() (*IronCoreServer, error) {
 		return nil, err
 	}
 
+	// Group prefixes by IP family
+	prefixesByFamily := make(map[corev1.IPFamily][]netip.Prefix)
+	for _, prefix := range c.ExtraConfig.PublicPrefix {
+		var family corev1.IPFamily
+		if prefix.Addr().Is6() {
+			family = corev1.IPv6Protocol
+		} else {
+			family = corev1.IPv4Protocol
+		}
+		prefixesByFamily[family] = append(prefixesByFamily[family], prefix)
+	}
+
 	ipAddrAllocByFamily := make(map[corev1.IPFamily]ipaddressallocator.Interface)
 	ipAllocByFamily := make(map[corev1.IPFamily]ipallocator.Interface)
 
-	for _, publicPrefix := range c.ExtraConfig.PublicPrefix {
+	for family, prefixes := range prefixesByFamily {
 		ipAddrAlloc, err := ipaddressallocator.New(
-			publicPrefix,
+			prefixes,
 			v1alpha1Client,
 			c.ExtraConfig.VersionedInformers.Core().V1alpha1().IPAddresses(),
 		)
@@ -129,7 +141,7 @@ func (c completedConfig) New() (*IronCoreServer, error) {
 		}
 
 		ipAlloc, err := ipallocator.New(
-			publicPrefix,
+			prefixes,
 			v1alpha1Client,
 			c.ExtraConfig.VersionedInformers.Core().V1alpha1().IPs(),
 		)
@@ -137,8 +149,8 @@ func (c completedConfig) New() (*IronCoreServer, error) {
 			return nil, err
 		}
 
-		ipAddrAllocByFamily[ipAddrAlloc.IPFamily()] = ipAddrAlloc
-		ipAllocByFamily[ipAlloc.IPFamily()] = ipAlloc
+		ipAddrAllocByFamily[family] = ipAddrAlloc
+		ipAllocByFamily[family] = ipAlloc
 	}
 
 	networkIDAllocator, err := networkidallocator.NewNetworkIDAllocator(
@@ -156,7 +168,7 @@ func (c completedConfig) New() (*IronCoreServer, error) {
 	}
 
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(core.GroupName, Scheme, metav1.ParameterCodec, Codecs)
-	// Since our types don’t implement the Protobuf marshaling interface,
+	// Since our types don't implement the Protobuf marshaling interface,
 	// but the default APIServer serializer advertises it by default, a lot
 	// of unexpected things might fail. One example is that deleting an
 	// arbitrary namespace will fail while this APIServer is running (see
