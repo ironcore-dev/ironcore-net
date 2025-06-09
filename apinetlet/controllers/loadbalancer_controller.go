@@ -154,7 +154,7 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 		return ctrl.Result{}, nil
 	}
 
-	apiNetDestinations, _, err := r.prepareApiNetDestinations(ctx, loadBalancer)
+	apiNetDestinations, err := r.prepareApiNetDestinations(ctx, loadBalancer)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error preparing APINet destinations: %w", err)
 	}
@@ -182,11 +182,11 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 	return ctrl.Result{}, nil
 }
 
-func (r *LoadBalancerReconciler) prepareApiNetDestinations(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer) ([]apinetv1alpha1.LoadBalancerDestination, *networkingv1alpha1.LoadBalancerRouting, error) {
+func (r *LoadBalancerReconciler) prepareApiNetDestinations(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer) ([]apinetv1alpha1.LoadBalancerDestination, error) {
 	apiNetDsts := make([]apinetv1alpha1.LoadBalancerDestination, 0)
 	loadBalancerRouting := &networkingv1alpha1.LoadBalancerRouting{}
 	if err := r.Get(ctx, client.ObjectKeyFromObject(loadBalancer), loadBalancerRouting); client.IgnoreNotFound(err) != nil {
-		return nil, nil, fmt.Errorf("error getting load balancer routing: %w", err)
+		return nil, fmt.Errorf("error getting load balancer routing: %w", err)
 	}
 
 	for _, dst := range loadBalancerRouting.Destinations {
@@ -210,7 +210,7 @@ func (r *LoadBalancerReconciler) prepareApiNetDestinations(ctx context.Context, 
 		})
 	}
 
-	return apiNetDsts, loadBalancerRouting, nil
+	return apiNetDsts, nil
 }
 
 func (r *LoadBalancerReconciler) manageAPINetLoadBalancerRouting(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, apiNetLoadBalancer *apinetv1alpha1.LoadBalancer, apiNetDsts []apinetv1alpha1.LoadBalancerDestination) error {
