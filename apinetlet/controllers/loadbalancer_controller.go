@@ -13,6 +13,7 @@ import (
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	apinetlethandler "github.com/ironcore-dev/ironcore-net/apinetlet/handler"
@@ -153,13 +154,13 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 		return ctrl.Result{}, nil
 	}
 
-	_, apiNetDestinations, err := r.prepareApiNetDestinations(ctx, loadBalancer)
+	apiNetDestinations, _, err := r.prepareApiNetDestinations(ctx, loadBalancer)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error preparing APINet destinations: %w", err)
 	}
 
 	log.V(1).Info("Applying APINet load balancer")
-	apiNetLoadBalancer, err := r.applyAPINetLoadBalancer(ctx, loadBalancer, apiNetNetworkName)
+	apiNetLoadBalancer, err := r.applyAPINetLoadBalancer(ctx, loadBalancer, apiNetDestinations, apiNetNetworkName)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying APINet load balancer: %w", err)
 	}
@@ -181,7 +182,7 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 	return ctrl.Result{}, nil
 }
 
-func (r *LoadBalancerReconciler) prepareApiNetDestinations(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer) (*networkingv1alpha1.LoadBalancerRouting, []apinetv1alpha1.LoadBalancerDestination, error) {
+func (r *LoadBalancerReconciler) prepareApiNetDestinations(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer) ([]apinetv1alpha1.LoadBalancerDestination, *networkingv1alpha1.LoadBalancerRouting, error) {
 	apiNetDsts := make([]apinetv1alpha1.LoadBalancerDestination, 0)
 	loadBalancerRouting := &networkingv1alpha1.LoadBalancerRouting{}
 	if err := r.Get(ctx, client.ObjectKeyFromObject(loadBalancer), loadBalancerRouting); client.IgnoreNotFound(err) != nil {
@@ -209,7 +210,7 @@ func (r *LoadBalancerReconciler) prepareApiNetDestinations(ctx context.Context, 
 		})
 	}
 
-	return loadBalancerRouting, apiNetDsts, nil
+	return apiNetDsts, loadBalancerRouting, nil
 }
 
 func (r *LoadBalancerReconciler) manageAPINetLoadBalancerRouting(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, apiNetLoadBalancer *apinetv1alpha1.LoadBalancer, apiNetDsts []apinetv1alpha1.LoadBalancerDestination) error {
@@ -287,7 +288,7 @@ func (r *LoadBalancerReconciler) getInternalLoadBalancerAPINetIPs(ctx context.Co
 	return ips, nil
 }
 
-func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, apiNetNetworkName string) (*apinetv1alpha1.LoadBalancer, error) {
+func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, apiNetDestinations []apinetv1alpha1.LoadBalancerDestination, apiNetNetworkName string) (*apinetv1alpha1.LoadBalancer, error) {
 	apiNetLoadBalancerType, err := loadBalancerTypeToAPINetLoadBalancerType(loadBalancer.Spec.Type)
 	if err != nil {
 		return nil, err
@@ -328,7 +329,24 @@ func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, lo
 		)
 
 	if r.IsNodeAffinityAware {
-		// // TODO(balpert): extend the apiNetLoadBalancerApplyCfg with nodeaffinity based on the loadbalancerrouting and the destinations
+		apiNetDestinationNames := make([]string, 0)
+		for i := range apiNetDestinations {
+			apiNetDestinationNames = append(apiNetDestinationNames, apiNetDestinations[i].TargetRef.NodeRef.Name)
+		}
+		apiNetLoadBalancerApplyCfg.Spec.Template.Spec.Affinity.
+			WithNodeAffinity(apinetv1alpha1ac.NodeAffinity().
+				WithRequiredDuringSchedulingIgnoredDuringExecution(
+					apinetv1alpha1ac.NodeSelector().
+						WithNodeSelectorTerms(
+							apinetv1alpha1ac.NodeSelectorTerm().
+								WithMatchFields(apinetv1alpha1ac.NodeSelectorRequirement().
+									WithKey("metadata.name").
+									WithOperator(corev1alpha1.NodeSelectorOpIn).
+									WithValues(apiNetDestinationNames...),
+								),
+						),
+				),
+			)
 	}
 
 	apiNetLoadBalancer, err := r.APINetInterface.CoreV1alpha1().
