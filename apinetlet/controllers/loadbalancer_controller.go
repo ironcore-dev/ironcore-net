@@ -332,20 +332,22 @@ func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, lo
 		for i := range apiNetDestinations {
 			apiNetDestinationNames = append(apiNetDestinationNames, apiNetDestinations[i].TargetRef.NodeRef.Name)
 		}
-		apiNetLoadBalancerApplyCfg.Spec.Template.Spec.Affinity.
-			WithNodeAffinity(apinetv1alpha1ac.NodeAffinity().
-				WithRequiredDuringSchedulingIgnoredDuringExecution(
-					apinetv1alpha1ac.NodeSelector().
-						WithNodeSelectorTerms(
-							apinetv1alpha1ac.NodeSelectorTerm().
-								WithMatchFields(apinetv1alpha1ac.NodeSelectorRequirement().
-									WithKey("metadata.name").
-									WithOperator(apinetv1alpha1.NodeSelectorOpIn).
-									WithValues(apiNetDestinationNames...),
-								),
-						),
-				),
-			)
+		if len(apiNetDestinations) > 0 {
+			apiNetLoadBalancerApplyCfg.Spec.Template.Spec.Affinity.
+				WithNodeAffinity(apinetv1alpha1ac.NodeAffinity().
+					WithRequiredDuringSchedulingIgnoredDuringExecution(
+						apinetv1alpha1ac.NodeSelector().
+							WithNodeSelectorTerms(
+								apinetv1alpha1ac.NodeSelectorTerm().
+									WithMatchFields(apinetv1alpha1ac.NodeSelectorRequirement().
+										WithKey("metadata.name").
+										WithOperator(apinetv1alpha1.NodeSelectorOpIn).
+										WithValues(apiNetDestinationNames...),
+									),
+							),
+					),
+				)
+		}
 	}
 
 	apiNetLoadBalancer, err := r.APINetInterface.CoreV1alpha1().
