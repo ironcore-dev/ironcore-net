@@ -13,7 +13,6 @@ import (
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	apinetlethandler "github.com/ironcore-dev/ironcore-net/apinetlet/handler"
@@ -341,7 +340,7 @@ func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, lo
 							apinetv1alpha1ac.NodeSelectorTerm().
 								WithMatchFields(apinetv1alpha1ac.NodeSelectorRequirement().
 									WithKey("metadata.name").
-									WithOperator(corev1alpha1.NodeSelectorOpIn).
+									WithOperator(apinetv1alpha1.NodeSelectorOpIn).
 									WithValues(apiNetDestinationNames...),
 								),
 						),
