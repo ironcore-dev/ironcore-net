@@ -328,25 +328,24 @@ func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, lo
 		)
 
 	if r.IsNodeAffinityAware {
-		apiNetDestinationNames := make([]string, 0)
-		for i := range apiNetDestinations {
-			apiNetDestinationNames = append(apiNetDestinationNames, apiNetDestinations[i].TargetRef.NodeRef.Name)
-		}
 		if len(apiNetDestinations) > 0 {
-			apiNetLoadBalancerApplyCfg.Spec.Template.Spec.Affinity.
-				WithNodeAffinity(apinetv1alpha1ac.NodeAffinity().
-					WithRequiredDuringSchedulingIgnoredDuringExecution(
-						apinetv1alpha1ac.NodeSelector().
-							WithNodeSelectorTerms(
-								apinetv1alpha1ac.NodeSelectorTerm().
-									WithMatchFields(apinetv1alpha1ac.NodeSelectorRequirement().
-										WithKey("metadata.name").
-										WithOperator(apinetv1alpha1.NodeSelectorOpIn).
-										WithValues(apiNetDestinationNames...),
-									),
-							),
-					),
-				)
+			nodeSelector := apinetv1alpha1ac.NodeSelector()
+			for i := range apiNetDestinations {
+				if apiNetDestinations[i].TargetRef != nil {
+					apiNetDestinationName := apiNetDestinations[i].TargetRef.NodeRef.Name
+					nodeSelector.WithNodeSelectorTerms(apinetv1alpha1ac.NodeSelectorTerm().WithMatchFields(apinetv1alpha1ac.NodeSelectorRequirement().
+						WithKey("metadata.name").
+						WithOperator(apinetv1alpha1.NodeSelectorOpIn).
+						WithValues([]string{apiNetDestinationName}...),
+					))
+				}
+			}
+			if len(nodeSelector.NodeSelectorTerms) > 0 {
+				apiNetLoadBalancerApplyCfg.Spec.Template.Spec.Affinity.
+					WithNodeAffinity(apinetv1alpha1ac.NodeAffinity().
+						WithRequiredDuringSchedulingIgnoredDuringExecution(nodeSelector),
+					)
+			}
 		}
 	}
 
