@@ -11,6 +11,8 @@ import (
 	"os"
 	"path/filepath"
 
+	flag "github.com/spf13/pflag"
+
 	ironcorenetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	apinetletconfig "github.com/ironcore-dev/ironcore-net/apinetlet/client/config"
@@ -21,14 +23,10 @@ import (
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
-	flag "github.com/spf13/pflag"
 
-	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
-	// to ensure that exec-entrypoint and run can make use of them.
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/certwatcher"
@@ -37,7 +35,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/metrics/filters"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
-	//+kubebuilder:scaffold:imports
+
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
 var (
@@ -74,6 +73,9 @@ func main() {
 
 	var watchNamespace string
 	var watchFilterValue string
+
+	var isNodeAffinityAware bool
+
 	var tlsOpts []func(*tls.Config)
 
 	flag.StringVar(&metricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
@@ -89,6 +91,7 @@ func main() {
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
+	flag.BoolVar(&isNodeAffinityAware, "is-node-affinity-aware", false, "If set, will determine node affinity topology for loadbalancer daemonsets.")
 
 	configOptions.BindFlags(flag.CommandLine)
 	apiNetGetConfigOptions.BindFlags(flag.CommandLine, config.WithNamePrefix(apiNetFlagPrefix))
@@ -248,11 +251,12 @@ func main() {
 	}
 
 	if err = (&controllers.LoadBalancerReconciler{
-		Client:           mgr.GetClient(),
-		APINetClient:     apiNetCluster.GetClient(),
-		APINetInterface:  apiNetIface,
-		APINetNamespace:  apiNetNamespace,
-		WatchFilterValue: watchFilterValue,
+		Client:              mgr.GetClient(),
+		APINetClient:        apiNetCluster.GetClient(),
+		APINetInterface:     apiNetIface,
+		APINetNamespace:     apiNetNamespace,
+		WatchFilterValue:    watchFilterValue,
+		IsNodeAffinityAware: isNodeAffinityAware,
 	}).SetupWithManager(mgr, apiNetCluster.GetCache()); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "LoadBalancer")
 		os.Exit(1)
