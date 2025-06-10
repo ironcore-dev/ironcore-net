@@ -9,6 +9,8 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/google/uuid"
+	"golang.org/x/exp/slices"
+
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
@@ -19,7 +21,6 @@ import (
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
 
-	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -159,7 +160,10 @@ func (r *NetworkInterfaceReconciler) getLoadBalancerTargetsForNetworkInterface(c
 				return nil, err
 			}
 
-			ipSet.Insert(v1alpha1.GetLoadBalancerIPs(loadBalancer)...)
+			// TODO(balpert): switch this around to actually check the loadbalancers of the same network first to not run into overhead 
+			if loadBalancer.Spec.NetworkRef.Name == nic.Spec.NetworkRef.Name {
+				ipSet.Insert(v1alpha1.GetLoadBalancerIPs(loadBalancer)...)
+			}
 		}
 	}
 
@@ -226,7 +230,7 @@ func extractFirewallRulesFromRule(rule v1alpha1.Rule, direction metalnetv1alpha1
 			baseFirewallRule.ProtocolMatch.ProtocolType = generic.Pointer(metalnetv1alpha1.FirewallRuleProtocolTypeTCP)
 		case corev1.ProtocolUDP:
 			baseFirewallRule.ProtocolMatch.ProtocolType = generic.Pointer(metalnetv1alpha1.FirewallRuleProtocolTypeUDP)
-			//TODO: no support for SCTP protocol in metalnetlet and metalnetlet FirewallRuleProtocolTypeICMP is not defined in ironcore
+			// TODO: no support for SCTP protocol in metalnetlet and metalnetlet FirewallRuleProtocolTypeICMP is not defined in ironcore
 		}
 
 		if port.Port != 0 {
