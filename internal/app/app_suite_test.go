@@ -91,7 +91,7 @@ var _ = BeforeSuite(func() {
 		Port:         testEnvExt.APIServiceInstallOptions.LocalServingPort,
 		CertDir:      testEnvExt.APIServiceInstallOptions.LocalServingCertDir,
 		Args: apiserver.ProcessArgs{
-			"public-prefix": []string{"10.0.0.0/24"},
+			"public-prefix": []string{"10.0.0.0/29", "10.0.1.0/29"},
 		},
 	})
 	Expect(err).NotTo(HaveOccurred())
