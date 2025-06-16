@@ -13,17 +13,15 @@ import (
 
 	"github.com/ironcore-dev/controller-utils/buildutils"
 	"github.com/ironcore-dev/controller-utils/modutils"
-	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
-	apinetclient "github.com/ironcore-dev/ironcore-net/internal/client"
-
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	ironcorenet "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
+	apinetclient "github.com/ironcore-dev/ironcore-net/internal/client"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	envtestutils "github.com/ironcore-dev/ironcore/utils/envtest"
 	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -32,10 +30,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	ctrlconfig "sigs.k8s.io/controller-runtime/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
-	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -187,10 +188,11 @@ func SetupTest(apiNetNamespace *corev1.Namespace) *corev1.Namespace {
 		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
 
 		Expect((&LoadBalancerReconciler{
-			Client:          k8sManager.GetClient(),
-			APINetClient:    k8sManager.GetClient(),
-			APINetInterface: apiNetInterface,
-			APINetNamespace: apiNetNamespace.Name,
+			Client:              k8sManager.GetClient(),
+			APINetClient:        k8sManager.GetClient(),
+			APINetInterface:     apiNetInterface,
+			APINetNamespace:     apiNetNamespace.Name,
+			IsNodeAffinityAware: true,
 		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
 
 		Expect((&NetworkPolicyReconciler{
@@ -206,7 +208,6 @@ func SetupTest(apiNetNamespace *corev1.Namespace) *corev1.Namespace {
 			defer GinkgoRecover()
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
 		}()
-
 	})
 
 	return apiNetNamespace

@@ -11,6 +11,7 @@ import (
 	"github.com/go-logr/logr"
 	"golang.org/x/exp/slices"
 
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
@@ -18,16 +19,15 @@ import (
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	ironcorenet "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
-	metav1ac "k8s.io/client-go/applyconfigurations/meta/v1"
-
-	"github.com/ironcore-dev/controller-utils/clientutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
+
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1ac "k8s.io/client-go/applyconfigurations/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
@@ -49,6 +49,8 @@ type LoadBalancerReconciler struct {
 	APINetNamespace string
 
 	WatchFilterValue string
+
+	IsNodeAffinityAware bool
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
@@ -151,14 +153,19 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 		return ctrl.Result{}, nil
 	}
 
+	apiNetDestinations, err := r.prepareApiNetDestinations(ctx, loadBalancer)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error preparing APINet destinations: %w", err)
+	}
+
 	log.V(1).Info("Applying APINet load balancer")
-	apiNetLoadBalancer, err := r.applyAPINetLoadBalancer(ctx, loadBalancer, apiNetNetworkName)
+	apiNetLoadBalancer, err := r.applyAPINetLoadBalancer(ctx, loadBalancer, apiNetDestinations, apiNetNetworkName)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying APINet load balancer: %w", err)
 	}
 
 	log.V(1).Info("Manage APINet load balancer routing")
-	if err := r.manageAPINetLoadBalancerRouting(ctx, loadBalancer, apiNetLoadBalancer); err != nil {
+	if err := r.manageAPINetLoadBalancerRouting(ctx, loadBalancer, apiNetLoadBalancer, apiNetDestinations); err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -174,13 +181,13 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 	return ctrl.Result{}, nil
 }
 
-func (r *LoadBalancerReconciler) manageAPINetLoadBalancerRouting(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, apiNetLoadBalancer *apinetv1alpha1.LoadBalancer) error {
+func (r *LoadBalancerReconciler) prepareApiNetDestinations(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer) ([]apinetv1alpha1.LoadBalancerDestination, error) {
+	apiNetDsts := make([]apinetv1alpha1.LoadBalancerDestination, 0)
 	loadBalancerRouting := &networkingv1alpha1.LoadBalancerRouting{}
 	if err := r.Get(ctx, client.ObjectKeyFromObject(loadBalancer), loadBalancerRouting); client.IgnoreNotFound(err) != nil {
-		return fmt.Errorf("error getting load balancer routing: %w", err)
+		return nil, fmt.Errorf("error getting load balancer routing: %w", err)
 	}
 
-	apiNetDsts := make([]apinetv1alpha1.LoadBalancerDestination, 0)
 	for _, dst := range loadBalancerRouting.Destinations {
 		var apiNetTargetRef *apinetv1alpha1.LoadBalancerTargetRef
 		if targetRef := dst.TargetRef; targetRef != nil {
@@ -202,6 +209,10 @@ func (r *LoadBalancerReconciler) manageAPINetLoadBalancerRouting(ctx context.Con
 		})
 	}
 
+	return apiNetDsts, nil
+}
+
+func (r *LoadBalancerReconciler) manageAPINetLoadBalancerRouting(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, apiNetLoadBalancer *apinetv1alpha1.LoadBalancer, apiNetDsts []apinetv1alpha1.LoadBalancerDestination) error {
 	apiNetLoadBalancerRouting := &apinetv1alpha1.LoadBalancerRouting{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: apinetv1alpha1.SchemeGroupVersion.String(),
@@ -276,7 +287,7 @@ func (r *LoadBalancerReconciler) getInternalLoadBalancerAPINetIPs(ctx context.Co
 	return ips, nil
 }
 
-func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, apiNetNetworkName string) (*apinetv1alpha1.LoadBalancer, error) {
+func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, apiNetDestinations []apinetv1alpha1.LoadBalancerDestination, apiNetNetworkName string) (*apinetv1alpha1.LoadBalancer, error) {
 	apiNetLoadBalancerType, err := loadBalancerTypeToAPINetLoadBalancerType(loadBalancer.Spec.Type)
 	if err != nil {
 		return nil, err
@@ -315,6 +326,29 @@ func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, lo
 					),
 			),
 		)
+
+	if r.IsNodeAffinityAware {
+		if len(apiNetDestinations) > 0 {
+			nodeSelector := apinetv1alpha1ac.NodeSelector()
+			for i := range apiNetDestinations {
+				if apiNetDestinations[i].TargetRef != nil {
+					apiNetDestinationName := apiNetDestinations[i].TargetRef.NodeRef.Name
+					nodeSelector.WithNodeSelectorTerms(apinetv1alpha1ac.NodeSelectorTerm().WithMatchFields(apinetv1alpha1ac.NodeSelectorRequirement().
+						WithKey("metadata.name").
+						WithOperator(apinetv1alpha1.NodeSelectorOpIn).
+						WithValues([]string{apiNetDestinationName}...),
+					))
+				}
+			}
+			if len(nodeSelector.NodeSelectorTerms) > 0 {
+				apiNetLoadBalancerApplyCfg.Spec.Template.Spec.Affinity.
+					WithNodeAffinity(apinetv1alpha1ac.NodeAffinity().
+						WithRequiredDuringSchedulingIgnoredDuringExecution(nodeSelector),
+					)
+			}
+		}
+	}
+
 	apiNetLoadBalancer, err := r.APINetInterface.CoreV1alpha1().
 		LoadBalancers(r.APINetNamespace).
 		Apply(ctx, apiNetLoadBalancerApplyCfg, metav1.ApplyOptions{FieldManager: string(fieldOwner), Force: true})
