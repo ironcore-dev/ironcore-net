@@ -9,15 +9,16 @@ import (
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	"github.com/ironcore-dev/ironcore/utils/generic"
-	. "github.com/ironcore-dev/ironcore/utils/testing"
 	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gstruct"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	. "github.com/ironcore-dev/ironcore/utils/testing"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gstruct"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
@@ -28,6 +29,7 @@ var _ = Describe("NetworkInterfaceController", func() {
 
 	metalnetNode := SetupMetalnetNode()
 	network := SetupNetwork(ns)
+	secondnetwork := SetupNetwork(ns)
 
 	It("should create a metalnet network interface for a network interface", func(ctx SpecContext) {
 		By("creating a network")
@@ -438,6 +440,140 @@ var _ = Describe("NetworkInterfaceController", func() {
 				Function: "00",
 			},
 		}))
+
+		By("deleting the network interface")
+		Expect(k8sClient.Delete(ctx, nic)).To(Succeed())
+
+		By("waiting for the metalnet network interface to be gone")
+		Eventually(Get(metalnetNic)).Should(Satisfy(apierrors.IsNotFound))
+	})
+
+	It("should create a metalnet network interface for a network interface while ignoring loadbalancer targets from foreign networks", func(ctx SpecContext) {
+		By("creating a network")
+
+		By("creating a network interface")
+		nic := &v1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "nic-",
+				Labels: map[string]string{
+					"app": "target",
+				},
+			},
+			Spec: v1alpha1.NetworkInterfaceSpec{
+				NodeRef: corev1.LocalObjectReference{
+					Name: PartitionNodeName(partitionName, metalnetNode.Name),
+				},
+				NetworkRef: corev1.LocalObjectReference{
+					Name: network.Name,
+				},
+				IPs: []net.IP{
+					net.MustParseIP("10.0.0.1"),
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+
+		By("creating a load balancer")
+		loadBalancer := &v1alpha1.LoadBalancer{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "lb-",
+			},
+			Spec: v1alpha1.LoadBalancerSpec{
+				Type:       v1alpha1.LoadBalancerTypePublic,
+				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+				IPs:        []v1alpha1.LoadBalancerIP{{IPFamily: corev1.IPv4Protocol, Name: "ip-2"}},
+				Selector:   &metav1.LabelSelector{MatchLabels: map[string]string{"foo": "bar"}},
+				Template: v1alpha1.InstanceTemplate{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: map[string]string{"foo": "bar"},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())
+
+		By("creating a load balancer routing")
+		loadBalancerRouting := &v1alpha1.LoadBalancerRouting{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      loadBalancer.Name,
+			},
+			Destinations: []v1alpha1.LoadBalancerDestination{
+				{
+					IP: net.MustParseIP("10.0.0.1"),
+					TargetRef: &v1alpha1.LoadBalancerTargetRef{
+						UID:     nic.UID,
+						Name:    nic.Name,
+						NodeRef: corev1.LocalObjectReference{Name: PartitionNodeName(partitionName, metalnetNode.Name)},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, loadBalancerRouting)).To(Succeed())
+
+		By("creating a load balancer that should be ignored")
+		loadBalancerToIgnore := &v1alpha1.LoadBalancer{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "lb-",
+			},
+			Spec: v1alpha1.LoadBalancerSpec{
+				Type:       v1alpha1.LoadBalancerTypePublic,
+				NetworkRef: corev1.LocalObjectReference{Name: secondnetwork.Name},
+				IPs:        []v1alpha1.LoadBalancerIP{{IPFamily: corev1.IPv4Protocol, Name: "ip-3"}},
+				Selector:   &metav1.LabelSelector{MatchLabels: map[string]string{"foo": "bar"}},
+				Template: v1alpha1.InstanceTemplate{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: map[string]string{"foo": "bar"},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, loadBalancerToIgnore)).To(Succeed())
+
+		By("creating a load balancer routing that should be ignored")
+		loadBalancerRoutingToIgnore := &v1alpha1.LoadBalancerRouting{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      loadBalancerToIgnore.Name,
+			},
+			Destinations: []v1alpha1.LoadBalancerDestination{
+				{
+					IP: net.MustParseIP("10.0.0.1"),
+					TargetRef: &v1alpha1.LoadBalancerTargetRef{
+						UID:     "does-not-exist",
+						Name:    "does-not-exist",
+						NodeRef: corev1.LocalObjectReference{Name: PartitionNodeName(partitionName, metalnetNode.Name)},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, loadBalancerRoutingToIgnore)).To(Succeed())
+
+		By("waiting for the network interface to have a finalizer")
+		Eventually(Object(nic)).Should(HaveField("Finalizers", []string{PartitionFinalizer(partitionName)}))
+
+		By("waiting for the metalnet network interface to be present with the expected values")
+		metalnetNic := &metalnetv1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: metalnetNs.Name,
+				Name:      string(nic.UID),
+			},
+		}
+
+		Eventually(Object(metalnetNic)).Should(SatisfyAll(
+			HaveField("Spec.NetworkRef", Equal(corev1.LocalObjectReference{Name: string(network.UID)})),
+			HaveField("Spec.IPFamilies", ConsistOf(corev1.IPv4Protocol)),
+			HaveField("Spec.IPs", ConsistOf(metalnetv1alpha1.MustParseIP("10.0.0.1"))),
+			HaveField("Spec.LoadBalancerTargets", ConsistOf(
+				MatchFields(IgnoreExtras, Fields{
+					"Prefix": Equal(netip.PrefixFrom(loadBalancer.Spec.IPs[0].IP.Addr, 32)),
+				}),
+			)),
+			HaveField("Spec.NodeName", Equal(&metalnetNode.Name)),
+		))
 
 		By("deleting the network interface")
 		Expect(k8sClient.Delete(ctx, nic)).To(Succeed())

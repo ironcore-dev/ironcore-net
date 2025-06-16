@@ -9,6 +9,8 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/google/uuid"
+	"golang.org/x/exp/slices"
+
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
@@ -19,7 +21,6 @@ import (
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
 
-	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -138,28 +139,35 @@ func (r *NetworkInterfaceReconciler) getMetalnetNetworkNameForNetworkInterface(c
 }
 
 func (r *NetworkInterfaceReconciler) getLoadBalancerTargetsForNetworkInterface(ctx context.Context, nic *v1alpha1.NetworkInterface) ([]net.IP, error) {
-	lbRoutingList := &v1alpha1.LoadBalancerRoutingList{}
-	if err := r.List(ctx, lbRoutingList,
+	lbList := &v1alpha1.LoadBalancerList{}
+	if err := r.List(ctx, lbList,
 		client.InNamespace(nic.Namespace),
 	); err != nil {
-		return nil, fmt.Errorf("error listing load balancer routings: %w", err)
+		return nil, fmt.Errorf("error listing load balancers: %w", err)
+	}
+	relevantLoadBalancers := make([]*v1alpha1.LoadBalancer, 0)
+	for i := range lbList.Items {
+		if nic.Spec.NetworkRef.Name != lbList.Items[i].Spec.NetworkRef.Name {
+			continue
+		}
+
+		relevantLoadBalancers = append(relevantLoadBalancers, &lbList.Items[i])
 	}
 
 	ipSet := sets.New[net.IP]()
-	for _, lbRouting := range lbRoutingList.Items {
+	for _, lb := range relevantLoadBalancers {
+		lbRouting := &v1alpha1.LoadBalancerRouting{}
+		lbRoutingKey := client.ObjectKeyFromObject(lb)
+		if err := r.Get(ctx, lbRoutingKey, lbRouting); client.IgnoreNotFound(err) != nil {
+			return nil, err
+		}
 		hasDst := slices.ContainsFunc(lbRouting.Destinations,
 			func(dst v1alpha1.LoadBalancerDestination) bool {
 				return slices.Contains(nic.Spec.IPs, dst.IP)
 			},
 		)
 		if hasDst {
-			loadBalancer := &v1alpha1.LoadBalancer{}
-			loadBalancerKey := client.ObjectKeyFromObject(&lbRouting)
-			if err := r.Get(ctx, loadBalancerKey, loadBalancer); client.IgnoreNotFound(err) != nil {
-				return nil, err
-			}
-
-			ipSet.Insert(v1alpha1.GetLoadBalancerIPs(loadBalancer)...)
+			ipSet.Insert(v1alpha1.GetLoadBalancerIPs(lb)...)
 		}
 	}
 
@@ -226,7 +234,7 @@ func extractFirewallRulesFromRule(rule v1alpha1.Rule, direction metalnetv1alpha1
 			baseFirewallRule.ProtocolMatch.ProtocolType = generic.Pointer(metalnetv1alpha1.FirewallRuleProtocolTypeTCP)
 		case corev1.ProtocolUDP:
 			baseFirewallRule.ProtocolMatch.ProtocolType = generic.Pointer(metalnetv1alpha1.FirewallRuleProtocolTypeUDP)
-			//TODO: no support for SCTP protocol in metalnetlet and metalnetlet FirewallRuleProtocolTypeICMP is not defined in ironcore
+			// TODO: no support for SCTP protocol in metalnetlet and metalnetlet FirewallRuleProtocolTypeICMP is not defined in ironcore
 		}
 
 		if port.Port != 0 {
