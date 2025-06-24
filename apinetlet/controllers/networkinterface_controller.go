@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 
 	"github.com/go-logr/logr"
 	"golang.org/x/exp/slices"
@@ -224,7 +225,8 @@ func (s *apiNetNetworkInterfaceClaimStrategy) ClaimState(claimer client.Object, 
 func (s *apiNetNetworkInterfaceClaimStrategy) Adopt(ctx context.Context, claimer client.Object, obj client.Object) error {
 	apiNetNic := obj.(*apinetv1alpha1.NetworkInterface)
 	base := apiNetNic.DeepCopy()
-	combinedLabels := make(map[string]string)
+	combinedLabels := make(map[string]string, len(apiNetNic.GetLabels())+len(claimer.GetLabels()))
+	maps.Copy(combinedLabels, apiNetNic.GetLabels())
 	if claimerLabels := claimer.GetLabels(); claimerLabels != nil {
 		for key, value := range claimerLabels {
 			combinedLabels[key] = value
