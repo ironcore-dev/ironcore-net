@@ -329,14 +329,18 @@ func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, lo
 
 	if r.IsNodeAffinityAware {
 		if len(apiNetDestinations) > 0 {
+			uniqueDsts := make(map[string]apinetv1alpha1.LoadBalancerDestination)
+			for _, dst := range apiNetDestinations {
+				uniqueDsts[dst.TargetRef.NodeRef.Name] = dst
+			}
+
 			nodeSelector := apinetv1alpha1ac.NodeSelector()
-			for i := range apiNetDestinations {
-				if apiNetDestinations[i].TargetRef != nil {
-					apiNetDestinationName := apiNetDestinations[i].TargetRef.NodeRef.Name
+			for dstName, dst := range uniqueDsts {
+				if dst.TargetRef != nil {
 					nodeSelector.WithNodeSelectorTerms(apinetv1alpha1ac.NodeSelectorTerm().WithMatchFields(apinetv1alpha1ac.NodeSelectorRequirement().
 						WithKey("metadata.name").
 						WithOperator(apinetv1alpha1.NodeSelectorOpIn).
-						WithValues([]string{apiNetDestinationName}...),
+						WithValues([]string{dstName}...),
 					))
 				}
 			}
