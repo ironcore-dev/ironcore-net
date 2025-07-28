@@ -6,8 +6,10 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"net/netip"
 
 	"github.com/go-logr/logr"
+	"github.com/google/go-cmp/cmp"
 	"github.com/google/uuid"
 	"golang.org/x/exp/slices"
 
@@ -31,6 +33,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
@@ -540,6 +543,64 @@ func (r *NetworkInterfaceReconciler) isPartitionNetworkInterface() predicate.Pre
 	})
 }
 
+func (r *NetworkInterfaceReconciler) metalnetNetworkInterfaceChangedPredicate() predicate.Predicate {
+	cmpOpts := cmp.Options{
+		cmp.Transformer("NetIPAddrToString", func(addr netip.Addr) string {
+			return addr.String()
+		}),
+		cmp.Transformer("NetIPPrefixToString", func(prefix netip.Prefix) string {
+			return prefix.String()
+		}),
+	}
+
+	return predicate.Funcs{
+		CreateFunc: func(evt event.CreateEvent) bool {
+			return true
+		},
+		UpdateFunc: func(evt event.UpdateEvent) bool {
+			oldNic := evt.ObjectOld.(*metalnetv1alpha1.NetworkInterface)
+			newNic := evt.ObjectNew.(*metalnetv1alpha1.NetworkInterface)
+
+			return !cmp.Equal(oldNic.Spec, newNic.Spec, cmpOpts) ||
+				!cmp.Equal(oldNic.Status, newNic.Status, cmpOpts)
+		},
+		DeleteFunc: func(evt event.DeleteEvent) bool {
+			return true
+		},
+		GenericFunc: func(evt event.GenericEvent) bool {
+			return true
+		},
+	}
+}
+
+func (r *NetworkInterfaceReconciler) nodeChangedPredicate() predicate.Predicate {
+	// Create cmp options to ignore LastHeartbeatTime changes in node conditions
+	cmpOpts := cmp.Options{
+		cmp.FilterPath(func(p cmp.Path) bool {
+			return p.String() == "Conditions.LastHeartbeatTime"
+		}, cmp.Ignore()),
+	}
+
+	return predicate.Funcs{
+		CreateFunc: func(evt event.CreateEvent) bool {
+			return true
+		},
+		UpdateFunc: func(evt event.UpdateEvent) bool {
+			oldNode := evt.ObjectOld.(*corev1.Node)
+			newNode := evt.ObjectNew.(*corev1.Node)
+
+			return !cmp.Equal(oldNode.Spec, newNode.Spec, cmpOpts) ||
+				!cmp.Equal(oldNode.Status, newNode.Status, cmpOpts)
+		},
+		DeleteFunc: func(evt event.DeleteEvent) bool {
+			return true
+		},
+		GenericFunc: func(evt event.GenericEvent) bool {
+			return true
+		},
+	}
+}
+
 func (r *NetworkInterfaceReconciler) enqueueByNATTable() handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
 		natTable := obj.(*v1alpha1.NATTable)
@@ -575,12 +636,6 @@ func (r *NetworkInterfaceReconciler) reconcileRequestsByLoadBalancerRouting(
 		client.InNamespace(loadBalancerRouting.Namespace),
 	); err != nil {
 		log.Error(err, "Error listing network interfaces")
-		return nil
-	}
-
-	metalnetNodeList := &corev1.NodeList{}
-	if err := r.MetalnetClient.List(ctx, metalnetNodeList); err != nil {
-		log.Error(err, "Error listing metalnet nodes")
 		return nil
 	}
 
@@ -641,12 +696,6 @@ func (r *NetworkInterfaceReconciler) reconcileRequestsByNetworkPolicyRule(
 		return nil
 	}
 
-	metalnetNodeList := &corev1.NodeList{}
-	if err := r.MetalnetClient.List(ctx, metalnetNodeList); err != nil {
-		log.Error(err, "Error listing metalnet nodes")
-		return nil
-	}
-
 	targetIPs := utilslices.ToSetFunc(networkPolicyRule.Targets,
 		func(target v1alpha1.TargetNetworkInterface) net.IP { return target.IP },
 	)
@@ -691,9 +740,9 @@ func (r *NetworkInterfaceReconciler) enqueueByNetworkPolicy() handler.EventHandl
 	})
 }
 
-func (r *NetworkInterfaceReconciler) enqueueByMetalnetNode() handler.EventHandler {
+func (r *NetworkInterfaceReconciler) enqueueByNode() handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
-		metalnetNode := obj.(*corev1.Node)
+		node := obj.(*corev1.Node)
 		log := ctrl.LoggerFrom(ctx)
 
 		nicList := &v1alpha1.NetworkInterfaceList{}
@@ -703,7 +752,7 @@ func (r *NetworkInterfaceReconciler) enqueueByMetalnetNode() handler.EventHandle
 		}
 
 		var (
-			nodeName = PartitionNodeName(r.PartitionName, metalnetNode.Name)
+			nodeName = PartitionNodeName(r.PartitionName, node.Name)
 			reqs     []ctrl.Request
 		)
 		for _, nic := range nicList.Items {
@@ -748,13 +797,15 @@ func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager, metalnet
 				metalnetCache,
 				&metalnetv1alpha1.NetworkInterface{},
 				utilhandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &v1alpha1.NetworkInterface{}),
+				r.metalnetNetworkInterfaceChangedPredicate(),
 			),
 		).
 		WatchesRawSource(
 			source.Kind[client.Object](
 				metalnetCache,
 				&corev1.Node{},
-				r.enqueueByMetalnetNode(),
+				r.enqueueByNode(),
+				r.nodeChangedPredicate(),
 			),
 		).
 		Complete(r)
