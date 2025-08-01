@@ -42,6 +42,8 @@ type NetworkReconciler struct {
 	APINetNamespace string
 
 	WatchFilterValue string
+
+	NetworkPeeringDisabled bool
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
@@ -124,7 +126,7 @@ func (r *NetworkReconciler) updateNetworkStatus(ctx context.Context, log logr.Lo
 	networkBase := network.DeepCopy()
 	statusPeerings := apiNetNetworkPeeringsStatusToNetworkPeeringsStatus(apiNetNetwork.Status.Peerings, apiNetNetwork.Spec.Peerings)
 	log.V(1).Info("network status peerings", "old", network.Status.Peerings, "new", statusPeerings)
-	if network.Status.State != state || !reflect.DeepEqual(network.Status.Peerings, statusPeerings) {
+	if network.Status.State != state || (!r.NetworkPeeringDisabled && !reflect.DeepEqual(network.Status.Peerings, statusPeerings)) {
 		log.V(1).Info("Patching network status")
 		network.Status.State = state
 		network.Status.Peerings = statusPeerings

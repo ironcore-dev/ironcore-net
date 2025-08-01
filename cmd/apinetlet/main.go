@@ -78,6 +78,8 @@ func main() {
 
 	var tlsOpts []func(*tls.Config)
 
+	var disableNetworkPeering bool
+
 	flag.StringVar(&metricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
 		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
 	flag.BoolVar(&secureMetrics, "metrics-secure", true,
@@ -100,6 +102,8 @@ func main() {
 
 	flag.StringVar(&watchNamespace, "namespace", "", "Namespace that the controller watches to reconcile ironcore objects. If unspecified, the controller watches for ironcore objects across all namespaces.")
 	flag.StringVar(&watchFilterValue, "watch-filter", "", fmt.Sprintf("label value that the controller watches to reconcile ironcore objects. Label key is always %s. If unspecified, the controller watches for all ironcore objects", commonv1alpha1.WatchLabel))
+	flag.BoolVar(&disableNetworkPeering, "disable-network-peering", false,
+		"Disable the metalnet based network peering. If set to true the network peering is handled externally.")
 
 	opts := zap.Options{
 		Development: true,
@@ -274,10 +278,11 @@ func main() {
 	}
 
 	if err = (&controllers.NetworkReconciler{
-		Client:           mgr.GetClient(),
-		APINetClient:     apiNetCluster.GetClient(),
-		APINetNamespace:  apiNetNamespace,
-		WatchFilterValue: watchFilterValue,
+		Client:                 mgr.GetClient(),
+		APINetClient:           apiNetCluster.GetClient(),
+		APINetNamespace:        apiNetNamespace,
+		WatchFilterValue:       watchFilterValue,
+		NetworkPeeringDisabled: disableNetworkPeering,
 	}).SetupWithManager(mgr, apiNetCluster.GetCache()); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Network")
 		os.Exit(1)
