@@ -145,6 +145,10 @@ var _ = BeforeSuite(func() {
 })
 
 func SetupTest(apiNetNamespace *corev1.Namespace) *corev1.Namespace {
+	return SetupTestWithNetworkPeeringFlag(apiNetNamespace, false)
+}
+
+func SetupTestWithNetworkPeeringFlag(apiNetNamespace *corev1.Namespace, isNetworkPeeringDisabled bool) *corev1.Namespace {
 	BeforeEach(func(ctx SpecContext) {
 		k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
 			Scheme: scheme.Scheme,
@@ -169,9 +173,10 @@ func SetupTest(apiNetNamespace *corev1.Namespace) *corev1.Namespace {
 		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
 
 		Expect((&NetworkReconciler{
-			Client:          k8sManager.GetClient(),
-			APINetClient:    k8sManager.GetClient(),
-			APINetNamespace: apiNetNamespace.Name,
+			Client:                 k8sManager.GetClient(),
+			APINetClient:           k8sManager.GetClient(),
+			APINetNamespace:        apiNetNamespace.Name,
+			NetworkPeeringDisabled: isNetworkPeeringDisabled,
 		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
 
 		Expect((&NetworkInterfaceReconciler{
