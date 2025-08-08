@@ -31,6 +31,9 @@ jobs:
             target: apinetlet-manager
           - name: metalnetlet
             target: metalnetlet-manager
+    permissions:
+      contents: read
+      packages: write
     # Condition: Run on push to main, published release, OR PR with 'ok-to-image' label
     if: |
       github.event_name == 'push' || 
