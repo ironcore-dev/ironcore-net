@@ -11,6 +11,7 @@ import (
 
 	apinetopenapi "github.com/ironcore-dev/ironcore-net/client-go/openapi"
 	"k8s.io/apiserver/pkg/endpoints/openapi"
+	"k8s.io/component-base/compatibility"
 
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	informers "github.com/ironcore-dev/ironcore-net/client-go/informers/externalversions"
@@ -26,7 +27,6 @@ import (
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/apiserver/pkg/server/options"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
-	"k8s.io/component-base/version"
 	netutils "k8s.io/utils/net"
 )
 
@@ -119,7 +119,7 @@ func (o *IronCoreNetServerOptions) Config() (*apiserver.Config, error) {
 
 	serverConfig := genericapiserver.NewRecommendedConfig(apiserver.Codecs)
 
-	serverConfig.EffectiveVersion = version.NewEffectiveVersion("1.0")
+	serverConfig.EffectiveVersion = compatibility.NewEffectiveVersionFromString("1.0", "", "")
 
 	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(apinetopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(apiserver.Scheme))
 	serverConfig.OpenAPIConfig.Info.Title = "ironcore-net-api"
