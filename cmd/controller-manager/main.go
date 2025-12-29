@@ -185,7 +185,17 @@ func main() {
 		APIReader:    mgr.GetAPIReader(),
 		AbsenceCache: lru.New(500),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "DaemonSet")
+		setupLog.Error(err, "unable to create controller", "controller", "IPAddressGC")
+		os.Exit(1)
+	}
+
+	if err = (&controllers.IPGCReconciler{
+		Client:       mgr.GetClient(),
+		APIReader:    mgr.GetAPIReader(),
+		RESTMapper:   mgr.GetRESTMapper(),
+		AbsenceCache: lru.New(500),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "IPGC")
 		os.Exit(1)
 	}
 
