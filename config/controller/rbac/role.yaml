@@ -83,15 +83,18 @@ rules:
   - core.apinet.ironcore.dev
   resources:
   - ips
-  - loadbalancers
-  - natgatewayautoscalers
-  - networkpolicies
-  - networks
-  - nodes
   verbs:
   - get
   - list
+  - patch
   - watch
+- apiGroups:
+  - core.apinet.ironcore.dev
+  resources:
+  - ips/finalizers
+  verbs:
+  - patch
+  - update
 - apiGroups:
   - core.apinet.ironcore.dev
   resources:
@@ -105,6 +108,18 @@ rules:
   - list
   - patch
   - update
+  - watch
+- apiGroups:
+  - core.apinet.ironcore.dev
+  resources:
+  - loadbalancers
+  - natgatewayautoscalers
+  - networkpolicies
+  - networks
+  - nodes
+  verbs:
+  - get
+  - list
   - watch
 - apiGroups:
   - core.apinet.ironcore.dev
