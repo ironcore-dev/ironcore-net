@@ -12,7 +12,7 @@ require (
 	github.com/ironcore-dev/ironcore v0.2.4
 	github.com/ironcore-dev/metalnet v0.3.12
 	github.com/onsi/ginkgo/v2 v2.27.3
-	github.com/onsi/gomega v1.38.3
+	github.com/onsi/gomega v1.39.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba
