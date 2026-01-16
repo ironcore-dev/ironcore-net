@@ -15,14 +15,12 @@ import (
 	v1alpha1informers "github.com/ironcore-dev/ironcore-net/client-go/informers/externalversions/core/v1alpha1"
 	v1alpha1client "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned/typed/core/v1alpha1"
 	v1alpha1listers "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
-	"github.com/ironcore-dev/ironcore/utils/generic"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
@@ -34,6 +32,8 @@ var (
 	ErrAllocated = errors.New("provided IP is already allocated")
 	ErrNotFound  = errors.New("provided IP was not found")
 )
+
+const IPEphemeralLabel = "core.apinet.ironcore.dev/ephemeral"
 
 type Allocator struct {
 	prefixes []netip.Prefix
@@ -206,15 +206,8 @@ func (a *Allocator) createEphemeralIP(
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace:    namespace,
 			GenerateName: claimRef.Name + "-",
-			OwnerReferences: []metav1.OwnerReference{
-				{
-					APIVersion:         (schema.GroupVersion{Group: claimRef.Group, Version: version}).String(),
-					Kind:               kind,
-					Name:               claimRef.Name,
-					UID:                claimRef.UID,
-					Controller:         generic.Pointer(true),
-					BlockOwnerDeletion: generic.Pointer(true),
-				},
+			Labels: map[string]string{
+				IPEphemeralLabel: "true",
 			},
 		},
 		Spec: v1alpha1.IPSpec{
@@ -247,9 +240,7 @@ func (a *Allocator) release(namespace string, addr netip.Addr, dryRun bool) erro
 		return nil
 	}
 
-	// If the IP is controlled, we assume it to be ephemeral.
-	// TODO: check on something more robust than just an owner reference.
-	if metav1.GetControllerOf(ip) != nil {
+	if ip.Labels[IPEphemeralLabel] == "true" {
 		err := a.client.IPs(namespace).Delete(context.Background(), ip.Name, metav1.DeleteOptions{})
 		if err == nil {
 			return nil
