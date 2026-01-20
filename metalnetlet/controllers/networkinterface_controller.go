@@ -526,7 +526,7 @@ func (r *NetworkInterfaceReconciler) applyMetalnetNic(ctx context.Context, log l
 			NAT:                 workaroundMetalnetNoIPv6NATDetailsToNATDetailsPointer(natIPs),
 			NodeName:            &metalnetNodeName,
 			FirewallRules:       npRules,
-			// Hostname goes here (from ironcore-net nic to metalnet nic)
+			Hostname:            &nic.Spec.Hostname,
 		},
 	}
 	log.V(1).Info("Applying metalnet network interface")
