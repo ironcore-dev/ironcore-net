@@ -2337,6 +2337,7 @@ func autoConvert_v1alpha1_NetworkInterfaceSpec_To_core_NetworkInterfaceSpec(in *
 	out.IPs = *(*[]net.IP)(unsafe.Pointer(&in.IPs))
 	out.Prefixes = *(*[]net.IPPrefix)(unsafe.Pointer(&in.Prefixes))
 	out.NATs = *(*[]core.NetworkInterfaceNAT)(unsafe.Pointer(&in.NATs))
+	out.Hostname = in.Hostname
 	out.PublicIPs = *(*[]core.NetworkInterfacePublicIP)(unsafe.Pointer(&in.PublicIPs))
 	return nil
 }
@@ -2352,6 +2353,7 @@ func autoConvert_core_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(in *
 	out.IPs = *(*[]net.IP)(unsafe.Pointer(&in.IPs))
 	out.Prefixes = *(*[]net.IPPrefix)(unsafe.Pointer(&in.Prefixes))
 	out.NATs = *(*[]corev1alpha1.NetworkInterfaceNAT)(unsafe.Pointer(&in.NATs))
+	out.Hostname = in.Hostname
 	out.PublicIPs = *(*[]corev1alpha1.NetworkInterfacePublicIP)(unsafe.Pointer(&in.PublicIPs))
 	return nil
 }

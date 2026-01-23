@@ -30,5 +30,28 @@ var _ = Describe("NetworkInterface", func() {
 				"Detail": Equal(apivalidation.FieldImmutableErrorMsg),
 			}))),
 		),
+		Entry("hostname update",
+			&core.NetworkInterfaceSpec{Hostname: "foo"},
+			&core.NetworkInterfaceSpec{Hostname: "bar"},
+			ContainElement(PointTo(MatchFields(IgnoreExtras, Fields{
+				"Type":   Equal(field.ErrorTypeInvalid),
+				"Field":  Equal("spec.hostname"),
+				"Detail": Equal(apivalidation.FieldImmutableErrorMsg),
+			}))),
+		),
+	)
+
+	DescribeTable("ValidateNetworkInterface",
+		func(spec *core.NetworkInterfaceSpec, match types.GomegaMatcher) {
+			allErrs := validation.ValidateNetworkInterfaceSpec(spec, field.NewPath("spec"))
+			Expect(allErrs).To(match)
+		},
+		Entry("invalid hostname",
+			&core.NetworkInterfaceSpec{Hostname: "hostname*"},
+			ContainElement(PointTo(MatchFields(IgnoreExtras, Fields{
+				"Type":  Equal(field.ErrorTypeInvalid),
+				"Field": Equal("spec.hostname"),
+			}))),
+		),
 	)
 })

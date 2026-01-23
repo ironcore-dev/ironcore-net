@@ -604,6 +604,7 @@ var _ = Describe("NetworkInterfaceController", func() {
 				IPs: []net.IP{
 					net.MustParseIP("10.0.0.1"),
 				},
+				Hostname: "foo",
 			},
 		}
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
@@ -624,6 +625,7 @@ var _ = Describe("NetworkInterfaceController", func() {
 			HaveField("Spec.IPFamilies", ConsistOf(corev1.IPv4Protocol)),
 			HaveField("Spec.IPs", ConsistOf(metalnetv1alpha1.MustParseIP("10.0.0.1"))),
 			HaveField("Spec.NodeName", Equal(&metalnetNode.Name)),
+			HaveField("Spec.Hostname", Equal(&nic.Spec.Hostname)),
 		))
 
 		By("updating the metalnet network interface's status")

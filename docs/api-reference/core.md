@@ -1331,6 +1331,17 @@ Can only be set if there is no matching IP family in PublicIPs.</p>
 </tr>
 <tr>
 <td>
+<code>hostname</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Hostname is the hostname which should be announced by the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>publicIPs</code><br/>
 <em>
 <a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfacePublicIP">
@@ -3525,6 +3536,7 @@ github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
 (<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterface">NetworkInterface</a>)
 </p>
 <div>
+<p>NetworkInterfaceSpec defines the desired state of NetworkInterface.</p>
 </div>
 <table>
 <thead>
@@ -3598,6 +3610,17 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <p>NATs specify the NAT of the network interface IP family.
 Can only be set if there is no matching IP family in PublicIPs.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>hostname</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Hostname is the hostname which should be announced by the network interface.</p>
 </td>
 </tr>
 <tr>

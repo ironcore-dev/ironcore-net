@@ -23117,12 +23117,17 @@
 				}
 			},
 			"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkInterfaceSpec": {
+				"description": "NetworkInterfaceSpec defines the desired state of NetworkInterface.",
 				"type": "object",
 				"required": [
 					"nodeRef",
 					"networkRef"
 				],
 				"properties": {
+					"hostname": {
+						"description": "Hostname is the hostname which should be announced by the network interface.",
+						"type": "string"
+					},
 					"ips": {
 						"description": "IPs are the internal IPs of the network interface.",
 						"type": "array",
