@@ -1,0 +1,5650 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../development/setup/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="https://raw.githubusercontent.com/ironcore-dev/ironcore/main/docs/assets/favicon/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Core - IronCore / ironcore-net</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Work+Sans:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Work Sans";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="IronCore / ironcore-net" class="md-header__button md-logo" aria-label="IronCore / ironcore-net" data-md-component="logo">
+      
+  <img src="https://raw.githubusercontent.com/ironcore-dev/ironcore/main/docs/assets/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            IronCore / ironcore-net
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Core
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ironcore-dev/ironcore-net/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="IronCore / ironcore-net" class="md-nav__button md-logo" aria-label="IronCore / ironcore-net" data-md-component="logo">
+      
+  <img src="https://raw.githubusercontent.com/ironcore-dev/ironcore/main/docs/assets/logo.svg" alt="logo">
+
+    </a>
+    IronCore / ironcore-net
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ironcore-dev/ironcore-net/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/ip-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IP lifecycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/ironcore-integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ironcore integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/network-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network lifecycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/objects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Core</h1>
+
+<p>Packages:</p>
+<ul>
+<li>
+<a href="#core.apinet.ironcore.dev%2fv1alpha1">core.apinet.ironcore.dev/v1alpha1</a>
+</li>
+</ul>
+<h2 id="core.apinet.ironcore.dev/v1alpha1">core.apinet.ironcore.dev/v1alpha1</h2>
+<div>
+<p>Package v1alpha1 is the v1alpha1 version of the API.</p>
+</div>
+<p>Resource Types:</p>
+<ul><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.DaemonSet">DaemonSet</a>
+</li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.IP">IP</a>
+</li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.IPAddress">IPAddress</a>
+</li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.Instance">Instance</a>
+</li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancer">LoadBalancer</a>
+</li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerRouting">LoadBalancerRouting</a>
+</li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NATGateway">NATGateway</a>
+</li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NATGatewayAutoscaler">NATGatewayAutoscaler</a>
+</li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NATTable">NATTable</a>
+</li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.Network">Network</a>
+</li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkID">NetworkID</a>
+</li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterface">NetworkInterface</a>
+</li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicy">NetworkPolicy</a>
+</li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyRule">NetworkPolicyRule</a>
+</li><li>
+<a href="#core.apinet.ironcore.dev/v1alpha1.Node">Node</a>
+</li></ul>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.DaemonSet">DaemonSet
+</h3>
+<div>
+<p>DaemonSet is the schema for the daemonsets API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>DaemonSet</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.DaemonSetSpec">
+DaemonSetSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>nodeSelector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>Selector selects all Instance that are managed by this daemon set.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>template</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.InstanceTemplate">
+InstanceTemplate
+</a>
+</em>
+</td>
+<td>
+<p>Template is the instance template.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.DaemonSetStatus">
+DaemonSetStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.IP">IP
+</h3>
+<div>
+<p>IP is the schema for the ips API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>IP</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.IPSpec">
+IPSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.IPType">
+IPType
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipFamily</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#ipfamily-v1-core">
+Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>claimRef</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.IPClaimRef">
+IPClaimRef
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.IPStatus">
+IPStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.IPAddress">IPAddress
+</h3>
+<div>
+<p>IPAddress is the schema for the ipaddresses API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>IPAddress</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.IPAddressSpec">
+IPAddressSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>claimRef</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.IPAddressClaimRef">
+IPAddressClaimRef
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.Instance">Instance
+</h3>
+<div>
+<p>Instance is the schema for the instances API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>Instance</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.InstanceSpec">
+InstanceSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.InstanceType">
+InstanceType
+</a>
+</em>
+</td>
+<td>
+<p>Type specifies the InstanceType to deploy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>loadBalancerType</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerType">
+LoadBalancerType
+</a>
+</em>
+</td>
+<td>
+<p>LoadBalancerType is the load balancer type this instance is for.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef references the network the instance is on.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+[]github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+<p>IPs are the IPs of the instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>loadBalancerPorts</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerPort">
+[]LoadBalancerPort
+</a>
+</em>
+</td>
+<td>
+<p>LoadBalancerPorts are the load balancer ports of this instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>affinity</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.Affinity">
+Affinity
+</a>
+</em>
+</td>
+<td>
+<p>Affinity are affinity constraints.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>topologySpreadConstraints</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.TopologySpreadConstraint">
+[]TopologySpreadConstraint
+</a>
+</em>
+</td>
+<td>
+<p>TopologySpreadConstraints describes how a group of instances ought to spread across topology
+domains. Scheduler will schedule instances in a way which abides by the constraints.
+All topologySpreadConstraints are ANDed.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>nodeRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NodeRef references the node hosting the load balancer instance.
+Will be set by the scheduler if empty.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.InstanceStatus">
+InstanceStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.LoadBalancer">LoadBalancer
+</h3>
+<div>
+<p>LoadBalancer is the schema for the loadbalancers API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>LoadBalancer</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerSpec">
+LoadBalancerSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerType">
+LoadBalancerType
+</a>
+</em>
+</td>
+<td>
+<p>Type specifies the type of load balancer.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef references the network the load balancer is part of.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerIP">
+[]LoadBalancerIP
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>IPs specifies the IPs of the load balancer.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ports</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerPort">
+[]LoadBalancerPort
+</a>
+</em>
+</td>
+<td>
+<p>Ports are the ports the load balancer should allow.
+If empty, the load balancer allows all ports.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>selector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>Selector selects all Instance that are managed by this daemon set.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>template</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.InstanceTemplate">
+InstanceTemplate
+</a>
+</em>
+</td>
+<td>
+<p>Template is the instance template.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerStatus">
+LoadBalancerStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.LoadBalancerRouting">LoadBalancerRouting
+</h3>
+<div>
+<p>LoadBalancerRouting is the schema for the loadbalancerroutings API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>LoadBalancerRouting</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>destinations</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerDestination">
+[]LoadBalancerDestination
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NATGateway">NATGateway
+</h3>
+<div>
+<p>NATGateway is the schema for the natgateways API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>NATGateway</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NATGatewaySpec">
+NATGatewaySpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>ipFamily</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#ipfamily-v1-core">
+Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamily is the IP family of the NAT gateway.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef references the network the NAT gateway is part of.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NATGatewayIP">
+[]NATGatewayIP
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>IPs specifies the IPs of the NAT gateway.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>portsPerNetworkInterface</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>PortsPerNetworkInterface specifies how many ports to allocate per network interface.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NATGatewayStatus">
+NATGatewayStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NATGatewayAutoscaler">NATGatewayAutoscaler
+</h3>
+<div>
+<p>NATGatewayAutoscaler is the schema for the natgatewayautoscalers API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>NATGatewayAutoscaler</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NATGatewayAutoscalerSpec">
+NATGatewayAutoscalerSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>natGatewayRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NATGatewayRef points to the target NATGateway to scale.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>minPublicIPs</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>MinPublicIPs is the minimum number of public IPs to allocate for a NAT Gateway.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>maxPublicIPs</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>MaxPublicIPs is the maximum number of public IPs to allocate for a NAT Gateway.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NATGatewayAutoscalerStatus">
+NATGatewayAutoscalerStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NATTable">NATTable
+</h3>
+<div>
+<p>NATTable is the schema for the nattables API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>NATTable</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NATIP">
+[]NATIP
+</a>
+</em>
+</td>
+<td>
+<p>IPs specifies how to NAT the IPs for the NAT gateway.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.Network">Network
+</h3>
+<div>
+<p>Network is the schema for the networks API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>Network</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkSpec">
+NetworkSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>id</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ID is the ID of the network.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>peerings</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeering">
+[]NetworkPeering
+</a>
+</em>
+</td>
+<td>
+<p>Peerings are the network peerings with this network</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkStatus">
+NetworkStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkID">NetworkID
+</h3>
+<div>
+<p>NetworkID is the schema for the networkids API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>NetworkID</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkIDSpec">
+NetworkIDSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>claimRef</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkIDClaimRef">
+NetworkIDClaimRef
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkInterface">NetworkInterface
+</h3>
+<div>
+<p>NetworkInterface is the schema for the networkinterfaces API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>NetworkInterface</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceSpec">
+NetworkInterfaceSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>nodeRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NodeRef is the node the network interface is hosted on.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef references the network that the network interface is in.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+[]github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+<p>IPs are the internal IPs of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefixes</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IPPrefix">
+[]github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Prefixes are additional prefixes to route to the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>natGateways</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceNAT">
+[]NetworkInterfaceNAT
+</a>
+</em>
+</td>
+<td>
+<p>NATs specify the NAT of the network interface IP family.
+Can only be set if there is no matching IP family in PublicIPs.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>hostname</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Hostname is the hostname which should be announced by the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>publicIPs</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfacePublicIP">
+[]NetworkInterfacePublicIP
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>PublicIPs are the public IPs the network interface should have.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceStatus">
+NetworkInterfaceStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicy">NetworkPolicy
+</h3>
+<div>
+<p>NetworkPolicy is the Schema for the networkpolicies API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>NetworkPolicy</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicySpec">
+NetworkPolicySpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the network to regulate using this policy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaceSelector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaceSelector selects the network interfaces that are subject to this policy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>priority</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Priority is an optional field that specifies the order in which the policy is applied.
+Policies with higher &ldquo;order&rdquo; are applied after those with lower
+order.  If the order is omitted, it may be considered to be &ldquo;infinite&rdquo; - i.e. the
+policy will be applied last.  Policies with identical order will be applied in
+alphanumerical order based on the Policy &ldquo;Name&rdquo;.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ingress</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyIngressRule">
+[]NetworkPolicyIngressRule
+</a>
+</em>
+</td>
+<td>
+<p>Ingress specifies rules for ingress traffic.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>egress</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyEgressRule">
+[]NetworkPolicyEgressRule
+</a>
+</em>
+</td>
+<td>
+<p>Egress specifies rules for egress traffic.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>policyTypes</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.PolicyType">
+[]PolicyType
+</a>
+</em>
+</td>
+<td>
+<p>PolicyTypes specifies the types of policies this network policy contains.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicyRule">NetworkPolicyRule
+</h3>
+<div>
+<p>NetworkPolicyRule is the schema for the networkpolicyrules API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>NetworkPolicyRule</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LocalUIDReference">
+LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the network to which network policy is applied.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>targets</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.TargetNetworkInterface">
+[]TargetNetworkInterface
+</a>
+</em>
+</td>
+<td>
+<p>Targets are the targets of the network policy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>priority</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Priority is an optional field that specifies the order in which the policy is applied.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ingressRule</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.Rule">
+[]Rule
+</a>
+</em>
+</td>
+<td>
+<p>IngressRules are the ingress rules.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>egressRule</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.Rule">
+[]Rule
+</a>
+</em>
+</td>
+<td>
+<p>EgressRules are the egress rules.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.Node">Node
+</h3>
+<div>
+<p>Node is the schema for the nodes API.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+core.apinet.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>Node</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NodeSpec">
+NodeSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NodeStatus">
+NodeStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.Affinity">Affinity
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.InstanceSpec">InstanceSpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>nodeAffinity</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NodeAffinity">
+NodeAffinity
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>instanceAntiAffinity</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.InstanceAntiAffinity">
+InstanceAntiAffinity
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.DaemonSetSpec">DaemonSetSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.DaemonSet">DaemonSet</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>nodeSelector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>Selector selects all Instance that are managed by this daemon set.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>template</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.InstanceTemplate">
+InstanceTemplate
+</a>
+</em>
+</td>
+<td>
+<p>Template is the instance template.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.DaemonSetStatus">DaemonSetStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.DaemonSet">DaemonSet</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>collisionCount</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.IPAddressClaimRef">IPAddressClaimRef
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.IPAddressSpec">IPAddressSpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>group</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>resource</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>namespace</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.IPAddressSpec">IPAddressSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.IPAddress">IPAddress</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>claimRef</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.IPAddressClaimRef">
+IPAddressClaimRef
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.IPBlock">IPBlock
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPeer">NetworkPolicyPeer</a>, <a href="#core.apinet.ironcore.dev/v1alpha1.Rule">Rule</a>)
+</p>
+<div>
+<p>IPBlock specifies an ip block with optional exceptions.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>cidr</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IPPrefix">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>CIDR is a string representing the ip block.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>except</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IPPrefix">
+[]github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Except is a slice of CIDRs that should not be included within the specified CIDR.
+Values will be rejected if they are outside CIDR.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.IPClaimRef">IPClaimRef
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.IPSpec">IPSpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>group</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>resource</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.IPSpec">IPSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.IP">IP</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.IPType">
+IPType
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipFamily</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#ipfamily-v1-core">
+Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>claimRef</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.IPClaimRef">
+IPClaimRef
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.IPStatus">IPStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.IP">IP</a>)
+</p>
+<div>
+</div>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.IPType">IPType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.IPSpec">IPSpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Public&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.InstanceAffinityTerm">InstanceAffinityTerm
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.InstanceAntiAffinity">InstanceAntiAffinity</a>)
+</p>
+<div>
+<p>InstanceAffinityTerm defines a set of instances (namely those matching the labelSelector that this instance should be
+co-located (affinity) or not co-located (anti-affinity) with, where co-located is defined as running on a node whose
+value of the label with key <topologyKey> matches that of any node on which a instance of the set of instances is running.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>labelSelector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>LabelSelector over a set of resources, in this case instances.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>topologyKey</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>TopologyKey indicates that this instance should be co-located (affinity) or not co-located (anti-affinity)
+with the instances matching the labelSelector, where co-located is defined as running on a
+node whose value of the label with key topologyKey matches that of any node on which any of the
+selected instances is running.
+Empty topologyKey is not allowed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.InstanceAntiAffinity">InstanceAntiAffinity
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.Affinity">Affinity</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>requiredDuringSchedulingIgnoredDuringExecution</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.InstanceAffinityTerm">
+[]InstanceAffinityTerm
+</a>
+</em>
+</td>
+<td>
+<p>RequiredDuringSchedulingIgnoredDuringExecution specifies anti-affinity requirements at
+scheduling time, that, if not met, will cause the instance not be scheduled onto the node.
+When there are multiple elements, the lists of nodes corresponding to each
+instanceAffinityTerm are intersected, i.e. all terms must be satisfied.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.InstanceSpec">InstanceSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.Instance">Instance</a>, <a href="#core.apinet.ironcore.dev/v1alpha1.InstanceTemplate">InstanceTemplate</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.InstanceType">
+InstanceType
+</a>
+</em>
+</td>
+<td>
+<p>Type specifies the InstanceType to deploy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>loadBalancerType</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerType">
+LoadBalancerType
+</a>
+</em>
+</td>
+<td>
+<p>LoadBalancerType is the load balancer type this instance is for.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef references the network the instance is on.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+[]github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+<p>IPs are the IPs of the instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>loadBalancerPorts</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerPort">
+[]LoadBalancerPort
+</a>
+</em>
+</td>
+<td>
+<p>LoadBalancerPorts are the load balancer ports of this instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>affinity</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.Affinity">
+Affinity
+</a>
+</em>
+</td>
+<td>
+<p>Affinity are affinity constraints.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>topologySpreadConstraints</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.TopologySpreadConstraint">
+[]TopologySpreadConstraint
+</a>
+</em>
+</td>
+<td>
+<p>TopologySpreadConstraints describes how a group of instances ought to spread across topology
+domains. Scheduler will schedule instances in a way which abides by the constraints.
+All topologySpreadConstraints are ANDed.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>nodeRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NodeRef references the node hosting the load balancer instance.
+Will be set by the scheduler if empty.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.InstanceStatus">InstanceStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.Instance">Instance</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+[]github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>collisionCount</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.InstanceTemplate">InstanceTemplate
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.DaemonSetSpec">DaemonSetSpec</a>, <a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerSpec">LoadBalancerSpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.InstanceSpec">
+InstanceSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.InstanceType">
+InstanceType
+</a>
+</em>
+</td>
+<td>
+<p>Type specifies the InstanceType to deploy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>loadBalancerType</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerType">
+LoadBalancerType
+</a>
+</em>
+</td>
+<td>
+<p>LoadBalancerType is the load balancer type this instance is for.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef references the network the instance is on.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+[]github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+<p>IPs are the IPs of the instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>loadBalancerPorts</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerPort">
+[]LoadBalancerPort
+</a>
+</em>
+</td>
+<td>
+<p>LoadBalancerPorts are the load balancer ports of this instance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>affinity</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.Affinity">
+Affinity
+</a>
+</em>
+</td>
+<td>
+<p>Affinity are affinity constraints.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>topologySpreadConstraints</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.TopologySpreadConstraint">
+[]TopologySpreadConstraint
+</a>
+</em>
+</td>
+<td>
+<p>TopologySpreadConstraints describes how a group of instances ought to spread across topology
+domains. Scheduler will schedule instances in a way which abides by the constraints.
+All topologySpreadConstraints are ANDed.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>nodeRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NodeRef references the node hosting the load balancer instance.
+Will be set by the scheduler if empty.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.InstanceType">InstanceType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.InstanceSpec">InstanceSpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;LoadBalancer&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.LoadBalancerDestination">LoadBalancerDestination
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerRouting">LoadBalancerRouting</a>)
+</p>
+<div>
+<p>LoadBalancerDestination is the destination of the load balancer.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+<p>IP is the target IP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>targetRef</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerTargetRef">
+LoadBalancerTargetRef
+</a>
+</em>
+</td>
+<td>
+<p>TargetRef is the target providing the destination.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.LoadBalancerIP">LoadBalancerIP
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerSpec">LoadBalancerSpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the load balancer IP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipFamily</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#ipfamily-v1-core">
+Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamily is the IP family of the IP. Has to match IP if specified. If unspecified and IP is specified,
+will be defaulted by using the IP family of IP.
+If only IPFamily is specified, a random IP of that family will be allocated if possible.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+<p>IP specifies a specific IP to allocate. If empty, a random IP will be allocated if possible.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.LoadBalancerPort">LoadBalancerPort
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.InstanceSpec">InstanceSpec</a>, <a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerSpec">LoadBalancerSpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>protocol</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#protocol-v1-core">
+Kubernetes core/v1.Protocol
+</a>
+</em>
+</td>
+<td>
+<p>Protocol is the protocol the load balancer should allow.
+If not specified, defaults to TCP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>port</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Port is the port to allow.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>endPort</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>EndPort marks the end of the port range to allow.
+If unspecified, only a single port, Port, will be allowed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.LoadBalancerSpec">LoadBalancerSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancer">LoadBalancer</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerType">
+LoadBalancerType
+</a>
+</em>
+</td>
+<td>
+<p>Type specifies the type of load balancer.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef references the network the load balancer is part of.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerIP">
+[]LoadBalancerIP
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>IPs specifies the IPs of the load balancer.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ports</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerPort">
+[]LoadBalancerPort
+</a>
+</em>
+</td>
+<td>
+<p>Ports are the ports the load balancer should allow.
+If empty, the load balancer allows all ports.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>selector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>Selector selects all Instance that are managed by this daemon set.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>template</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.InstanceTemplate">
+InstanceTemplate
+</a>
+</em>
+</td>
+<td>
+<p>Template is the instance template.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.LoadBalancerStatus">LoadBalancerStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancer">LoadBalancer</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>collisionCount</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>CollisionCount is used to construct names for IP addresses for the load balancer.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.LoadBalancerTargetRef">LoadBalancerTargetRef
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerDestination">LoadBalancerDestination</a>)
+</p>
+<div>
+<p>LoadBalancerTargetRef is a load balancer target.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+<p>UID is the UID of the target.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the target.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>nodeRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NodeRef references the node the destination network interface is on.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.LoadBalancerType">LoadBalancerType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.InstanceSpec">InstanceSpec</a>, <a href="#core.apinet.ironcore.dev/v1alpha1.LoadBalancerSpec">LoadBalancerSpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Internal&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Public&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.LocalUIDReference">LocalUIDReference
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyRule">NetworkPolicyRule</a>, <a href="#core.apinet.ironcore.dev/v1alpha1.TargetNetworkInterface">TargetNetworkInterface</a>)
+</p>
+<div>
+<p>LocalUIDReference is a reference to another entity including its UID</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the referenced entity.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+<p>UID is the UID of the referenced entity.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NATGatewayAutoscalerSpec">NATGatewayAutoscalerSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NATGatewayAutoscaler">NATGatewayAutoscaler</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>natGatewayRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NATGatewayRef points to the target NATGateway to scale.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>minPublicIPs</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>MinPublicIPs is the minimum number of public IPs to allocate for a NAT Gateway.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>maxPublicIPs</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>MaxPublicIPs is the maximum number of public IPs to allocate for a NAT Gateway.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NATGatewayAutoscalerStatus">NATGatewayAutoscalerStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NATGatewayAutoscaler">NATGatewayAutoscaler</a>)
+</p>
+<div>
+</div>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NATGatewayIP">NATGatewayIP
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NATGatewaySpec">NATGatewaySpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the semantic name of the NAT gateway IP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+<p>IP specifies a specific IP to allocate. If empty, a random IP will be allocated if possible.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NATGatewaySpec">NATGatewaySpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NATGateway">NATGateway</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ipFamily</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#ipfamily-v1-core">
+Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamily is the IP family of the NAT gateway.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef references the network the NAT gateway is part of.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NATGatewayIP">
+[]NATGatewayIP
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>IPs specifies the IPs of the NAT gateway.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>portsPerNetworkInterface</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>PortsPerNetworkInterface specifies how many ports to allocate per network interface.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NATGatewayStatus">NATGatewayStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NATGateway">NATGateway</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>usedNATIPs</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>UsedNATIPs is the number of NAT IPs in-use.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>requestedNATIPs</code><br/>
+<em>
+int64
+</em>
+</td>
+<td>
+<p>RequestedNATIPs is the number of requested NAT IPs.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NATIP">NATIP
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NATTable">NATTable</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+<p>IP is the IP to NAT.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>sections</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NATIPSection">
+[]NATIPSection
+</a>
+</em>
+</td>
+<td>
+<p>Sections are the sections of the NATIP.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NATIPSection">NATIPSection
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NATIP">NATIP</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+<p>IP is the source IP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>port</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Port is the start port of the section.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>endPort</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>EndPort is the end port of the section</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>targetRef</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NATTableIPTargetRef">
+NATTableIPTargetRef
+</a>
+</em>
+</td>
+<td>
+<p>TargetRef references the entity having the IP.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NATTableIPTargetRef">NATTableIPTargetRef
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NATIPSection">NATIPSection</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+<p>UID is the UID of the target.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the target.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>nodeRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NodeRef references the node the destination network interface is on.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkIDClaimRef">NetworkIDClaimRef
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkIDSpec">NetworkIDSpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>group</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>resource</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>namespace</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkIDSpec">NetworkIDSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkID">NetworkID</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>claimRef</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkIDClaimRef">
+NetworkIDClaimRef
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceNAT">NetworkInterfaceNAT
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ipFamily</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#ipfamily-v1-core">
+Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamily is the IP family of the handling NAT gateway.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>claimRef</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceNATClaimRef">
+NetworkInterfaceNATClaimRef
+</a>
+</em>
+</td>
+<td>
+<p>ClaimRef references the NAT claim handling the network interface&rsquo;s NAT.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceNATClaimRef">NetworkInterfaceNATClaimRef
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceNAT">NetworkInterfaceNAT</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the claiming NAT gateway.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>uid</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID">
+k8s.io/apimachinery/pkg/types.UID
+</a>
+</em>
+</td>
+<td>
+<p>UID is the uid of the claiming NAT gateway.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkInterfacePublicIP">NetworkInterfacePublicIP
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the semantic name of the network interface public IP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipFamily</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#ipfamily-v1-core">
+Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamily is the IP family of the IP. Has to match IP if specified. If unspecified and IP is specified,
+will be defaulted by using the IP family of IP.
+If only IPFamily is specified, a random IP of that family will be allocated if possible.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+<p>IP specifies a specific IP to allocate. If empty, a random ephemeral IP will be allocated.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceSpec">NetworkInterfaceSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterface">NetworkInterface</a>)
+</p>
+<div>
+<p>NetworkInterfaceSpec defines the desired state of NetworkInterface.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>nodeRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NodeRef is the node the network interface is hosted on.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef references the network that the network interface is in.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+[]github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+<p>IPs are the internal IPs of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefixes</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IPPrefix">
+[]github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Prefixes are additional prefixes to route to the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>natGateways</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceNAT">
+[]NetworkInterfaceNAT
+</a>
+</em>
+</td>
+<td>
+<p>NATs specify the NAT of the network interface IP family.
+Can only be set if there is no matching IP family in PublicIPs.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>hostname</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Hostname is the hostname which should be announced by the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>publicIPs</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfacePublicIP">
+[]NetworkInterfacePublicIP
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>PublicIPs are the public IPs the network interface should have.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceState">NetworkInterfaceState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Error&#34;</p></td>
+<td><p>NetworkInterfaceStateError is used for any NetworkInterface that is some error occurred.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>NetworkInterfaceStatePending is used for any NetworkInterface that is in an intermediate state.</p>
+</td>
+</tr><tr><td><p>&#34;Ready&#34;</p></td>
+<td><p>NetworkInterfaceStateReady is used for any NetworkInterface that is ready.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterface">NetworkInterface</a>)
+</p>
+<div>
+<p>NetworkInterfaceStatus defines the observed state of NetworkInterface.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceState">
+NetworkInterfaceState
+</a>
+</em>
+</td>
+<td>
+<p>State is the state of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>pciAddress</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.PCIAddress">
+PCIAddress
+</a>
+</em>
+</td>
+<td>
+<p>PCIAddress is the PCI address of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tapDevice</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.TAPDevice">
+TAPDevice
+</a>
+</em>
+</td>
+<td>
+<p>TAPDevice is the TAP device of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefixes</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IPPrefix">
+[]github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Prefixes are the prefixes of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>publicIPs</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+[]github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+<p>PublicIPs are the public IPs of the network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>natIPs</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+[]github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+<p>NATIPs are the NAT IPs of the network interface.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPeering">NetworkPeering
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkSpec">NetworkSpec</a>)
+</p>
+<div>
+<p>NetworkPeering defines a network peering with another network.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the semantical name of the network peering.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>id</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ID is the ID of the network to peer with.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefixes</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.PeeringPrefix">
+[]PeeringPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Prefixes is a list of prefixes that we want only to be exposed
+to the peered network, if no prefixes are specified no filtering will be done.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPeeringState">NetworkPeeringState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus</a>)
+</p>
+<div>
+<p>NetworkPeeringState is the state a NetworkPeering can be in</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Error&#34;</p></td>
+<td><p>NetworkPeeringStateError signals that the network peering is in error state.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>NetworkPeeringStatePending signals that the network peering is not applied.</p>
+</td>
+</tr><tr><td><p>&#34;Ready&#34;</p></td>
+<td><p>NetworkPeeringStateReady signals that the network peering is ready.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPeeringStatus">NetworkPeeringStatus
+</h3>
+<div>
+<p>NetworkPeeringStatus is the status of a network peering.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>id</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>ID is the ID of network</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeeringState">
+NetworkPeeringState
+</a>
+</em>
+</td>
+<td>
+<p>State represents the network peering state</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicyEgressRule">NetworkPolicyEgressRule
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicySpec">NetworkPolicySpec</a>)
+</p>
+<div>
+<p>NetworkPolicyEgressRule describes a rule to regulate egress traffic with.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ports</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPort">
+[]NetworkPolicyPort
+</a>
+</em>
+</td>
+<td>
+<p>Ports specifies the list of destination ports that can be called with
+this rule. Each item in this list is combined using a logical OR. Empty matches all ports.
+As soon as a single item is present, only these ports are allowed.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>to</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPeer">
+[]NetworkPolicyPeer
+</a>
+</em>
+</td>
+<td>
+<p>To specifies the list of destinations which the selected network interfaces should be
+able to send traffic to. Fields are combined using a logical OR. Empty matches all destinations.
+As soon as a single item is present, only these peers are allowed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicyIngressRule">NetworkPolicyIngressRule
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicySpec">NetworkPolicySpec</a>)
+</p>
+<div>
+<p>NetworkPolicyIngressRule describes a rule to regulate ingress traffic with.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>from</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPeer">
+[]NetworkPolicyPeer
+</a>
+</em>
+</td>
+<td>
+<p>From specifies the list of sources which should be able to send traffic to the
+selected network interfaces. Fields are combined using a logical OR. Empty matches all sources.
+As soon as a single item is present, only these peers are allowed.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ports</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPort">
+[]NetworkPolicyPort
+</a>
+</em>
+</td>
+<td>
+<p>Ports specifies the list of ports which should be made accessible for
+this rule. Each item in this list is combined using a logical OR. Empty matches all ports.
+As soon as a single item is present, only these ports are allowed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPeer">NetworkPolicyPeer
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyEgressRule">NetworkPolicyEgressRule</a>, <a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyIngressRule">NetworkPolicyIngressRule</a>)
+</p>
+<div>
+<p>NetworkPolicyPeer describes a peer to allow traffic to / from.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>objectSelector</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.ObjectSelector">
+ObjectSelector
+</a>
+</em>
+</td>
+<td>
+<p>ObjectSelector selects peers with the given kind matching the label selector.
+Exclusive with other peer specifiers.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ipBlock</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.IPBlock">
+IPBlock
+</a>
+</em>
+</td>
+<td>
+<p>IPBlock specifies the ip block from or to which network traffic may come.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPort">NetworkPolicyPort
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyEgressRule">NetworkPolicyEgressRule</a>, <a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyIngressRule">NetworkPolicyIngressRule</a>, <a href="#core.apinet.ironcore.dev/v1alpha1.Rule">Rule</a>)
+</p>
+<div>
+<p>NetworkPolicyPort describes a port to allow traffic on</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>protocol</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#protocol-v1-core">
+Kubernetes core/v1.Protocol
+</a>
+</em>
+</td>
+<td>
+<p>Protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this
+field defaults to TCP.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>port</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>The port on the given protocol. If this field is not provided, this matches
+all port names and numbers.
+If present, only traffic on the specified protocol AND port will be matched.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>endPort</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>EndPort indicates that the range of ports from Port to EndPort, inclusive,
+should be allowed by the policy. This field cannot be defined if the port field
+is not defined. The endPort must be equal or greater than port.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkPolicySpec">NetworkPolicySpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicy">NetworkPolicy</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>networkRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>NetworkRef is the network to regulate using this policy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkInterfaceSelector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>NetworkInterfaceSelector selects the network interfaces that are subject to this policy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>priority</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Priority is an optional field that specifies the order in which the policy is applied.
+Policies with higher &ldquo;order&rdquo; are applied after those with lower
+order.  If the order is omitted, it may be considered to be &ldquo;infinite&rdquo; - i.e. the
+policy will be applied last.  Policies with identical order will be applied in
+alphanumerical order based on the Policy &ldquo;Name&rdquo;.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ingress</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyIngressRule">
+[]NetworkPolicyIngressRule
+</a>
+</em>
+</td>
+<td>
+<p>Ingress specifies rules for ingress traffic.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>egress</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyEgressRule">
+[]NetworkPolicyEgressRule
+</a>
+</em>
+</td>
+<td>
+<p>Egress specifies rules for egress traffic.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>policyTypes</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.PolicyType">
+[]PolicyType
+</a>
+</em>
+</td>
+<td>
+<p>PolicyTypes specifies the types of policies this network policy contains.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkSpec">NetworkSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.Network">Network</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>id</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>ID is the ID of the network.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>peerings</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeering">
+[]NetworkPeering
+</a>
+</em>
+</td>
+<td>
+<p>Peerings are the network peerings with this network</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkState">NetworkState
+(<code>string</code> alias)</h3>
+<div>
+<p>NetworkState is the state of a network.</p>
+</div>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NetworkStatus">NetworkStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.Network">Network</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>peerings</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.[]./api/core/v1alpha1.NetworkPeeringStatus">
+map[string][]./api/core/v1alpha1.NetworkPeeringStatus
+</a>
+</em>
+</td>
+<td>
+<p>Peerings contains the states of the network peerings for the network.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NodeAffinity">NodeAffinity
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.Affinity">Affinity</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>requiredDuringSchedulingIgnoredDuringExecution</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NodeSelector">
+NodeSelector
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NodeSelector">NodeSelector
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NodeAffinity">NodeAffinity</a>)
+</p>
+<div>
+<p>NodeSelector represents the union of the results of one or more queries
+over a set of nodes; that is, it represents the OR of the selectors represented
+by the node selector terms.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>nodeSelectorTerms</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NodeSelectorTerm">
+[]NodeSelectorTerm
+</a>
+</em>
+</td>
+<td>
+<p>Required. A list of node selector terms. The terms are ORed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NodeSelectorOperator">NodeSelectorOperator
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NodeSelectorRequirement">NodeSelectorRequirement</a>)
+</p>
+<div>
+<p>NodeSelectorOperator is the set of operators that can be used in
+a node selector requirement.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;DoesNotExist&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Exists&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Gt&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;In&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Lt&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;NotIn&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NodeSelectorRequirement">NodeSelectorRequirement
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NodeSelectorTerm">NodeSelectorTerm</a>)
+</p>
+<div>
+<p>NodeSelectorRequirement is a requirement for a selector. It&rsquo;s a combination of the key to match, the operator
+to match with, and zero to n values, depending on the operator.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>key</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Key is the key the selector applies to.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>operator</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NodeSelectorOperator">
+NodeSelectorOperator
+</a>
+</em>
+</td>
+<td>
+<p>Operator represents the key&rsquo;s relationship to the values.
+Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>values</code><br/>
+<em>
+[]string
+</em>
+</td>
+<td>
+<p>Values are the values to relate the key to via the operator.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NodeSelectorTerm">NodeSelectorTerm
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NodeSelector">NodeSelector</a>)
+</p>
+<div>
+<p>NodeSelectorTerm matches no objects if it&rsquo;s empty. The requirements of the selector are ANDed.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>matchExpressions</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NodeSelectorRequirement">
+[]NodeSelectorRequirement
+</a>
+</em>
+</td>
+<td>
+<p>MatchExpressions matches nodes by the label selector requirements.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>matchFields</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NodeSelectorRequirement">
+[]NodeSelectorRequirement
+</a>
+</em>
+</td>
+<td>
+<p>MatchFields matches the nodes by their fields.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NodeSpec">NodeSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.Node">Node</a>)
+</p>
+<div>
+</div>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.NodeStatus">NodeStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.Node">Node</a>)
+</p>
+<div>
+</div>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.ObjectIP">ObjectIP
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.Rule">Rule</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ipFamily</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#ipfamily-v1-core">
+Kubernetes core/v1.IPFamily
+</a>
+</em>
+</td>
+<td>
+<p>IPFamily is the IPFamily of the prefix.
+If unset but Prefix is set, this can be inferred.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefix</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IPPrefix">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>Prefix is the prefix of the IP.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.ObjectSelector">ObjectSelector
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPeer">NetworkPolicyPeer</a>)
+</p>
+<div>
+<p>ObjectSelector specifies how to select objects of a certain kind.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>kind</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Kind is the kind of object to select.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>LabelSelector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>
+(Members of <code>LabelSelector</code> are embedded into this type.)
+</p>
+<p>LabelSelector is the label selector to select objects of the specified Kind by.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.PCIAddress">PCIAddress
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
+</p>
+<div>
+<p>PCIAddress is a PCI address.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>domain</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>bus</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>slot</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>function</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.PeeringPrefix">PeeringPrefix
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPeering">NetworkPeering</a>)
+</p>
+<div>
+<p>PeeringPrefix defines prefixes to be exposed to the peered network</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the semantical name of the peering prefixes</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>prefix</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IPPrefix">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix
+</a>
+</em>
+</td>
+<td>
+<p>CIDR to be exposed to the peered network</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.PolicyType">PolicyType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicySpec">NetworkPolicySpec</a>)
+</p>
+<div>
+<p>PolicyType is a type of policy.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Egress&#34;</p></td>
+<td><p>PolicyTypeEgress is a policy that describes egress traffic.</p>
+</td>
+</tr><tr><td><p>&#34;Ingress&#34;</p></td>
+<td><p>PolicyTypeIngress is a policy that describes ingress traffic.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.Rule">Rule
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyRule">NetworkPolicyRule</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ipBlock</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.IPBlock">
+[]IPBlock
+</a>
+</em>
+</td>
+<td>
+<p>CIDRBlock specifies the CIDR block from which network traffic may come or go.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>ips</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.ObjectIP">
+[]ObjectIP
+</a>
+</em>
+</td>
+<td>
+<p>ObjectIPs are the object IPs the rule applies to.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>networkPolicyPorts</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyPort">
+[]NetworkPolicyPort
+</a>
+</em>
+</td>
+<td>
+<p>NetworkPolicyPorts are the protocol type and ports.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.TAPDevice">TAPDevice
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkInterfaceStatus">NetworkInterfaceStatus</a>)
+</p>
+<div>
+<p>TAPDevice is a TAP device.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the TAP device.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.TargetNetworkInterface">TargetNetworkInterface
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.NetworkPolicyRule">NetworkPolicyRule</a>)
+</p>
+<div>
+<p>TargetNetworkInterface is the target of the network policy.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>ip</code><br/>
+<em>
+<a href="../api/#api.ironcore.dev/net.IP">
+github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP
+</a>
+</em>
+</td>
+<td>
+<p>IP is the IP address of the target network interface.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>targetRef</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.LocalUIDReference">
+LocalUIDReference
+</a>
+</em>
+</td>
+<td>
+<p>TargetRef is the target providing the destination.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.TopologySpreadConstraint">TopologySpreadConstraint
+</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.InstanceSpec">InstanceSpec</a>)
+</p>
+<div>
+<p>TopologySpreadConstraint specifies how to spread matching instances among the given topology.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>maxSkew</code><br/>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>MaxSkew describes the degree to which instances may be unevenly distributed.
+When <code>whenUnsatisfiable=DoNotSchedule</code>, it is the maximum permitted difference
+between the number of matching instances in the target topology and the global minimum.
+The global minimum is the minimum number of matching instances in an eligible domain
+or zero if the number of eligible domains is less than MinDomains.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>topologyKey</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>TopologyKey is the key of node labels. Nodes that have a label with this key
+and identical values are considered to be in the same topology.
+We consider each <key, value> as a &ldquo;bucket&rdquo;, and try to put balanced number
+of instances into each bucket.
+We define a domain as a particular instance of a topology.
+Also, we define an eligible domain as a domain whose nodes meet the requirements of
+nodeAffinityPolicy and nodeTaintsPolicy.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>whenUnsatisfiable</code><br/>
+<em>
+<a href="#core.apinet.ironcore.dev/v1alpha1.UnsatisfiableConstraintAction">
+UnsatisfiableConstraintAction
+</a>
+</em>
+</td>
+<td>
+<p>WhenUnsatisfiable indicates how to deal with a instance if it doesn&rsquo;t satisfy
+the spread constraint.
+- DoNotSchedule (default) tells the scheduler not to schedule it.
+- ScheduleAnyway tells the scheduler to schedule the instance in any location,
+but giving higher precedence to topologies that would help reduce the
+skew.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>labelSelector</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.33/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<p>LabelSelector is used to find matching instances.
+Instances that match this label selector are counted to determine the number of instances
+in their corresponding topology domain.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.apinet.ironcore.dev/v1alpha1.UnsatisfiableConstraintAction">UnsatisfiableConstraintAction
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#core.apinet.ironcore.dev/v1alpha1.TopologySpreadConstraint">TopologySpreadConstraint</a>)
+</p>
+<div>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;DoNotSchedule&#34;</p></td>
+<td><p>DoNotSchedule instructs the scheduler not to schedule the instance
+when constraints are not satisfied.</p>
+</td>
+</tr></tbody>
+</table>
+<hr/>
+<p><em>
+Generated with <code>gen-crd-api-reference-docs</code>
+</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/ironcore-dev/ironcore-net" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.indexes", "navigation.top"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
