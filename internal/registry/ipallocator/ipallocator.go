@@ -240,7 +240,10 @@ func (a *Allocator) release(namespace string, addr netip.Addr, dryRun bool) erro
 		return nil
 	}
 
-	if ip.Labels[IPEphemeralLabel] == "true" {
+	// TODO: Remove the legacy OwnerReference check (|| metav1.GetControllerOf(ip) != nil) once migration is complete.
+	// Check apiserver logs for "IP OwnerRef to ephemeral label migration: COMPLETE" to confirm migration is done.
+	// Treat IP as ephemeral if it has the ephemeral label or a legacy controller OwnerReference
+	if ip.Labels[IPEphemeralLabel] == "true" || metav1.GetControllerOf(ip) != nil {
 		err := a.client.IPs(namespace).Delete(context.Background(), ip.Name, metav1.DeleteOptions{})
 		if err == nil || apierrors.IsNotFound(err) {
 			return nil
