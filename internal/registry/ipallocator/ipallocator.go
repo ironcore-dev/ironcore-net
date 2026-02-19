@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"net/netip"
-	"strings"
 	"time"
 
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
@@ -21,7 +20,6 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/retry"
@@ -95,22 +93,6 @@ func (a *Allocator) allocate(namespace string, claimRef v1alpha1.IPClaimRef, ip 
 	}
 
 	return a.claimIP(namespace, claimRef, ip)
-}
-
-func (a *Allocator) getIPFromLister(namespace string, addr netip.Addr) (*v1alpha1.IP, error) {
-	ips, err := a.ipLister.IPs(namespace).List(labels.SelectorFromSet(labels.Set{
-		v1alpha1.IPFamilyLabel: string(a.ipFamily),
-		v1alpha1.IPIPLabel:     strings.ReplaceAll(addr.String(), ":", "-"),
-	}))
-	if err != nil {
-		return nil, err
-	}
-	if n := len(ips); n == 0 {
-		return nil, ErrNotFound
-	} else if n > 1 {
-		return nil, fmt.Errorf("multiple IPs found for address %s", addr)
-	}
-	return ips[0], nil
 }
 
 func (a *Allocator) getIPFromClient(namespace string, addr netip.Addr) (*v1alpha1.IP, error) {
