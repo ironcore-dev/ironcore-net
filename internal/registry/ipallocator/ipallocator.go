@@ -23,8 +23,8 @@ import (
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/util/retry"
 	"k8s.io/klog/v2"
 	utiltrace "k8s.io/utils/trace"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -131,32 +131,32 @@ func (a *Allocator) getIPFromClient(namespace string, addr netip.Addr) (*v1alpha
 }
 
 func (a *Allocator) claimIP(namespace string, claimRef v1alpha1.IPClaimRef, addr netip.Addr) error {
-	ip, err := a.getIPFromLister(namespace, addr)
-	if err != nil {
-		return err
-	}
-	if ip.Spec.ClaimRef != nil {
-		return ErrAllocated
-	}
+	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		ip, err := a.getIPFromClient(namespace, addr)
+		if err != nil {
+			return err
+		}
+		if ip.Spec.ClaimRef != nil {
+			return ErrAllocated
+		}
 
-	base := ip.DeepCopy()
-	ip.Spec.ClaimRef = &claimRef
-	data, err := client.StrategicMergeFrom(base).Data(ip)
-	if err != nil {
-		return err
-	}
+		base := ip.DeepCopy()
+		ip.Spec.ClaimRef = &claimRef
+		patch := client.MergeFromWithOptions(base, &client.MergeFromWithOptimisticLock{})
+		data, err := patch.Data(ip)
+		if err != nil {
+			return err
+		}
 
-	_, err = a.client.IPs(namespace).Patch(context.Background(), ip.Name, types.StrategicMergePatchType, data, metav1.PatchOptions{})
-	if err == nil {
-		return nil
-	}
-	if apierrors.IsNotFound(err) {
-		return ErrNotFound
-	}
-	if apierrors.IsConflict(err) {
-		return ErrAllocated
-	}
-	return err
+		_, err = a.client.IPs(namespace).Patch(context.Background(), ip.Name, patch.Type(), data, metav1.PatchOptions{})
+		if err == nil {
+			return nil
+		}
+		if apierrors.IsNotFound(err) {
+			return ErrNotFound
+		}
+		return err
+	})
 }
 
 func (a *Allocator) AllocateNext(
@@ -229,11 +229,11 @@ func (a *Allocator) createEphemeralIP(
 	return ip.Spec.IP.Addr, nil
 }
 
-func (a *Allocator) Release(namespace string, ip netip.Addr) error {
-	return a.release(namespace, ip, false)
+func (a *Allocator) Release(namespace string, ip netip.Addr, claimRef v1alpha1.IPClaimRef) error {
+	return a.release(namespace, ip, claimRef, false)
 }
 
-func (a *Allocator) release(namespace string, addr netip.Addr, dryRun bool) error {
+func (a *Allocator) release(namespace string, addr netip.Addr, claimRef v1alpha1.IPClaimRef, dryRun bool) error {
 	if !a.ipSynced() {
 		return fmt.Errorf("allocator not ready")
 	}
@@ -241,25 +241,27 @@ func (a *Allocator) release(namespace string, addr netip.Addr, dryRun bool) erro
 		return nil
 	}
 
-	ip, err := a.getIPFromClient(namespace, addr)
-	if err != nil {
-		klog.ErrorS(err, "error getting IP for address", "address", addr)
-		return nil
-	}
+	err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		ip, err := a.getIPFromClient(namespace, addr)
+		if err != nil {
+			return err
+		}
 
-	// If the IP is controlled, we assume it to be ephemeral.
-	// TODO: check on something more robust than just an owner reference.
-	if metav1.GetControllerOf(ip) != nil {
-		err := a.client.IPs(namespace).Delete(context.Background(), ip.Name, metav1.DeleteOptions{})
-		if err == nil {
+		// If the claim no longer belongs to the expected owner, the IP was
+		// reclaimed by another resource — nothing to release.
+		if ip.Spec.ClaimRef == nil || ip.Spec.ClaimRef.UID != claimRef.UID {
 			return nil
 		}
-		klog.ErrorS(err, "error deleting IP", "ip", klog.KObj(ip))
-		return nil
-	}
 
-	if err := a.releaseIP(ip); err != nil {
-		klog.ErrorS(err, "error releasing IP", "ip", klog.KObj(ip))
+		// If the IP is controlled, we assume it to be ephemeral.
+		if metav1.GetControllerOf(ip) != nil {
+			return a.client.IPs(namespace).Delete(context.Background(), ip.Name, metav1.DeleteOptions{})
+		}
+
+		return a.releaseIP(ip)
+	})
+	if err != nil {
+		klog.ErrorS(err, "error releasing IP for address", "address", addr)
 	}
 	return nil
 }
@@ -267,11 +269,12 @@ func (a *Allocator) release(namespace string, addr netip.Addr, dryRun bool) erro
 func (a *Allocator) releaseIP(ip *v1alpha1.IP) error {
 	base := ip.DeepCopy()
 	ip.Spec.ClaimRef = nil
-	data, err := client.StrategicMergeFrom(base).Data(ip)
+	patch := client.MergeFromWithOptions(base, &client.MergeFromWithOptimisticLock{})
+	data, err := patch.Data(ip)
 	if err != nil {
 		return err
 	}
-	_, err = a.client.IPs(ip.Namespace).Patch(context.Background(), ip.Name, types.StrategicMergePatchType, data, metav1.PatchOptions{})
+	_, err = a.client.IPs(ip.Namespace).Patch(context.Background(), ip.Name, patch.Type(), data, metav1.PatchOptions{})
 	return err
 }
 
@@ -299,8 +302,8 @@ func (dry dryRunAllocator) AllocateNext(
 	return dry.real.allocateNext(namespace, claimRef, version, kind, true)
 }
 
-func (dry dryRunAllocator) Release(namespace string, ip netip.Addr) error {
-	return dry.real.release(namespace, ip, true)
+func (dry dryRunAllocator) Release(namespace string, ip netip.Addr, claimRef v1alpha1.IPClaimRef) error {
+	return dry.real.release(namespace, ip, claimRef, true)
 }
 
 func (dry dryRunAllocator) DryRun() Interface {
@@ -311,6 +314,6 @@ type Interface interface {
 	IPFamily() corev1.IPFamily
 	Allocate(namespace string, claimRef v1alpha1.IPClaimRef, ip netip.Addr) error
 	AllocateNext(namespace string, claimRef v1alpha1.IPClaimRef, version, kind string) (netip.Addr, error)
-	Release(namespace string, ip netip.Addr) error
+	Release(namespace string, ip netip.Addr, claimRef v1alpha1.IPClaimRef) error
 	DryRun() Interface
 }

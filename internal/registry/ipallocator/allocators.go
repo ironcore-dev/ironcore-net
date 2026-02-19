@@ -100,14 +100,23 @@ func (a *Allocators) allocatorsForRequestIterator(it func(yield func(Request) bo
 	return allocs, err
 }
 
-func (a *Allocators) releaseIPs(allocByIPFamily map[corev1.IPFamily]Interface, namespace string, ips []netip.Addr) ([]netip.Addr, error) {
+func (a *Allocators) claimRefFor(acc Accessor) v1alpha1.IPClaimRef {
+	return v1alpha1.IPClaimRef{
+		Group:    a.gv.Group,
+		Resource: a.resource,
+		Name:     acc.GetName(),
+		UID:      acc.GetUID(),
+	}
+}
+
+func (a *Allocators) releaseIPs(allocByIPFamily map[corev1.IPFamily]Interface, namespace string, ips []netip.Addr, claimRef v1alpha1.IPClaimRef) ([]netip.Addr, error) {
 	var (
 		released []netip.Addr
 		errs     []error
 	)
 	for _, ip := range ips {
 		alloc := allocByIPFamily[core.IPFamilyForAddr(ip)]
-		if err := alloc.Release(namespace, ip); err != nil {
+		if err := alloc.Release(namespace, ip, claimRef); err != nil {
 			errs = append(errs, err)
 			continue
 		}
@@ -182,7 +191,7 @@ func (a *Allocators) AllocateCreate(obj runtime.Object, dryRun bool) (Transactio
 				return
 			}
 
-			actuallyReleased, err := a.releaseIPs(allocs, acc.GetNamespace(), allocated)
+			actuallyReleased, err := a.releaseIPs(allocs, acc.GetNamespace(), allocated, a.claimRefFor(acc))
 			if err != nil {
 				klog.ErrorS(err, "Error releasing IPs",
 					"shouldRelease", allocated,
@@ -247,7 +256,7 @@ func (a *Allocators) AllocateUpdate(obj, oldObj runtime.Object, dryRun bool) (Tr
 			}
 
 			toRelease := toReleaseSet.UnsortedList()
-			if actuallyReleased, err := a.releaseIPs(allocs, acc.GetNamespace(), toRelease); err != nil {
+			if actuallyReleased, err := a.releaseIPs(allocs, acc.GetNamespace(), toRelease, a.claimRefFor(oldAcc)); err != nil {
 				klog.ErrorS(err, "Error releasing IPs",
 					"shouldRelease", toRelease,
 					"released", actuallyReleased,
@@ -259,7 +268,7 @@ func (a *Allocators) AllocateUpdate(obj, oldObj runtime.Object, dryRun bool) (Tr
 				return
 			}
 
-			if actuallyReleased, err := a.releaseIPs(allocs, acc.GetNamespace(), toReleaseSet.UnsortedList()); err != nil {
+			if actuallyReleased, err := a.releaseIPs(allocs, acc.GetNamespace(), toReleaseSet.UnsortedList(), a.claimRefFor(acc)); err != nil {
 				klog.ErrorS(err, "Error releasing IPs",
 					"shouldRelease", allocated,
 					"released", actuallyReleased,
@@ -288,7 +297,7 @@ func (a *Allocators) Release(obj runtime.Object, dryRun bool) {
 	}
 
 	allocated := utilslices.Map(reqs, func(r Request) netip.Addr { return r.Addr })
-	actuallyReleased, err := a.releaseIPs(allocs, acc.GetNamespace(), allocated)
+	actuallyReleased, err := a.releaseIPs(allocs, acc.GetNamespace(), allocated, a.claimRefFor(acc))
 	if err != nil {
 		klog.ErrorS(err, "Error releasing IPs",
 			"shouldRelease", allocated,
