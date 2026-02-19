@@ -25,7 +25,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/retry"
-	"k8s.io/klog/v2"
 	utiltrace "k8s.io/utils/trace"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -241,9 +240,13 @@ func (a *Allocator) release(namespace string, addr netip.Addr, claimRef v1alpha1
 		return nil
 	}
 
-	err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
+	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		ip, err := a.getIPFromClient(namespace, addr)
 		if err != nil {
+			// IP is already gone — nothing to release.
+			if err == ErrNotFound {
+				return nil
+			}
 			return err
 		}
 
@@ -255,15 +258,13 @@ func (a *Allocator) release(namespace string, addr netip.Addr, claimRef v1alpha1
 
 		// If the IP is controlled, we assume it to be ephemeral.
 		if metav1.GetControllerOf(ip) != nil {
-			return a.client.IPs(namespace).Delete(context.Background(), ip.Name, metav1.DeleteOptions{})
+			return a.client.IPs(namespace).Delete(context.Background(), ip.Name, metav1.DeleteOptions{
+				Preconditions: &metav1.Preconditions{ResourceVersion: &ip.ResourceVersion},
+			})
 		}
 
 		return a.releaseIP(ip)
 	})
-	if err != nil {
-		klog.ErrorS(err, "error releasing IP for address", "address", addr)
-	}
-	return nil
 }
 
 func (a *Allocator) releaseIP(ip *v1alpha1.IP) error {
