@@ -228,9 +228,13 @@ func (a *Allocator) release(namespace string, addr netip.Addr, claimRef v1alpha1
 
 		// If the IP is labeled as ephemeral, delete it.
 		if ip.Labels[v1alpha1.IPEphemeralLabel] == "true" {
-			return a.client.IPs(namespace).Delete(context.Background(), ip.Name, metav1.DeleteOptions{
+			err := a.client.IPs(namespace).Delete(context.Background(), ip.Name, metav1.DeleteOptions{
 				Preconditions: &metav1.Preconditions{ResourceVersion: &ip.ResourceVersion},
 			})
+			if apierrors.IsNotFound(err) {
+				return nil
+			}
+			return err
 		}
 
 		return a.releaseIP(ip)

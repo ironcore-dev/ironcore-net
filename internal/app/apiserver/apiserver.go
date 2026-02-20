@@ -177,21 +177,27 @@ func (o *IronCoreNetServerOptions) Run(ctx context.Context) error {
 			return nil
 		}
 
-		migrateEphemeralIPOwnerReferences(ipClient)
+		hookCtx, cancel := context.WithCancel(context.Background())
+		go func() {
+			<-hookContext.Done()
+			cancel()
+		}()
+
+		migrateEphemeralIPOwnerReferences(hookCtx, ipClient)
 		return nil
 	})
 
 	return server.GenericAPIServer.PrepareRun().RunWithContext(ctx)
 }
 
-func migrateEphemeralIPOwnerReferences(ipClient v1alpha1client.CoreV1alpha1Interface) {
+func migrateEphemeralIPOwnerReferences(ctx context.Context, ipClient v1alpha1client.CoreV1alpha1Interface) {
 	var (
 		continueToken string
 		migrated      int
 	)
 
 	for {
-		ipList, err := ipClient.IPs("").List(context.Background(), metav1.ListOptions{
+		ipList, err := ipClient.IPs("").List(ctx, metav1.ListOptions{
 			Limit:    500,
 			Continue: continueToken,
 		})
@@ -220,7 +226,7 @@ func migrateEphemeralIPOwnerReferences(ipClient v1alpha1client.CoreV1alpha1Inter
 				continue
 			}
 
-			_, err = ipClient.IPs(ip.Namespace).Patch(context.Background(), ip.Name, types.MergePatchType, patchData, metav1.PatchOptions{})
+			_, err = ipClient.IPs(ip.Namespace).Patch(ctx, ip.Name, types.MergePatchType, patchData, metav1.PatchOptions{})
 			if err != nil {
 				slog.Error("Failed to migrate IP", "ip", ip.Name, "namespace", ip.Namespace, "error", err)
 				continue
