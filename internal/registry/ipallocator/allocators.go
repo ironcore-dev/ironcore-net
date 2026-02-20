@@ -58,7 +58,6 @@ type Allocators struct {
 	allocByFamily map[corev1.IPFamily]Interface
 
 	gv       schema.GroupVersion
-	kind     string
 	resource string
 
 	accessorFor func(obj runtime.Object) (Accessor, error)
@@ -67,13 +66,12 @@ type Allocators struct {
 func NewAllocators(
 	allocByIPFamily map[corev1.IPFamily]Interface,
 	gv schema.GroupVersion,
-	kind, resource string,
+	resource string,
 	accessorFor func(obj runtime.Object) (Accessor, error),
 ) *Allocators {
 	return &Allocators{
 		allocByFamily: allocByIPFamily,
 		gv:            gv,
-		kind:          kind,
 		resource:      resource,
 		accessorFor:   accessorFor,
 	}
@@ -143,7 +141,7 @@ func (a *Allocators) allocateIPs(allocByFamily map[corev1.IPFamily]Interface, ac
 				return allocated, err
 			}
 		} else {
-			newAddr, err := alloc.AllocateNext(acc.GetNamespace(), claimRef, a.gv.Version, a.kind)
+			newAddr, err := alloc.AllocateNext(acc.GetNamespace(), claimRef)
 			if err != nil {
 				return allocated, err
 			}

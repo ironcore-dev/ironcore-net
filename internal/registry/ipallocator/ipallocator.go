@@ -14,13 +14,11 @@ import (
 	v1alpha1informers "github.com/ironcore-dev/ironcore-net/client-go/informers/externalversions/core/v1alpha1"
 	v1alpha1client "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned/typed/core/v1alpha1"
 	v1alpha1listers "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
-	"github.com/ironcore-dev/ironcore/utils/generic"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/retry"
 	utiltrace "k8s.io/utils/trace"
@@ -143,15 +141,13 @@ func (a *Allocator) claimIP(namespace string, claimRef v1alpha1.IPClaimRef, addr
 func (a *Allocator) AllocateNext(
 	namespace string,
 	claimRef v1alpha1.IPClaimRef,
-	version, kind string,
 ) (netip.Addr, error) {
-	return a.allocateNext(namespace, claimRef, version, kind, false)
+	return a.allocateNext(namespace, claimRef, false)
 }
 
 func (a *Allocator) allocateNext(
 	namespace string,
 	claimRef v1alpha1.IPClaimRef,
-	version, kind string,
 	dryRun bool,
 ) (netip.Addr, error) {
 	if !a.ipSynced() {
@@ -166,7 +162,7 @@ func (a *Allocator) allocateNext(
 
 	// Try each prefix in order
 	for range a.prefixes {
-		ip, err := a.createEphemeralIP(namespace, claimRef, version, kind)
+		ip, err := a.createEphemeralIP(namespace, claimRef)
 		if err == nil {
 			return ip, nil
 		}
@@ -181,21 +177,13 @@ func (a *Allocator) allocateNext(
 func (a *Allocator) createEphemeralIP(
 	namespace string,
 	claimRef v1alpha1.IPClaimRef,
-	version, kind string,
 ) (netip.Addr, error) {
 	ip, err := a.client.IPs(namespace).Create(context.Background(), &v1alpha1.IP{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace:    namespace,
 			GenerateName: claimRef.Name + "-",
-			OwnerReferences: []metav1.OwnerReference{
-				{
-					APIVersion:         (schema.GroupVersion{Group: claimRef.Group, Version: version}).String(),
-					Kind:               kind,
-					Name:               claimRef.Name,
-					UID:                claimRef.UID,
-					Controller:         generic.Pointer(true),
-					BlockOwnerDeletion: generic.Pointer(true),
-				},
+			Labels: map[string]string{
+				v1alpha1.IPEphemeralLabel: "true",
 			},
 		},
 		Spec: v1alpha1.IPSpec{
@@ -238,8 +226,11 @@ func (a *Allocator) release(namespace string, addr netip.Addr, claimRef v1alpha1
 			return nil
 		}
 
-		// If the IP is controlled, we assume it to be ephemeral.
-		if metav1.GetControllerOf(ip) != nil {
+		// If the IP is labelled as ephemeral or has a legacy controller
+		// OwnerReference, delete it. The OwnerReference check provides
+		// backward compatibility for IPs created before the switch to
+		// label-based ephemeral tracking.
+		if ip.Labels[v1alpha1.IPEphemeralLabel] == "true" || metav1.GetControllerOf(ip) != nil {
 			return a.client.IPs(namespace).Delete(context.Background(), ip.Name, metav1.DeleteOptions{
 				Preconditions: &metav1.Preconditions{ResourceVersion: &ip.ResourceVersion},
 			})
@@ -280,9 +271,8 @@ func (dry dryRunAllocator) Allocate(namespace string, claimRef v1alpha1.IPClaimR
 func (dry dryRunAllocator) AllocateNext(
 	namespace string,
 	claimRef v1alpha1.IPClaimRef,
-	version, kind string,
 ) (netip.Addr, error) {
-	return dry.real.allocateNext(namespace, claimRef, version, kind, true)
+	return dry.real.allocateNext(namespace, claimRef, true)
 }
 
 func (dry dryRunAllocator) Release(namespace string, ip netip.Addr, claimRef v1alpha1.IPClaimRef) error {
@@ -296,7 +286,7 @@ func (dry dryRunAllocator) DryRun() Interface {
 type Interface interface {
 	IPFamily() corev1.IPFamily
 	Allocate(namespace string, claimRef v1alpha1.IPClaimRef, ip netip.Addr) error
-	AllocateNext(namespace string, claimRef v1alpha1.IPClaimRef, version, kind string) (netip.Addr, error)
+	AllocateNext(namespace string, claimRef v1alpha1.IPClaimRef) (netip.Addr, error)
 	Release(namespace string, ip netip.Addr, claimRef v1alpha1.IPClaimRef) error
 	DryRun() Interface
 }
