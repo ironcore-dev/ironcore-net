@@ -5,7 +5,9 @@ package apiserver
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/netip"
 
@@ -16,12 +18,15 @@ import (
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	informers "github.com/ironcore-dev/ironcore-net/client-go/informers/externalversions"
 	clientset "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
+	v1alpha1client "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned/typed/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/internal/apiserver"
 	netflag "github.com/ironcore-dev/ironcore-net/utils/flag"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/types"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/apiserver/pkg/admission"
 	genericapiserver "k8s.io/apiserver/pkg/server"
@@ -163,5 +168,73 @@ func (o *IronCoreNetServerOptions) Run(ctx context.Context) error {
 		return nil
 	})
 
+	// TODO: This is temporary migration code to strip OwnerReferences from legacy ephemeral IPs.
+	// Remove this hook once all clusters have been migrated.
+	server.GenericAPIServer.AddPostStartHookOrDie("migrate-ephemeral-ip-owner-references", func(hookContext genericapiserver.PostStartHookContext) error {
+		ipClient, err := v1alpha1client.NewForConfig(hookContext.LoopbackClientConfig)
+		if err != nil {
+			slog.Error("Failed to create client for IP migration", "error", err)
+			return nil
+		}
+
+		migrateEphemeralIPOwnerReferences(ipClient)
+		return nil
+	})
+
 	return server.GenericAPIServer.PrepareRun().RunWithContext(ctx)
+}
+
+func migrateEphemeralIPOwnerReferences(ipClient v1alpha1client.CoreV1alpha1Interface) {
+	var (
+		continueToken string
+		migrated      int
+	)
+
+	for {
+		ipList, err := ipClient.IPs("").List(context.Background(), metav1.ListOptions{
+			Limit:    500,
+			Continue: continueToken,
+		})
+		if err != nil {
+			slog.Error("Failed to list IPs for migration", "error", err)
+			return
+		}
+
+		for i := range ipList.Items {
+			ip := &ipList.Items[i]
+			if metav1.GetControllerOf(ip) == nil {
+				continue
+			}
+
+			patch := map[string]any{
+				"metadata": map[string]any{
+					"ownerReferences": []any{},
+					"labels": map[string]string{
+						v1alpha1.IPEphemeralLabel: "true",
+					},
+				},
+			}
+			patchData, err := json.Marshal(patch)
+			if err != nil {
+				slog.Error("Failed to marshal migration patch", "ip", ip.Name, "namespace", ip.Namespace, "error", err)
+				continue
+			}
+
+			_, err = ipClient.IPs(ip.Namespace).Patch(context.Background(), ip.Name, types.MergePatchType, patchData, metav1.PatchOptions{})
+			if err != nil {
+				slog.Error("Failed to migrate IP", "ip", ip.Name, "namespace", ip.Namespace, "error", err)
+				continue
+			}
+			migrated++
+		}
+
+		continueToken = ipList.Continue
+		if continueToken == "" {
+			break
+		}
+	}
+
+	if migrated > 0 {
+		slog.Info("Migrated ephemeral IPs: stripped OwnerReferences and ensured label", "count", migrated)
+	}
 }

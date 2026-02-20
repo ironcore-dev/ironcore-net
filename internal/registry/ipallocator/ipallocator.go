@@ -226,11 +226,8 @@ func (a *Allocator) release(namespace string, addr netip.Addr, claimRef v1alpha1
 			return nil
 		}
 
-		// If the IP is labelled as ephemeral or has a legacy controller
-		// OwnerReference, delete it. The OwnerReference check provides
-		// backward compatibility for IPs created before the switch to
-		// label-based ephemeral tracking.
-		if ip.Labels[v1alpha1.IPEphemeralLabel] == "true" || metav1.GetControllerOf(ip) != nil {
+		// If the IP is labeled as ephemeral, delete it.
+		if ip.Labels[v1alpha1.IPEphemeralLabel] == "true" {
 			return a.client.IPs(namespace).Delete(context.Background(), ip.Name, metav1.DeleteOptions{
 				Preconditions: &metav1.Preconditions{ResourceVersion: &ip.ResourceVersion},
 			})
