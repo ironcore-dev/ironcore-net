@@ -142,7 +142,6 @@ func NewStorage(
 		allocators: ipallocator.NewAllocators(
 			allocatorByFamily,
 			v1alpha1.SchemeGroupVersion,
-			"NetworkInterface",
 			"networkinterfaces",
 			GetNetworkInterfaceIPAllocatorAccessor,
 		),
