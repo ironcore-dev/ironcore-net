@@ -6,9 +6,6 @@ APINETLET_IMG ?= apinetlet:latest
 METALNETLET_IMG ?= metalnetlet:latest
 KIND_CLUSTER_NAME ?= kind
 
-# ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION = 1.33
-
 # Docker image name for the mkdocs based local development setup
 IMAGE=ironcore-net/documentation
 
@@ -346,11 +343,11 @@ GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.5.0
 VGOPATH_VERSION ?= v0.1.5
-CONTROLLER_TOOLS_VERSION ?= v0.18.0
+CONTROLLER_TOOLS_VERSION ?= v0.19.0
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.1
 GOIMPORTS_VERSION ?= v0.36.0
-GOLANGCI_LINT_VERSION ?= v2.4
+GOLANGCI_LINT_VERSION ?= v2.11
 OPENAPI_EXTRACTOR_VERSION ?= v0.2.0
 #ENVTEST_VERSION is the version of controller-runtime release branch to fetch the envtest setup script (i.e. release-0.20)
 ENVTEST_VERSION ?= $(shell go list -m -f "{{ .Version }}" sigs.k8s.io/controller-runtime | awk -F'[v.]' '{printf "release-%d.%d", $$2, $$3}')
