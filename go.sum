@@ -124,8 +124,8 @@ github.com/ironcore-dev/controller-utils v0.11.0 h1:vQhZgPxxFwmSi+fSlPEuwCmI5sOP
 github.com/ironcore-dev/controller-utils v0.11.0/go.mod h1:kPIgIjGNMA5zUlwH04rCdDbYnvvDtd79z3Rgav1Yrpg=
 github.com/ironcore-dev/ironcore v0.3.0 h1:l/q9xprt5iNG0HaySFDCGLX19tco/MNUMGc0+11Od8o=
 github.com/ironcore-dev/ironcore v0.3.0/go.mod h1:qM1oGh2FcNmdyWPhrSbz+PQMt72aqMO62UgAyfWCa+c=
-github.com/ironcore-dev/metalnet v0.3.13 h1:bpibsgrZs0WVLcgrgN6vHFyt0ugt7JdTv1fUuAwqr88=
-github.com/ironcore-dev/metalnet v0.3.13/go.mod h1:X0zriNZmxNIIKlXUp02LLYR1xi8Pg0rPfLg1DAPB6RI=
+github.com/ironcore-dev/metalnet v0.3.14 h1:IYrvTEyNSd81I3G/SvffbuWM3Of78LTF0UEXZwR6m3I=
+github.com/ironcore-dev/metalnet v0.3.14/go.mod h1:Cz2+rXcHmLe0woXcX3yU9ZJhJYO9MsrhSKKq7TsGKOE=
 github.com/jonboulle/clockwork v0.5.0 h1:Hyh9A8u51kptdkR+cqRpT1EebBwTn1oK9YfGYbdFz6I=
 github.com/jonboulle/clockwork v0.5.0/go.mod h1:3mZlmanh0g2NDKO5TWZVJAfofYk64M7XN3SzBPjZF60=
 github.com/joshdk/go-junit v1.0.0 h1:S86cUKIdwBHWwA6xCmFlf3RTLfVXYQfvanM5Uh+K6GE=
