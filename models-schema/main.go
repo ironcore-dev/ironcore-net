@@ -4,9 +4,11 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"io/fs"
 	"log/slog"
 	"os"
@@ -70,11 +72,12 @@ func run(openapiPackage, openapiTitle string) error {
 		return fmt.Errorf("error executing template: %w", err)
 	}
 
+	var output bytes.Buffer
 	cmd := exec.Command("go", "run", tmpFile.Name())
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
+	cmd.Stderr = io.MultiWriter(&output, os.Stderr)
+	cmd.Stdout = io.MultiWriter(&output, os.Stdout)
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("error running command: %w", err)
+		return fmt.Errorf("error running command: %w\nOutput: %s", err, output.String())
 	}
 	return nil
 }

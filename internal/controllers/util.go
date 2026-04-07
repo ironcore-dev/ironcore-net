@@ -4,14 +4,21 @@
 package controllers
 
 import (
+	"context"
 	"encoding/binary"
 	"fmt"
 	"hash/fnv"
 
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/klog/v2"
+	"k8s.io/utils/lru"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func GetTargetNodeName(inst *v1alpha1.Instance) (string, error) {
@@ -111,4 +118,49 @@ func ComputeHash(template *v1alpha1.InstanceTemplate, collisionCount *int32) str
 	}
 
 	return rand.SafeEncodeString(fmt.Sprint(podTemplateSpecHasher.Sum32()))
+}
+
+func NewPartialObjectMetadata(restMapper meta.RESTMapper, gvr schema.GroupVersionResource) (*metav1.PartialObjectMetadata, error) {
+	resList, err := restMapper.KindsFor(gvr)
+	if err != nil {
+		return nil, fmt.Errorf("error getting kinds for %s: %w", gvr.GroupResource(), err)
+	}
+	if len(resList) == 0 {
+		return nil, fmt.Errorf("no kind for %s", gvr.GroupResource())
+	}
+
+	gvk := resList[0]
+	return &metav1.PartialObjectMetadata{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: gvk.GroupVersion().String(),
+			Kind:       gvk.Kind,
+		},
+	}, nil
+}
+
+func GetWithAbsenceCache(
+	ctx context.Context,
+	apiReader client.Reader,
+	absenceCache *lru.Cache,
+	key client.ObjectKey,
+	obj client.Object,
+	uid types.UID,
+) error {
+	if _, ok := absenceCache.Get(uid); ok {
+		return apierrors.NewNotFound(schema.GroupResource{}, key.String())
+	}
+
+	if err := apiReader.Get(ctx, key, obj); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return err
+		}
+
+		absenceCache.Add(uid, nil)
+		return apierrors.NewNotFound(schema.GroupResource{}, key.String())
+	}
+	if uid != obj.GetUID() {
+		absenceCache.Add(uid, nil)
+		return apierrors.NewNotFound(schema.GroupResource{}, key.String())
+	}
+	return nil
 }
