@@ -23,11 +23,11 @@ import (
 	"sigs.k8s.io/structured-merge-diff/v6/fieldpath"
 )
 
-type networkInterfaceIPAllocatorAccessor struct {
+type networkInterfaceIPRequester struct {
 	core.NetworkInterface
 }
 
-func (acc *networkInterfaceIPAllocatorAccessor) GetRequests() []ipallocator.Request {
+func (acc *networkInterfaceIPRequester) GetRequests() []ipallocator.Request {
 	return utilslices.Map(acc.Spec.PublicIPs, func(ip core.NetworkInterfacePublicIP) ipallocator.Request {
 		return ipallocator.Request{
 			IPFamily: ip.IPFamily,
@@ -36,17 +36,17 @@ func (acc *networkInterfaceIPAllocatorAccessor) GetRequests() []ipallocator.Requ
 	})
 }
 
-func (acc *networkInterfaceIPAllocatorAccessor) SetIP(idx int, addr netip.Addr) {
+func (acc *networkInterfaceIPRequester) SetIP(idx int, addr netip.Addr) {
 	acc.Spec.PublicIPs[idx].IP = net.IP{Addr: addr}
 }
 
-func GetNetworkInterfaceIPAllocatorAccessor(obj runtime.Object) (ipallocator.Accessor, error) {
+func GetNetworkInterfaceIPRequester(obj runtime.Object) (ipallocator.Requester, error) {
 	networkInterface, ok := obj.(*core.NetworkInterface)
 	if !ok {
 		return nil, fmt.Errorf("object %T is not a NetworkInterface", obj)
 	}
 
-	return &networkInterfaceIPAllocatorAccessor{
+	return &networkInterfaceIPRequester{
 		*networkInterface,
 	}, nil
 }
@@ -66,7 +66,7 @@ func (r *REST) beginCreate(ctx context.Context, obj runtime.Object, opts *metav1
 
 	dryRun := dryrun.IsDryRun(opts.DryRun)
 
-	txn, err := r.allocators.AllocateCreate(networkInterface, dryRun)
+	txn, err := r.allocators.AllocateCreate(ctx, networkInterface, dryRun)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (r *REST) beginUpdate(ctx context.Context, obj, oldObj runtime.Object, opts
 	oldNetworkInterface := oldObj.(*core.NetworkInterface)
 
 	dryRun := dryrun.IsDryRun(opts.DryRun)
-	txn, err := r.allocators.AllocateUpdate(newNetworkInterface, oldNetworkInterface, dryRun)
+	txn, err := r.allocators.AllocateUpdate(ctx, newNetworkInterface, oldNetworkInterface, dryRun)
 	if err != nil {
 		return nil, err
 	}
@@ -100,10 +100,11 @@ func (r *REST) beginUpdate(ctx context.Context, obj, oldObj runtime.Object, opts
 }
 
 func (r *REST) afterDelete(obj runtime.Object, opts *metav1.DeleteOptions) {
+	ctx := context.TODO()
 	networkInterface := obj.(*core.NetworkInterface)
 
 	dryRun := dryrun.IsDryRun(opts.DryRun)
-	r.allocators.Release(networkInterface, dryRun)
+	r.allocators.Release(ctx, networkInterface, dryRun)
 }
 
 func NewStorage(
@@ -144,7 +145,7 @@ func NewStorage(
 			v1alpha1.SchemeGroupVersion,
 			"NetworkInterface",
 			"networkinterfaces",
-			GetNetworkInterfaceIPAllocatorAccessor,
+			GetNetworkInterfaceIPRequester,
 		),
 	}
 	store.BeginCreate = genericStore.beginCreate

@@ -180,12 +180,21 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err = (&controllers.IPAddressReconciler{
+		Client:       mgr.GetClient(),
+		APIReader:    mgr.GetAPIReader(),
+		AbsenceCache: lru.New(500),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "IPAddress")
+		os.Exit(1)
+	}
+
 	if err = (&controllers.IPAddressGCReconciler{
 		Client:       mgr.GetClient(),
 		APIReader:    mgr.GetAPIReader(),
 		AbsenceCache: lru.New(500),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "DaemonSet")
+		setupLog.Error(err, "unable to create controller", "controller", "IPAddressGC")
 		os.Exit(1)
 	}
 

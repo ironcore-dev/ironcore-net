@@ -90,7 +90,7 @@ kube::codegen::gen_client \
   --with-applyconfig \
   --applyconfig-name "applyconfigurations" \
   --applyconfig-externals "${applyconfigurationgen_external_apis_csv}" \
-  --applyconfig-openapi-schema <("$MODELS_SCHEMA" --openapi-package "${IRONCORE_NET_ROOT}/client-go/openapi" --openapi-title "ironcore-net") \
+  --applyconfig-openapi-schema "$tmp_schema_file" \
   --clientset-name "ironcorenet" \
   --listers-name "listers" \
   --informers-name "informers" \
