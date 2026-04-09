@@ -5,6 +5,7 @@ package testing
 
 import (
 	"fmt"
+	"io"
 	"reflect"
 
 	"github.com/onsi/ginkgo/v2"
@@ -117,5 +118,26 @@ func (k *haveKeysWithValues[K, V]) NegatedFailureMessage(actual any) (message st
 func HaveKeysWithValues[M ~map[K]V, K comparable, V any](keysWithValues M) types.GomegaMatcher {
 	return &haveKeysWithValues[K, V]{
 		keysWithValues: keysWithValues,
+	}
+}
+
+type prefixedWriter struct {
+	prefix []byte
+	writer io.Writer
+}
+
+func (pw *prefixedWriter) Write(p []byte) (n int, err error) {
+	buf := make([]byte, len(pw.prefix)+len(p))
+	copy(buf, pw.prefix)
+	copy(buf[len(pw.prefix):], p)
+	n, err = pw.writer.Write(buf)
+	return max(0, n-len(pw.prefix)), err
+}
+
+// PrefixWriter creates a writer that forwards each write with the prefix prefixed to the given writer.
+func PrefixWriter[Prefix ~string | ~[]byte](prefix Prefix, w io.Writer) io.Writer {
+	return &prefixedWriter{
+		prefix: []byte(prefix),
+		writer: w,
 	}
 }

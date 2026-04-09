@@ -11,7 +11,9 @@ import (
 	"net/netip"
 	"time"
 
+	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	v1alpha1informers "github.com/ironcore-dev/ironcore-net/client-go/informers/externalversions/core/v1alpha1"
 	v1alpha1client "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned/typed/core/v1alpha1"
 	v1alpha1listers "github.com/ironcore-dev/ironcore-net/client-go/listers/core/v1alpha1"
@@ -90,11 +92,11 @@ func (a *Allocator) IPFamily() corev1.IPFamily {
 	return a.family
 }
 
-func (a *Allocator) Allocate(claimRef v1alpha1.IPAddressClaimRef, ip netip.Addr) error {
-	return a.allocate(claimRef, ip, false)
+func (a *Allocator) Allocate(ctx context.Context, claimRef v1alpha1.IPAddressClaimRef, ip netip.Addr) error {
+	return a.allocate(ctx, claimRef, ip, false)
 }
 
-func (a *Allocator) allocate(claimRef v1alpha1.IPAddressClaimRef, ip netip.Addr, dryRun bool) error {
+func (a *Allocator) allocate(ctx context.Context, claimRef v1alpha1.IPAddressClaimRef, ip netip.Addr, dryRun bool) error {
 	if !a.ipAddressSynced() {
 		return fmt.Errorf("allocator not ready")
 	}
@@ -108,23 +110,24 @@ func (a *Allocator) allocate(claimRef v1alpha1.IPAddressClaimRef, ip netip.Addr,
 			if dryRun {
 				return nil
 			}
-			return a.createIPAddress(ip.String(), claimRef)
+			return a.createIPAddress(ctx, ip, claimRef)
 		}
 	}
 
 	return ErrNotInRange
 }
 
-func (a *Allocator) createIPAddress(name string, claimRef v1alpha1.IPAddressClaimRef) error {
+func (a *Allocator) createIPAddress(ctx context.Context, addr netip.Addr, claimRef v1alpha1.IPAddressClaimRef) error {
 	ipAddress := &v1alpha1.IPAddress{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: name,
+			Name: addr.String(),
 		},
 		Spec: v1alpha1.IPAddressSpec{
+			IP:       net.NewIP(addr),
 			ClaimRef: claimRef,
 		},
 	}
-	_, err := a.client.IPAddresses().Create(context.Background(), ipAddress, metav1.CreateOptions{})
+	_, err := a.client.IPAddresses().Create(ctx, ipAddress, metav1.CreateOptions{})
 	if err != nil {
 		if apierrors.IsAlreadyExists(err) {
 			return ErrAllocated
@@ -134,11 +137,16 @@ func (a *Allocator) createIPAddress(name string, claimRef v1alpha1.IPAddressClai
 	return nil
 }
 
-func (a *Allocator) AllocateNext(claimRef v1alpha1.IPAddressClaimRef) (netip.Addr, error) {
-	return a.allocateNext(claimRef, false)
+func (a *Allocator) AllocateNext(ctx context.Context, claimRef v1alpha1.IPAddressClaimRef) (netip.Addr, error) {
+	return a.allocateNext(ctx, claimRef, false)
 }
 
-func (a *Allocator) allocateNext(claimRef v1alpha1.IPAddressClaimRef, dryRun bool) (netip.Addr, error) {
+func (a *Allocator) allocateNext(ctx context.Context, claimRef v1alpha1.IPAddressClaimRef, dryRun bool) (netip.Addr, error) {
+	log := klog.FromContext(ctx).WithValues(
+		"ClaimRef", claimRef,
+		"DryRun", dryRun,
+	)
+
 	if !a.ipAddressSynced() {
 		return netip.Addr{}, fmt.Errorf("allocator not ready")
 	}
@@ -153,11 +161,11 @@ func (a *Allocator) allocateNext(claimRef v1alpha1.IPAddressClaimRef, dryRun boo
 	for _, meta := range a.prefixMetaInformation {
 		offset := rand.Int63n(meta.size)
 		iterator := ipIterator(meta.firstIP, meta.lastIP, uint64(offset))
-		addr, err := a.allocateFromIterator(claimRef, iterator)
+		addr, err := a.allocateFromIterator(ctx, log, claimRef, iterator)
 		if err == nil {
 			return addr, nil
 		}
-		if err != ErrFull {
+		if !errors.Is(err, ErrFull) {
 			return netip.Addr{}, err
 		}
 	}
@@ -165,7 +173,7 @@ func (a *Allocator) allocateNext(claimRef v1alpha1.IPAddressClaimRef, dryRun boo
 	return netip.Addr{}, ErrFull
 }
 
-func (a *Allocator) allocateFromIterator(claimRef v1alpha1.IPAddressClaimRef, it func() netip.Addr) (netip.Addr, error) {
+func (a *Allocator) allocateFromIterator(ctx context.Context, log logr.Logger, claimRef v1alpha1.IPAddressClaimRef, it func() netip.Addr) (netip.Addr, error) {
 	for {
 		addr := it()
 		if !addr.IsValid() {
@@ -173,19 +181,19 @@ func (a *Allocator) allocateFromIterator(claimRef v1alpha1.IPAddressClaimRef, it
 		}
 
 		name := addr.String()
-		_, err := a.client.IPAddresses().Get(context.Background(), name, metav1.GetOptions{})
+		_, err := a.client.IPAddresses().Get(ctx, name, metav1.GetOptions{})
 		if err == nil {
 			continue
 		}
 
 		if !apierrors.IsNotFound(err) {
-			klog.InfoS("unexpected error", "err", err)
+			log.Error(err, "Unexpected error getting IP address", "Address", addr)
 			continue
 		}
 
-		err = a.createIPAddress(name, claimRef)
+		err = a.createIPAddress(ctx, addr, claimRef)
 		if err != nil {
-			klog.InfoS("can not create IP address", "name", name, "err", err)
+			log.Error(err, "Error creating IP address", "Address", addr)
 			continue
 		}
 
@@ -193,11 +201,11 @@ func (a *Allocator) allocateFromIterator(claimRef v1alpha1.IPAddressClaimRef, it
 	}
 }
 
-func (a *Allocator) Release(ip netip.Addr) error {
-	return a.release(ip, false)
+func (a *Allocator) Release(ctx context.Context, ip netip.Addr) error {
+	return a.release(ctx, ip, false)
 }
 
-func (a *Allocator) release(ip netip.Addr, dryRun bool) error {
+func (a *Allocator) release(ctx context.Context, ip netip.Addr, dryRun bool) error {
 	if !a.ipAddressSynced() {
 		return fmt.Errorf("allocator not ready")
 	}
@@ -206,11 +214,10 @@ func (a *Allocator) release(ip netip.Addr, dryRun bool) error {
 	}
 
 	name := ip.String()
-	err := a.client.IPAddresses().Delete(context.Background(), name, metav1.DeleteOptions{})
-	if err == nil {
-		return nil
+	if err := a.client.IPAddresses().Delete(ctx, name, metav1.DeleteOptions{}); err != nil {
+		return fmt.Errorf("error deleting IP address %s: %w", name, err)
 	}
-	klog.InfoS("error releasing IP", "ip", ip, "err", err)
+
 	return nil
 }
 
@@ -226,16 +233,16 @@ func (dry dryRunAllocator) IPFamily() corev1.IPFamily {
 	return dry.real.IPFamily()
 }
 
-func (dry dryRunAllocator) Allocate(claimRef v1alpha1.IPAddressClaimRef, ip netip.Addr) error {
-	return dry.real.allocate(claimRef, ip, true)
+func (dry dryRunAllocator) Allocate(ctx context.Context, claimRef v1alpha1.IPAddressClaimRef, ip netip.Addr) error {
+	return dry.real.allocate(ctx, claimRef, ip, true)
 }
 
-func (dry dryRunAllocator) AllocateNext(claimRef v1alpha1.IPAddressClaimRef) (netip.Addr, error) {
-	return dry.real.allocateNext(claimRef, true)
+func (dry dryRunAllocator) AllocateNext(ctx context.Context, claimRef v1alpha1.IPAddressClaimRef) (netip.Addr, error) {
+	return dry.real.allocateNext(ctx, claimRef, true)
 }
 
-func (dry dryRunAllocator) Release(ip netip.Addr) error {
-	return dry.real.release(ip, true)
+func (dry dryRunAllocator) Release(ctx context.Context, ip netip.Addr) error {
+	return dry.real.release(ctx, ip, true)
 }
 
 func (dry dryRunAllocator) DryRun() Interface {
@@ -277,8 +284,8 @@ func ipIterator(first netip.Addr, last netip.Addr, offset uint64) func() netip.A
 
 type Interface interface {
 	IPFamily() corev1.IPFamily
-	Allocate(claimRef v1alpha1.IPAddressClaimRef, ip netip.Addr) error
-	AllocateNext(claimRef v1alpha1.IPAddressClaimRef) (netip.Addr, error)
-	Release(ip netip.Addr) error
+	Allocate(ctx context.Context, claimRef v1alpha1.IPAddressClaimRef, ip netip.Addr) error
+	AllocateNext(ctx context.Context, claimRef v1alpha1.IPAddressClaimRef) (netip.Addr, error)
+	Release(ctx context.Context, ip netip.Addr) error
 	DryRun() Interface
 }

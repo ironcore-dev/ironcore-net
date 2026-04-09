@@ -141,6 +141,7 @@ func (c completedConfig) New() (*IronCoreServer, error) {
 		}
 
 		ipAlloc, err := ipallocator.New(
+			Scheme,
 			prefixes,
 			v1alpha1Client,
 			c.ExtraConfig.VersionedInformers.Core().V1alpha1().IPs(),

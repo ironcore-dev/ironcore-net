@@ -6,6 +6,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -23,7 +24,8 @@ import (
 
 type IPAddressGCReconciler struct {
 	client.Client
-	APIReader client.Reader
+	APIReader   client.Reader
+	GracePeriod time.Duration
 
 	AbsenceCache *lru.Cache
 }
@@ -43,6 +45,13 @@ func (r *IPAddressGCReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, nil
 	}
 
+	if r.GracePeriod > 0 {
+		now := time.Now()
+		if diff := now.Sub(addr.CreationTimestamp.Time); diff <= r.GracePeriod {
+			return ctrl.Result{RequeueAfter: diff}, nil
+		}
+	}
+
 	log.V(1).Info("Checking whether IP address claimer exists")
 	ok, err := r.ipAddressClaimerExists(ctx, addr)
 	if err != nil {
@@ -53,7 +62,7 @@ func (r *IPAddressGCReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, nil
 	}
 
-	log.V(1).Info("IP address claimer does not exist, releasing IP address")
+	log.Info("IP address claimer does not exist, releasing IP address")
 	if err := r.Delete(ctx, addr); client.IgnoreNotFound(err) != nil {
 		return ctrl.Result{}, fmt.Errorf("error deleting IP address: %w", err)
 	}

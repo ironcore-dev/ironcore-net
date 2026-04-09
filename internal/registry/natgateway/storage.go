@@ -23,11 +23,11 @@ import (
 	"sigs.k8s.io/structured-merge-diff/v6/fieldpath"
 )
 
-type natGatewayIPAllocatorAccessor struct {
+type natGatewayIPRequester struct {
 	core.NATGateway
 }
 
-func (acc *natGatewayIPAllocatorAccessor) GetRequests() []ipallocator.Request {
+func (acc *natGatewayIPRequester) GetRequests() []ipallocator.Request {
 	return utilslices.Map(acc.Spec.IPs, func(ip core.NATGatewayIP) ipallocator.Request {
 		return ipallocator.Request{
 			IPFamily: acc.Spec.IPFamily,
@@ -36,17 +36,17 @@ func (acc *natGatewayIPAllocatorAccessor) GetRequests() []ipallocator.Request {
 	})
 }
 
-func (acc *natGatewayIPAllocatorAccessor) SetIP(idx int, addr netip.Addr) {
+func (acc *natGatewayIPRequester) SetIP(idx int, addr netip.Addr) {
 	acc.Spec.IPs[idx].IP = net.IP{Addr: addr}
 }
 
-func GetNATGatewayIPAllocatorAccessor(obj runtime.Object) (ipallocator.Accessor, error) {
+func GetNATGatewayIPAllocatorAccessor(obj runtime.Object) (ipallocator.Requester, error) {
 	natGateway, ok := obj.(*core.NATGateway)
 	if !ok {
 		return nil, fmt.Errorf("object %T is not a NATGateway", obj)
 	}
 
-	return &natGatewayIPAllocatorAccessor{
+	return &natGatewayIPRequester{
 		*natGateway,
 	}, nil
 }
@@ -66,7 +66,7 @@ func (r *REST) beginCreate(ctx context.Context, obj runtime.Object, opts *metav1
 
 	dryRun := dryrun.IsDryRun(opts.DryRun)
 
-	txn, err := r.allocators.AllocateCreate(natGateway, dryRun)
+	txn, err := r.allocators.AllocateCreate(ctx, natGateway, dryRun)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (r *REST) beginUpdate(ctx context.Context, obj, oldObj runtime.Object, opts
 	oldNATGateway := oldObj.(*core.NATGateway)
 
 	dryRun := dryrun.IsDryRun(opts.DryRun)
-	txn, err := r.allocators.AllocateUpdate(newNATGateway, oldNATGateway, dryRun)
+	txn, err := r.allocators.AllocateUpdate(ctx, newNATGateway, oldNATGateway, dryRun)
 	if err != nil {
 		return nil, err
 	}
@@ -100,10 +100,11 @@ func (r *REST) beginUpdate(ctx context.Context, obj, oldObj runtime.Object, opts
 }
 
 func (r *REST) afterDelete(obj runtime.Object, opts *metav1.DeleteOptions) {
+	ctx := context.TODO()
 	natGateway := obj.(*core.NATGateway)
 
 	dryRun := dryrun.IsDryRun(opts.DryRun)
-	r.allocators.Release(natGateway, dryRun)
+	r.allocators.Release(ctx, natGateway, dryRun)
 }
 
 func NewStorage(

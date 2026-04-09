@@ -6,6 +6,7 @@ package controllers
 import (
 	"github.com/google/uuid"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	. "github.com/ironcore-dev/ironcore/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -53,6 +54,7 @@ var _ = Describe("IPAddressGarbageCollectorController", func() {
 					Name: ip.String(),
 				},
 				Spec: v1alpha1.IPAddressSpec{
+					IP: net.NewIP(ip),
 					ClaimRef: v1alpha1.IPAddressClaimRef{
 						Group:    v1alpha1.GroupName,
 						Resource: "natgateways",
