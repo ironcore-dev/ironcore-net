@@ -142,7 +142,6 @@ func NewStorage(
 		allocators: ipallocator.NewAllocators(
 			allocByIPFamily,
 			v1alpha1.SchemeGroupVersion,
-			"NATGateway",
 			"natgateways",
 			GetNATGatewayIPAllocatorAccessor,
 		),

@@ -12,4 +12,6 @@ const (
 	TopologyLabelPrefix    = "topology.core.apinet.ironcore.dev/"
 	TopologyPartitionLabel = TopologyLabelPrefix + "partition"
 	TopologyZoneLabel      = TopologyLabelPrefix + "zone"
+
+	IPEphemeralLabel = "apinet.ironcore.dev/ip-ephemeral"
 )
