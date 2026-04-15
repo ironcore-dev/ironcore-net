@@ -24,11 +24,11 @@ import (
 	"sigs.k8s.io/structured-merge-diff/v6/fieldpath"
 )
 
-type loadBalancerIPAllocatorAccessor struct {
+type loadBalancerIPRequester struct {
 	core.LoadBalancer
 }
 
-func (l *loadBalancerIPAllocatorAccessor) GetRequests() []ipallocator.Request {
+func (l *loadBalancerIPRequester) GetRequests() []ipallocator.Request {
 	return utilslices.Map(l.Spec.IPs, func(ip core.LoadBalancerIP) ipallocator.Request {
 		return ipallocator.Request{
 			IPFamily: ip.IPFamily,
@@ -37,17 +37,17 @@ func (l *loadBalancerIPAllocatorAccessor) GetRequests() []ipallocator.Request {
 	})
 }
 
-func (l *loadBalancerIPAllocatorAccessor) SetIP(idx int, addr netip.Addr) {
+func (l *loadBalancerIPRequester) SetIP(idx int, addr netip.Addr) {
 	l.Spec.IPs[idx].IP = net.IP{Addr: addr}
 }
 
-func GetLoadBalancerIPAllocatorAccessor(obj runtime.Object) (ipallocator.Accessor, error) {
+func GetLoadBalancerIPAllocatorAccessor(obj runtime.Object) (ipallocator.Requester, error) {
 	loadBalancer, ok := obj.(*core.LoadBalancer)
 	if !ok {
 		return nil, fmt.Errorf("object %T is not a LoadBalancer", obj)
 	}
 
-	return &loadBalancerIPAllocatorAccessor{
+	return &loadBalancerIPRequester{
 		*loadBalancer,
 	}, nil
 }
@@ -71,7 +71,7 @@ func (r *REST) beginCreate(ctx context.Context, obj runtime.Object, opts *metav1
 
 	dryRun := dryrun.IsDryRun(opts.DryRun)
 
-	txn, err := r.allocators.AllocateCreate(loadBalancer, dryRun)
+	txn, err := r.allocators.AllocateCreate(ctx, loadBalancer, dryRun)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (r *REST) beginUpdate(ctx context.Context, obj, oldObj runtime.Object, opts
 	}
 
 	dryRun := dryrun.IsDryRun(opts.DryRun)
-	txn, err := r.allocators.AllocateUpdate(newLoadBalancer, oldLoadBalancer, dryRun)
+	txn, err := r.allocators.AllocateUpdate(ctx, newLoadBalancer, oldLoadBalancer, dryRun)
 	if err != nil {
 		return nil, err
 	}
@@ -109,6 +109,7 @@ func (r *REST) beginUpdate(ctx context.Context, obj, oldObj runtime.Object, opts
 }
 
 func (r *REST) afterDelete(obj runtime.Object, opts *metav1.DeleteOptions) {
+	ctx := context.TODO()
 	loadBalancer := obj.(*core.LoadBalancer)
 
 	if loadBalancer.Spec.Type != core.LoadBalancerTypePublic {
@@ -116,7 +117,7 @@ func (r *REST) afterDelete(obj runtime.Object, opts *metav1.DeleteOptions) {
 	}
 
 	dryRun := dryrun.IsDryRun(opts.DryRun)
-	r.allocators.Release(loadBalancer, dryRun)
+	r.allocators.Release(ctx, loadBalancer, dryRun)
 }
 
 func NewStorage(

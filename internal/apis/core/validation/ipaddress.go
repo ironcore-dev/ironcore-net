@@ -26,6 +26,20 @@ func ValidateIPAddress(ipAddress *core.IPAddress) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, validation.ValidateObjectMetaAccessor(ipAddress, false, ValidateIPAddressName, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, ValidateIPAddressSpec(ipAddress, &ipAddress.Spec, field.NewPath("spec"))...)
+
+	return allErrs
+}
+
+func ValidateIPAddressSpec(ipAddress *core.IPAddress, spec *core.IPAddressSpec, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	ip, err := netip.ParseAddr(ipAddress.Name)
+	if err == nil {
+		if spec.IP.Addr != ip {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("ip"), spec.IP.Addr, "IP address must match name"))
+		}
+	}
 
 	return allErrs
 }

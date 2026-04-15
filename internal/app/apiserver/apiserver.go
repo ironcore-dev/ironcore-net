@@ -10,6 +10,7 @@ import (
 	"net/netip"
 
 	apinetopenapi "github.com/ironcore-dev/ironcore-net/client-go/openapi"
+	"github.com/ironcore-dev/ironcore-net/internal/admission/plugin/ipaddressinuseprotection"
 	"k8s.io/apiserver/pkg/endpoints/openapi"
 	"k8s.io/component-base/compatibility"
 
@@ -97,6 +98,13 @@ func (o *IronCoreNetServerOptions) Validate(args []string) error {
 }
 
 func (o *IronCoreNetServerOptions) Complete() error {
+	ipaddressinuseprotection.Register(o.RecommendedOptions.Admission.Plugins)
+
+	o.RecommendedOptions.Admission.RecommendedPluginOrder = append(
+		o.RecommendedOptions.Admission.RecommendedPluginOrder,
+		ipaddressinuseprotection.PluginName,
+	)
+
 	return nil
 }
 

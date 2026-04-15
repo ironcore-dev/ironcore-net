@@ -18,6 +18,7 @@ import (
 	ironcorenet "github.com/ironcore-dev/ironcore-net/internal/controllers/certificate/ironcore-net"
 	"github.com/ironcore-dev/ironcore-net/internal/controllers/scheduler"
 	"github.com/ironcore-dev/ironcore-net/utils/expectations"
+	. "github.com/ironcore-dev/ironcore-net/utils/testing"
 	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"
 	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
 
@@ -103,7 +104,10 @@ var _ = BeforeSuite(func() {
 
 	SetClient(k8sClient)
 
+	apiServerWriter := PrefixWriter("[net-apiserver] ", GinkgoWriter)
 	apiSrv, err := apiserver.New(cfg, apiserver.Options{
+		Stdout:       apiServerWriter,
+		Stderr:       apiServerWriter,
 		MainPath:     "github.com/ironcore-dev/ironcore-net/cmd/apiserver",
 		BuildOptions: []buildutils.BuildOption{buildutils.ModModeMod},
 		ETCDServers:  []string{testEnv.ControlPlane.Etcd.URL.String()},
@@ -130,6 +134,12 @@ var _ = BeforeSuite(func() {
 	Expect(err).ToNot(HaveOccurred())
 
 	mgrClient = k8sManager.GetClient()
+
+	Expect((&IPAddressReconciler{
+		Client:       k8sManager.GetClient(),
+		APIReader:    k8sManager.GetAPIReader(),
+		AbsenceCache: lru.New(100),
+	}).SetupWithManager(k8sManager)).To(Succeed())
 
 	Expect((&IPAddressGCReconciler{
 		Client:       k8sManager.GetClient(),

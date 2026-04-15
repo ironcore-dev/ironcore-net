@@ -4,19 +4,19 @@
 package ipallocator
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/netip"
 
-	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/utils/core"
 	"github.com/ironcore-dev/ironcore-net/utils/iterator"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/klog/v2"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type Transaction interface {
@@ -46,10 +46,7 @@ func (f transactionFuncs) Revert() {
 	}
 }
 
-type Accessor interface {
-	GetNamespace() string
-	GetName() string
-	GetUID() types.UID
+type Requester interface {
 	GetRequests() []Request
 	SetIP(idx int, addr netip.Addr)
 }
@@ -61,22 +58,37 @@ type Allocators struct {
 	kind     string
 	resource string
 
-	accessorFor func(obj runtime.Object) (Accessor, error)
+	requesterFor func(obj runtime.Object) (Requester, error)
 }
 
 func NewAllocators(
 	allocByIPFamily map[corev1.IPFamily]Interface,
 	gv schema.GroupVersion,
 	kind, resource string,
-	accessorFor func(obj runtime.Object) (Accessor, error),
+	requesterFor func(obj runtime.Object) (Requester, error),
 ) *Allocators {
 	return &Allocators{
 		allocByFamily: allocByIPFamily,
 		gv:            gv,
 		kind:          kind,
 		resource:      resource,
-		accessorFor:   accessorFor,
+		requesterFor:  requesterFor,
 	}
+}
+
+func (a *Allocators) requesterAndClaimerForObject(obj client.Object) (Requester, *Claimer, error) {
+	requester, err := a.requesterFor(obj)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	claimer := &Claimer{
+		Object:          obj,
+		Resource:        a.resource,
+		ExternalVersion: a.gv.Version,
+	}
+
+	return requester, claimer, nil
 }
 
 func (a *Allocators) allocatorsForRequestIterator(it func(yield func(Request) bool) bool, dryRun bool) (map[corev1.IPFamily]Interface, error) {
@@ -100,14 +112,19 @@ func (a *Allocators) allocatorsForRequestIterator(it func(yield func(Request) bo
 	return allocs, err
 }
 
-func (a *Allocators) releaseIPs(allocByIPFamily map[corev1.IPFamily]Interface, namespace string, ips []netip.Addr) ([]netip.Addr, error) {
+func (a *Allocators) releaseIPs(
+	ctx context.Context,
+	allocByIPFamily map[corev1.IPFamily]Interface,
+	claimedBy *Claimer,
+	ips []netip.Addr,
+) ([]netip.Addr, error) {
 	var (
 		released []netip.Addr
 		errs     []error
 	)
 	for _, ip := range ips {
 		alloc := allocByIPFamily[core.IPFamilyForAddr(ip)]
-		if err := alloc.Release(namespace, ip); err != nil {
+		if err := alloc.Release(ctx, claimedBy, ip); err != nil {
 			errs = append(errs, err)
 			continue
 		}
@@ -117,24 +134,23 @@ func (a *Allocators) releaseIPs(allocByIPFamily map[corev1.IPFamily]Interface, n
 	return released, errors.Join(errs...)
 }
 
-func (a *Allocators) allocateIPs(allocByFamily map[corev1.IPFamily]Interface, acc Accessor, reqs []Request) ([]netip.Addr, error) {
+func (a *Allocators) allocateIPs(
+	ctx context.Context,
+	allocByFamily map[corev1.IPFamily]Interface,
+	claimedBy *Claimer,
+	reqs []Request,
+) ([]netip.Addr, error) {
 	var allocated []netip.Addr
 	for _, req := range reqs {
 		alloc := allocByFamily[req.IPFamily]
 
 		addr := req.Addr
-		claimRef := v1alpha1.IPClaimRef{
-			Group:    a.gv.Group,
-			Resource: a.resource,
-			Name:     acc.GetName(),
-			UID:      acc.GetUID(),
-		}
 		if addr.IsValid() {
-			if err := alloc.Allocate(acc.GetNamespace(), claimRef, addr); err != nil {
+			if err := alloc.Allocate(ctx, claimedBy, addr); err != nil {
 				return allocated, err
 			}
 		} else {
-			newAddr, err := alloc.AllocateNext(acc.GetNamespace(), claimRef, a.gv.Version, a.kind)
+			newAddr, err := alloc.AllocateNext(ctx, claimedBy)
 			if err != nil {
 				return allocated, err
 			}
@@ -147,19 +163,25 @@ func (a *Allocators) allocateIPs(allocByFamily map[corev1.IPFamily]Interface, ac
 	return allocated, nil
 }
 
-func (a *Allocators) AllocateCreate(obj runtime.Object, dryRun bool) (Transaction, error) {
-	acc, err := a.accessorFor(obj)
+func (a *Allocators) AllocateCreate(ctx context.Context, obj client.Object, dryRun bool) (Transaction, error) {
+	acc, claimedBy, err := a.requesterAndClaimerForObject(obj)
 	if err != nil {
 		return nil, err
 	}
 
 	reqs := acc.GetRequests()
+
+	log := klog.FromContext(ctx).WithValues(
+		"Requester", klog.KObj(claimedBy.Object),
+		"Requests", reqs,
+	)
+
 	allocs, err := a.allocatorsForRequestIterator(iterator.OfSlice(reqs), dryRun)
 	if err != nil {
 		return nil, err
 	}
 
-	allocated, err := a.allocateIPs(allocs, acc, reqs)
+	allocated, err := a.allocateIPs(ctx, allocs, claimedBy, reqs)
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +196,7 @@ func (a *Allocators) AllocateCreate(obj runtime.Object, dryRun bool) (Transactio
 				return
 			}
 			if len(allocated) > 0 {
-				klog.InfoS("Allocated IPs", "ips", allocated)
+				log.Info("Allocated IPs", "Allocated", allocated)
 			}
 		},
 		RevertFunc: func() {
@@ -182,30 +204,38 @@ func (a *Allocators) AllocateCreate(obj runtime.Object, dryRun bool) (Transactio
 				return
 			}
 
-			actuallyReleased, err := a.releaseIPs(allocs, acc.GetNamespace(), allocated)
+			actuallyReleased, err := a.releaseIPs(ctx, allocs, claimedBy, allocated)
 			if err != nil {
-				klog.ErrorS(err, "Error releasing IPs",
+				log.Error(err, "Error releasing IPs",
 					"shouldRelease", allocated,
 					"released", actuallyReleased,
 				)
+			} else {
+				log.Info("Released IPs", "Released", actuallyReleased)
 			}
 		},
 	}, nil
 }
 
-func (a *Allocators) AllocateUpdate(obj, oldObj runtime.Object, dryRun bool) (Transaction, error) {
-	acc, err := a.accessorFor(obj)
+func (a *Allocators) AllocateUpdate(ctx context.Context, obj, oldObj client.Object, dryRun bool) (Transaction, error) {
+	acc, claimedBy, err := a.requesterAndClaimerForObject(obj)
 	if err != nil {
 		return nil, err
 	}
 
-	oldAcc, err := a.accessorFor(oldObj)
+	oldAcc, err := a.requesterFor(oldObj)
 	if err != nil {
 		return nil, err
 	}
 
 	newReqs := acc.GetRequests()
 	oldReqs := oldAcc.GetRequests()
+
+	log := klog.FromContext(ctx).WithValues(
+		"Requester", klog.KObj(claimedBy.Object),
+		"OldRequests", oldReqs,
+		"NewRequests", newReqs,
+	)
 
 	reqsIt := iterator.Concat(iterator.OfSlice(oldReqs), iterator.OfSlice(newReqs))
 	allocs, err := a.allocatorsForRequestIterator(reqsIt, dryRun)
@@ -227,7 +257,7 @@ func (a *Allocators) AllocateUpdate(obj, oldObj runtime.Object, dryRun bool) (Tr
 		}
 	}
 
-	allocated, err := a.allocateIPs(allocs, acc, toAllocate)
+	allocated, err := a.allocateIPs(ctx, allocs, claimedBy, toAllocate)
 	if err != nil {
 		return nil, err
 	}
@@ -243,15 +273,21 @@ func (a *Allocators) AllocateUpdate(obj, oldObj runtime.Object, dryRun bool) (Tr
 			}
 
 			if len(allocated) > 0 {
-				klog.InfoS("allocated IPs", "ips", allocated)
+				log.Info("Allocated IPs", "Allocated", allocated)
 			}
 
 			toRelease := toReleaseSet.UnsortedList()
-			if actuallyReleased, err := a.releaseIPs(allocs, acc.GetNamespace(), toRelease); err != nil {
-				klog.ErrorS(err, "Error releasing IPs",
-					"shouldRelease", toRelease,
-					"released", actuallyReleased,
+			if len(toRelease) == 0 {
+				return
+			}
+
+			if actuallyReleased, err := a.releaseIPs(ctx, allocs, claimedBy, toRelease); err != nil {
+				log.Error(err, "Error releasing IPs",
+					"ShouldRelease", toRelease,
+					"Released", actuallyReleased,
 				)
+			} else {
+				log.Info("Released IPs", "Released", actuallyReleased)
 			}
 		},
 		RevertFunc: func() {
@@ -259,40 +295,49 @@ func (a *Allocators) AllocateUpdate(obj, oldObj runtime.Object, dryRun bool) (Tr
 				return
 			}
 
-			if actuallyReleased, err := a.releaseIPs(allocs, acc.GetNamespace(), toReleaseSet.UnsortedList()); err != nil {
-				klog.ErrorS(err, "Error releasing IPs",
-					"shouldRelease", allocated,
-					"released", actuallyReleased,
+			if actuallyReleased, err := a.releaseIPs(ctx, allocs, claimedBy, toReleaseSet.UnsortedList()); err != nil {
+				log.Error(err, "Error releasing IPs",
+					"ShouldRelease", allocated,
+					"Released", actuallyReleased,
 				)
+			} else {
+				log.Info("Released IPs", "Released", actuallyReleased)
 			}
 		},
 	}, nil
 }
 
-func (a *Allocators) Release(obj runtime.Object, dryRun bool) {
-	acc, err := a.accessorFor(obj)
-	if err != nil {
-		klog.ErrorS(err, "Error getting accessor for object", "object", obj)
-		return
-	}
+func (a *Allocators) Release(ctx context.Context, obj client.Object, dryRun bool) {
+	log := klog.FromContext(ctx)
 
-	if dryRun {
+	acc, claimedBy, err := a.requesterAndClaimerForObject(obj)
+	if err != nil {
+		log.Error(err, "Error getting requester / claimed by for object", "Object", obj)
 		return
 	}
 
 	reqs := acc.GetRequests()
-	allocs, err := a.allocatorsForRequestIterator(iterator.OfSlice(reqs), false)
+	allocated := utilslices.Map(reqs, func(r Request) netip.Addr { return r.Addr })
+
+	log = log.WithValues(
+		"Requester", klog.KObj(claimedBy.Object),
+		"Requests", reqs,
+		"Allocated", allocated,
+	)
+
+	allocs, err := a.allocatorsForRequestIterator(iterator.OfSlice(reqs), dryRun)
 	if err != nil {
-		klog.ErrorS(err, "Error getting allocators")
+		log.Error(err, "Error getting allocators")
 		return
 	}
 
-	allocated := utilslices.Map(reqs, func(r Request) netip.Addr { return r.Addr })
-	actuallyReleased, err := a.releaseIPs(allocs, acc.GetNamespace(), allocated)
+	actuallyReleased, err := a.releaseIPs(ctx, allocs, claimedBy, allocated)
 	if err != nil {
-		klog.ErrorS(err, "Error releasing IPs",
-			"shouldRelease", allocated,
-			"released", actuallyReleased,
+		log.Error(err, "Error releasing IPs",
+			"ShouldRelease", allocated,
+			"Released", actuallyReleased,
 		)
+	} else {
+		log.Info("Released IPs", "Released", actuallyReleased)
 	}
 }

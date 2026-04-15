@@ -82,6 +82,12 @@ rules:
 - apiGroups:
   - core.apinet.ironcore.dev
   resources:
+  - ipaddresses/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.apinet.ironcore.dev
+  resources:
   - ips
   - loadbalancers
   - natgatewayautoscalers

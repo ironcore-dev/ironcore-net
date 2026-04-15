@@ -4,8 +4,15 @@
 package app_test
 
 import (
+	"context"
+	"fmt"
+	"sync"
+	"sync/atomic"
+	"time"
+
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
+	"github.com/ironcore-dev/ironcore-net/internal/ipaddress"
 	. "github.com/ironcore-dev/ironcore-net/utils/testing"
 	. "github.com/ironcore-dev/ironcore/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
@@ -13,12 +20,52 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
+func whileCondDoParallel(ctx context.Context, n int, cond func() bool, f func()) {
+	var wg sync.WaitGroup
+	defer wg.Wait()
+
+	for range n {
+		wg.Go(func() {
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				default:
+				}
+
+				if !cond() {
+					return
+				}
+
+				f()
+			}
+		})
+	}
+}
+
 var _ = Describe("Core", func() {
 	ns := SetupNamespace(&k8sClient)
+
+	AfterEach(func(ctx context.Context) {
+		By("cleaning up IPs")
+		Expect(k8sClient.DeleteAllOf(ctx, &v1alpha1.IP{}, client.InNamespace(ns.Name))).To(Succeed())
+
+		By("cleaning up IP addresses")
+		ipAddressList := &v1alpha1.IPAddressList{}
+		Expect(k8sClient.List(ctx, ipAddressList)).To(Succeed())
+		for _, ipAddress := range ipAddressList.Items {
+			base := ipAddress.DeepCopy()
+			controllerutil.RemoveFinalizer(&ipAddress, ipaddress.ProtectionFinalizer)
+			Expect(client.IgnoreNotFound(k8sClient.Patch(ctx, &ipAddress, client.MergeFrom(base)))).To(Succeed())
+			Expect(client.IgnoreNotFound(k8sClient.Delete(ctx, &ipAddress))).To(Succeed())
+		}
+	})
 
 	Context("Network", func() {
 		It("should maintain network ID allocations for networks", func(ctx SpecContext) {
@@ -106,6 +153,7 @@ var _ = Describe("Core", func() {
 			}
 			Expect(k8sClient.Delete(ctx, newIP)).To(Succeed())
 		})
+
 		It("should maintain IP address allocations for IPs", func(ctx SpecContext) {
 			By("creating an IP")
 			ip := &v1alpha1.IP{
@@ -140,8 +188,138 @@ var _ = Describe("Core", func() {
 			By("deleting the IP")
 			Expect(k8sClient.Delete(ctx, ip)).To(Succeed())
 
-			By("asserting the corresponding IP address is gone")
-			Expect(k8sClient.Get(ctx, ipAddressKey, ipAddress)).To(Satisfy(apierrors.IsNotFound))
+			By("getting the corresponding IP address")
+			Expect(k8sClient.Get(ctx, ipAddressKey, ipAddress)).To(Succeed())
+
+			By("asserting it's marked for deletion but has a finalizer attached")
+			Expect(ipAddress.DeletionTimestamp).ToNot(BeZero())
+			Expect(ipAddress.Finalizers).To(ConsistOf(ipaddress.ProtectionFinalizer))
+		})
+
+		It("should not allocate the same IP twice", func(ctx context.Context) {
+			var (
+				noRequestIPs   = 10
+				noAllocatedIPs atomic.Int32
+				noWorkers      = 4
+			)
+
+			allocateCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+			defer cancel()
+			whileCondDoParallel(allocateCtx, noWorkers,
+				func() bool {
+					return int(noAllocatedIPs.Load()) < noRequestIPs
+				},
+				func() {
+					err := k8sClient.Create(allocateCtx, &v1alpha1.IP{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace:    ns.Name,
+							GenerateName: "ip-",
+						},
+						Spec: v1alpha1.IPSpec{
+							Type:     v1alpha1.IPTypePublic,
+							IPFamily: corev1.IPv4Protocol,
+						},
+					})
+					if err != nil {
+						GinkgoT().Logf("Failed to allocate IP: %v", err)
+						return
+					}
+
+					noAllocatedIPs.Add(1)
+				},
+			)
+
+			ipList := v1alpha1.IPList{}
+			Expect(k8sClient.List(ctx, &ipList, client.InNamespace(ns.Name))).To(Succeed())
+
+			seenAddresses := sets.New[net.IP]()
+			for _, ipAddress := range ipList.Items {
+				if seenAddresses.Has(ipAddress.Spec.IP) {
+					Fail(fmt.Sprintf("Duplicate IP address: %s", ipAddress.Spec.IP))
+				}
+				seenAddresses.Insert(ipAddress.Spec.IP)
+			}
+
+			Expect(int32(seenAddresses.Len())).To(BeNumerically(">=", noRequestIPs))
+		})
+
+		It("should not allocate the same IP twice", func(ctx context.Context) {
+			var (
+				noRequestIPs   = 10
+				noAllocatedIPs atomic.Int32
+				noWorkers      = 4
+			)
+
+			By("creating a network")
+			network := &v1alpha1.Network{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace:    ns.Name,
+					GenerateName: "network-",
+				},
+			}
+			Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+			By("allocating load balancer IPs")
+			allocateCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+			defer cancel()
+			whileCondDoParallel(allocateCtx, noWorkers,
+				func() bool {
+					return int(noAllocatedIPs.Load()) < noRequestIPs
+				},
+				func() {
+					loadBalancer := &v1alpha1.LoadBalancer{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace:    ns.Name,
+							GenerateName: "lb-",
+						},
+						Spec: v1alpha1.LoadBalancerSpec{
+							Type: v1alpha1.LoadBalancerTypePublic,
+							NetworkRef: corev1.LocalObjectReference{
+								Name: network.Name,
+							},
+							IPs: []v1alpha1.LoadBalancerIP{
+								{
+									Name:     "ip",
+									IPFamily: corev1.IPv4Protocol,
+								},
+							},
+							Selector: &metav1.LabelSelector{},
+							Template: v1alpha1.InstanceTemplate{},
+						},
+					}
+					err := k8sClient.Create(allocateCtx, loadBalancer)
+					if err != nil {
+						GinkgoT().Logf("failed to allocate IP: %v", err)
+						return
+					}
+
+					noAllocatedIPs.Add(1)
+				},
+			)
+
+			By("listing load balancers")
+			loadBalancerList := v1alpha1.LoadBalancerList{}
+			Expect(k8sClient.List(ctx, &loadBalancerList, client.InNamespace(ns.Name))).To(Succeed())
+
+			By("inspecting the load balancer IPs")
+			addressToClaimingLoadBalancer := make(map[net.IP]*v1alpha1.LoadBalancer)
+			for _, loadBalancer := range loadBalancerList.Items {
+				for _, lbIp := range loadBalancer.Spec.IPs {
+					ip := lbIp.IP
+
+					claimingLoadBalancer, ok := addressToClaimingLoadBalancer[ip]
+					if ok {
+						Fail(fmt.Sprintf("IP address %q has at least two claimers:\nClaimer 1: %s\nClaimer 2: %s",
+							ip,
+							client.ObjectKeyFromObject(claimingLoadBalancer),
+							client.ObjectKeyFromObject(&loadBalancer),
+						))
+					}
+
+					addressToClaimingLoadBalancer[ip] = &loadBalancer
+				}
+			}
+			Expect(int32(len(addressToClaimingLoadBalancer))).To(BeNumerically(">=", noRequestIPs))
 		})
 	})
 
