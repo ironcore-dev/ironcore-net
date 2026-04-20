@@ -11,6 +11,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/metautils"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore-net/apimachinery/equality"
 	"github.com/ironcore-dev/ironcore-net/internal/nodeaffinity"
 	"github.com/ironcore-dev/ironcore-net/utils/controller"
 	"github.com/ironcore-dev/ironcore-net/utils/expectations"
@@ -72,12 +73,14 @@ func (r *DaemonSetReconciler) delete(
 }
 
 func (r *DaemonSetReconciler) instanceNeedsUpdate(ds *v1alpha1.DaemonSet, inst *v1alpha1.Instance) bool {
-	return !slices.Equal(inst.Spec.IPs, ds.Spec.Template.Spec.IPs)
+	return !slices.Equal(inst.Spec.IPs, ds.Spec.Template.Spec.IPs) ||
+		!equality.Semantic.DeepEqual(inst.Spec.LoadBalancerPorts, ds.Spec.Template.Spec.LoadBalancerPorts)
 }
 
 func (r *DaemonSetReconciler) updateInstance(ctx context.Context, ds *v1alpha1.DaemonSet, inst *v1alpha1.Instance) error {
 	base := inst.DeepCopy()
 	inst.Spec.IPs = ds.Spec.Template.Spec.IPs
+	inst.Spec.LoadBalancerPorts = ds.Spec.Template.Spec.LoadBalancerPorts
 	return r.Patch(ctx, inst, client.StrategicMergeFrom(base))
 }
 

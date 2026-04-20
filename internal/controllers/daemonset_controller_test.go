@@ -90,6 +90,27 @@ var _ = Describe("DaemonSetController", func() {
 			client.InNamespace(ns.Name),
 		)).Should(HaveField("Items", HaveEach(HaveField("Spec.IPs", []net.IP{net.MustParseIP("192.168.178.1")}))))
 
+		By("updating the daemon set template ports")
+		protocol := corev1.ProtocolTCP
+		Eventually(Update(ds, func() {
+			ds.Spec.Template.Spec.LoadBalancerPorts = []v1alpha1.LoadBalancerPort{
+				{
+					Protocol: &protocol,
+					Port:     80,
+				},
+			}
+		})).Should(Succeed())
+
+		By("waiting until the instance IPs are updated")
+		Eventually(ObjectList(&v1alpha1.InstanceList{},
+			client.InNamespace(ns.Name),
+		)).Should(HaveField("Items", HaveEach(HaveField("Spec.LoadBalancerPorts", []v1alpha1.LoadBalancerPort{
+			{
+				Protocol: &protocol,
+				Port:     80,
+			},
+		}))))
+
 		By("deleting the instances")
 		Expect(k8sClient.DeleteAllOf(ctx, &v1alpha1.Instance{}, client.InNamespace(ns.Name))).To(Succeed())
 
