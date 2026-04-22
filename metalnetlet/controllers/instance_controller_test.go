@@ -59,6 +59,30 @@ var _ = Describe("LoadBalancerInstanceController", func() {
 			HaveField("Spec.IP", metalnetv1alpha1.MustParseIP("10.0.0.1")),
 			HaveField("Spec.IP", metalnetv1alpha1.MustParseIP("10.0.0.2")),
 		)))
+
+		By("adding a load balancer ports")
+		Eventually(Update(inst, func() {
+			inst.Spec.LoadBalancerPorts = append(inst.Spec.LoadBalancerPorts, v1alpha1.LoadBalancerPort{
+				Protocol: &protocol,
+				Port:     1001,
+			})
+		})).Should(Succeed())
+
+		By("waiting for the metalnet load balancers to be updated")
+		consistOfExpectedPorts := ConsistOf(
+			metalnetv1alpha1.LBPort{
+				Protocol: string(protocol),
+				Port:     1000,
+			},
+			metalnetv1alpha1.LBPort{
+				Protocol: string(protocol),
+				Port:     1001,
+			},
+		)
+		Eventually(ObjectList(metalnetLoadBalancerList)).Should(HaveField("Items", ConsistOf(
+			HaveField("Spec.Ports", consistOfExpectedPorts),
+			HaveField("Spec.Ports", consistOfExpectedPorts),
+		)))
 	})
 
 	It("should recreate the metalnet load balancer if it gets deleted", func(ctx SpecContext) {
