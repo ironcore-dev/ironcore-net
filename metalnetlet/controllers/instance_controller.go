@@ -22,6 +22,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/apimachinery/pkg/util/sets"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -134,6 +135,47 @@ func (r *InstanceReconciler) getMetalnetLoadBalancersForLoadBalancerInstance(
 	return metalnetLoadBalancerList.Items, nil
 }
 
+func (r *InstanceReconciler) metalnetLoadBalancerSpec(
+	inst *v1alpha1.Instance,
+	networkUID types.UID,
+	metalnetNodeName string,
+	metalnetLoadBalancerType metalnetv1alpha1.LoadBalancerType,
+	ip net.IP,
+) *metalnetv1alpha1.LoadBalancerSpec {
+	return &metalnetv1alpha1.LoadBalancerSpec{
+		NetworkRef: corev1.LocalObjectReference{Name: string(networkUID)},
+		LBtype:     metalnetLoadBalancerType,
+		IPFamily:   ip.Family(),
+		IP:         ipToMetalnetIP(ip),
+		Ports:      loadBalancerPortsToMetalnetLoadBalancerPorts(inst.Spec.LoadBalancerPorts),
+		NodeName:   &metalnetNodeName,
+	}
+}
+
+func (r *InstanceReconciler) updateMetalnetLoadBalancerIfNecessary(
+	ctx context.Context,
+	inst *v1alpha1.Instance,
+	metalnetLoadBalancer *metalnetv1alpha1.LoadBalancer,
+) error {
+	desiredSpec := r.metalnetLoadBalancerSpec(
+		inst,
+		types.UID(metalnetLoadBalancer.Spec.NetworkRef.Name),
+		generic.DerefZero(metalnetLoadBalancer.Spec.NodeName),
+		metalnetLoadBalancer.Spec.LBtype,
+		metalnetIPToIP(metalnetLoadBalancer.Spec.IP),
+	)
+	if MetalnetEqualities.DeepEqual(desiredSpec, &metalnetLoadBalancer.Spec) {
+		return nil
+	}
+
+	patch := client.MergeFrom(metalnetLoadBalancer.DeepCopy())
+	metalnetLoadBalancer.Spec = *desiredSpec
+	if err := r.MetalnetClient.Patch(ctx, metalnetLoadBalancer, patch); err != nil {
+		return fmt.Errorf("updating metalnet load balancer: %w", err)
+	}
+	return nil
+}
+
 func (r *InstanceReconciler) manageMetalnetLoadBalancers(
 	ctx context.Context,
 	log logr.Logger,
@@ -168,6 +210,10 @@ func (r *InstanceReconciler) manageMetalnetLoadBalancers(
 		ip := metalnetIPToIP(metalnetLoadBalancer.Spec.IP)
 		if unsatisfiedIPs.Has(ip) {
 			unsatisfiedIPs.Delete(ip)
+
+			if err := r.updateMetalnetLoadBalancerIfNecessary(ctx, inst, &metalnetLoadBalancer); err != nil {
+				errs = append(errs, err)
+			}
 			continue
 		}
 
@@ -180,14 +226,7 @@ func (r *InstanceReconciler) manageMetalnetLoadBalancers(
 	var bumpCollisionCount bool
 	for ip := range unsatisfiedIPs {
 		metalnetLoadBalancerHash := computeMetalnetLoadBalancerHash(ip, inst.Status.CollisionCount)
-		metalnetLoadBalancerSpec := metalnetv1alpha1.LoadBalancerSpec{
-			NetworkRef: corev1.LocalObjectReference{Name: string(network.UID)},
-			LBtype:     metalnetLoadBalancerType,
-			IPFamily:   ip.Family(),
-			IP:         ipToMetalnetIP(ip),
-			Ports:      loadBalancerPortsToMetalnetLoadBalancerPorts(inst.Spec.LoadBalancerPorts),
-			NodeName:   &metalnetNodeName,
-		}
+		metalnetLoadBalancerSpec := r.metalnetLoadBalancerSpec(inst, network.UID, metalnetNodeName, metalnetLoadBalancerType, ip)
 		metalnetLoadBalancerName := string(inst.UID) + "-" + metalnetLoadBalancerHash
 		metalnetLoadBalancer := &metalnetv1alpha1.LoadBalancer{
 			ObjectMeta: metav1.ObjectMeta{
@@ -195,7 +234,7 @@ func (r *InstanceReconciler) manageMetalnetLoadBalancers(
 				Name:      metalnetLoadBalancerName,
 				Labels:    metalnetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), inst),
 			},
-			Spec: metalnetLoadBalancerSpec,
+			Spec: *metalnetLoadBalancerSpec,
 		}
 		createMetalnetLoadBalancer := metalnetLoadBalancer.DeepCopy()
 		if err := r.MetalnetClient.Create(ctx, metalnetLoadBalancer); err != nil {
