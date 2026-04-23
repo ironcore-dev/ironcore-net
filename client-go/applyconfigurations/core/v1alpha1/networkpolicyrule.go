@@ -16,14 +16,21 @@ import (
 
 // NetworkPolicyRuleApplyConfiguration represents a declarative configuration of the NetworkPolicyRule type for use
 // with apply.
+//
+// NetworkPolicyRule is the schema for the networkpolicyrules API.
 type NetworkPolicyRuleApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	NetworkRef                       *LocalUIDReferenceApplyConfiguration       `json:"networkRef,omitempty"`
-	Targets                          []TargetNetworkInterfaceApplyConfiguration `json:"targets,omitempty"`
-	Priority                         *int32                                     `json:"priority,omitempty"`
-	IngressRules                     []RuleApplyConfiguration                   `json:"ingressRule,omitempty"`
-	EgressRules                      []RuleApplyConfiguration                   `json:"egressRule,omitempty"`
+	// NetworkRef is the network to which network policy is applied.
+	NetworkRef *LocalUIDReferenceApplyConfiguration `json:"networkRef,omitempty"`
+	// Targets are the targets of the network policy.
+	Targets []TargetNetworkInterfaceApplyConfiguration `json:"targets,omitempty"`
+	// Priority is an optional field that specifies the order in which the policy is applied.
+	Priority *int32 `json:"priority,omitempty"`
+	// IngressRules are the ingress rules.
+	IngressRules []RuleApplyConfiguration `json:"ingressRule,omitempty"`
+	// EgressRules are the egress rules.
+	EgressRules []RuleApplyConfiguration `json:"egressRule,omitempty"`
 }
 
 // NetworkPolicyRule constructs a declarative configuration of the NetworkPolicyRule type for use with
@@ -37,29 +44,14 @@ func NetworkPolicyRule(name, namespace string) *NetworkPolicyRuleApplyConfigurat
 	return b
 }
 
-// ExtractNetworkPolicyRule extracts the applied configuration owned by fieldManager from
-// networkPolicyRule. If no managedFields are found in networkPolicyRule for fieldManager, a
-// NetworkPolicyRuleApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractNetworkPolicyRuleFrom extracts the applied configuration owned by fieldManager from
+// networkPolicyRule for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // networkPolicyRule must be a unmodified NetworkPolicyRule API object that was retrieved from the Kubernetes API.
-// ExtractNetworkPolicyRule provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractNetworkPolicyRuleFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractNetworkPolicyRule(networkPolicyRule *corev1alpha1.NetworkPolicyRule, fieldManager string) (*NetworkPolicyRuleApplyConfiguration, error) {
-	return extractNetworkPolicyRule(networkPolicyRule, fieldManager, "")
-}
-
-// ExtractNetworkPolicyRuleStatus is the same as ExtractNetworkPolicyRule except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractNetworkPolicyRuleStatus(networkPolicyRule *corev1alpha1.NetworkPolicyRule, fieldManager string) (*NetworkPolicyRuleApplyConfiguration, error) {
-	return extractNetworkPolicyRule(networkPolicyRule, fieldManager, "status")
-}
-
-func extractNetworkPolicyRule(networkPolicyRule *corev1alpha1.NetworkPolicyRule, fieldManager string, subresource string) (*NetworkPolicyRuleApplyConfiguration, error) {
+func ExtractNetworkPolicyRuleFrom(networkPolicyRule *corev1alpha1.NetworkPolicyRule, fieldManager string, subresource string) (*NetworkPolicyRuleApplyConfiguration, error) {
 	b := &NetworkPolicyRuleApplyConfiguration{}
 	err := managedfields.ExtractInto(networkPolicyRule, internal.Parser().Type("com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicyRule"), fieldManager, b, subresource)
 	if err != nil {
@@ -72,6 +64,21 @@ func extractNetworkPolicyRule(networkPolicyRule *corev1alpha1.NetworkPolicyRule,
 	b.WithAPIVersion("core.apinet.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractNetworkPolicyRule extracts the applied configuration owned by fieldManager from
+// networkPolicyRule. If no managedFields are found in networkPolicyRule for fieldManager, a
+// NetworkPolicyRuleApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// networkPolicyRule must be a unmodified NetworkPolicyRule API object that was retrieved from the Kubernetes API.
+// ExtractNetworkPolicyRule provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractNetworkPolicyRule(networkPolicyRule *corev1alpha1.NetworkPolicyRule, fieldManager string) (*NetworkPolicyRuleApplyConfiguration, error) {
+	return ExtractNetworkPolicyRuleFrom(networkPolicyRule, fieldManager, "")
+}
+
 func (b NetworkPolicyRuleApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

@@ -137,7 +137,7 @@ var _ = Describe("NetworkInterfaceController", func() {
 					NetworkPolicyPorts: []v1alpha1.NetworkPolicyPort{
 						{
 							Protocol: generic.Pointer(corev1.ProtocolTCP),
-							Port:     8080,
+							Port:     generic.Pointer(int32(8080)),
 							EndPort:  generic.Pointer(int32(8090)),
 						},
 					},
@@ -161,11 +161,11 @@ var _ = Describe("NetworkInterfaceController", func() {
 					NetworkPolicyPorts: []v1alpha1.NetworkPolicyPort{
 						{
 							Protocol: generic.Pointer(corev1.ProtocolTCP),
-							Port:     8095,
+							Port:     generic.Pointer(int32(8095)),
 						},
 						{
 							Protocol: generic.Pointer(corev1.ProtocolTCP),
-							Port:     9000,
+							Port:     generic.Pointer(int32(9000)),
 							EndPort:  generic.Pointer(int32(9010)),
 						},
 					},

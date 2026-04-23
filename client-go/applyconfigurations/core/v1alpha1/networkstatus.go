@@ -12,6 +12,7 @@ import (
 // NetworkStatusApplyConfiguration represents a declarative configuration of the NetworkStatus type for use
 // with apply.
 type NetworkStatusApplyConfiguration struct {
+	// Peerings contains the states of the network peerings for the network.
 	Peerings map[string][]corev1alpha1.NetworkPeeringStatus `json:"peerings,omitempty"`
 }
 

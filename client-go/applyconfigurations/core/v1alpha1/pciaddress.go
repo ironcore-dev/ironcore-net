@@ -7,6 +7,8 @@ package v1alpha1
 
 // PCIAddressApplyConfiguration represents a declarative configuration of the PCIAddress type for use
 // with apply.
+//
+// PCIAddress is a PCI address.
 type PCIAddressApplyConfiguration struct {
 	Domain   *string `json:"domain,omitempty"`
 	Bus      *string `json:"bus,omitempty"`

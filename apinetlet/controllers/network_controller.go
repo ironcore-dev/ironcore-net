@@ -12,10 +12,10 @@ import (
 	"github.com/go-logr/logr"
 
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	"github.com/ironcore-dev/ironcore-net/apimachinery/equality"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
+	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
@@ -196,31 +196,6 @@ func (r *NetworkReconciler) setNetworkProviderID(
 }
 
 func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network) (*apinetv1alpha1.Network, error) {
-	isNetworkExist := false
-	apiNetNetwork := &apinetv1alpha1.Network{}
-	apiNetNetworkKey := client.ObjectKey{Namespace: r.APINetNamespace, Name: string(network.UID)}
-	log.V(1).Info("Check if APINet network already exists")
-	if err := r.APINetClient.Get(ctx, apiNetNetworkKey, apiNetNetwork); err != nil {
-		if !apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf("error getting apinet network %s: %w", apiNetNetworkKey.Name, err)
-		} else {
-			apiNetNetwork = &apinetv1alpha1.Network{
-				TypeMeta: metav1.TypeMeta{
-					APIVersion: apinetv1alpha1.SchemeGroupVersion.String(),
-					Kind:       "Network",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: r.APINetNamespace,
-					Name:      string(network.UID),
-					Labels:    apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), network),
-				},
-			}
-		}
-	} else {
-		log.V(1).Info("APINet network already exists")
-		isNetworkExist = true
-	}
-
 	var peerings []apinetv1alpha1.NetworkPeering
 	for _, peeringClaimRef := range network.Spec.PeeringClaimRefs {
 		log.V(1).Info("Get APINet network for target network")
@@ -251,19 +226,45 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 		}
 	}
 
-	isPeeringsEqual := equality.Semantic.DeepEqual(apiNetNetwork.Spec.Peerings, peerings)
+	log.V(1).Info("Applying APINet network")
 
-	if !isNetworkExist || !isPeeringsEqual {
-		log.V(1).Info("Applying APINet network")
+	// Build peering apply configurations
+	var peeringCfgs []*apinetv1alpha1ac.NetworkPeeringApplyConfiguration
+	for _, peering := range peerings {
+		// Build prefix apply configurations
+		var prefixCfgs []*apinetv1alpha1ac.PeeringPrefixApplyConfiguration
+		for _, prefix := range peering.Prefixes {
+			prefixCfg := apinetv1alpha1ac.PeeringPrefix().
+				WithName(prefix.Name)
+			if prefix.Prefix != nil {
+				prefixCfg = prefixCfg.WithPrefix(*prefix.Prefix)
+			}
+			prefixCfgs = append(prefixCfgs, prefixCfg)
+		}
 
-		if !isPeeringsEqual {
-			apiNetNetwork.Spec.Peerings = peerings
-		}
-		apiNetNetwork.ManagedFields = nil
-		if err := r.APINetClient.Patch(ctx, apiNetNetwork, client.Apply, fieldOwner, client.ForceOwnership); err != nil {
-			return nil, fmt.Errorf("error applying apinet network: %w", err)
-		}
+		peeringCfg := apinetv1alpha1ac.NetworkPeering().
+			WithName(peering.Name).
+			WithID(peering.ID).
+			WithPrefixes(prefixCfgs...)
+		peeringCfgs = append(peeringCfgs, peeringCfg)
 	}
+
+	apiNetNetworkApplyCfg := apinetv1alpha1ac.Network(string(network.UID), r.APINetNamespace).
+		WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), network)).
+		WithSpec(apinetv1alpha1ac.NetworkSpec().
+			WithPeerings(peeringCfgs...))
+
+	if err := r.APINetClient.Apply(ctx, apiNetNetworkApplyCfg, fieldOwner, client.ForceOwnership); err != nil {
+		return nil, fmt.Errorf("error applying apinet network: %w", err)
+	}
+
+	// Fetch the applied network to return current state
+	apiNetNetwork := &apinetv1alpha1.Network{}
+	apiNetNetworkKey := client.ObjectKey{Namespace: r.APINetNamespace, Name: string(network.UID)}
+	if err := r.APINetClient.Get(ctx, apiNetNetworkKey, apiNetNetwork); err != nil {
+		return nil, fmt.Errorf("error getting applied apinet network: %w", err)
+	}
+
 	return apiNetNetwork, nil
 }
 

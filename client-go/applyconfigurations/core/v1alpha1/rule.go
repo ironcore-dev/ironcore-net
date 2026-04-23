@@ -8,8 +8,11 @@ package v1alpha1
 // RuleApplyConfiguration represents a declarative configuration of the Rule type for use
 // with apply.
 type RuleApplyConfiguration struct {
-	CIDRBlock          []IPBlockApplyConfiguration           `json:"ipBlock,omitempty"`
-	ObjectIPs          []ObjectIPApplyConfiguration          `json:"ips,omitempty"`
+	// CIDRBlock specifies the CIDR block from which network traffic may come or go.
+	CIDRBlock []IPBlockApplyConfiguration `json:"ipBlock,omitempty"`
+	// ObjectIPs are the object IPs the rule applies to.
+	ObjectIPs []ObjectIPApplyConfiguration `json:"ips,omitempty"`
+	// NetworkPolicyPorts are the protocol type and ports.
 	NetworkPolicyPorts []NetworkPolicyPortApplyConfiguration `json:"networkPolicyPorts,omitempty"`
 }
 

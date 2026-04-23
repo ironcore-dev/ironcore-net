@@ -9,8 +9,11 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	corev1alpha1apply "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -74,29 +77,23 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 }
 
 func (r *LoadBalancerReconciler) applyDaemonSetForLoadBalancer(ctx context.Context, loadBalancer *v1alpha1.LoadBalancer) error {
-	daemonSet := &v1alpha1.DaemonSet{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: v1alpha1.SchemeGroupVersion.String(),
-			Kind:       "DaemonSet",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: loadBalancer.Namespace,
-			Name:      v1alpha1.LoadBalancerDaemonSetName(loadBalancer.Name),
-			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(loadBalancer, v1alpha1.SchemeGroupVersion.WithKind("LoadBalancer")),
-			},
-		},
-		Spec: v1alpha1.DaemonSetSpec{
-			Selector: loadBalancer.Spec.Selector,
-			Template: loadBalancer.Spec.Template,
-		},
-	}
-	daemonSet.Spec.Template.Spec.Type = v1alpha1.InstanceTypeLoadBalancer
-	daemonSet.Spec.Template.Spec.LoadBalancerType = loadBalancer.Spec.Type
-	daemonSet.Spec.Template.Spec.IPs = v1alpha1.GetLoadBalancerIPs(loadBalancer)
-	daemonSet.Spec.Template.Spec.NetworkRef = loadBalancer.Spec.NetworkRef
-	daemonSet.Spec.Template.Spec.LoadBalancerPorts = loadBalancer.Spec.Ports
-	err := r.Patch(ctx, daemonSet, client.Apply, fieldOwner, client.ForceOwnership)
+	daemonsetApplyconfig := corev1alpha1apply.DaemonSet(loadBalancer.Namespace, v1alpha1.LoadBalancerDaemonSetName(loadBalancer.Name)).
+		WithOwnerReferences(v1.OwnerReference().
+			WithAPIVersion(v1alpha1.SchemeGroupVersion.String()).
+			WithKind("LoadBalancer").
+			WithName(loadBalancer.Name).
+			WithUID(loadBalancer.UID)).
+		WithSpec(corev1alpha1apply.DaemonSetSpec().
+			WithSelector(v1.LabelSelector().
+				WithMatchLabels(loadBalancer.Spec.Selector.MatchLabels)).
+			WithTemplate(corev1alpha1apply.InstanceTemplate().
+				WithLabels(loadBalancer.Spec.Template.ObjectMeta.Labels).
+				WithSpec(corev1alpha1apply.InstanceSpec().
+					WithType(v1alpha1.InstanceTypeLoadBalancer).
+					WithLoadBalancerType(loadBalancer.Spec.Type).
+					WithNetworkRef(corev1.LocalObjectReference{Name: loadBalancer.Spec.NetworkRef.Name}).
+					WithIPs(v1alpha1.GetLoadBalancerIPs(loadBalancer)...))))
+	err := r.Apply(ctx, daemonsetApplyconfig, fieldOwner, client.ForceOwnership)
 	return err
 }
 

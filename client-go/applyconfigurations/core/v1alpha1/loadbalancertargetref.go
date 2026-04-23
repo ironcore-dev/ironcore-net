@@ -12,9 +12,14 @@ import (
 
 // LoadBalancerTargetRefApplyConfiguration represents a declarative configuration of the LoadBalancerTargetRef type for use
 // with apply.
+//
+// LoadBalancerTargetRef is a load balancer target.
 type LoadBalancerTargetRefApplyConfiguration struct {
-	UID     *types.UID               `json:"uid,omitempty"`
-	Name    *string                  `json:"name,omitempty"`
+	// UID is the UID of the target.
+	UID *types.UID `json:"uid,omitempty"`
+	// Name is the name of the target.
+	Name *string `json:"name,omitempty"`
+	// NodeRef references the node the destination network interface is on.
 	NodeRef *v1.LocalObjectReference `json:"nodeRef,omitempty"`
 }
 

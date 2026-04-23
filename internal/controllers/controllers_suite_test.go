@@ -23,7 +23,7 @@ import (
 
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	"k8s.io/utils/lru"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -83,7 +83,7 @@ var _ = BeforeSuite(func() {
 		// Note that you must have the required binaries setup under the bin directory to perform
 		// the tests directly. When we run make test it will be setup and used automatically.
 		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
-			fmt.Sprintf("1.34.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
+			fmt.Sprintf("1.35.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
 	}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
 		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "config", "apiserver", "apiservice", "bases")},
@@ -145,7 +145,7 @@ var _ = BeforeSuite(func() {
 
 	Expect((&NATGatewayReconciler{
 		Client:        k8sManager.GetClient(),
-		EventRecorder: &record.FakeRecorder{},
+		EventRecorder: &events.FakeRecorder{},
 	}).SetupWithManager(k8sManager)).To(Succeed())
 
 	Expect((&LoadBalancerReconciler{
@@ -171,7 +171,7 @@ var _ = BeforeSuite(func() {
 
 	Expect((&SchedulerReconciler{
 		Client:        k8sManager.GetClient(),
-		EventRecorder: &record.FakeRecorder{},
+		EventRecorder: &events.FakeRecorder{},
 		Cache:         schedulerCache,
 	}).SetupWithManager(k8sManager)).To(Succeed())
 

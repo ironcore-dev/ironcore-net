@@ -25,6 +25,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	metav1apply "k8s.io/client-go/applyconfigurations/meta/v1"
 	"k8s.io/client-go/util/workqueue"
 	klog "k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -374,34 +375,59 @@ func (r *NetworkPolicyReconciler) fetchIPsFromLoadBalancers(ctx context.Context,
 }
 
 func (r *NetworkPolicyReconciler) applyNetworkPolicyRule(ctx context.Context, networkPolicy *networkingv1alpha1.NetworkPolicy, apiNetNetworkPolicy *apinetv1alpha1.NetworkPolicy, targets []apinetv1alpha1.TargetNetworkInterface, network *apinetv1alpha1.Network, ingressRules, egressRules []apinetv1alpha1.Rule) error {
-	networkPolicyRule := &apinetv1alpha1.NetworkPolicyRule{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "NetworkPolicyRule",
-			APIVersion: apinetv1alpha1.SchemeGroupVersion.String(),
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: apiNetNetworkPolicy.Namespace,
-			Name:      apiNetNetworkPolicy.Name,
-			Labels:    apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), networkPolicy),
-			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apiNetNetworkPolicy, apinetv1alpha1.SchemeGroupVersion.WithKind("NetworkPolicy")),
-			},
-		},
-		NetworkRef: apinetv1alpha1.LocalUIDReference{
-			Name: network.Name,
-			UID:  network.UID,
-		},
-		Priority:     apiNetNetworkPolicy.Spec.Priority,
-		Targets:      targets,
-		IngressRules: ingressRules,
-		EgressRules:  egressRules,
-	}
-	err := ctrl.SetControllerReference(apiNetNetworkPolicy, networkPolicyRule, r.Scheme())
-	if err != nil {
-		return fmt.Errorf("error setting controller reference: %w", err)
+	// Build target configurations
+	var targetCfgs []*apinetv1alpha1ac.TargetNetworkInterfaceApplyConfiguration
+	for _, target := range targets {
+		targetCfg := apinetv1alpha1ac.TargetNetworkInterface().
+			WithIP(target.IP)
+		if target.TargetRef != nil {
+			targetCfg = targetCfg.WithTargetRef(apinetv1alpha1ac.LocalUIDReference().
+				WithName(target.TargetRef.Name).
+				WithUID(target.TargetRef.UID))
+		}
+		targetCfgs = append(targetCfgs, targetCfg)
 	}
 
-	if err := r.APINetClient.Patch(ctx, networkPolicyRule, client.Apply, networkPolicyFieldOwner, client.ForceOwnership); err != nil {
+	// Build ingress rule configurations
+	var ingressRuleCfgs []*apinetv1alpha1ac.RuleApplyConfiguration
+	for _, rule := range ingressRules {
+		ruleCfg := apinetv1alpha1ac.Rule()
+		ruleCfg = ruleCfg.WithNetworkPolicyPorts(buildNetworkPolicyPortConfigs(rule.NetworkPolicyPorts)...)
+		ruleCfg = ruleCfg.WithCIDRBlock(buildIPBlockConfigs(rule.CIDRBlock)...)
+		ruleCfg = ruleCfg.WithObjectIPs(buildObjectIPConfigs(rule.ObjectIPs)...)
+		ingressRuleCfgs = append(ingressRuleCfgs, ruleCfg)
+	}
+
+	// Build egress rule configurations
+	var egressRuleCfgs []*apinetv1alpha1ac.RuleApplyConfiguration
+	for _, rule := range egressRules {
+		ruleCfg := apinetv1alpha1ac.Rule()
+		ruleCfg = ruleCfg.WithNetworkPolicyPorts(buildNetworkPolicyPortConfigs(rule.NetworkPolicyPorts)...)
+		ruleCfg = ruleCfg.WithCIDRBlock(buildIPBlockConfigs(rule.CIDRBlock)...)
+		ruleCfg = ruleCfg.WithObjectIPs(buildObjectIPConfigs(rule.ObjectIPs)...)
+		egressRuleCfgs = append(egressRuleCfgs, ruleCfg)
+	}
+
+	ownerRef := metav1apply.OwnerReference().
+		WithAPIVersion(apinetv1alpha1.SchemeGroupVersion.String()).
+		WithKind("NetworkPolicy").
+		WithName(apiNetNetworkPolicy.Name).
+		WithUID(apiNetNetworkPolicy.UID).
+		WithController(true).
+		WithBlockOwnerDeletion(true)
+
+	networkPolicyRuleApplyCfg := apinetv1alpha1ac.NetworkPolicyRule(apiNetNetworkPolicy.Name, apiNetNetworkPolicy.Namespace).
+		WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), networkPolicy)).
+		WithNetworkRef(apinetv1alpha1ac.LocalUIDReference().
+			WithName(network.Name).
+			WithUID(network.UID)).
+		WithPriority(*apiNetNetworkPolicy.Spec.Priority).
+		WithTargets(targetCfgs...).
+		WithIngressRules(ingressRuleCfgs...).
+		WithEgressRules(egressRuleCfgs...).
+		WithOwnerReferences(ownerRef)
+
+	if err := r.APINetClient.Apply(ctx, networkPolicyRuleApplyCfg, networkPolicyFieldOwner, client.ForceOwnership); err != nil {
 		return fmt.Errorf("error applying network policy rule: %w", err)
 	}
 	return nil
@@ -563,6 +589,48 @@ func (r *NetworkPolicyReconciler) networkInterfaceReadyPredicate() predicate.Pre
 			return isNetworkInterfaceReady(nic)
 		},
 	}
+}
+
+func buildNetworkPolicyPortConfigs(ports []apinetv1alpha1.NetworkPolicyPort) []*apinetv1alpha1ac.NetworkPolicyPortApplyConfiguration {
+	var cfgs []*apinetv1alpha1ac.NetworkPolicyPortApplyConfiguration
+	for _, port := range ports {
+		cfg := apinetv1alpha1ac.NetworkPolicyPort()
+		if port.Protocol != nil {
+			cfg = cfg.WithProtocol(*port.Protocol)
+		}
+		if port.Port != nil {
+			cfg = cfg.WithPort(*port.Port)
+		}
+		if port.EndPort != nil {
+			cfg = cfg.WithEndPort(*port.EndPort)
+		}
+		cfgs = append(cfgs, cfg)
+	}
+	return cfgs
+}
+
+func buildIPBlockConfigs(blocks []apinetv1alpha1.IPBlock) []*apinetv1alpha1ac.IPBlockApplyConfiguration {
+	var cfgs []*apinetv1alpha1ac.IPBlockApplyConfiguration
+	for _, block := range blocks {
+		cfg := apinetv1alpha1ac.IPBlock().
+			WithCIDR(block.CIDR)
+		if block.Except != nil {
+			cfg = cfg.WithExcept(block.Except...)
+		}
+		cfgs = append(cfgs, cfg)
+	}
+	return cfgs
+}
+
+func buildObjectIPConfigs(objectIPs []apinetv1alpha1.ObjectIP) []*apinetv1alpha1ac.ObjectIPApplyConfiguration {
+	var cfgs []*apinetv1alpha1ac.ObjectIPApplyConfiguration
+	for _, objectIP := range objectIPs {
+		cfg := apinetv1alpha1ac.ObjectIP().
+			WithPrefix(objectIP.Prefix).
+			WithIPFamily(objectIP.IPFamily)
+		cfgs = append(cfgs, cfg)
+	}
+	return cfgs
 }
 
 func (r *NetworkPolicyReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache cache.Cache) error {

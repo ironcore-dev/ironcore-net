@@ -14,12 +14,19 @@ import (
 // LoadBalancerSpecApplyConfiguration represents a declarative configuration of the LoadBalancerSpec type for use
 // with apply.
 type LoadBalancerSpecApplyConfiguration struct {
-	Type       *corev1alpha1.LoadBalancerType          `json:"type,omitempty"`
-	NetworkRef *v1.LocalObjectReference                `json:"networkRef,omitempty"`
-	IPs        []LoadBalancerIPApplyConfiguration      `json:"ips,omitempty"`
-	Ports      []LoadBalancerPortApplyConfiguration    `json:"ports,omitempty"`
-	Selector   *metav1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
-	Template   *InstanceTemplateApplyConfiguration     `json:"template,omitempty"`
+	// Type specifies the type of load balancer.
+	Type *corev1alpha1.LoadBalancerType `json:"type,omitempty"`
+	// NetworkRef references the network the load balancer is part of.
+	NetworkRef *v1.LocalObjectReference `json:"networkRef,omitempty"`
+	// IPs specifies the IPs of the load balancer.
+	IPs []LoadBalancerIPApplyConfiguration `json:"ips,omitempty"`
+	// Ports are the ports the load balancer should allow.
+	// If empty, the load balancer allows all ports.
+	Ports []LoadBalancerPortApplyConfiguration `json:"ports,omitempty"`
+	// Selector selects all Instance that are managed by this daemon set.
+	Selector *metav1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
+	// Template is the instance template.
+	Template *InstanceTemplateApplyConfiguration `json:"template,omitempty"`
 }
 
 // LoadBalancerSpecApplyConfiguration constructs a declarative configuration of the LoadBalancerSpec type for use with

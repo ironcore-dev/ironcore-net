@@ -205,7 +205,7 @@ func main() {
 
 	if err = (&controllers.NATGatewayReconciler{
 		Client:        mgr.GetClient(),
-		EventRecorder: mgr.GetEventRecorderFor("natgateways"),
+		EventRecorder: mgr.GetEventRecorder("natgateways"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "NATGateway")
 		os.Exit(1)
@@ -246,7 +246,7 @@ func main() {
 
 	if err = (&controllers.SchedulerReconciler{
 		Client:        mgr.GetClient(),
-		EventRecorder: mgr.GetEventRecorderFor("scheduler"),
+		EventRecorder: mgr.GetEventRecorder("scheduler"),
 		Cache:         schedulerCache,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Scheduler")

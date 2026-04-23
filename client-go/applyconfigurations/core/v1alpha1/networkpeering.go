@@ -7,9 +7,15 @@ package v1alpha1
 
 // NetworkPeeringApplyConfiguration represents a declarative configuration of the NetworkPeering type for use
 // with apply.
+//
+// NetworkPeering defines a network peering with another network.
 type NetworkPeeringApplyConfiguration struct {
-	Name     *string                           `json:"name,omitempty"`
-	ID       *string                           `json:"id,omitempty"`
+	// Name is the semantical name of the network peering.
+	Name *string `json:"name,omitempty"`
+	// ID is the ID of the network to peer with.
+	ID *string `json:"id,omitempty"`
+	// Prefixes is a list of prefixes that we want only to be exposed
+	// to the peered network, if no prefixes are specified no filtering will be done.
 	Prefixes []PeeringPrefixApplyConfiguration `json:"prefixes,omitempty"`
 }
 

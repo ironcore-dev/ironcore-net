@@ -16,6 +16,8 @@ import (
 
 // IPAddressApplyConfiguration represents a declarative configuration of the IPAddress type for use
 // with apply.
+//
+// IPAddress is the schema for the ipaddresses API.
 type IPAddressApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -32,29 +34,14 @@ func IPAddress(name string) *IPAddressApplyConfiguration {
 	return b
 }
 
-// ExtractIPAddress extracts the applied configuration owned by fieldManager from
-// iPAddress. If no managedFields are found in iPAddress for fieldManager, a
-// IPAddressApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractIPAddressFrom extracts the applied configuration owned by fieldManager from
+// iPAddress for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // iPAddress must be a unmodified IPAddress API object that was retrieved from the Kubernetes API.
-// ExtractIPAddress provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractIPAddressFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractIPAddress(iPAddress *corev1alpha1.IPAddress, fieldManager string) (*IPAddressApplyConfiguration, error) {
-	return extractIPAddress(iPAddress, fieldManager, "")
-}
-
-// ExtractIPAddressStatus is the same as ExtractIPAddress except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractIPAddressStatus(iPAddress *corev1alpha1.IPAddress, fieldManager string) (*IPAddressApplyConfiguration, error) {
-	return extractIPAddress(iPAddress, fieldManager, "status")
-}
-
-func extractIPAddress(iPAddress *corev1alpha1.IPAddress, fieldManager string, subresource string) (*IPAddressApplyConfiguration, error) {
+func ExtractIPAddressFrom(iPAddress *corev1alpha1.IPAddress, fieldManager string, subresource string) (*IPAddressApplyConfiguration, error) {
 	b := &IPAddressApplyConfiguration{}
 	err := managedfields.ExtractInto(iPAddress, internal.Parser().Type("com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IPAddress"), fieldManager, b, subresource)
 	if err != nil {
@@ -66,6 +53,21 @@ func extractIPAddress(iPAddress *corev1alpha1.IPAddress, fieldManager string, su
 	b.WithAPIVersion("core.apinet.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractIPAddress extracts the applied configuration owned by fieldManager from
+// iPAddress. If no managedFields are found in iPAddress for fieldManager, a
+// IPAddressApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// iPAddress must be a unmodified IPAddress API object that was retrieved from the Kubernetes API.
+// ExtractIPAddress provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractIPAddress(iPAddress *corev1alpha1.IPAddress, fieldManager string) (*IPAddressApplyConfiguration, error) {
+	return ExtractIPAddressFrom(iPAddress, fieldManager, "")
+}
+
 func (b IPAddressApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

@@ -8,7 +8,9 @@ package v1alpha1
 // NetworkSpecApplyConfiguration represents a declarative configuration of the NetworkSpec type for use
 // with apply.
 type NetworkSpecApplyConfiguration struct {
-	ID       *string                            `json:"id,omitempty"`
+	// ID is the ID of the network.
+	ID *string `json:"id,omitempty"`
+	// Peerings are the network peerings with this network
 	Peerings []NetworkPeeringApplyConfiguration `json:"peerings,omitempty"`
 }
 

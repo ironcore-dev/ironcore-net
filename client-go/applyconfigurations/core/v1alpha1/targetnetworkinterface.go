@@ -11,8 +11,12 @@ import (
 
 // TargetNetworkInterfaceApplyConfiguration represents a declarative configuration of the TargetNetworkInterface type for use
 // with apply.
+//
+// TargetNetworkInterface is the target of the network policy.
 type TargetNetworkInterfaceApplyConfiguration struct {
-	IP        *net.IP                              `json:"ip,omitempty"`
+	// IP is the IP address of the target network interface.
+	IP *net.IP `json:"ip,omitempty"`
+	// TargetRef is the target providing the destination.
 	TargetRef *LocalUIDReferenceApplyConfiguration `json:"targetRef,omitempty"`
 }
 

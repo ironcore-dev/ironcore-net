@@ -8,7 +8,9 @@ package v1alpha1
 // NATGatewayStatusApplyConfiguration represents a declarative configuration of the NATGatewayStatus type for use
 // with apply.
 type NATGatewayStatusApplyConfiguration struct {
-	UsedNATIPs      *int64 `json:"usedNATIPs,omitempty"`
+	// UsedNATIPs is the number of NAT IPs in-use.
+	UsedNATIPs *int64 `json:"usedNATIPs,omitempty"`
+	// RequestedNATIPs is the number of requested NAT IPs.
 	RequestedNATIPs *int64 `json:"requestedNATIPs,omitempty"`
 }
 

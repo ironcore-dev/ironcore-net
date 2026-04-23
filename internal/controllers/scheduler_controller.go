@@ -15,7 +15,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -34,7 +34,7 @@ const (
 
 type SchedulerReconciler struct {
 	client.Client
-	record.EventRecorder
+	events.EventRecorder
 	Cache *scheduler.Cache
 
 	snapshot *scheduler.Snapshot
@@ -468,7 +468,7 @@ func (r *SchedulerReconciler) reconcileExists(
 		return ctrl.Result{}, fmt.Errorf("error getting nodes for instance: %w", err)
 	}
 	if len(nodes) == 0 {
-		r.Event(inst, corev1.EventTypeNormal, outOfCapacity, "No nodes available to schedule instance on")
+		r.Eventf(inst, nil, corev1.EventTypeNormal, outOfCapacity, "No nodes available to schedule %v on", inst.Name)
 		return ctrl.Result{}, nil
 	}
 

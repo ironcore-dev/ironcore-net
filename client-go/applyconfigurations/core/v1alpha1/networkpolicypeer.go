@@ -7,9 +7,14 @@ package v1alpha1
 
 // NetworkPolicyPeerApplyConfiguration represents a declarative configuration of the NetworkPolicyPeer type for use
 // with apply.
+//
+// NetworkPolicyPeer describes a peer to allow traffic to / from.
 type NetworkPolicyPeerApplyConfiguration struct {
+	// ObjectSelector selects peers with the given kind matching the label selector.
+	// Exclusive with other peer specifiers.
 	ObjectSelector *ObjectSelectorApplyConfiguration `json:"objectSelector,omitempty"`
-	IPBlock        *IPBlockApplyConfiguration        `json:"ipBlock,omitempty"`
+	// IPBlock specifies the ip block from or to which network traffic may come.
+	IPBlock *IPBlockApplyConfiguration `json:"ipBlock,omitempty"`
 }
 
 // NetworkPolicyPeerApplyConfiguration constructs a declarative configuration of the NetworkPolicyPeer type for use with

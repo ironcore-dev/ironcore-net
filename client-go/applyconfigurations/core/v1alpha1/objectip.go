@@ -13,8 +13,11 @@ import (
 // ObjectIPApplyConfiguration represents a declarative configuration of the ObjectIP type for use
 // with apply.
 type ObjectIPApplyConfiguration struct {
-	IPFamily *v1.IPFamily  `json:"ipFamily,omitempty"`
-	Prefix   *net.IPPrefix `json:"prefix,omitempty"`
+	// IPFamily is the IPFamily of the prefix.
+	// If unset but Prefix is set, this can be inferred.
+	IPFamily *v1.IPFamily `json:"ipFamily,omitempty"`
+	// Prefix is the prefix of the IP.
+	Prefix *net.IPPrefix `json:"prefix,omitempty"`
 }
 
 // ObjectIPApplyConfiguration constructs a declarative configuration of the ObjectIP type for use with

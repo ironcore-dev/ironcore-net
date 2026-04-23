@@ -240,11 +240,11 @@ func extractFirewallRulesFromRule(rule v1alpha1.Rule, direction metalnetv1alpha1
 			// TODO: no support for SCTP protocol in metalnetlet and metalnetlet FirewallRuleProtocolTypeICMP is not defined in ironcore
 		}
 
-		if port.Port != 0 {
+		if port.Port != nil {
 			if direction == metalnetv1alpha1.FirewallRuleDirectionIngress {
-				baseFirewallRule.ProtocolMatch.PortRange = &metalnetv1alpha1.PortMatch{SrcPort: &port.Port}
+				baseFirewallRule.ProtocolMatch.PortRange = &metalnetv1alpha1.PortMatch{SrcPort: port.Port}
 			} else {
-				baseFirewallRule.ProtocolMatch.PortRange = &metalnetv1alpha1.PortMatch{DstPort: &port.Port}
+				baseFirewallRule.ProtocolMatch.PortRange = &metalnetv1alpha1.PortMatch{DstPort: port.Port}
 			}
 			if port.EndPort != nil {
 				if direction == metalnetv1alpha1.FirewallRuleDirectionIngress {

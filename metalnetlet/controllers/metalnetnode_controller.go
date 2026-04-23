@@ -10,6 +10,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/maps"
 	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -120,21 +121,23 @@ func (r *MetalnetNodeReconciler) reconcile(ctx context.Context, log logr.Logger,
 	log.V(1).Info("Finalizer is present")
 
 	log.V(1).Info("Applying node")
-	node := &v1alpha1.Node{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: v1alpha1.SchemeGroupVersion.String(),
-			Kind:       "Node",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name: PartitionNodeName(r.PartitionName, metalnetNode.Name),
-			Labels: maps.AppendMap(map[string]string{
+
+	nodeName := PartitionNodeName(r.PartitionName, metalnetNode.Name)
+
+	nodeApplyCfg := apinetv1alpha1ac.Node(nodeName).
+		WithKind("Node").
+		WithAPIVersion(v1alpha1.SchemeGroupVersion.String()).
+		WithLabels(maps.AppendMap(
+			map[string]string{
 				v1alpha1.TopologyPartitionLabel: r.PartitionName,
-			}, r.NodeLabels),
-		},
-	}
-	if err := r.Patch(ctx, node, client.Apply, PartitionFieldOwner(r.PartitionName), client.ForceOwnership); err != nil {
+			},
+			r.NodeLabels,
+		))
+
+	if err := r.Apply(ctx, nodeApplyCfg, PartitionFieldOwner(r.PartitionName)); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying node: %w", err)
 	}
+
 	log.V(1).Info("Applied node")
 
 	log.V(1).Info("Reconciled")

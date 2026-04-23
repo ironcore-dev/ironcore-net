@@ -12,8 +12,10 @@ import (
 // NetworkInterfaceNATClaimRefApplyConfiguration represents a declarative configuration of the NetworkInterfaceNATClaimRef type for use
 // with apply.
 type NetworkInterfaceNATClaimRefApplyConfiguration struct {
-	Name *string    `json:"name,omitempty"`
-	UID  *types.UID `json:"uid,omitempty"`
+	// Name is the name of the claiming NAT gateway.
+	Name *string `json:"name,omitempty"`
+	// UID is the uid of the claiming NAT gateway.
+	UID *types.UID `json:"uid,omitempty"`
 }
 
 // NetworkInterfaceNATClaimRefApplyConfiguration constructs a declarative configuration of the NetworkInterfaceNATClaimRef type for use with

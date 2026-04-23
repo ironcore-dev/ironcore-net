@@ -11,8 +11,13 @@ import (
 
 // IPBlockApplyConfiguration represents a declarative configuration of the IPBlock type for use
 // with apply.
+//
+// IPBlock specifies an ip block with optional exceptions.
 type IPBlockApplyConfiguration struct {
-	CIDR   *net.IPPrefix  `json:"cidr,omitempty"`
+	// CIDR is a string representing the ip block.
+	CIDR *net.IPPrefix `json:"cidr,omitempty"`
+	// Except is a slice of CIDRs that should not be included within the specified CIDR.
+	// Values will be rejected if they are outside CIDR.
 	Except []net.IPPrefix `json:"except,omitempty"`
 }
 

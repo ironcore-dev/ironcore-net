@@ -12,14 +12,24 @@ import (
 
 // NetworkInterfaceSpecApplyConfiguration represents a declarative configuration of the NetworkInterfaceSpec type for use
 // with apply.
+//
+// NetworkInterfaceSpec defines the desired state of NetworkInterface.
 type NetworkInterfaceSpecApplyConfiguration struct {
-	NodeRef    *v1.LocalObjectReference                     `json:"nodeRef,omitempty"`
-	NetworkRef *v1.LocalObjectReference                     `json:"networkRef,omitempty"`
-	IPs        []net.IP                                     `json:"ips,omitempty"`
-	Prefixes   []net.IPPrefix                               `json:"prefixes,omitempty"`
-	NATs       []NetworkInterfaceNATApplyConfiguration      `json:"natGateways,omitempty"`
-	Hostname   *string                                      `json:"hostname,omitempty"`
-	PublicIPs  []NetworkInterfacePublicIPApplyConfiguration `json:"publicIPs,omitempty"`
+	// NodeRef is the node the network interface is hosted on.
+	NodeRef *v1.LocalObjectReference `json:"nodeRef,omitempty"`
+	// NetworkRef references the network that the network interface is in.
+	NetworkRef *v1.LocalObjectReference `json:"networkRef,omitempty"`
+	// IPs are the internal IPs of the network interface.
+	IPs []net.IP `json:"ips,omitempty"`
+	// Prefixes are additional prefixes to route to the network interface.
+	Prefixes []net.IPPrefix `json:"prefixes,omitempty"`
+	// NATs specify the NAT of the network interface IP family.
+	// Can only be set if there is no matching IP family in PublicIPs.
+	NATs []NetworkInterfaceNATApplyConfiguration `json:"natGateways,omitempty"`
+	// Hostname is the hostname which should be announced by the network interface.
+	Hostname *string `json:"hostname,omitempty"`
+	// PublicIPs are the public IPs the network interface should have.
+	PublicIPs []NetworkInterfacePublicIPApplyConfiguration `json:"publicIPs,omitempty"`
 }
 
 // NetworkInterfaceSpecApplyConfiguration constructs a declarative configuration of the NetworkInterfaceSpec type for use with

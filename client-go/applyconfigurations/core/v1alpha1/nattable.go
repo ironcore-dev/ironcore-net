@@ -16,10 +16,13 @@ import (
 
 // NATTableApplyConfiguration represents a declarative configuration of the NATTable type for use
 // with apply.
+//
+// NATTable is the schema for the nattables API.
 type NATTableApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	IPs                              []NATIPApplyConfiguration `json:"ips,omitempty"`
+	// IPs specifies how to NAT the IPs for the NAT gateway.
+	IPs []NATIPApplyConfiguration `json:"ips,omitempty"`
 }
 
 // NATTable constructs a declarative configuration of the NATTable type for use with
@@ -33,29 +36,14 @@ func NATTable(name, namespace string) *NATTableApplyConfiguration {
 	return b
 }
 
-// ExtractNATTable extracts the applied configuration owned by fieldManager from
-// nATTable. If no managedFields are found in nATTable for fieldManager, a
-// NATTableApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractNATTableFrom extracts the applied configuration owned by fieldManager from
+// nATTable for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // nATTable must be a unmodified NATTable API object that was retrieved from the Kubernetes API.
-// ExtractNATTable provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractNATTableFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractNATTable(nATTable *corev1alpha1.NATTable, fieldManager string) (*NATTableApplyConfiguration, error) {
-	return extractNATTable(nATTable, fieldManager, "")
-}
-
-// ExtractNATTableStatus is the same as ExtractNATTable except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractNATTableStatus(nATTable *corev1alpha1.NATTable, fieldManager string) (*NATTableApplyConfiguration, error) {
-	return extractNATTable(nATTable, fieldManager, "status")
-}
-
-func extractNATTable(nATTable *corev1alpha1.NATTable, fieldManager string, subresource string) (*NATTableApplyConfiguration, error) {
+func ExtractNATTableFrom(nATTable *corev1alpha1.NATTable, fieldManager string, subresource string) (*NATTableApplyConfiguration, error) {
 	b := &NATTableApplyConfiguration{}
 	err := managedfields.ExtractInto(nATTable, internal.Parser().Type("com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATTable"), fieldManager, b, subresource)
 	if err != nil {
@@ -68,6 +56,21 @@ func extractNATTable(nATTable *corev1alpha1.NATTable, fieldManager string, subre
 	b.WithAPIVersion("core.apinet.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractNATTable extracts the applied configuration owned by fieldManager from
+// nATTable. If no managedFields are found in nATTable for fieldManager, a
+// NATTableApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// nATTable must be a unmodified NATTable API object that was retrieved from the Kubernetes API.
+// ExtractNATTable provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractNATTable(nATTable *corev1alpha1.NATTable, fieldManager string) (*NATTableApplyConfiguration, error) {
+	return ExtractNATTableFrom(nATTable, fieldManager, "")
+}
+
 func (b NATTableApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

@@ -2488,7 +2488,17 @@ func Convert_core_NetworkPolicy_To_v1alpha1_NetworkPolicy(in *core.NetworkPolicy
 }
 
 func autoConvert_v1alpha1_NetworkPolicyEgressRule_To_core_NetworkPolicyEgressRule(in *corev1alpha1.NetworkPolicyEgressRule, out *core.NetworkPolicyEgressRule, s conversion.Scope) error {
-	out.Ports = *(*[]core.NetworkPolicyPort)(unsafe.Pointer(&in.Ports))
+	if in.Ports != nil {
+		in, out := &in.Ports, &out.Ports
+		*out = make([]core.NetworkPolicyPort, len(*in))
+		for i := range *in {
+			if err := Convert_v1alpha1_NetworkPolicyPort_To_core_NetworkPolicyPort(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Ports = nil
+	}
 	out.To = *(*[]core.NetworkPolicyPeer)(unsafe.Pointer(&in.To))
 	return nil
 }
@@ -2499,7 +2509,17 @@ func Convert_v1alpha1_NetworkPolicyEgressRule_To_core_NetworkPolicyEgressRule(in
 }
 
 func autoConvert_core_NetworkPolicyEgressRule_To_v1alpha1_NetworkPolicyEgressRule(in *core.NetworkPolicyEgressRule, out *corev1alpha1.NetworkPolicyEgressRule, s conversion.Scope) error {
-	out.Ports = *(*[]corev1alpha1.NetworkPolicyPort)(unsafe.Pointer(&in.Ports))
+	if in.Ports != nil {
+		in, out := &in.Ports, &out.Ports
+		*out = make([]corev1alpha1.NetworkPolicyPort, len(*in))
+		for i := range *in {
+			if err := Convert_core_NetworkPolicyPort_To_v1alpha1_NetworkPolicyPort(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Ports = nil
+	}
 	out.To = *(*[]corev1alpha1.NetworkPolicyPeer)(unsafe.Pointer(&in.To))
 	return nil
 }
@@ -2511,7 +2531,17 @@ func Convert_core_NetworkPolicyEgressRule_To_v1alpha1_NetworkPolicyEgressRule(in
 
 func autoConvert_v1alpha1_NetworkPolicyIngressRule_To_core_NetworkPolicyIngressRule(in *corev1alpha1.NetworkPolicyIngressRule, out *core.NetworkPolicyIngressRule, s conversion.Scope) error {
 	out.From = *(*[]core.NetworkPolicyPeer)(unsafe.Pointer(&in.From))
-	out.Ports = *(*[]core.NetworkPolicyPort)(unsafe.Pointer(&in.Ports))
+	if in.Ports != nil {
+		in, out := &in.Ports, &out.Ports
+		*out = make([]core.NetworkPolicyPort, len(*in))
+		for i := range *in {
+			if err := Convert_v1alpha1_NetworkPolicyPort_To_core_NetworkPolicyPort(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Ports = nil
+	}
 	return nil
 }
 
@@ -2522,7 +2552,17 @@ func Convert_v1alpha1_NetworkPolicyIngressRule_To_core_NetworkPolicyIngressRule(
 
 func autoConvert_core_NetworkPolicyIngressRule_To_v1alpha1_NetworkPolicyIngressRule(in *core.NetworkPolicyIngressRule, out *corev1alpha1.NetworkPolicyIngressRule, s conversion.Scope) error {
 	out.From = *(*[]corev1alpha1.NetworkPolicyPeer)(unsafe.Pointer(&in.From))
-	out.Ports = *(*[]corev1alpha1.NetworkPolicyPort)(unsafe.Pointer(&in.Ports))
+	if in.Ports != nil {
+		in, out := &in.Ports, &out.Ports
+		*out = make([]corev1alpha1.NetworkPolicyPort, len(*in))
+		for i := range *in {
+			if err := Convert_core_NetworkPolicyPort_To_v1alpha1_NetworkPolicyPort(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Ports = nil
+	}
 	return nil
 }
 
@@ -2533,7 +2573,17 @@ func Convert_core_NetworkPolicyIngressRule_To_v1alpha1_NetworkPolicyIngressRule(
 
 func autoConvert_v1alpha1_NetworkPolicyList_To_core_NetworkPolicyList(in *corev1alpha1.NetworkPolicyList, out *core.NetworkPolicyList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]core.NetworkPolicy)(unsafe.Pointer(&in.Items))
+	if in.Items != nil {
+		in, out := &in.Items, &out.Items
+		*out = make([]core.NetworkPolicy, len(*in))
+		for i := range *in {
+			if err := Convert_v1alpha1_NetworkPolicy_To_core_NetworkPolicy(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
 	return nil
 }
 
@@ -2544,7 +2594,17 @@ func Convert_v1alpha1_NetworkPolicyList_To_core_NetworkPolicyList(in *corev1alph
 
 func autoConvert_core_NetworkPolicyList_To_v1alpha1_NetworkPolicyList(in *core.NetworkPolicyList, out *corev1alpha1.NetworkPolicyList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]corev1alpha1.NetworkPolicy)(unsafe.Pointer(&in.Items))
+	if in.Items != nil {
+		in, out := &in.Items, &out.Items
+		*out = make([]corev1alpha1.NetworkPolicy, len(*in))
+		for i := range *in {
+			if err := Convert_core_NetworkPolicy_To_v1alpha1_NetworkPolicy(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
 	return nil
 }
 
@@ -2577,7 +2637,9 @@ func Convert_core_NetworkPolicyPeer_To_v1alpha1_NetworkPolicyPeer(in *core.Netwo
 
 func autoConvert_v1alpha1_NetworkPolicyPort_To_core_NetworkPolicyPort(in *corev1alpha1.NetworkPolicyPort, out *core.NetworkPolicyPort, s conversion.Scope) error {
 	out.Protocol = (*corev1.Protocol)(unsafe.Pointer(in.Protocol))
-	out.Port = in.Port
+	if err := v1.Convert_Pointer_int32_To_int32(&in.Port, &out.Port, s); err != nil {
+		return err
+	}
 	out.EndPort = (*int32)(unsafe.Pointer(in.EndPort))
 	return nil
 }
@@ -2589,7 +2651,9 @@ func Convert_v1alpha1_NetworkPolicyPort_To_core_NetworkPolicyPort(in *corev1alph
 
 func autoConvert_core_NetworkPolicyPort_To_v1alpha1_NetworkPolicyPort(in *core.NetworkPolicyPort, out *corev1alpha1.NetworkPolicyPort, s conversion.Scope) error {
 	out.Protocol = (*corev1.Protocol)(unsafe.Pointer(in.Protocol))
-	out.Port = in.Port
+	if err := v1.Convert_int32_To_Pointer_int32(&in.Port, &out.Port, s); err != nil {
+		return err
+	}
 	out.EndPort = (*int32)(unsafe.Pointer(in.EndPort))
 	return nil
 }
@@ -2606,8 +2670,28 @@ func autoConvert_v1alpha1_NetworkPolicyRule_To_core_NetworkPolicyRule(in *corev1
 	}
 	out.Targets = *(*[]core.TargetNetworkInterface)(unsafe.Pointer(&in.Targets))
 	out.Priority = (*int32)(unsafe.Pointer(in.Priority))
-	out.IngressRules = *(*[]core.Rule)(unsafe.Pointer(&in.IngressRules))
-	out.EgressRules = *(*[]core.Rule)(unsafe.Pointer(&in.EgressRules))
+	if in.IngressRules != nil {
+		in, out := &in.IngressRules, &out.IngressRules
+		*out = make([]core.Rule, len(*in))
+		for i := range *in {
+			if err := Convert_v1alpha1_Rule_To_core_Rule(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.IngressRules = nil
+	}
+	if in.EgressRules != nil {
+		in, out := &in.EgressRules, &out.EgressRules
+		*out = make([]core.Rule, len(*in))
+		for i := range *in {
+			if err := Convert_v1alpha1_Rule_To_core_Rule(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.EgressRules = nil
+	}
 	return nil
 }
 
@@ -2623,8 +2707,28 @@ func autoConvert_core_NetworkPolicyRule_To_v1alpha1_NetworkPolicyRule(in *core.N
 	}
 	out.Targets = *(*[]corev1alpha1.TargetNetworkInterface)(unsafe.Pointer(&in.Targets))
 	out.Priority = (*int32)(unsafe.Pointer(in.Priority))
-	out.IngressRules = *(*[]corev1alpha1.Rule)(unsafe.Pointer(&in.IngressRules))
-	out.EgressRules = *(*[]corev1alpha1.Rule)(unsafe.Pointer(&in.EgressRules))
+	if in.IngressRules != nil {
+		in, out := &in.IngressRules, &out.IngressRules
+		*out = make([]corev1alpha1.Rule, len(*in))
+		for i := range *in {
+			if err := Convert_core_Rule_To_v1alpha1_Rule(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.IngressRules = nil
+	}
+	if in.EgressRules != nil {
+		in, out := &in.EgressRules, &out.EgressRules
+		*out = make([]corev1alpha1.Rule, len(*in))
+		for i := range *in {
+			if err := Convert_core_Rule_To_v1alpha1_Rule(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.EgressRules = nil
+	}
 	return nil
 }
 
@@ -2635,7 +2739,17 @@ func Convert_core_NetworkPolicyRule_To_v1alpha1_NetworkPolicyRule(in *core.Netwo
 
 func autoConvert_v1alpha1_NetworkPolicyRuleList_To_core_NetworkPolicyRuleList(in *corev1alpha1.NetworkPolicyRuleList, out *core.NetworkPolicyRuleList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]core.NetworkPolicyRule)(unsafe.Pointer(&in.Items))
+	if in.Items != nil {
+		in, out := &in.Items, &out.Items
+		*out = make([]core.NetworkPolicyRule, len(*in))
+		for i := range *in {
+			if err := Convert_v1alpha1_NetworkPolicyRule_To_core_NetworkPolicyRule(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
 	return nil
 }
 
@@ -2646,7 +2760,17 @@ func Convert_v1alpha1_NetworkPolicyRuleList_To_core_NetworkPolicyRuleList(in *co
 
 func autoConvert_core_NetworkPolicyRuleList_To_v1alpha1_NetworkPolicyRuleList(in *core.NetworkPolicyRuleList, out *corev1alpha1.NetworkPolicyRuleList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]corev1alpha1.NetworkPolicyRule)(unsafe.Pointer(&in.Items))
+	if in.Items != nil {
+		in, out := &in.Items, &out.Items
+		*out = make([]corev1alpha1.NetworkPolicyRule, len(*in))
+		for i := range *in {
+			if err := Convert_core_NetworkPolicyRule_To_v1alpha1_NetworkPolicyRule(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
 	return nil
 }
 
@@ -2659,8 +2783,28 @@ func autoConvert_v1alpha1_NetworkPolicySpec_To_core_NetworkPolicySpec(in *corev1
 	out.NetworkRef = in.NetworkRef
 	out.NetworkInterfaceSelector = in.NetworkInterfaceSelector
 	out.Priority = (*int32)(unsafe.Pointer(in.Priority))
-	out.Ingress = *(*[]core.NetworkPolicyIngressRule)(unsafe.Pointer(&in.Ingress))
-	out.Egress = *(*[]core.NetworkPolicyEgressRule)(unsafe.Pointer(&in.Egress))
+	if in.Ingress != nil {
+		in, out := &in.Ingress, &out.Ingress
+		*out = make([]core.NetworkPolicyIngressRule, len(*in))
+		for i := range *in {
+			if err := Convert_v1alpha1_NetworkPolicyIngressRule_To_core_NetworkPolicyIngressRule(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Ingress = nil
+	}
+	if in.Egress != nil {
+		in, out := &in.Egress, &out.Egress
+		*out = make([]core.NetworkPolicyEgressRule, len(*in))
+		for i := range *in {
+			if err := Convert_v1alpha1_NetworkPolicyEgressRule_To_core_NetworkPolicyEgressRule(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Egress = nil
+	}
 	out.PolicyTypes = *(*[]core.PolicyType)(unsafe.Pointer(&in.PolicyTypes))
 	return nil
 }
@@ -2674,8 +2818,28 @@ func autoConvert_core_NetworkPolicySpec_To_v1alpha1_NetworkPolicySpec(in *core.N
 	out.NetworkRef = in.NetworkRef
 	out.NetworkInterfaceSelector = in.NetworkInterfaceSelector
 	out.Priority = (*int32)(unsafe.Pointer(in.Priority))
-	out.Ingress = *(*[]corev1alpha1.NetworkPolicyIngressRule)(unsafe.Pointer(&in.Ingress))
-	out.Egress = *(*[]corev1alpha1.NetworkPolicyEgressRule)(unsafe.Pointer(&in.Egress))
+	if in.Ingress != nil {
+		in, out := &in.Ingress, &out.Ingress
+		*out = make([]corev1alpha1.NetworkPolicyIngressRule, len(*in))
+		for i := range *in {
+			if err := Convert_core_NetworkPolicyIngressRule_To_v1alpha1_NetworkPolicyIngressRule(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Ingress = nil
+	}
+	if in.Egress != nil {
+		in, out := &in.Egress, &out.Egress
+		*out = make([]corev1alpha1.NetworkPolicyEgressRule, len(*in))
+		for i := range *in {
+			if err := Convert_core_NetworkPolicyEgressRule_To_v1alpha1_NetworkPolicyEgressRule(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Egress = nil
+	}
 	out.PolicyTypes = *(*[]corev1alpha1.PolicyType)(unsafe.Pointer(&in.PolicyTypes))
 	return nil
 }
@@ -2998,7 +3162,17 @@ func Convert_core_PeeringPrefix_To_v1alpha1_PeeringPrefix(in *core.PeeringPrefix
 func autoConvert_v1alpha1_Rule_To_core_Rule(in *corev1alpha1.Rule, out *core.Rule, s conversion.Scope) error {
 	out.CIDRBlock = *(*[]core.IPBlock)(unsafe.Pointer(&in.CIDRBlock))
 	out.ObjectIPs = *(*[]core.ObjectIP)(unsafe.Pointer(&in.ObjectIPs))
-	out.NetworkPolicyPorts = *(*[]core.NetworkPolicyPort)(unsafe.Pointer(&in.NetworkPolicyPorts))
+	if in.NetworkPolicyPorts != nil {
+		in, out := &in.NetworkPolicyPorts, &out.NetworkPolicyPorts
+		*out = make([]core.NetworkPolicyPort, len(*in))
+		for i := range *in {
+			if err := Convert_v1alpha1_NetworkPolicyPort_To_core_NetworkPolicyPort(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.NetworkPolicyPorts = nil
+	}
 	return nil
 }
 
@@ -3010,7 +3184,17 @@ func Convert_v1alpha1_Rule_To_core_Rule(in *corev1alpha1.Rule, out *core.Rule, s
 func autoConvert_core_Rule_To_v1alpha1_Rule(in *core.Rule, out *corev1alpha1.Rule, s conversion.Scope) error {
 	out.CIDRBlock = *(*[]corev1alpha1.IPBlock)(unsafe.Pointer(&in.CIDRBlock))
 	out.ObjectIPs = *(*[]corev1alpha1.ObjectIP)(unsafe.Pointer(&in.ObjectIPs))
-	out.NetworkPolicyPorts = *(*[]corev1alpha1.NetworkPolicyPort)(unsafe.Pointer(&in.NetworkPolicyPorts))
+	if in.NetworkPolicyPorts != nil {
+		in, out := &in.NetworkPolicyPorts, &out.NetworkPolicyPorts
+		*out = make([]corev1alpha1.NetworkPolicyPort, len(*in))
+		for i := range *in {
+			if err := Convert_core_NetworkPolicyPort_To_v1alpha1_NetworkPolicyPort(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.NetworkPolicyPorts = nil
+	}
 	return nil
 }
 

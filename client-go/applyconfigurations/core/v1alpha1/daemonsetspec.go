@@ -12,7 +12,9 @@ import (
 // DaemonSetSpecApplyConfiguration represents a declarative configuration of the DaemonSetSpec type for use
 // with apply.
 type DaemonSetSpecApplyConfiguration struct {
+	// Selector selects all Instance that are managed by this daemon set.
 	Selector *v1.LabelSelectorApplyConfiguration `json:"nodeSelector,omitempty"`
+	// Template is the instance template.
 	Template *InstanceTemplateApplyConfiguration `json:"template,omitempty"`
 }
 

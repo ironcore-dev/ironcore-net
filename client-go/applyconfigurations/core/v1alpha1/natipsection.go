@@ -12,9 +12,13 @@ import (
 // NATIPSectionApplyConfiguration represents a declarative configuration of the NATIPSection type for use
 // with apply.
 type NATIPSectionApplyConfiguration struct {
-	IP        *net.IP                                `json:"ip,omitempty"`
-	Port      *int32                                 `json:"port,omitempty"`
-	EndPort   *int32                                 `json:"endPort,omitempty"`
+	// IP is the source IP.
+	IP *net.IP `json:"ip,omitempty"`
+	// Port is the start port of the section.
+	Port *int32 `json:"port,omitempty"`
+	// EndPort is the end port of the section
+	EndPort *int32 `json:"endPort,omitempty"`
+	// TargetRef references the entity having the IP.
 	TargetRef *NATTableIPTargetRefApplyConfiguration `json:"targetRef,omitempty"`
 }
 

@@ -4,6 +4,10 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+# TODO: Remove once "Making unsupported type entry" in gengo is fixed.
+# Tracking issue: https://github.com/kubernetes/gengo/issues/269
+export GODEBUG="gotypesalias=0"
+
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$SCRIPT_DIR/.."
 export TERM="xterm-256color"
@@ -12,30 +16,12 @@ bold="$(tput bold)"
 blue="$(tput setaf 4)"
 normal="$(tput sgr0)"
 
-function qualify-gvs() {
-  APIS_PKG="$1"
-  GROUPS_WITH_VERSIONS="$2"
-  join_char=""
-  res=""
-
-  for GVs in ${GROUPS_WITH_VERSIONS}; do
-    IFS=: read -r G Vs <<<"${GVs}"
-
-    for V in ${Vs//,/ }; do
-      res="$res$join_char$APIS_PKG/$G/$V"
-      join_char=" "
-    done
-  done
-
-  echo "$res"
-}
 
 VGOPATH="$VGOPATH"
 MODELS_SCHEMA="$MODELS_SCHEMA"
 OPENAPI_GEN="$OPENAPI_GEN"
-
 VIRTUAL_GOPATH="$(mktemp -d)"
-trap 'rm -rf "$GOPATH"' EXIT
+trap 'rm -rf "$VIRTUAL_GOPATH"' EXIT
 
 # Setup virtual GOPATH so the codegen tools work as expected.
 (cd "$PROJECT_ROOT"; go mod download && "$VGOPATH" -o "$VIRTUAL_GOPATH")
@@ -57,28 +43,37 @@ kube::codegen::gen_helpers \
   --boilerplate "$SCRIPT_DIR/boilerplate.go.txt" \
   "$PROJECT_ROOT/api"
 
+# NOTE: openapi-gen opens files not in read-only mode, so we chmod relevant
+# modules to 644 as a workaround.
+# See: https://github.com/kubernetes/kubernetes/issues/136295
+declare -a GOMODS=(
+  "k8s.io/apimachinery"
+  "k8s.io/api"
+)
+echo "Setting permissions for files of relevant go modules to 644"
+for MOD in "${GOMODS[@]}"; do
+  # Use 'go list' directly to avoid an external 'jq' dependency.
+  find "$(go list -m -f '{{.Dir}}' "${MOD}")" -type f -exec chmod 644 -- {} +
+done
+
 echo "Generating ${blue}openapi${normal}"
-input_dirs=($(qualify-gvs "${IRONCORE_NET_ROOT}/api" "$ALL_VERSION_GROUPS"))
-input_dirs+=("${IRONCORE_NET_ROOT}/apimachinery/api/net")
-"$OPENAPI_GEN" \
-  --output-dir "$PROJECT_ROOT/client-go/openapi" \
-  --output-pkg "${IRONCORE_NET_ROOT}/client-go/openapi" \
-  --output-file "zz_generated.openapi.go" \
-  --report-filename "$PROJECT_ROOT/client-go/openapi/api_violations.report" \
-  --go-header-file "$SCRIPT_DIR/boilerplate.go.txt" \
-  "k8s.io/apimachinery/pkg/apis/meta/v1" \
-  "k8s.io/apimachinery/pkg/runtime" \
-  "k8s.io/apimachinery/pkg/version" \
-  "k8s.io/api/core/v1" \
-  "k8s.io/apimachinery/pkg/api/resource" \
-  "${input_dirs[@]}"
+kube::codegen::gen_openapi \
+    --output-dir "${PROJECT_ROOT}/client-go/openapi" \
+    --output-pkg "${IRONCORE_NET_ROOT}/client-go/openapi" \
+    --report-filename "$PROJECT_ROOT/client-go/openapi/api_violations.report" --update-report \
+    --output-model-name-file "zz_generated.model_name.go" \
+    --boilerplate "${PROJECT_ROOT}/hack/boilerplate.go.txt" \
+    --extra-pkgs "k8s.io/api/core/v1" \
+    "${PROJECT_ROOT}/api"
 
 echo "Generating ${blue}client, lister, informer and applyconfiguration${normal}"
-applyconfigurationgen_external_apis=()
+declare -a applyconfigurationgen_external_apis=()
+applyconfigurationgen_external_apis+=("k8s.io/apimachinery/pkg/apis/meta/v1:k8s.io/client-go/applyconfigurations/meta/v1")
 for GV in ${ALL_VERSION_GROUPS}; do
   IFS=: read -r G V <<<"${GV}"
   applyconfigurationgen_external_apis+=("${IRONCORE_NET_ROOT}/api/${G}/${V}:${IRONCORE_NET_ROOT}/client-go/applyconfigurations/${G}/${V}")
 done
+applyconfigurationgen_external_apis+=("${IRONCORE_NET_ROOT}/apimachinery/api/net:${IRONCORE_NET_ROOT}/client-go/applyconfigurations/apimachinery/api/net")
 applyconfigurationgen_external_apis_csv=$(IFS=,; echo "${applyconfigurationgen_external_apis[*]}")
 
 # Do not rely on process substitution / GNU bash

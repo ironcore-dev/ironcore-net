@@ -7,9 +7,13 @@ package v1alpha1
 
 // NodeSelectorTermApplyConfiguration represents a declarative configuration of the NodeSelectorTerm type for use
 // with apply.
+//
+// NodeSelectorTerm matches no objects if it's empty. The requirements of the selector are ANDed.
 type NodeSelectorTermApplyConfiguration struct {
+	// MatchExpressions matches nodes by the label selector requirements.
 	MatchExpressions []NodeSelectorRequirementApplyConfiguration `json:"matchExpressions,omitempty"`
-	MatchFields      []NodeSelectorRequirementApplyConfiguration `json:"matchFields,omitempty"`
+	// MatchFields matches the nodes by their fields.
+	MatchFields []NodeSelectorRequirementApplyConfiguration `json:"matchFields,omitempty"`
 }
 
 // NodeSelectorTermApplyConfiguration constructs a declarative configuration of the NodeSelectorTerm type for use with

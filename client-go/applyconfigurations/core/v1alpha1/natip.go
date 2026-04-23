@@ -12,7 +12,9 @@ import (
 // NATIPApplyConfiguration represents a declarative configuration of the NATIP type for use
 // with apply.
 type NATIPApplyConfiguration struct {
-	IP       *net.IP                          `json:"ip,omitempty"`
+	// IP is the IP to NAT.
+	IP *net.IP `json:"ip,omitempty"`
+	// Sections are the sections of the NATIP.
 	Sections []NATIPSectionApplyConfiguration `json:"sections,omitempty"`
 }
 

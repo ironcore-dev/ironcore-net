@@ -11,10 +11,17 @@ import (
 
 // NodeSelectorRequirementApplyConfiguration represents a declarative configuration of the NodeSelectorRequirement type for use
 // with apply.
+//
+// NodeSelectorRequirement is a requirement for a selector. It's a combination of the key to match, the operator
+// to match with, and zero to n values, depending on the operator.
 type NodeSelectorRequirementApplyConfiguration struct {
-	Key      *string                            `json:"key,omitempty"`
+	// Key is the key the selector applies to.
+	Key *string `json:"key,omitempty"`
+	// Operator represents the key's relationship to the values.
+	// Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
 	Operator *corev1alpha1.NodeSelectorOperator `json:"operator,omitempty"`
-	Values   []string                           `json:"values,omitempty"`
+	// Values are the values to relate the key to via the operator.
+	Values []string `json:"values,omitempty"`
 }
 
 // NodeSelectorRequirementApplyConfiguration constructs a declarative configuration of the NodeSelectorRequirement type for use with

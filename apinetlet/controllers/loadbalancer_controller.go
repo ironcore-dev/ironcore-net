@@ -27,7 +27,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	metav1ac "k8s.io/client-go/applyconfigurations/meta/v1"
+	metav1apply "k8s.io/client-go/applyconfigurations/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
@@ -213,22 +213,34 @@ func (r *LoadBalancerReconciler) prepareApiNetDestinations(ctx context.Context, 
 }
 
 func (r *LoadBalancerReconciler) manageAPINetLoadBalancerRouting(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, apiNetLoadBalancer *apinetv1alpha1.LoadBalancer, apiNetDsts []apinetv1alpha1.LoadBalancerDestination) error {
-	apiNetLoadBalancerRouting := &apinetv1alpha1.LoadBalancerRouting{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: apinetv1alpha1.SchemeGroupVersion.String(),
-			Kind:       "LoadBalancerRouting",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: r.APINetNamespace,
-			Name:      apiNetLoadBalancer.Name,
-			Labels:    apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), loadBalancer),
-			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apiNetLoadBalancer, apinetv1alpha1.SchemeGroupVersion.WithKind("LoadBalancer")),
-			},
-		},
-		Destinations: apiNetDsts,
+	ownerRef := metav1apply.OwnerReference().
+		WithAPIVersion(networkingv1alpha1.SchemeGroupVersion.String()).
+		WithKind("LoadBalancer").
+		WithName(loadBalancer.Name).
+		WithUID(loadBalancer.UID).
+		WithController(true).
+		WithBlockOwnerDeletion(true)
+
+	dstConfigs := make([]*apinetv1alpha1ac.LoadBalancerDestinationApplyConfiguration, len(apiNetDsts))
+	for i, dst := range apiNetDsts {
+		dstCfg := apinetv1alpha1ac.LoadBalancerDestination().
+			WithIP(dst.IP)
+		if dst.TargetRef != nil {
+			dstCfg = dstCfg.
+				WithTargetRef(apinetv1alpha1ac.LoadBalancerTargetRef().
+					WithUID(dst.TargetRef.UID).
+					WithName(dst.TargetRef.Name).
+					WithNodeRef(corev1.LocalObjectReference{Name: dst.TargetRef.NodeRef.Name}))
+		}
+		dstConfigs[i] = dstCfg
 	}
-	if err := r.APINetClient.Patch(ctx, apiNetLoadBalancerRouting, client.Apply, fieldOwner, client.ForceOwnership); err != nil {
+
+	apiNetLBRoutingApplycfg := apinetv1alpha1ac.LoadBalancerRouting(string(loadBalancer.UID), r.APINetNamespace).
+		WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), loadBalancer)).
+		WithDestinations(dstConfigs...).
+		WithOwnerReferences(ownerRef)
+
+	if err := r.APINetClient.Apply(ctx, apiNetLBRoutingApplycfg, fieldOwner, client.ForceOwnership); err != nil {
 		return fmt.Errorf("error applying APINet load balancer routing: %w", err)
 	}
 	return nil
@@ -311,7 +323,7 @@ func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, lo
 			WithNetworkRef(corev1.LocalObjectReference{Name: apiNetNetworkName}).
 			WithIPs(ips...).
 			WithPorts(loadBalancerPortsToAPINetLoadBalancerPortConfigs(loadBalancer.Spec.Ports)...).
-			WithSelector(metav1ac.LabelSelector().WithMatchLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), loadBalancer))).
+			WithSelector(metav1apply.LabelSelector().WithMatchLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), loadBalancer))).
 			WithTemplate(
 				apinetv1alpha1ac.InstanceTemplate().
 					WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), loadBalancer)).
@@ -320,7 +332,7 @@ func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, lo
 							WithInstanceAntiAffinity(apinetv1alpha1ac.InstanceAntiAffinity().WithRequiredDuringSchedulingIgnoredDuringExecution(
 								apinetv1alpha1ac.InstanceAffinityTerm().
 									WithTopologyKey(apinetv1alpha1.TopologyZoneLabel).
-									WithLabelSelector(metav1ac.LabelSelector().WithMatchLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), loadBalancer))),
+									WithLabelSelector(metav1apply.LabelSelector().WithMatchLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), loadBalancer))),
 							)),
 						),
 					),

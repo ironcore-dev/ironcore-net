@@ -12,7 +12,9 @@ import (
 // NetworkInterfaceNATApplyConfiguration represents a declarative configuration of the NetworkInterfaceNAT type for use
 // with apply.
 type NetworkInterfaceNATApplyConfiguration struct {
-	IPFamily *v1.IPFamily                                   `json:"ipFamily,omitempty"`
+	// IPFamily is the IP family of the handling NAT gateway.
+	IPFamily *v1.IPFamily `json:"ipFamily,omitempty"`
+	// ClaimRef references the NAT claim handling the network interface's NAT.
 	ClaimRef *NetworkInterfaceNATClaimRefApplyConfiguration `json:"claimRef,omitempty"`
 }
 

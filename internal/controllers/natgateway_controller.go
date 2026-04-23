@@ -11,6 +11,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
+	corev1alpha1apply "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	apinetclient "github.com/ironcore-dev/ironcore-net/internal/client"
 	"github.com/ironcore-dev/ironcore-net/internal/natgateway"
 	"github.com/ironcore-dev/ironcore-net/utils/maps"
@@ -19,7 +20,8 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/tools/record"
+	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
+	"k8s.io/client-go/tools/events"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -27,7 +29,7 @@ import (
 
 type NATGatewayReconciler struct {
 	client.Client
-	record.EventRecorder
+	events.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=natgateways,verbs=get;list;watch
@@ -318,34 +320,70 @@ func (r *NATGatewayReconciler) applyNATTable(
 	natGateway *v1alpha1.NATGateway,
 	natTableData map[net.IP]map[types.UID]v1alpha1.NATIPSection,
 ) error {
-	natTable := &v1alpha1.NATTable{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: v1alpha1.SchemeGroupVersion.String(),
-			Kind:       "NATTable",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: natGateway.Namespace,
-			Name:      natGateway.Name,
-			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(natGateway, v1alpha1.SchemeGroupVersion.WithKind("NATGateway")),
-			},
-		},
-	}
+	natTableApplyConfig := corev1alpha1apply.NATTable(natGateway.Name, natGateway.Namespace).
+		WithOwnerReferences(v1.OwnerReference().
+			WithAPIVersion(v1alpha1.SchemeGroupVersion.String()).
+			WithKind("NATGateway").
+			WithName(natGateway.Name).
+			WithUID(natGateway.UID))
+
+	var natTableIPs []*corev1alpha1apply.NATIPApplyConfiguration
 	for ip, allocs := range natTableData {
-		natIP := v1alpha1.NATIP{IP: ip}
+		sectionConfs := make([]*corev1alpha1apply.NATIPSectionApplyConfiguration, 0, len(allocs))
 		for _, alloc := range allocs {
-			natIP.Sections = append(natIP.Sections, alloc)
+			sectionConf := corev1alpha1apply.NATIPSection().
+				WithIP(alloc.IP).
+				WithPort(alloc.Port).
+				WithEndPort(alloc.EndPort)
+			if alloc.TargetRef != nil {
+				sectionConf = sectionConf.WithTargetRef(
+					corev1alpha1apply.NATTableIPTargetRef().
+						WithUID(alloc.TargetRef.UID).
+						WithName(alloc.TargetRef.Name).
+						WithNodeRef(alloc.TargetRef.NodeRef),
+				)
+			}
+			sectionConfs = append(sectionConfs, sectionConf)
 		}
-		slices.SortFunc(natIP.Sections, func(a, b v1alpha1.NATIPSection) int {
-			return int(a.Port - b.Port)
+
+		slices.SortFunc(sectionConfs, func(a, b *corev1alpha1apply.NATIPSectionApplyConfiguration) int {
+			if a.Port == nil || b.Port == nil {
+				return 0
+			}
+			if *a.Port < *b.Port {
+				return -1
+			}
+			if *a.Port > *b.Port {
+				return 1
+			}
+			return 0
 		})
-		natTable.IPs = append(natTable.IPs, natIP)
+
+		natIPConf := corev1alpha1apply.NATIP().WithIP(ip)
+		for _, sectionConf := range sectionConfs {
+			natIPConf.WithSections(sectionConf)
+		}
+		natTableIPs = append(natTableIPs, natIPConf)
 	}
-	slices.SortFunc(natTable.IPs, func(a, b v1alpha1.NATIP) int {
+
+	slices.SortFunc(natTableIPs, func(a, b *corev1alpha1apply.NATIPApplyConfiguration) int {
+		if a.IP.IsZero() || b.IP.IsZero() {
+			if a.IP.IsZero() && !b.IP.IsZero() {
+				return 1
+			}
+			if !a.IP.IsZero() && b.IP.IsZero() {
+				return -1
+			}
+			return 0
+		}
 		return a.IP.Compare(b.IP.Addr)
 	})
 
-	if err := r.Patch(ctx, natTable, client.Apply, fieldOwner, client.ForceOwnership); err != nil {
+	for _, natIPConf := range natTableIPs {
+		natTableApplyConfig.WithIPs(natIPConf)
+	}
+
+	if err := r.Apply(ctx, natTableApplyConfig, fieldOwner, client.ForceOwnership); err != nil {
 		return fmt.Errorf("error applying NAT table: %w", err)
 	}
 	return nil

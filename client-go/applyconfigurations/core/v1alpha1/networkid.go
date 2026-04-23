@@ -16,6 +16,8 @@ import (
 
 // NetworkIDApplyConfiguration represents a declarative configuration of the NetworkID type for use
 // with apply.
+//
+// NetworkID is the schema for the networkids API.
 type NetworkIDApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -32,29 +34,14 @@ func NetworkID(name string) *NetworkIDApplyConfiguration {
 	return b
 }
 
-// ExtractNetworkID extracts the applied configuration owned by fieldManager from
-// networkID. If no managedFields are found in networkID for fieldManager, a
-// NetworkIDApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractNetworkIDFrom extracts the applied configuration owned by fieldManager from
+// networkID for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // networkID must be a unmodified NetworkID API object that was retrieved from the Kubernetes API.
-// ExtractNetworkID provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractNetworkIDFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractNetworkID(networkID *corev1alpha1.NetworkID, fieldManager string) (*NetworkIDApplyConfiguration, error) {
-	return extractNetworkID(networkID, fieldManager, "")
-}
-
-// ExtractNetworkIDStatus is the same as ExtractNetworkID except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractNetworkIDStatus(networkID *corev1alpha1.NetworkID, fieldManager string) (*NetworkIDApplyConfiguration, error) {
-	return extractNetworkID(networkID, fieldManager, "status")
-}
-
-func extractNetworkID(networkID *corev1alpha1.NetworkID, fieldManager string, subresource string) (*NetworkIDApplyConfiguration, error) {
+func ExtractNetworkIDFrom(networkID *corev1alpha1.NetworkID, fieldManager string, subresource string) (*NetworkIDApplyConfiguration, error) {
 	b := &NetworkIDApplyConfiguration{}
 	err := managedfields.ExtractInto(networkID, internal.Parser().Type("com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkID"), fieldManager, b, subresource)
 	if err != nil {
@@ -66,6 +53,21 @@ func extractNetworkID(networkID *corev1alpha1.NetworkID, fieldManager string, su
 	b.WithAPIVersion("core.apinet.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractNetworkID extracts the applied configuration owned by fieldManager from
+// networkID. If no managedFields are found in networkID for fieldManager, a
+// NetworkIDApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// networkID must be a unmodified NetworkID API object that was retrieved from the Kubernetes API.
+// ExtractNetworkID provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractNetworkID(networkID *corev1alpha1.NetworkID, fieldManager string) (*NetworkIDApplyConfiguration, error) {
+	return ExtractNetworkIDFrom(networkID, fieldManager, "")
+}
+
 func (b NetworkIDApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

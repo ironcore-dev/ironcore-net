@@ -16,6 +16,8 @@ import (
 
 // LoadBalancerRoutingApplyConfiguration represents a declarative configuration of the LoadBalancerRouting type for use
 // with apply.
+//
+// LoadBalancerRouting is the schema for the loadbalancerroutings API.
 type LoadBalancerRoutingApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -33,29 +35,14 @@ func LoadBalancerRouting(name, namespace string) *LoadBalancerRoutingApplyConfig
 	return b
 }
 
-// ExtractLoadBalancerRouting extracts the applied configuration owned by fieldManager from
-// loadBalancerRouting. If no managedFields are found in loadBalancerRouting for fieldManager, a
-// LoadBalancerRoutingApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractLoadBalancerRoutingFrom extracts the applied configuration owned by fieldManager from
+// loadBalancerRouting for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // loadBalancerRouting must be a unmodified LoadBalancerRouting API object that was retrieved from the Kubernetes API.
-// ExtractLoadBalancerRouting provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractLoadBalancerRoutingFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractLoadBalancerRouting(loadBalancerRouting *corev1alpha1.LoadBalancerRouting, fieldManager string) (*LoadBalancerRoutingApplyConfiguration, error) {
-	return extractLoadBalancerRouting(loadBalancerRouting, fieldManager, "")
-}
-
-// ExtractLoadBalancerRoutingStatus is the same as ExtractLoadBalancerRouting except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractLoadBalancerRoutingStatus(loadBalancerRouting *corev1alpha1.LoadBalancerRouting, fieldManager string) (*LoadBalancerRoutingApplyConfiguration, error) {
-	return extractLoadBalancerRouting(loadBalancerRouting, fieldManager, "status")
-}
-
-func extractLoadBalancerRouting(loadBalancerRouting *corev1alpha1.LoadBalancerRouting, fieldManager string, subresource string) (*LoadBalancerRoutingApplyConfiguration, error) {
+func ExtractLoadBalancerRoutingFrom(loadBalancerRouting *corev1alpha1.LoadBalancerRouting, fieldManager string, subresource string) (*LoadBalancerRoutingApplyConfiguration, error) {
 	b := &LoadBalancerRoutingApplyConfiguration{}
 	err := managedfields.ExtractInto(loadBalancerRouting, internal.Parser().Type("com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.LoadBalancerRouting"), fieldManager, b, subresource)
 	if err != nil {
@@ -68,6 +55,21 @@ func extractLoadBalancerRouting(loadBalancerRouting *corev1alpha1.LoadBalancerRo
 	b.WithAPIVersion("core.apinet.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractLoadBalancerRouting extracts the applied configuration owned by fieldManager from
+// loadBalancerRouting. If no managedFields are found in loadBalancerRouting for fieldManager, a
+// LoadBalancerRoutingApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// loadBalancerRouting must be a unmodified LoadBalancerRouting API object that was retrieved from the Kubernetes API.
+// ExtractLoadBalancerRouting provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractLoadBalancerRouting(loadBalancerRouting *corev1alpha1.LoadBalancerRouting, fieldManager string) (*LoadBalancerRoutingApplyConfiguration, error) {
+	return ExtractLoadBalancerRoutingFrom(loadBalancerRouting, fieldManager, "")
+}
+
 func (b LoadBalancerRoutingApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

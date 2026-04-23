@@ -11,9 +11,13 @@ import (
 
 // LocalUIDReferenceApplyConfiguration represents a declarative configuration of the LocalUIDReference type for use
 // with apply.
+//
+// LocalUIDReference is a reference to another entity including its UID
 type LocalUIDReferenceApplyConfiguration struct {
-	Name *string    `json:"name,omitempty"`
-	UID  *types.UID `json:"uid,omitempty"`
+	// Name is the name of the referenced entity.
+	Name *string `json:"name,omitempty"`
+	// UID is the UID of the referenced entity.
+	UID *types.UID `json:"uid,omitempty"`
 }
 
 // LocalUIDReferenceApplyConfiguration constructs a declarative configuration of the LocalUIDReference type for use with
