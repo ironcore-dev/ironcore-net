@@ -37,7 +37,7 @@ type NetworkPolicyPort struct {
 	// The port on the given protocol. If this field is not provided, this matches
 	// all port names and numbers.
 	// If present, only traffic on the specified protocol AND port will be matched.
-	Port int32 `json:"port,omitempty"`
+	Port *int32 `json:"port,omitempty"`
 
 	// EndPort indicates that the range of ports from Port to EndPort, inclusive,
 	// should be allowed by the policy. This field cannot be defined if the port field

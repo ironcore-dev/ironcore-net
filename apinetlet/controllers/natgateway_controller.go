@@ -24,6 +24,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1apply "k8s.io/client-go/applyconfigurations/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
@@ -160,24 +161,22 @@ func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 		return ctrl.Result{}, fmt.Errorf("error applying apinet nat gateway: %w", err)
 	}
 
-	apiNetNATGatewayAutoscaler := &apinetv1alpha1.NATGatewayAutoscaler{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: apinetv1alpha1.SchemeGroupVersion.String(),
-			Kind:       "NATGatewayAutoscaler",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: r.APINetNamespace,
-			Name:      string(natGateway.UID),
-			Labels:    apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), natGateway),
-		},
-		Spec: apinetv1alpha1.NATGatewayAutoscalerSpec{
-			NATGatewayRef: corev1.LocalObjectReference{Name: apiNetNATGateway.Name},
-			MinPublicIPs:  generic.Pointer[int32](1),  // TODO: Make this configurable via ironcore NAT gateway
-			MaxPublicIPs:  generic.Pointer[int32](10), // TODO: Configure depending on ironcore NAT gateway
-		},
-	}
-	_ = ctrl.SetControllerReference(apiNetNATGateway, apiNetNATGatewayAutoscaler, r.Scheme())
-	if err := r.APINetClient.Patch(ctx, apiNetNATGatewayAutoscaler, client.Apply, client.ForceOwnership, fieldOwner); err != nil {
+	// TODO: Make minPublicIPs and maxPublicIPs configurable via ironcore NAT gateway
+	apiNetNATGatewayAutoscalerCfg := apinetv1alpha1ac.NATGatewayAutoscaler(string(natGateway.UID), r.APINetNamespace).
+		WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), natGateway)).
+		WithSpec(apinetv1alpha1ac.NATGatewayAutoscalerSpec().
+			WithNATGatewayRef(corev1.LocalObjectReference{Name: apiNetNATGateway.Name}).
+			WithMinPublicIPs(int32(1)).
+			WithMaxPublicIPs(int32(10))).
+		WithOwnerReferences(metav1apply.OwnerReference().
+			WithAPIVersion(apinetv1alpha1.SchemeGroupVersion.String()).
+			WithKind("NATGateway").
+			WithName(apiNetNATGateway.Name).
+			WithUID(apiNetNATGateway.UID).
+			WithController(true).
+			WithBlockOwnerDeletion(true))
+
+	if err := r.APINetClient.Apply(ctx, apiNetNATGatewayAutoscalerCfg, fieldOwner, client.ForceOwnership); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying APINet NAT gateway autoscaler: %w", err)
 	}
 

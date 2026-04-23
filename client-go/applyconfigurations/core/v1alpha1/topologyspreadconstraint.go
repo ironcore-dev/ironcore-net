@@ -12,11 +12,34 @@ import (
 
 // TopologySpreadConstraintApplyConfiguration represents a declarative configuration of the TopologySpreadConstraint type for use
 // with apply.
+//
+// TopologySpreadConstraint specifies how to spread matching instances among the given topology.
 type TopologySpreadConstraintApplyConfiguration struct {
-	MaxSkew           *int32                                      `json:"maxSkew,omitempty"`
-	TopologyKey       *string                                     `json:"topologyKey,omitempty"`
+	// MaxSkew describes the degree to which instances may be unevenly distributed.
+	// When `whenUnsatisfiable=DoNotSchedule`, it is the maximum permitted difference
+	// between the number of matching instances in the target topology and the global minimum.
+	// The global minimum is the minimum number of matching instances in an eligible domain
+	// or zero if the number of eligible domains is less than MinDomains.
+	MaxSkew *int32 `json:"maxSkew,omitempty"`
+	// TopologyKey is the key of node labels. Nodes that have a label with this key
+	// and identical values are considered to be in the same topology.
+	// We consider each <key, value> as a "bucket", and try to put balanced number
+	// of instances into each bucket.
+	// We define a domain as a particular instance of a topology.
+	// Also, we define an eligible domain as a domain whose nodes meet the requirements of
+	// nodeAffinityPolicy and nodeTaintsPolicy.
+	TopologyKey *string `json:"topologyKey,omitempty"`
+	// WhenUnsatisfiable indicates how to deal with a instance if it doesn't satisfy
+	// the spread constraint.
+	// - DoNotSchedule (default) tells the scheduler not to schedule it.
+	// - ScheduleAnyway tells the scheduler to schedule the instance in any location,
+	// but giving higher precedence to topologies that would help reduce the
+	// skew.
 	WhenUnsatisfiable *corev1alpha1.UnsatisfiableConstraintAction `json:"whenUnsatisfiable,omitempty"`
-	LabelSelector     *v1.LabelSelectorApplyConfiguration         `json:"labelSelector,omitempty"`
+	// LabelSelector is used to find matching instances.
+	// Instances that match this label selector are counted to determine the number of instances
+	// in their corresponding topology domain.
+	LabelSelector *v1.LabelSelectorApplyConfiguration `json:"labelSelector,omitempty"`
 }
 
 // TopologySpreadConstraintApplyConfiguration constructs a declarative configuration of the TopologySpreadConstraint type for use with

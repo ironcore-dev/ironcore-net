@@ -8,6 +8,10 @@ package v1alpha1
 // InstanceAntiAffinityApplyConfiguration represents a declarative configuration of the InstanceAntiAffinity type for use
 // with apply.
 type InstanceAntiAffinityApplyConfiguration struct {
+	// RequiredDuringSchedulingIgnoredDuringExecution specifies anti-affinity requirements at
+	// scheduling time, that, if not met, will cause the instance not be scheduled onto the node.
+	// When there are multiple elements, the lists of nodes corresponding to each
+	// instanceAffinityTerm are intersected, i.e. all terms must be satisfied.
 	RequiredDuringSchedulingIgnoredDuringExecution []InstanceAffinityTermApplyConfiguration `json:"requiredDuringSchedulingIgnoredDuringExecution,omitempty"`
 }
 

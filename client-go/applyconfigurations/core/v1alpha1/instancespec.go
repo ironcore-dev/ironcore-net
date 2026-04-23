@@ -14,14 +14,25 @@ import (
 // InstanceSpecApplyConfiguration represents a declarative configuration of the InstanceSpec type for use
 // with apply.
 type InstanceSpecApplyConfiguration struct {
-	Type                      *corev1alpha1.InstanceType                   `json:"type,omitempty"`
-	LoadBalancerType          *corev1alpha1.LoadBalancerType               `json:"loadBalancerType,omitempty"`
-	NetworkRef                *v1.LocalObjectReference                     `json:"networkRef,omitempty"`
-	IPs                       []net.IP                                     `json:"ips,omitempty"`
-	LoadBalancerPorts         []LoadBalancerPortApplyConfiguration         `json:"loadBalancerPorts,omitempty"`
-	Affinity                  *AffinityApplyConfiguration                  `json:"affinity,omitempty"`
+	// Type specifies the InstanceType to deploy.
+	Type *corev1alpha1.InstanceType `json:"type,omitempty"`
+	// LoadBalancerType is the load balancer type this instance is for.
+	LoadBalancerType *corev1alpha1.LoadBalancerType `json:"loadBalancerType,omitempty"`
+	// NetworkRef references the network the instance is on.
+	NetworkRef *v1.LocalObjectReference `json:"networkRef,omitempty"`
+	// IPs are the IPs of the instance.
+	IPs []net.IP `json:"ips,omitempty"`
+	// LoadBalancerPorts are the load balancer ports of this instance.
+	LoadBalancerPorts []LoadBalancerPortApplyConfiguration `json:"loadBalancerPorts,omitempty"`
+	// Affinity are affinity constraints.
+	Affinity *AffinityApplyConfiguration `json:"affinity,omitempty"`
+	// TopologySpreadConstraints describes how a group of instances ought to spread across topology
+	// domains. Scheduler will schedule instances in a way which abides by the constraints.
+	// All topologySpreadConstraints are ANDed.
 	TopologySpreadConstraints []TopologySpreadConstraintApplyConfiguration `json:"topologySpreadConstraints,omitempty"`
-	NodeRef                   *v1.LocalObjectReference                     `json:"nodeRef,omitempty"`
+	// NodeRef references the node hosting the load balancer instance.
+	// Will be set by the scheduler if empty.
+	NodeRef *v1.LocalObjectReference `json:"nodeRef,omitempty"`
 }
 
 // InstanceSpecApplyConfiguration constructs a declarative configuration of the InstanceSpec type for use with

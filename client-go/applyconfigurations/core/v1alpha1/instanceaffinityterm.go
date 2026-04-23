@@ -11,9 +11,19 @@ import (
 
 // InstanceAffinityTermApplyConfiguration represents a declarative configuration of the InstanceAffinityTerm type for use
 // with apply.
+//
+// InstanceAffinityTerm defines a set of instances (namely those matching the labelSelector that this instance should be
+// co-located (affinity) or not co-located (anti-affinity) with, where co-located is defined as running on a node whose
+// value of the label with key <topologyKey> matches that of any node on which a instance of the set of instances is running.
 type InstanceAffinityTermApplyConfiguration struct {
+	// LabelSelector over a set of resources, in this case instances.
 	LabelSelector *v1.LabelSelectorApplyConfiguration `json:"labelSelector,omitempty"`
-	TopologyKey   *string                             `json:"topologyKey,omitempty"`
+	// TopologyKey indicates that this instance should be co-located (affinity) or not co-located (anti-affinity)
+	// with the instances matching the labelSelector, where co-located is defined as running on a
+	// node whose value of the label with key topologyKey matches that of any node on which any of the
+	// selected instances is running.
+	// Empty topologyKey is not allowed.
+	TopologyKey *string `json:"topologyKey,omitempty"`
 }
 
 // InstanceAffinityTermApplyConfiguration constructs a declarative configuration of the InstanceAffinityTerm type for use with

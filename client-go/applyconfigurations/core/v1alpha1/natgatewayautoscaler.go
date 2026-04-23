@@ -16,6 +16,8 @@ import (
 
 // NATGatewayAutoscalerApplyConfiguration represents a declarative configuration of the NATGatewayAutoscaler type for use
 // with apply.
+//
+// NATGatewayAutoscaler is the schema for the natgatewayautoscalers API.
 type NATGatewayAutoscalerApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -34,29 +36,14 @@ func NATGatewayAutoscaler(name, namespace string) *NATGatewayAutoscalerApplyConf
 	return b
 }
 
-// ExtractNATGatewayAutoscaler extracts the applied configuration owned by fieldManager from
-// nATGatewayAutoscaler. If no managedFields are found in nATGatewayAutoscaler for fieldManager, a
-// NATGatewayAutoscalerApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractNATGatewayAutoscalerFrom extracts the applied configuration owned by fieldManager from
+// nATGatewayAutoscaler for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // nATGatewayAutoscaler must be a unmodified NATGatewayAutoscaler API object that was retrieved from the Kubernetes API.
-// ExtractNATGatewayAutoscaler provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractNATGatewayAutoscalerFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractNATGatewayAutoscaler(nATGatewayAutoscaler *corev1alpha1.NATGatewayAutoscaler, fieldManager string) (*NATGatewayAutoscalerApplyConfiguration, error) {
-	return extractNATGatewayAutoscaler(nATGatewayAutoscaler, fieldManager, "")
-}
-
-// ExtractNATGatewayAutoscalerStatus is the same as ExtractNATGatewayAutoscaler except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractNATGatewayAutoscalerStatus(nATGatewayAutoscaler *corev1alpha1.NATGatewayAutoscaler, fieldManager string) (*NATGatewayAutoscalerApplyConfiguration, error) {
-	return extractNATGatewayAutoscaler(nATGatewayAutoscaler, fieldManager, "status")
-}
-
-func extractNATGatewayAutoscaler(nATGatewayAutoscaler *corev1alpha1.NATGatewayAutoscaler, fieldManager string, subresource string) (*NATGatewayAutoscalerApplyConfiguration, error) {
+func ExtractNATGatewayAutoscalerFrom(nATGatewayAutoscaler *corev1alpha1.NATGatewayAutoscaler, fieldManager string, subresource string) (*NATGatewayAutoscalerApplyConfiguration, error) {
 	b := &NATGatewayAutoscalerApplyConfiguration{}
 	err := managedfields.ExtractInto(nATGatewayAutoscaler, internal.Parser().Type("com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NATGatewayAutoscaler"), fieldManager, b, subresource)
 	if err != nil {
@@ -69,6 +56,27 @@ func extractNATGatewayAutoscaler(nATGatewayAutoscaler *corev1alpha1.NATGatewayAu
 	b.WithAPIVersion("core.apinet.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractNATGatewayAutoscaler extracts the applied configuration owned by fieldManager from
+// nATGatewayAutoscaler. If no managedFields are found in nATGatewayAutoscaler for fieldManager, a
+// NATGatewayAutoscalerApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// nATGatewayAutoscaler must be a unmodified NATGatewayAutoscaler API object that was retrieved from the Kubernetes API.
+// ExtractNATGatewayAutoscaler provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractNATGatewayAutoscaler(nATGatewayAutoscaler *corev1alpha1.NATGatewayAutoscaler, fieldManager string) (*NATGatewayAutoscalerApplyConfiguration, error) {
+	return ExtractNATGatewayAutoscalerFrom(nATGatewayAutoscaler, fieldManager, "")
+}
+
+// ExtractNATGatewayAutoscalerStatus extracts the applied configuration owned by fieldManager from
+// nATGatewayAutoscaler for the status subresource.
+func ExtractNATGatewayAutoscalerStatus(nATGatewayAutoscaler *corev1alpha1.NATGatewayAutoscaler, fieldManager string) (*NATGatewayAutoscalerApplyConfiguration, error) {
+	return ExtractNATGatewayAutoscalerFrom(nATGatewayAutoscaler, fieldManager, "status")
+}
+
 func (b NATGatewayAutoscalerApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

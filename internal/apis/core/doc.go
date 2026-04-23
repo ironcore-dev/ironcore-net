@@ -3,6 +3,7 @@
 
 // +k8s:deepcopy-gen=package
 // +k8s:openapi-gen=true
+// +k8s:openapi-model-package=com.github.ironcore-dev.ironcore-net.api.core.core
 // +k8s:defaulter-gen=TypeMeta
 // +k8s:protobuf-gen=package
 // +groupName=core.apinet.ironcore.dev

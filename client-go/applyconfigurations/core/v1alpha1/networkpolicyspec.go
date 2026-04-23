@@ -14,12 +14,22 @@ import (
 // NetworkPolicySpecApplyConfiguration represents a declarative configuration of the NetworkPolicySpec type for use
 // with apply.
 type NetworkPolicySpecApplyConfiguration struct {
-	NetworkRef               *v1.LocalObjectReference                     `json:"networkRef,omitempty"`
-	NetworkInterfaceSelector *metav1.LabelSelectorApplyConfiguration      `json:"networkInterfaceSelector,omitempty"`
-	Priority                 *int32                                       `json:"priority,omitempty"`
-	Ingress                  []NetworkPolicyIngressRuleApplyConfiguration `json:"ingress,omitempty"`
-	Egress                   []NetworkPolicyEgressRuleApplyConfiguration  `json:"egress,omitempty"`
-	PolicyTypes              []corev1alpha1.PolicyType                    `json:"policyTypes,omitempty"`
+	// NetworkRef is the network to regulate using this policy.
+	NetworkRef *v1.LocalObjectReference `json:"networkRef,omitempty"`
+	// NetworkInterfaceSelector selects the network interfaces that are subject to this policy.
+	NetworkInterfaceSelector *metav1.LabelSelectorApplyConfiguration `json:"networkInterfaceSelector,omitempty"`
+	// Priority is an optional field that specifies the order in which the policy is applied.
+	// Policies with higher "order" are applied after those with lower
+	// order.  If the order is omitted, it may be considered to be "infinite" - i.e. the
+	// policy will be applied last.  Policies with identical order will be applied in
+	// alphanumerical order based on the Policy "Name".
+	Priority *int32 `json:"priority,omitempty"`
+	// Ingress specifies rules for ingress traffic.
+	Ingress []NetworkPolicyIngressRuleApplyConfiguration `json:"ingress,omitempty"`
+	// Egress specifies rules for egress traffic.
+	Egress []NetworkPolicyEgressRuleApplyConfiguration `json:"egress,omitempty"`
+	// PolicyTypes specifies the types of policies this network policy contains.
+	PolicyTypes []corev1alpha1.PolicyType `json:"policyTypes,omitempty"`
 }
 
 // NetworkPolicySpecApplyConfiguration constructs a declarative configuration of the NetworkPolicySpec type for use with

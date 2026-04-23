@@ -11,8 +11,12 @@ import (
 
 // NetworkPeeringStatusApplyConfiguration represents a declarative configuration of the NetworkPeeringStatus type for use
 // with apply.
+//
+// NetworkPeeringStatus is the status of a network peering.
 type NetworkPeeringStatusApplyConfiguration struct {
-	ID    *int32                            `json:"id,omitempty"`
+	// ID is the ID of network
+	ID *int32 `json:"id,omitempty"`
+	// State represents the network peering state
 	State *corev1alpha1.NetworkPeeringState `json:"state,omitempty"`
 }
 

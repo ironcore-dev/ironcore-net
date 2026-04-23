@@ -16,6 +16,8 @@ import (
 
 // NetworkPolicyApplyConfiguration represents a declarative configuration of the NetworkPolicy type for use
 // with apply.
+//
+// NetworkPolicy is the Schema for the networkpolicies API.
 type NetworkPolicyApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -33,29 +35,14 @@ func NetworkPolicy(name, namespace string) *NetworkPolicyApplyConfiguration {
 	return b
 }
 
-// ExtractNetworkPolicy extracts the applied configuration owned by fieldManager from
-// networkPolicy. If no managedFields are found in networkPolicy for fieldManager, a
-// NetworkPolicyApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractNetworkPolicyFrom extracts the applied configuration owned by fieldManager from
+// networkPolicy for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // networkPolicy must be a unmodified NetworkPolicy API object that was retrieved from the Kubernetes API.
-// ExtractNetworkPolicy provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractNetworkPolicyFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractNetworkPolicy(networkPolicy *corev1alpha1.NetworkPolicy, fieldManager string) (*NetworkPolicyApplyConfiguration, error) {
-	return extractNetworkPolicy(networkPolicy, fieldManager, "")
-}
-
-// ExtractNetworkPolicyStatus is the same as ExtractNetworkPolicy except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractNetworkPolicyStatus(networkPolicy *corev1alpha1.NetworkPolicy, fieldManager string) (*NetworkPolicyApplyConfiguration, error) {
-	return extractNetworkPolicy(networkPolicy, fieldManager, "status")
-}
-
-func extractNetworkPolicy(networkPolicy *corev1alpha1.NetworkPolicy, fieldManager string, subresource string) (*NetworkPolicyApplyConfiguration, error) {
+func ExtractNetworkPolicyFrom(networkPolicy *corev1alpha1.NetworkPolicy, fieldManager string, subresource string) (*NetworkPolicyApplyConfiguration, error) {
 	b := &NetworkPolicyApplyConfiguration{}
 	err := managedfields.ExtractInto(networkPolicy, internal.Parser().Type("com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkPolicy"), fieldManager, b, subresource)
 	if err != nil {
@@ -68,6 +55,21 @@ func extractNetworkPolicy(networkPolicy *corev1alpha1.NetworkPolicy, fieldManage
 	b.WithAPIVersion("core.apinet.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractNetworkPolicy extracts the applied configuration owned by fieldManager from
+// networkPolicy. If no managedFields are found in networkPolicy for fieldManager, a
+// NetworkPolicyApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// networkPolicy must be a unmodified NetworkPolicy API object that was retrieved from the Kubernetes API.
+// ExtractNetworkPolicy provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractNetworkPolicy(networkPolicy *corev1alpha1.NetworkPolicy, fieldManager string) (*NetworkPolicyApplyConfiguration, error) {
+	return ExtractNetworkPolicyFrom(networkPolicy, fieldManager, "")
+}
+
 func (b NetworkPolicyApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

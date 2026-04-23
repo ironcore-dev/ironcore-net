@@ -12,9 +12,12 @@ import (
 // NATGatewayAutoscalerSpecApplyConfiguration represents a declarative configuration of the NATGatewayAutoscalerSpec type for use
 // with apply.
 type NATGatewayAutoscalerSpecApplyConfiguration struct {
+	// NATGatewayRef points to the target NATGateway to scale.
 	NATGatewayRef *v1.LocalObjectReference `json:"natGatewayRef,omitempty"`
-	MinPublicIPs  *int32                   `json:"minPublicIPs,omitempty"`
-	MaxPublicIPs  *int32                   `json:"maxPublicIPs,omitempty"`
+	// MinPublicIPs is the minimum number of public IPs to allocate for a NAT Gateway.
+	MinPublicIPs *int32 `json:"minPublicIPs,omitempty"`
+	// MaxPublicIPs is the maximum number of public IPs to allocate for a NAT Gateway.
+	MaxPublicIPs *int32 `json:"maxPublicIPs,omitempty"`
 }
 
 // NATGatewayAutoscalerSpecApplyConfiguration constructs a declarative configuration of the NATGatewayAutoscalerSpec type for use with
