@@ -5,7 +5,6 @@ package controllers
 
 import (
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	. "github.com/ironcore-dev/ironcore-net/utils/testing"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -47,7 +46,7 @@ var _ = Describe("VirtualIPController", func() {
 			},
 		}
 		Eventually(Object(ip)).Should(SatisfyAll(
-			HaveField("Labels", HaveKeysWithValues(apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), virtualIP))),
+			StemFrom(VirtualIPOrigin, virtualIP),
 			HaveField("Spec", MatchFields(IgnoreExtras, Fields{
 				"Type":     Equal(apinetv1alpha1.IPTypePublic),
 				"IPFamily": Equal(corev1.IPv4Protocol),

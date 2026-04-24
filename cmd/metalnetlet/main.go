@@ -14,11 +14,15 @@ import (
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	metalnetletconfig "github.com/ironcore-dev/ironcore-net/metalnetlet/client/config"
 	"github.com/ironcore-dev/ironcore-net/metalnetlet/controllers"
+	"github.com/ironcore-dev/ironcore-net/utils/migration"
+	"github.com/ironcore-dev/ironcore-net/utils/migrations"
+	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
 	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
 	flag "github.com/spf13/pflag"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/certwatcher"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 	"sigs.k8s.io/controller-runtime/pkg/metrics/filters"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
@@ -67,6 +71,8 @@ func main() {
 	var disableNetworkPeering bool
 	var tlsOpts []func(*tls.Config)
 
+	var skipMigrations bool
+
 	flag.StringVar(&name, "name", "", "The name of the partition the metalnetlet represents (required).")
 	flag.StringToStringVar(&nodeLabels, "node-label", nodeLabels, "Additional labels to add to the nodes.")
 	flag.StringVar(&metricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
@@ -88,6 +94,8 @@ func main() {
 	flag.StringVar(&metalnetNamespace, "metalnet-namespace", corev1.NamespaceDefault, "Metalnet namespace to use.")
 	flag.BoolVar(&disableNetworkPeering, "disable-network-peering", false,
 		"Disable the metalnet based network peering. If set to true the network peering is handled externally.")
+
+	flag.BoolVar(&skipMigrations, "skip-migrations", false, "Whether to skip any migration before start or not.")
 
 	opts := zap.Options{
 		Development: true,
@@ -212,6 +220,56 @@ func main() {
 		os.Exit(1)
 	}
 
+	if metricsCertWatcher != nil {
+		setupLog.Info("Adding metrics certificate watcher to manager")
+		if err := mgr.Add(metricsCertWatcher); err != nil {
+			setupLog.Error(err, "unable to add metrics certificate watcher to manager")
+			os.Exit(1)
+		}
+	}
+
+	if !skipMigrations {
+		migrator := migration.NewMigrator()
+
+		for _, originAndType := range []struct {
+			Origin *origin.Origin
+			Type   client.Object
+		}{
+			{
+				Origin: controllers.InstanceOrigin,
+				Type:   &metalnetv1alpha1.LoadBalancer{},
+			},
+			{
+				Origin: controllers.NetworkOrigin,
+				Type:   &metalnetv1alpha1.Network{},
+			},
+			{
+				Origin: controllers.NetworkInterfaceOrigin,
+				Type:   &metalnetv1alpha1.NetworkInterface{},
+			},
+		} {
+			if err := migrator.Add(&migrations.OriginMetadataMigration{
+				Client:      metalnetCluster.GetClient(),
+				Origin:      originAndType.Origin,
+				Type:        originAndType.Type,
+				ListOptions: []client.ListOption{client.InNamespace(metalnetNamespace)},
+			}); err != nil {
+				setupLog.Error(err, "unable to add origin metadata migration",
+					"Origin", originAndType.Origin.Name,
+					"Type", fmt.Sprintf("%T", originAndType.Type),
+				)
+				os.Exit(1)
+			}
+		}
+
+		if err := mgr.Add(migrator); err != nil {
+			setupLog.Error(err, "unable to add migrator to manager")
+			os.Exit(1)
+		}
+
+		mgr = migration.WrapManager(migrator, mgr)
+	}
+
 	if err := (&controllers.InstanceReconciler{
 		Client:            mgr.GetClient(),
 		MetalnetClient:    metalnetCluster.GetClient(),
@@ -251,14 +309,6 @@ func main() {
 	}).SetupWithManager(mgr, metalnetCluster.GetCache()); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Network")
 		os.Exit(1)
-	}
-
-	if metricsCertWatcher != nil {
-		setupLog.Info("Adding metrics certificate watcher to manager")
-		if err := mgr.Add(metricsCertWatcher); err != nil {
-			setupLog.Error(err, "unable to add metrics certificate watcher to manager")
-			os.Exit(1)
-		}
 	}
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {

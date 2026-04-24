@@ -9,11 +9,13 @@ import (
 	"net/netip"
 
 	"github.com/go-logr/logr"
+	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	utilhandlers "github.com/ironcore-dev/ironcore-net/utils/handler"
+	"github.com/ironcore-dev/ironcore-net/utils/origin"
 
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
-	apinetlethandler "github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	ironcorenet "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
 	apinetclient "github.com/ironcore-dev/ironcore-net/internal/client"
@@ -26,7 +28,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/util/workqueue"
-	klog "k8s.io/klog/v2"
+	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
@@ -41,6 +43,13 @@ import (
 
 const (
 	networkPolicyFinalizer = "apinet.ironcore.dev/networkpolicy"
+)
+
+var (
+	NetworkPolicyOrigin = &origin.Origin{
+		Name:       "apinetlet.ironcore.dev/networkpolicy",
+		Namespaced: true,
+	}
 )
 
 var networkPolicyFieldOwner = client.FieldOwner(networkingv1alpha1.Resource("networkpolicies").String())
@@ -81,15 +90,19 @@ func (r *NetworkPolicyReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 func (r *NetworkPolicyReconciler) deleteGone(ctx context.Context, log logr.Logger, networkPolicyKey client.ObjectKey) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
-	log.V(1).Info("Deleting any matching APINet network policies")
-	if err := r.APINetClient.DeleteAllOf(ctx, &apinetv1alpha1.NetworkPolicy{},
+	log.V(1).Info("Listing and deleting descendant APINet network policies")
+	if _, err := netclientutils.ListAnd(r.APINetClient, &apinetv1alpha1.NetworkPolicyList{},
 		client.InNamespace(r.APINetNamespace),
-		apinetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), networkPolicyKey, &networkingv1alpha1.NetworkPolicy{}),
+		&netclientutils.StemmingFromKey{Origin: NetworkPolicyOrigin, SourceKey: networkPolicyKey},
+	).DeletePredicate(ctx,
+		&netclientutils.StemmingFromKey{Origin: NetworkPolicyOrigin, SourceKey: networkPolicyKey},
 	); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error deleting APINet network policies: %w", err)
 	}
 
-	log.V(1).Info("Deleted any leftover APINet network policy")
+	log.V(1).Info("Issued delete for any leftover APINet network policy")
+
+	log.V(1).Info("Deleted gone")
 	return ctrl.Result{}, nil
 }
 
@@ -382,7 +395,6 @@ func (r *NetworkPolicyReconciler) applyNetworkPolicyRule(ctx context.Context, ne
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: apiNetNetworkPolicy.Namespace,
 			Name:      apiNetNetworkPolicy.Name,
-			Labels:    apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), networkPolicy),
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apiNetNetworkPolicy, apinetv1alpha1.SchemeGroupVersion.WithKind("NetworkPolicy")),
 			},
@@ -434,7 +446,8 @@ func (r *NetworkPolicyReconciler) applyAPINetNetworkPolicy(ctx context.Context, 
 	nicSelector := translateLabelSelector(networkPolicy.Spec.NetworkInterfaceSelector)
 
 	apiNetNetworkPolicyApplyCfg := apinetv1alpha1ac.NetworkPolicy(string(networkPolicy.UID), r.APINetNamespace).
-		WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), networkPolicy)).
+		WithAnnotations(NetworkPolicyOrigin.Annotations(networkPolicy)).
+		WithLabels(NetworkPolicyOrigin.Labels(networkPolicy)).
 		WithSpec(apinetv1alpha1ac.NetworkPolicySpec().
 			WithNetworkRef(corev1.LocalObjectReference{Name: apiNetNetworkName}).
 			WithNetworkInterfaceSelector(nicSelector).
@@ -580,7 +593,7 @@ func (r *NetworkPolicyReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache
 			source.Kind[client.Object](
 				apiNetCache,
 				&apinetv1alpha1.NetworkPolicy{},
-				apinetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.NetworkPolicy{}),
+				utilhandlers.EnqueueRequestByOrigin(NetworkPolicyOrigin),
 			),
 		).
 		WatchesRawSource(

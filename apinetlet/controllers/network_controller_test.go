@@ -9,8 +9,8 @@ import (
 
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
-	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
+	. "github.com/ironcore-dev/ironcore-net/utils/testing"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -50,9 +50,7 @@ var _ = Describe("NetworkController", func() {
 		Eventually(Get(apiNetNetwork)).Should(Succeed())
 
 		By("inspecting the created apinet network")
-		Expect(apiNetNetwork.Labels).To(Equal(
-			apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), network),
-		))
+		Expect(apiNetNetwork).To(StemFrom(NetworkOrigin, network))
 		Expect(apiNetNetwork.Spec.ID).NotTo(BeEmpty())
 
 		By("waiting for the network to reflect the allocated vni")
@@ -83,18 +81,16 @@ var _ = Describe("NetworkController", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    apiNetNs.Name,
 				GenerateName: "apinet-network-",
-				Labels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(),
-					&networkingv1alpha1.Network{
-						ObjectMeta: metav1.ObjectMeta{
-							Namespace: ns.Name,
-							Name:      "should-not-exist",
-							UID:       "some-uid",
-						},
-					},
-				),
 			},
 			Spec: apinetv1alpha1.NetworkSpec{},
 		}
+		NetworkOrigin.SetOrigin(&networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      "some-nonexistent-name",
+				UID:       "some-nonexistent-uid",
+			},
+		}, apiNetNetwork)
 		Expect(k8sClient.Create(ctx, apiNetNetwork)).To(Succeed())
 
 		By("waiting for the apinet network to be gone")
@@ -160,10 +156,10 @@ var _ = Describe("NetworkController", func() {
 		Eventually(Get(apiNetNetwork2)).Should(Succeed())
 
 		By("inspecting the created apinet networks")
-		Expect(apiNetNetwork1.Labels).To(Equal(apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), network1)))
+		Expect(apiNetNetwork1).To(StemFrom(NetworkOrigin, network1))
 		Expect(apiNetNetwork1.Spec.ID).NotTo(BeEmpty())
 
-		Expect(apiNetNetwork2.Labels).To(Equal(apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), network2)))
+		Expect(apiNetNetwork2).To(StemFrom(NetworkOrigin, network2))
 		Expect(apiNetNetwork2.Spec.ID).NotTo(BeEmpty())
 
 		By("patching networks with peeringClaimRefs")
@@ -330,10 +326,10 @@ var _ = Describe("NetworkController", func() {
 		Eventually(Get(apiNetNetwork2)).Should(Succeed())
 
 		By("inspecting the created apinet networks")
-		Expect(apiNetNetwork1.Labels).To(Equal(apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), network1)))
+		Expect(apiNetNetwork1).To(StemFrom(NetworkOrigin, network1))
 		Expect(apiNetNetwork1.Spec.ID).NotTo(BeEmpty())
 
-		Expect(apiNetNetwork2.Labels).To(Equal(apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), network2)))
+		Expect(apiNetNetwork2).To(StemFrom(NetworkOrigin, network2))
 		Expect(apiNetNetwork2.Spec.ID).NotTo(BeEmpty())
 
 		By("patching networks with peeringClaimRefs")
@@ -497,10 +493,10 @@ var _ = Describe("NetworkControllerPeering", func() {
 		Eventually(Get(apiNetNetwork2)).Should(Succeed())
 
 		By("inspecting the created apinet networks")
-		Expect(apiNetNetwork1.Labels).To(Equal(apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), network1)))
+		Expect(apiNetNetwork1).To(StemFrom(NetworkOrigin, network1))
 		Expect(apiNetNetwork1.Spec.ID).NotTo(BeEmpty())
 
-		Expect(apiNetNetwork2.Labels).To(Equal(apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), network2)))
+		Expect(apiNetNetwork2).To(StemFrom(NetworkOrigin, network2))
 		Expect(apiNetNetwork2.Spec.ID).NotTo(BeEmpty())
 
 		By("patching networks with peeringClaimRefs")

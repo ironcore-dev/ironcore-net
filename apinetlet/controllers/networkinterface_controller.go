@@ -7,20 +7,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"maps"
 
 	"github.com/go-logr/logr"
+	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	utilhandlers "github.com/ironcore-dev/ironcore-net/utils/handler"
+	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	"golang.org/x/exp/slices"
 
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
-	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
-	apinetlethandler "github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
 	utilgeneric "github.com/ironcore-dev/ironcore-net/utils/generic"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
-	"github.com/ironcore-dev/controller-utils/metautils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -43,6 +42,13 @@ import (
 
 const (
 	networkInterfaceFinalizer = "apinet.ironcore.dev/networkinterface"
+)
+
+var (
+	NetworkInterfaceOrigin = &origin.Origin{
+		Name:       "apinetlet.ironcore.dev/networkinterface",
+		Namespaced: true,
+	}
 )
 
 type NetworkInterfaceReconciler struct {
@@ -70,6 +76,7 @@ func (r *NetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Req
 			return ctrl.Result{}, err
 		}
 
+		log.V(1).Info("Releasing APINet network interfaces")
 		if err := r.releaseNetworkInterfaceKeyAPINetInterfaces(ctx, req.NamespacedName); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error releasing APINet network interfaces by key: %w", err)
 		}
@@ -90,13 +97,17 @@ func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceKeyAPINetInterfaces(
 	apiNetNicList := &apinetv1alpha1.NetworkInterfaceList{}
 	if err := r.APINetClient.List(ctx, apiNetNicList,
 		client.InNamespace(r.APINetNamespace),
-		apinetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), nicKey, &networkingv1alpha1.NetworkInterface{}),
+		&netclientutils.StemmingFromKey{Origin: NetworkInterfaceOrigin, SourceKey: nicKey},
 	); err != nil {
 		return fmt.Errorf("error listing APINet network interfaces: %w", err)
 	}
 
 	var errs []error
 	for _, apiNetNic := range apiNetNicList.Items {
+		if !NetworkInterfaceOrigin.StemsFromKey(&apiNetNic, nicKey) {
+			continue
+		}
+
 		if err := r.releaseAPINetNetworkInterface(ctx, &apiNetNic); client.IgnoreNotFound(err) != nil {
 			errs = append(errs, err)
 		}
@@ -105,9 +116,8 @@ func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceKeyAPINetInterfaces(
 }
 
 func (r *NetworkInterfaceReconciler) releaseAPINetNetworkInterface(ctx context.Context, apiNetNic *apinetv1alpha1.NetworkInterface) error {
-	keys := apinetletclient.SourceLabelKeys(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.NetworkInterface{})
 	base := apiNetNic.DeepCopy()
-	metautils.DeleteLabels(apiNetNic, keys)
+	NetworkInterfaceOrigin.RemoveOrigin(apiNetNic)
 	return r.APINetClient.Patch(ctx, apiNetNic, client.StrategicMergeFrom(base))
 }
 
@@ -115,7 +125,7 @@ func (r *NetworkInterfaceReconciler) releaseNetworkInterfaceAPINetNetworkInterfa
 	apiNetNicList := &apinetv1alpha1.NetworkInterfaceList{}
 	if err := r.APINetClient.List(ctx, apiNetNicList,
 		client.InNamespace(r.APINetNamespace),
-		apinetletclient.MatchingSourceLabels(r.Scheme(), r.RESTMapper(), nic),
+		&netclientutils.StemmingFrom{Origin: NetworkInterfaceOrigin, Source: nic},
 	); err != nil {
 		return fmt.Errorf("error listing APINet network interfaces: %w", err)
 	}
@@ -212,8 +222,7 @@ type apiNetNetworkInterfaceClaimStrategy struct {
 }
 
 func (s *apiNetNetworkInterfaceClaimStrategy) ClaimState(claimer client.Object, obj client.Object) claimmanager.ClaimState {
-	apiNetNic := obj.(*apinetv1alpha1.NetworkInterface)
-	if data := apinetletclient.SourceObjectDataFromObject(s.Scheme(), s.RESTMapper(), claimer, apiNetNic); data != nil {
+	if data := NetworkInterfaceOrigin.DataOf(obj); data != nil {
 		if data.UID == claimer.GetUID() {
 			return claimmanager.ClaimStateClaimed
 		}
@@ -225,27 +234,14 @@ func (s *apiNetNetworkInterfaceClaimStrategy) ClaimState(claimer client.Object, 
 func (s *apiNetNetworkInterfaceClaimStrategy) Adopt(ctx context.Context, claimer client.Object, obj client.Object) error {
 	apiNetNic := obj.(*apinetv1alpha1.NetworkInterface)
 	base := apiNetNic.DeepCopy()
-	combinedLabels := make(map[string]string, len(apiNetNic.GetLabels())+len(claimer.GetLabels()))
-	maps.Copy(combinedLabels, apiNetNic.GetLabels())
-	if claimerLabels := claimer.GetLabels(); claimerLabels != nil {
-		for key, value := range claimerLabels {
-			combinedLabels[key] = value
-		}
-	}
-	if sourceLabels := apinetletclient.SourceLabels(s.Scheme(), s.RESTMapper(), claimer); sourceLabels != nil {
-		for key, value := range sourceLabels {
-			combinedLabels[key] = value
-		}
-	}
-	apiNetNic.SetLabels(combinedLabels)
+	NetworkInterfaceOrigin.SetOrigin(claimer, apiNetNic)
 	return s.Patch(ctx, apiNetNic, client.StrategicMergeFrom(base))
 }
 
 func (s *apiNetNetworkInterfaceClaimStrategy) Release(ctx context.Context, claimer client.Object, obj client.Object) error {
 	apiNetNic := obj.(*apinetv1alpha1.NetworkInterface)
 	base := apiNetNic.DeepCopy()
-	keys := apinetletclient.SourceLabelKeys(s.Scheme(), s.RESTMapper(), claimer)
-	metautils.DeleteLabels(apiNetNic, keys)
+	NetworkInterfaceOrigin.RemoveOrigin(apiNetNic)
 	apiNetNic.Spec.PublicIPs = nil
 	apiNetNic.Spec.Prefixes = nil
 	return s.Patch(ctx, apiNetNic, client.StrategicMergeFrom(base))
@@ -586,7 +582,7 @@ func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCa
 			source.Kind[client.Object](
 				apiNetCache,
 				&apinetv1alpha1.NetworkInterface{},
-				apinetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &networkingv1alpha1.NetworkInterface{}),
+				utilhandlers.EnqueueRequestByOrigin(NetworkInterfaceOrigin),
 			),
 		).
 		Owns(&ipamv1alpha1.Prefix{}).
