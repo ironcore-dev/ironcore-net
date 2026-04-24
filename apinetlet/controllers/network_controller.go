@@ -10,10 +10,11 @@ import (
 	"slices"
 
 	"github.com/go-logr/logr"
+	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	utilhandlers "github.com/ironcore-dev/ironcore-net/utils/handler"
+	"github.com/ironcore-dev/ironcore-net/utils/origin"
 
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
-	"github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 
@@ -33,6 +34,13 @@ import (
 
 const (
 	networkFinalizer = "apinet.ironcore.dev/network"
+)
+
+var (
+	NetworkOrigin = &origin.Origin{
+		Name:       "apinetlet.ironcore.dev/network",
+		Namespaced: true,
+	}
 )
 
 type NetworkReconciler struct {
@@ -70,15 +78,20 @@ func (r *NetworkReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 func (r *NetworkReconciler) deleteGone(ctx context.Context, log logr.Logger, networkKey client.ObjectKey) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
-	log.V(1).Info("Deleting any matching APINet networks")
-	if err := r.APINetClient.DeleteAllOf(ctx, &apinetv1alpha1.Network{},
+	log.V(1).Info("Listing and deleting descendant APINet networks")
+	stemmingFromKey := &netclientutils.StemmingFromKey{Origin: NetworkOrigin, SourceKey: networkKey}
+	if _, err := netclientutils.ListAnd(r.APINetClient, &apinetv1alpha1.NetworkList{},
 		client.InNamespace(r.APINetNamespace),
-		apinetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), networkKey, &networkingv1alpha1.Network{}),
+		stemmingFromKey.UIDExistsSelector(),
+	).DeletePredicate(ctx,
+		stemmingFromKey,
 	); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error deleting APINet networks: %w", err)
 	}
 
 	log.V(1).Info("Issued delete for any leftover APINet network")
+
+	log.V(1).Info("Deleted gone")
 	return ctrl.Result{}, nil
 }
 
@@ -250,7 +263,8 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 	}
 
 	apiNetNetworkApplyCfg := apinetv1alpha1ac.Network(string(network.UID), r.APINetNamespace).
-		WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), network)).
+		WithAnnotations(NetworkOrigin.Annotations(network)).
+		WithLabels(NetworkOrigin.Labels(network)).
 		WithSpec(apinetv1alpha1ac.NetworkSpec().
 			WithPeerings(peeringCfgs...))
 
@@ -313,7 +327,7 @@ func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache cache
 			source.Kind[client.Object](
 				apiNetCache,
 				&apinetv1alpha1.Network{},
-				handler.EnqueueRequestForSource(mgr.GetScheme(), mgr.GetRESTMapper(), &networkingv1alpha1.Network{}),
+				utilhandlers.EnqueueRequestByOrigin(NetworkOrigin),
 			),
 		).
 		Complete(r)

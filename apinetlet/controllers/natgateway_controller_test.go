@@ -5,7 +5,7 @@ package controllers
 
 import (
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
+	. "github.com/ironcore-dev/ironcore-net/utils/testing"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	. "github.com/ironcore-dev/ironcore/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
@@ -43,9 +43,7 @@ var _ = Describe("NATGatewayController", func() {
 				Name:      string(natGateway.UID),
 			},
 		}
-		Eventually(Object(apiNetNATGateway)).Should(
-			HaveField("Labels", apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), natGateway)),
-		)
+		Eventually(Object(apiNetNATGateway)).Should(StemFrom(NATGatewayOrigin, natGateway))
 
 		By("waiting for the APINet NAT gateway autoscaler to be present")
 		apiNetNATGatewayAutoscaler := &v1alpha1.NATGatewayAutoscaler{
@@ -56,7 +54,7 @@ var _ = Describe("NATGatewayController", func() {
 		}
 		Eventually(Object(apiNetNATGatewayAutoscaler)).Should(
 			SatisfyAll(
-				HaveField("Labels", apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), natGateway)),
+				StemFrom(NATGatewayOrigin, natGateway),
 				BeControlledBy(apiNetNATGateway),
 			),
 		)

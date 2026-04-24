@@ -11,13 +11,14 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/uuid"
+	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	utilhandlers "github.com/ironcore-dev/ironcore-net/utils/handler"
+	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	"golang.org/x/exp/slices"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
-	metalnetletclient "github.com/ironcore-dev/ironcore-net/metalnetlet/client"
-	utilhandler "github.com/ironcore-dev/ironcore-net/metalnetlet/handler"
 	netiputils "github.com/ironcore-dev/ironcore-net/utils/netip"
 	"github.com/ironcore-dev/ironcore/utils/generic"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
@@ -38,6 +39,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+)
+
+var (
+	NetworkInterfaceOrigin = &origin.Origin{
+		Name:       "metalnetlet.ironcore.dev/networkinterface",
+		Namespaced: true,
+	}
 )
 
 type NetworkInterfaceReconciler struct {
@@ -72,14 +80,16 @@ func (r *NetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		}
 
 		log.V(1).Info("Deleting all matching metalnet network interfaces")
-		exists, err := metalnetletclient.DeleteAllOfAndAnyExists(ctx, r.MetalnetClient, &metalnetv1alpha1.NetworkInterface{},
+		stemmingFromKey := &netclientutils.StemmingFromKey{Origin: NetworkInterfaceOrigin, SourceKey: req.NamespacedName}
+		n, err := netclientutils.ListAnd(r.MetalnetClient,
+			&metalnetv1alpha1.NetworkInterfaceList{},
 			client.InNamespace(r.MetalnetNamespace),
-			metalnetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), req.NamespacedName, &v1alpha1.NetworkInterface{}),
-		)
+			stemmingFromKey.UIDExistsSelector(),
+		).DeletePredicate(ctx, stemmingFromKey)
 		if err != nil {
-			return ctrl.Result{}, fmt.Errorf("error deleting matching metalnet network interfaces: %w", err)
+			return ctrl.Result{}, err
 		}
-		if exists {
+		if n > 0 {
 			log.V(1).Info("Matching metalnet network interfaces are still present, requeueing")
 			return ctrl.Result{Requeue: true}, nil
 		}
@@ -564,7 +574,8 @@ func (r *NetworkInterfaceReconciler) applyMetalnetNic(ctx context.Context, log l
 	metalnetNicApplyCfg := metalnetv1alpha1ac.NetworkInterface(metalnetNicName, r.MetalnetNamespace).
 		WithKind("NetworkInterface").
 		WithAPIVersion(metalnetv1alpha1.GroupVersion.String()).
-		WithLabels(metalnetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), nic))
+		WithLabels(NetworkInterfaceOrigin.Labels(nic)).
+		WithAnnotations(NetworkInterfaceOrigin.Annotations(nic))
 
 	specApplyCfg := metalnetv1alpha1ac.NetworkInterfaceSpec().
 		WithNetworkRef(corev1.LocalObjectReference{Name: metalnetNetworkName}).
@@ -866,7 +877,7 @@ func (r *NetworkInterfaceReconciler) SetupWithManager(mgr ctrl.Manager, metalnet
 			source.Kind[client.Object](
 				metalnetCache,
 				&metalnetv1alpha1.NetworkInterface{},
-				utilhandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &v1alpha1.NetworkInterface{}),
+				utilhandlers.EnqueueRequestByOrigin(NetworkInterfaceOrigin),
 				r.metalnetNetworkInterfaceChangedPredicate(),
 			),
 		).

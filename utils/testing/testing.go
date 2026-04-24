@@ -8,10 +8,41 @@ import (
 	"io"
 	"reflect"
 
+	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega/format"
 	"github.com/onsi/gomega/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
+
+type stemFrom struct {
+	origin    *origin.Origin
+	sourceObj client.Object
+}
+
+func (s *stemFrom) Match(actual any) (success bool, err error) {
+	obj, ok := actual.(client.Object)
+	if !ok {
+		return false, fmt.Errorf("not a client.Object: %T", actual)
+	}
+
+	return s.origin.StemsFrom(obj, s.sourceObj), nil
+}
+
+func (s *stemFrom) FailureMessage(actual any) (message string) {
+	return format.Message(actual, "to stem from", s.sourceObj)
+}
+
+func (s *stemFrom) NegatedFailureMessage(actual any) (message string) {
+	return format.Message(actual, "not to stem from", s.sourceObj)
+}
+
+func StemFrom(origin *origin.Origin, sourceObj client.Object) types.GomegaMatcher {
+	return &stemFrom{
+		origin:    origin,
+		sourceObj: sourceObj,
+	}
+}
 
 type asRef struct {
 	matcher types.GomegaMatcher

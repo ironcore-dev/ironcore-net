@@ -11,7 +11,11 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/ironcore-dev/ironcore-net/utils/migration"
+	"github.com/ironcore-dev/ironcore-net/utils/migrations"
+	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	flag "github.com/spf13/pflag"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	ironcorenetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
@@ -80,6 +84,8 @@ func main() {
 
 	var disableNetworkPeering bool
 
+	var skipMigrations bool
+
 	flag.StringVar(&metricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
 		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
 	flag.BoolVar(&secureMetrics, "metrics-secure", true,
@@ -104,6 +110,8 @@ func main() {
 	flag.StringVar(&watchFilterValue, "watch-filter", "", fmt.Sprintf("label value that the controller watches to reconcile ironcore objects. Label key is always %s. If unspecified, the controller watches for all ironcore objects", commonv1alpha1.WatchLabel))
 	flag.BoolVar(&disableNetworkPeering, "disable-network-peering", false,
 		"Disable the metalnet based network peering. If set to true the network peering is handled externally.")
+
+	flag.BoolVar(&skipMigrations, "skip-migrations", false, "Whether to skip any migration before start or not.")
 
 	opts := zap.Options{
 		Development: true,
@@ -254,6 +262,72 @@ func main() {
 		os.Exit(1)
 	}
 
+	if metricsCertWatcher != nil {
+		setupLog.Info("Adding metrics certificate watcher to manager")
+		if err := mgr.Add(metricsCertWatcher); err != nil {
+			setupLog.Error(err, "unable to add metrics certificate watcher to manager")
+			os.Exit(1)
+		}
+	}
+
+	if !skipMigrations {
+		migrator := migration.NewMigrator()
+
+		for _, originAndType := range []struct {
+			Origin *origin.Origin
+			Type   client.Object
+		}{
+			{
+				Origin: controllers.LoadBalancerOrigin,
+				Type:   &ironcorenetv1alpha1.LoadBalancer{},
+			},
+			{
+				Origin: controllers.NATGatewayOrigin,
+				Type:   &ironcorenetv1alpha1.NATGateway{},
+			},
+			{
+				Origin: controllers.NATGatewayOrigin,
+				Type:   &ironcorenetv1alpha1.NATGatewayAutoscaler{},
+			},
+			{
+				Origin: controllers.NetworkOrigin,
+				Type:   &ironcorenetv1alpha1.Network{},
+			},
+			{
+				Origin: controllers.NetworkInterfaceOrigin,
+				Type:   &ironcorenetv1alpha1.NetworkInterface{},
+			},
+			{
+				Origin: controllers.NetworkPolicyOrigin,
+				Type:   &ironcorenetv1alpha1.NetworkPolicy{},
+			},
+			{
+				Origin: controllers.VirtualIPOrigin,
+				Type:   &ironcorenetv1alpha1.IP{},
+			},
+		} {
+			if err := migrator.Add(&migrations.OriginMetadataMigration{
+				Client:      apiNetCluster.GetClient(),
+				Origin:      originAndType.Origin,
+				Type:        originAndType.Type,
+				ListOptions: []client.ListOption{client.InNamespace(apiNetNamespace)},
+			}); err != nil {
+				setupLog.Error(err, "unable to add origin metadata migration",
+					"Origin", originAndType.Origin.Name,
+					"Type", fmt.Sprintf("%T", originAndType.Type),
+				)
+				os.Exit(1)
+			}
+		}
+
+		if err := mgr.Add(migrator); err != nil {
+			setupLog.Error(err, "unable to add migrator to manager")
+			os.Exit(1)
+		}
+
+		mgr = migration.WrapManager(migrator, mgr)
+	}
+
 	if err = (&controllers.LoadBalancerReconciler{
 		Client:              mgr.GetClient(),
 		APINetClient:        apiNetCluster.GetClient(),
@@ -327,14 +401,6 @@ func main() {
 	if err := apinetclient.SetupNetworkInterfaceNetworkNameFieldIndexer(ctx, apiNetCluster.GetFieldIndexer()); err != nil {
 		setupLog.Error(err, "unable to setup field indexer", "field", apinetclient.NetworkInterfaceSpecNetworkRefNameField)
 		os.Exit(1)
-	}
-
-	if metricsCertWatcher != nil {
-		setupLog.Info("Adding metrics certificate watcher to manager")
-		if err := mgr.Add(metricsCertWatcher); err != nil {
-			setupLog.Error(err, "unable to add metrics certificate watcher to manager")
-			os.Exit(1)
-		}
 	}
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
