@@ -26,6 +26,7 @@ var (
 		{Name: "IPs", Type: "string", Description: "The IPs of the network interface"},
 		{Name: "Prefixes", Type: "string", Description: "The prefixes of the network interface"},
 		{Name: "PublicIPs", Type: "string", Description: "The public IPs of the network interface"},
+		{Name: "State", Type: "string", Description: "The state of the network interface"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
 )
@@ -81,6 +82,7 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		cells = append(cells, formatIPs(nic.Spec.IPs))
 		cells = append(cells, formatPrefixes(nic.Spec.Prefixes))
 		cells = append(cells, formatPublicIPs(nic.Spec.PublicIPs))
+		cells = append(cells, nic.Status.State)
 		cells = append(cells, age)
 
 		return cells, nil
