@@ -32,7 +32,7 @@ type IPAddressReconciler struct {
 }
 
 //+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=ipaddresses/finalizers,verbs=update
-//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=ipaddresses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=ipaddresses,verbs=get;list;watch;patch
 //+kubebuilder:rbac:groups=core.apinet.ironcore.dev,resources=ips,verbs=get;list;watch
 
 func (r *IPAddressReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
