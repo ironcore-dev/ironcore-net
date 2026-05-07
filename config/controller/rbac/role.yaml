@@ -73,11 +73,11 @@ rules:
   - core.apinet.ironcore.dev
   resources:
   - ipaddresses
-  - networkids
   verbs:
   - delete
   - get
   - list
+  - patch
   - watch
 - apiGroups:
   - core.apinet.ironcore.dev
@@ -122,4 +122,13 @@ rules:
   - list
   - patch
   - update
+  - watch
+- apiGroups:
+  - core.apinet.ironcore.dev
+  resources:
+  - networkids
+  verbs:
+  - delete
+  - get
+  - list
   - watch
