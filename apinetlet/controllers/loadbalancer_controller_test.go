@@ -8,7 +8,7 @@ import (
 
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
-	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
+	. "github.com/ironcore-dev/ironcore-net/utils/testing"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -54,7 +54,7 @@ var _ = Describe("LoadBalancerController", func() {
 			},
 		}
 		Eventually(Object(apiNetLoadBalancer)).Should(SatisfyAll(
-			HaveField("Labels", apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer)),
+			StemFrom(LoadBalancerOrigin, loadBalancer),
 			HaveField("Spec", MatchFields(IgnoreExtras, Fields{
 				"Type":       Equal(v1alpha1.LoadBalancerTypePublic),
 				"NetworkRef": Equal(corev1.LocalObjectReference{Name: apiNetNetwork.Name}),
@@ -63,11 +63,12 @@ var _ = Describe("LoadBalancerController", func() {
 					"Name":     Equal("ipv4"),
 				})),
 				"Selector": Equal(&metav1.LabelSelector{
-					MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+					MatchLabels: LoadBalancerOrigin.Labels(loadBalancer),
 				}),
 				"Template": Equal(v1alpha1.InstanceTemplate{
 					ObjectMeta: metav1.ObjectMeta{
-						Labels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+						Annotations: LoadBalancerOrigin.Annotations(loadBalancer),
+						Labels:      LoadBalancerOrigin.Labels(loadBalancer),
 					},
 					Spec: v1alpha1.InstanceSpec{
 						Affinity: &v1alpha1.Affinity{
@@ -75,7 +76,7 @@ var _ = Describe("LoadBalancerController", func() {
 								RequiredDuringSchedulingIgnoredDuringExecution: []v1alpha1.InstanceAffinityTerm{
 									{
 										LabelSelector: &metav1.LabelSelector{
-											MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+											MatchLabels: LoadBalancerOrigin.Labels(loadBalancer),
 										},
 										TopologyKey: v1alpha1.TopologyZoneLabel,
 									},
@@ -116,7 +117,7 @@ var _ = Describe("LoadBalancerController", func() {
 			},
 		}
 		Eventually(Object(apiNetLoadBalancer)).Should(SatisfyAll(
-			HaveField("Labels", apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer)),
+			StemFrom(LoadBalancerOrigin, loadBalancer),
 			HaveField("Spec", MatchFields(IgnoreExtras, Fields{
 				"Type":       Equal(v1alpha1.LoadBalancerTypeInternal),
 				"NetworkRef": Equal(corev1.LocalObjectReference{Name: apiNetNetwork.Name}),
@@ -125,11 +126,12 @@ var _ = Describe("LoadBalancerController", func() {
 					"IP":       Equal(net.MustParseIP("10.0.0.1")),
 				})),
 				"Selector": Equal(&metav1.LabelSelector{
-					MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+					MatchLabels: LoadBalancerOrigin.Labels(loadBalancer),
 				}),
 				"Template": Equal(v1alpha1.InstanceTemplate{
 					ObjectMeta: metav1.ObjectMeta{
-						Labels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+						Annotations: LoadBalancerOrigin.Annotations(loadBalancer),
+						Labels:      LoadBalancerOrigin.Labels(loadBalancer),
 					},
 					Spec: v1alpha1.InstanceSpec{
 						Affinity: &v1alpha1.Affinity{
@@ -137,7 +139,7 @@ var _ = Describe("LoadBalancerController", func() {
 								RequiredDuringSchedulingIgnoredDuringExecution: []v1alpha1.InstanceAffinityTerm{
 									{
 										LabelSelector: &metav1.LabelSelector{
-											MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+											MatchLabels: LoadBalancerOrigin.Labels(loadBalancer),
 										},
 										TopologyKey: v1alpha1.TopologyZoneLabel,
 									},
@@ -222,7 +224,7 @@ var _ = Describe("LoadBalancerController", func() {
 			},
 		}
 		Eventually(Object(apiNetLoadBalancer)).Should(SatisfyAll(
-			HaveField("Labels", apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer)),
+			StemFrom(LoadBalancerOrigin, loadBalancer),
 			HaveField("Spec", MatchFields(IgnoreExtras, Fields{
 				"Type":       Equal(v1alpha1.LoadBalancerTypeInternal),
 				"NetworkRef": Equal(corev1.LocalObjectReference{Name: apiNetNetwork.Name}),
@@ -231,11 +233,12 @@ var _ = Describe("LoadBalancerController", func() {
 					"IP":       Equal(net.MustParseIP("10.0.0.1")),
 				})),
 				"Selector": Equal(&metav1.LabelSelector{
-					MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+					MatchLabels: LoadBalancerOrigin.Labels(loadBalancer),
 				}),
 				"Template": Equal(v1alpha1.InstanceTemplate{
 					ObjectMeta: metav1.ObjectMeta{
-						Labels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+						Annotations: LoadBalancerOrigin.Annotations(loadBalancer),
+						Labels:      LoadBalancerOrigin.Labels(loadBalancer),
 					},
 					Spec: v1alpha1.InstanceSpec{
 						Affinity: &v1alpha1.Affinity{
@@ -243,7 +246,7 @@ var _ = Describe("LoadBalancerController", func() {
 								RequiredDuringSchedulingIgnoredDuringExecution: []v1alpha1.InstanceAffinityTerm{
 									{
 										LabelSelector: &metav1.LabelSelector{
-											MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+											MatchLabels: LoadBalancerOrigin.Labels(loadBalancer),
 										},
 										TopologyKey: v1alpha1.TopologyZoneLabel,
 									},
@@ -312,7 +315,7 @@ var _ = Describe("LoadBalancerController", func() {
 			},
 		}
 		Eventually(Object(apiNetLoadBalancer)).Should(SatisfyAll(
-			HaveField("Labels", apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer)),
+			StemFrom(LoadBalancerOrigin, loadBalancer),
 			HaveField("Spec", MatchFields(IgnoreExtras, Fields{
 				"Type":       Equal(v1alpha1.LoadBalancerTypePublic),
 				"NetworkRef": Equal(corev1.LocalObjectReference{Name: apiNetNetwork.Name}),
@@ -321,11 +324,12 @@ var _ = Describe("LoadBalancerController", func() {
 					"Name":     Equal("ipv4"),
 				})),
 				"Selector": Equal(&metav1.LabelSelector{
-					MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+					MatchLabels: LoadBalancerOrigin.Labels(loadBalancer),
 				}),
 				"Template": Equal(v1alpha1.InstanceTemplate{
 					ObjectMeta: metav1.ObjectMeta{
-						Labels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+						Annotations: LoadBalancerOrigin.Annotations(loadBalancer),
+						Labels:      LoadBalancerOrigin.Labels(loadBalancer),
 					},
 					Spec: v1alpha1.InstanceSpec{
 						Affinity: &v1alpha1.Affinity{
@@ -333,7 +337,7 @@ var _ = Describe("LoadBalancerController", func() {
 								RequiredDuringSchedulingIgnoredDuringExecution: []v1alpha1.InstanceAffinityTerm{
 									{
 										LabelSelector: &metav1.LabelSelector{
-											MatchLabels: apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), loadBalancer),
+											MatchLabels: LoadBalancerOrigin.Labels(loadBalancer),
 										},
 										TopologyKey: v1alpha1.TopologyZoneLabel,
 									},

@@ -9,10 +9,11 @@ import (
 	"net/netip"
 
 	"github.com/go-logr/logr"
+	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	utilhandlers "github.com/ironcore-dev/ironcore-net/utils/handler"
+	"github.com/ironcore-dev/ironcore-net/utils/origin"
 
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
-	"github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	ironcorenet "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
 
@@ -32,6 +33,13 @@ import (
 
 const (
 	virtualIPFinalizer = "apinet.ironcore.dev/virtualip"
+)
+
+var (
+	VirtualIPOrigin = &origin.Origin{
+		Name:       "apinetlet.ironcore.dev/virtualip",
+		Namespaced: true,
+	}
 )
 
 type VirtualIPReconciler struct {
@@ -68,15 +76,19 @@ func (r *VirtualIPReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 func (r *VirtualIPReconciler) deleteGone(ctx context.Context, log logr.Logger, virtualIPKey client.ObjectKey) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
-	log.V(1).Info("Deleting any matching APINet ips")
-	if err := r.APINetClient.DeleteAllOf(ctx, &apinetv1alpha1.IP{},
+	log.V(1).Info("Listing and deleting descendant APINet IPs")
+	if _, err := netclientutils.ListAnd(r.APINetClient, &apinetv1alpha1.IPList{},
 		client.InNamespace(r.APINetNamespace),
-		apinetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), virtualIPKey, &networkingv1alpha1.VirtualIP{}),
+		&netclientutils.StemmingFromKey{Origin: VirtualIPOrigin, SourceKey: virtualIPKey},
+	).DeletePredicate(ctx,
+		&netclientutils.StemmingFromKey{Origin: VirtualIPOrigin, SourceKey: virtualIPKey},
 	); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error deleting APINet ips: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error deleting APINet IPs: %w", err)
 	}
 
-	log.V(1).Info("Issued delete for any leftover APINet ips")
+	log.V(1).Info("Issued delete for any leftover APINet IP")
+
+	log.V(1).Info("Deleted gone")
 	return ctrl.Result{}, nil
 }
 
@@ -156,7 +168,8 @@ func (r *VirtualIPReconciler) reconcile(ctx context.Context, log logr.Logger, vi
 
 func (r *VirtualIPReconciler) applyIP(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (netip.Addr, error) {
 	apiNetIPApplyCfg := apinetv1alpha1ac.IP(string(virtualIP.UID), r.APINetNamespace).
-		WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), virtualIP)).
+		WithAnnotations(VirtualIPOrigin.Annotations(virtualIP)).
+		WithLabels(VirtualIPOrigin.Labels(virtualIP)).
 		WithSpec(apinetv1alpha1ac.IPSpec().
 			WithType(apinetv1alpha1.IPTypePublic).
 			WithIPFamily(virtualIP.Spec.IPFamily),
@@ -207,7 +220,7 @@ func (r *VirtualIPReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache cac
 			source.Kind[client.Object](
 				apiNetCache,
 				&apinetv1alpha1.IP{},
-				handler.EnqueueRequestForSource(r.Scheme(), mgr.GetRESTMapper(), &networkingv1alpha1.VirtualIP{}),
+				utilhandlers.EnqueueRequestByOrigin(VirtualIPOrigin),
 			),
 		).
 		Complete(r)

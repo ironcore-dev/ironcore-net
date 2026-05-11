@@ -9,10 +9,11 @@ import (
 	"slices"
 
 	"github.com/go-logr/logr"
+	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	utilhandlers "github.com/ironcore-dev/ironcore-net/utils/handler"
+	"github.com/ironcore-dev/ironcore-net/utils/origin"
 
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
-	"github.com/ironcore-dev/ironcore-net/apinetlet/handler"
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	ironcorenet "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
 
@@ -34,6 +35,13 @@ import (
 
 const (
 	natGatewayFinalizer = "apinet.ironcore.dev/natgateway"
+)
+
+var (
+	NATGatewayOrigin = &origin.Origin{
+		Name:       "apinetlet.ironcore.dev/natgateway",
+		Namespaced: true,
+	}
 )
 
 type NATGatewayReconciler struct {
@@ -67,13 +75,17 @@ func (r *NATGatewayReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 func (r *NATGatewayReconciler) deleteGone(ctx context.Context, log logr.Logger, key client.ObjectKey) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
-	log.V(1).Info("Deleting any APINet NAT gateway by key")
-	if err := r.APINetClient.DeleteAllOf(ctx, &apinetv1alpha1.NATGateway{},
+	log.V(1).Info("Listing and deleting descendant APINet NAT gateways")
+	if _, err := netclientutils.ListAnd(r.APINetClient, &apinetv1alpha1.NATGatewayList{},
 		client.InNamespace(r.APINetNamespace),
-		apinetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), key, &networkingv1alpha1.NATGateway{}),
+		&netclientutils.StemmingFromKey{Origin: NATGatewayOrigin, SourceKey: key},
+	).DeletePredicate(ctx,
+		&netclientutils.StemmingFromKey{Origin: NATGatewayOrigin, SourceKey: key},
 	); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error deleting apinet nat gateways by key: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error deleting APINet NAT gateways: %w", err)
 	}
+
+	log.V(1).Info("Issued delete for any left over descendant APINet NAT gateway")
 
 	log.V(1).Info("Deleted gone")
 	return ctrl.Result{}, nil
@@ -144,7 +156,8 @@ func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 	}
 
 	apiNetNATGatewayCfg := apinetv1alpha1ac.NATGateway(string(natGateway.UID), r.APINetNamespace).
-		WithLabels(apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), natGateway)).
+		WithAnnotations(NATGatewayOrigin.Annotations(natGateway)).
+		WithLabels(NATGatewayOrigin.Labels(natGateway)).
 		WithSpec(apinetv1alpha1ac.NATGatewaySpec().
 			WithIPFamily(natGateway.Spec.IPFamily).
 			WithNetworkRef(corev1.LocalObjectReference{Name: networkName}).
@@ -168,7 +181,6 @@ func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: r.APINetNamespace,
 			Name:      string(natGateway.UID),
-			Labels:    apinetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), natGateway),
 		},
 		Spec: apinetv1alpha1.NATGatewayAutoscalerSpec{
 			NATGatewayRef: corev1.LocalObjectReference{Name: apiNetNATGateway.Name},
@@ -176,6 +188,7 @@ func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 			MaxPublicIPs:  generic.Pointer[int32](10), // TODO: Configure depending on ironcore NAT gateway
 		},
 	}
+	NATGatewayOrigin.SetOrigin(natGateway, apiNetNATGatewayAutoscaler)
 	_ = ctrl.SetControllerReference(apiNetNATGateway, apiNetNATGatewayAutoscaler, r.Scheme())
 	if err := r.APINetClient.Patch(ctx, apiNetNATGatewayAutoscaler, client.Apply, client.ForceOwnership, fieldOwner); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying APINet NAT gateway autoscaler: %w", err)
@@ -218,14 +231,14 @@ func (r *NATGatewayReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache ca
 			source.Kind[client.Object](
 				apiNetCache,
 				&apinetv1alpha1.NATGateway{},
-				handler.EnqueueRequestForSource(mgr.GetScheme(), mgr.GetRESTMapper(), &networkingv1alpha1.NATGateway{}),
+				utilhandlers.EnqueueRequestByOrigin(NATGatewayOrigin),
 			),
 		).
 		WatchesRawSource(
 			source.Kind[client.Object](
 				apiNetCache,
 				&apinetv1alpha1.NATGatewayAutoscaler{},
-				handler.EnqueueRequestForSource(mgr.GetScheme(), mgr.GetRESTMapper(), &networkingv1alpha1.NATGateway{}),
+				utilhandlers.EnqueueRequestByOrigin(NATGatewayOrigin),
 			),
 		).
 		Complete(r)

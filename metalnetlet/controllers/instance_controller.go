@@ -14,8 +14,9 @@ import (
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
-	metalnetletclient "github.com/ironcore-dev/ironcore-net/metalnetlet/client"
-	utilhandler "github.com/ironcore-dev/ironcore-net/metalnetlet/handler"
+	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	"github.com/ironcore-dev/ironcore-net/utils/handler"
+	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	"github.com/ironcore-dev/ironcore/utils/generic"
 	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
 	"golang.org/x/exp/slices"
@@ -32,6 +33,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+)
+
+var (
+	InstanceOrigin = &origin.Origin{
+		Name:       "metalnetlet.ironcore.dev/instance",
+		Namespaced: true,
+	}
 )
 
 type InstanceReconciler struct {
@@ -60,11 +68,15 @@ func (r *InstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		}
 
 		log.V(1).Info("Deleting any leftover metalnet load balancers")
-		anyExists, err := r.deleteMetalnetLoadBalancersByLoadBalancerInstanceKeyAndAnyExists(ctx, req.NamespacedName)
+		n, err := netclientutils.ListAnd(r.MetalnetClient,
+			&metalnetv1alpha1.LoadBalancerList{},
+			client.InNamespace(r.MetalnetNamespace),
+			&netclientutils.StemmingFromKey{Origin: InstanceOrigin, SourceKey: req.NamespacedName},
+		).DeletePredicate(ctx, &netclientutils.StemmingFromKey{Origin: InstanceOrigin, SourceKey: req.NamespacedName})
 		if err != nil {
 			return ctrl.Result{}, err
 		}
-		if anyExists {
+		if n > 0 {
 			log.V(1).Info("Some metalnet load balancers still exist, requeueing")
 			return ctrl.Result{Requeue: true}, nil
 		}
@@ -82,17 +94,17 @@ func (r *InstanceReconciler) reconcileExists(ctx context.Context, log logr.Logge
 	return r.reconcile(ctx, log, loadBalancerInstance)
 }
 
-func (r *InstanceReconciler) deleteMetalnetLoadBalancersByLoadBalancerInstanceKeyAndAnyExists(ctx context.Context, key client.ObjectKey) (bool, error) {
-	return metalnetletclient.DeleteAllOfAndAnyExists(ctx, r.MetalnetClient, &metalnetv1alpha1.LoadBalancer{},
-		client.InNamespace(r.MetalnetNamespace),
-		metalnetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), key, &v1alpha1.Instance{}),
-	)
-}
-
 func (r *InstanceReconciler) deleteMetalnetLoadBalancersByLoadBalancerInstanceAndAnyExists(ctx context.Context, inst *v1alpha1.Instance) (bool, error) {
-	return metalnetletclient.DeleteAllOfAndAnyExists(ctx, r.MetalnetClient, &metalnetv1alpha1.LoadBalancer{},
+	if err := r.MetalnetClient.DeleteAllOf(ctx, &metalnetv1alpha1.LoadBalancer{},
 		client.InNamespace(r.MetalnetNamespace),
-		metalnetletclient.MatchingSourceLabels(r.Scheme(), r.RESTMapper(), inst),
+		&netclientutils.StemmingFrom{Origin: InstanceOrigin, Source: inst},
+	); err != nil {
+		return false, err
+	}
+
+	return netclientutils.AnyExists(ctx, r.MetalnetClient, &metalnetv1alpha1.LoadBalancer{},
+		client.InNamespace(r.MetalnetNamespace),
+		&netclientutils.StemmingFrom{Origin: InstanceOrigin, Source: inst},
 	)
 }
 
@@ -128,7 +140,7 @@ func (r *InstanceReconciler) getMetalnetLoadBalancersForLoadBalancerInstance(
 	metalnetLoadBalancerList := &metalnetv1alpha1.LoadBalancerList{}
 	if err := r.MetalnetClient.List(ctx, metalnetLoadBalancerList,
 		client.InNamespace(r.MetalnetNamespace),
-		metalnetletclient.MatchingSourceLabels(r.Scheme(), r.RESTMapper(), inst),
+		&netclientutils.StemmingFrom{Origin: InstanceOrigin, Source: inst},
 	); err != nil {
 		return nil, fmt.Errorf("error listing metalnet load balancer instances: %w", err)
 	}
@@ -232,10 +244,10 @@ func (r *InstanceReconciler) manageMetalnetLoadBalancers(
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: r.MetalnetNamespace,
 				Name:      metalnetLoadBalancerName,
-				Labels:    metalnetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), inst),
 			},
 			Spec: *metalnetLoadBalancerSpec,
 		}
+		InstanceOrigin.SetOrigin(inst, metalnetLoadBalancer)
 		createMetalnetLoadBalancer := metalnetLoadBalancer.DeepCopy()
 		if err := r.MetalnetClient.Create(ctx, metalnetLoadBalancer); err != nil {
 			if !apierrors.IsAlreadyExists(err) {
@@ -377,7 +389,7 @@ func (r *InstanceReconciler) SetupWithManager(mgr ctrl.Manager, metalnetCache ca
 			source.Kind[client.Object](
 				metalnetCache,
 				&metalnetv1alpha1.LoadBalancer{},
-				utilhandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &v1alpha1.Instance{}),
+				handler.EnqueueRequestByOrigin(InstanceOrigin),
 			),
 		).
 		Complete(r)

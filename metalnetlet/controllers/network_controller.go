@@ -13,9 +13,10 @@ import (
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/equality"
-	metalnetletclient "github.com/ironcore-dev/ironcore-net/metalnetlet/client"
-	metalnetlethandler "github.com/ironcore-dev/ironcore-net/metalnetlet/handler"
 	"github.com/ironcore-dev/ironcore-net/networkid"
+	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	utilhandler "github.com/ironcore-dev/ironcore-net/utils/handler"
+	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -24,6 +25,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+)
+
+var (
+	NetworkOrigin = &origin.Origin{
+		Name:       "metalnetlet.ironcore.dev/network",
+		Namespaced: true,
+	}
 )
 
 type NetworkReconciler struct {
@@ -61,11 +69,11 @@ func (r *NetworkReconciler) deleteGone(ctx context.Context, log logr.Logger, net
 	log.V(1).Info("Delete gone")
 
 	log.V(1).Info("Deleting all metalnet networks that match the network label")
-	if err := r.MetalnetClient.DeleteAllOf(ctx, &metalnetv1alpha1.Network{},
+	if _, err := netclientutils.ListAnd(r.MetalnetClient, &metalnetv1alpha1.NetworkList{},
 		client.InNamespace(r.MetalnetNamespace),
-		metalnetletclient.MatchingSourceKeyLabels(r.Scheme(), r.RESTMapper(), networkKey, &apinetv1alpha1.Network{}),
-	); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error deleting metalnet networks matching network label: %w", err)
+		&netclientutils.StemmingFromKey{Origin: NetworkOrigin, SourceKey: networkKey},
+	).DeletePredicate(ctx, &netclientutils.StemmingFromKey{Origin: NetworkOrigin, SourceKey: networkKey}); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error deleting metalnet networks stemming from network key: %w", err)
 	}
 
 	log.V(1).Info("Deleted gone")
@@ -170,12 +178,12 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: r.MetalnetNamespace,
 					Name:      string(network.UID),
-					Labels:    metalnetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), network),
 				},
 				Spec: metalnetv1alpha1.NetworkSpec{
 					ID: vni,
 				},
 			}
+			NetworkOrigin.SetOrigin(network, metalnetNetwork)
 		}
 	} else {
 		isNetworkExist = true
@@ -256,7 +264,7 @@ func (r *NetworkReconciler) SetupWithManager(mgr ctrl.Manager, metalnetCache cac
 			source.Kind[client.Object](
 				metalnetCache,
 				&metalnetv1alpha1.Network{},
-				metalnetlethandler.EnqueueRequestForSource(r.Scheme(), r.RESTMapper(), &apinetv1alpha1.Network{}),
+				utilhandler.EnqueueRequestByOrigin(NetworkOrigin),
 			),
 		).
 		Complete(r)
