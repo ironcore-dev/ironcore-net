@@ -134,7 +134,7 @@ func (r *MetalnetNodeReconciler) reconcile(ctx context.Context, log logr.Logger,
 			r.NodeLabels,
 		))
 
-	if err := r.Apply(ctx, nodeApplyCfg, PartitionFieldOwner(r.PartitionName)); err != nil {
+	if err := r.Apply(ctx, nodeApplyCfg, PartitionFieldOwner(r.PartitionName), client.ForceOwnership); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying node: %w", err)
 	}
 

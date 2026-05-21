@@ -20,7 +20,7 @@ type NATGatewaySpec struct {
 	// +optional
 	// +patchMergeKey=name
 	// +patchStrategy=merge,retainKeys
-	IPs []NATGatewayIP
+	IPs []NATGatewayIP `patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
 
 	// PortsPerNetworkInterface specifies how many ports to allocate per network interface.
 	PortsPerNetworkInterface int32

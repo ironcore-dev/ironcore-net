@@ -4,6 +4,7 @@
 package controllers
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
@@ -325,8 +326,9 @@ func (r *NATGatewayReconciler) applyNATTable(
 			WithAPIVersion(v1alpha1.SchemeGroupVersion.String()).
 			WithKind("NATGateway").
 			WithName(natGateway.Name).
-			WithUID(natGateway.UID))
-
+			WithUID(natGateway.UID).
+			WithController(true).
+			WithBlockOwnerDeletion(true))
 	var natTableIPs []*corev1alpha1apply.NATIPApplyConfiguration
 	for ip, allocs := range natTableData {
 		sectionConfs := make([]*corev1alpha1apply.NATIPSectionApplyConfiguration, 0, len(allocs))
@@ -347,16 +349,15 @@ func (r *NATGatewayReconciler) applyNATTable(
 		}
 
 		slices.SortFunc(sectionConfs, func(a, b *corev1alpha1apply.NATIPSectionApplyConfiguration) int {
-			if a.Port == nil || b.Port == nil {
+			switch {
+			case a.Port == nil && b.Port == nil:
 				return 0
-			}
-			if *a.Port < *b.Port {
+			case a.Port == nil:
+				return 1
+			case b.Port == nil:
 				return -1
 			}
-			if *a.Port > *b.Port {
-				return 1
-			}
-			return 0
+			return cmp.Compare(*a.Port, *b.Port)
 		})
 
 		natIPConf := corev1alpha1apply.NATIP().WithIP(ip)

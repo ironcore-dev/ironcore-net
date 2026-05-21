@@ -64,6 +64,7 @@ kube::codegen::gen_openapi \
     --output-model-name-file "zz_generated.model_name.go" \
     --boilerplate "${PROJECT_ROOT}/hack/boilerplate.go.txt" \
     --extra-pkgs "k8s.io/api/core/v1" \
+    --extra-pkgs "${IRONCORE_NET_ROOT}/apimachinery/api/net" \
     "${PROJECT_ROOT}/api"
 
 echo "Generating ${blue}client, lister, informer and applyconfiguration${normal}"
@@ -73,7 +74,6 @@ for GV in ${ALL_VERSION_GROUPS}; do
   IFS=: read -r G V <<<"${GV}"
   applyconfigurationgen_external_apis+=("${IRONCORE_NET_ROOT}/api/${G}/${V}:${IRONCORE_NET_ROOT}/client-go/applyconfigurations/${G}/${V}")
 done
-applyconfigurationgen_external_apis+=("${IRONCORE_NET_ROOT}/apimachinery/api/net:${IRONCORE_NET_ROOT}/client-go/applyconfigurations/apimachinery/api/net")
 applyconfigurationgen_external_apis_csv=$(IFS=,; echo "${applyconfigurationgen_external_apis[*]}")
 
 # Do not rely on process substitution / GNU bash

@@ -34,7 +34,7 @@ type NetworkInterfaceSpec struct {
 	// +optional
 	// +patchMergeKey=name
 	// +patchStrategy=merge,retainKeys
-	PublicIPs []NetworkInterfacePublicIP
+	PublicIPs []NetworkInterfacePublicIP `patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
 }
 
 type NetworkInterfaceNAT struct {

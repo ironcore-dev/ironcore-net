@@ -28,6 +28,7 @@ import (
 	metav1apply "k8s.io/client-go/applyconfigurations/meta/v1"
 	"k8s.io/client-go/util/workqueue"
 	klog "k8s.io/klog/v2"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
@@ -421,7 +422,7 @@ func (r *NetworkPolicyReconciler) applyNetworkPolicyRule(ctx context.Context, ne
 		WithNetworkRef(apinetv1alpha1ac.LocalUIDReference().
 			WithName(network.Name).
 			WithUID(network.UID)).
-		WithPriority(*apiNetNetworkPolicy.Spec.Priority).
+		WithPriority(ptr.Deref(apiNetNetworkPolicy.Spec.Priority, 1000)).
 		WithTargets(targetCfgs...).
 		WithIngressRules(ingressRuleCfgs...).
 		WithEgressRules(egressRuleCfgs...).
@@ -598,8 +599,8 @@ func buildNetworkPolicyPortConfigs(ports []apinetv1alpha1.NetworkPolicyPort) []*
 		if port.Protocol != nil {
 			cfg = cfg.WithProtocol(*port.Protocol)
 		}
-		if port.Port != nil {
-			cfg = cfg.WithPort(*port.Port)
+		if port.Port != 0 {
+			cfg = cfg.WithPort(port.Port)
 		}
 		if port.EndPort != nil {
 			cfg = cfg.WithEndPort(*port.EndPort)

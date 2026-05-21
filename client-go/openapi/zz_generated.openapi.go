@@ -10,6 +10,7 @@ package openapi
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	net "github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	v1 "k8s.io/api/core/v1"
 	resource "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -110,6 +111,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		v1alpha1.TAPDevice{}.OpenAPIModelName():                   schema_ironcore_net_api_core_v1alpha1_TAPDevice(ref),
 		v1alpha1.TargetNetworkInterface{}.OpenAPIModelName():      schema_ironcore_net_api_core_v1alpha1_TargetNetworkInterface(ref),
 		v1alpha1.TopologySpreadConstraint{}.OpenAPIModelName():    schema_ironcore_net_api_core_v1alpha1_TopologySpreadConstraint(ref),
+		net.IP{}.OpenAPIModelName():                               schema_ironcore_net_apimachinery_api_net_IP(ref),
+		net.IPPrefix{}.OpenAPIModelName():                         schema_ironcore_net_apimachinery_api_net_IPPrefix(ref),
 		v1.AWSElasticBlockStoreVolumeSource{}.OpenAPIModelName():  schema_k8sio_api_core_v1_AWSElasticBlockStoreVolumeSource(ref),
 		v1.Affinity{}.OpenAPIModelName():                          schema_k8sio_api_core_v1_Affinity(ref),
 		v1.AppArmorProfile{}.OpenAPIModelName():                   schema_k8sio_api_core_v1_AppArmorProfile(ref),
@@ -757,7 +760,7 @@ func schema_ironcore_net_api_core_v1alpha1_IPAddressSpec(ref common.ReferenceCal
 				Properties: map[string]spec.Schema{
 					"ip": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
+							Ref: ref(net.IP{}.OpenAPIModelName()),
 						},
 					},
 					"claimRef": {
@@ -770,7 +773,7 @@ func schema_ironcore_net_api_core_v1alpha1_IPAddressSpec(ref common.ReferenceCal
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.IPAddressClaimRef{}.OpenAPIModelName(), "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"},
+			v1alpha1.IPAddressClaimRef{}.OpenAPIModelName(), net.IP{}.OpenAPIModelName()},
 	}
 }
 
@@ -784,7 +787,7 @@ func schema_ironcore_net_api_core_v1alpha1_IPBlock(ref common.ReferenceCallback)
 					"cidr": {
 						SchemaProps: spec.SchemaProps{
 							Description: "CIDR is a string representing the ip block.",
-							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"),
+							Ref:         ref(net.IPPrefix{}.OpenAPIModelName()),
 						},
 					},
 					"except": {
@@ -794,7 +797,7 @@ func schema_ironcore_net_api_core_v1alpha1_IPBlock(ref common.ReferenceCallback)
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"),
+										Ref: ref(net.IPPrefix{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -805,7 +808,7 @@ func schema_ironcore_net_api_core_v1alpha1_IPBlock(ref common.ReferenceCallback)
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"},
+			net.IPPrefix{}.OpenAPIModelName()},
 	}
 }
 
@@ -917,7 +920,7 @@ func schema_ironcore_net_api_core_v1alpha1_IPSpec(ref common.ReferenceCallback) 
 					},
 					"ip": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
+							Ref: ref(net.IP{}.OpenAPIModelName()),
 						},
 					},
 					"claimRef": {
@@ -930,7 +933,7 @@ func schema_ironcore_net_api_core_v1alpha1_IPSpec(ref common.ReferenceCallback) 
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.IPClaimRef{}.OpenAPIModelName(), "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"},
+			v1alpha1.IPClaimRef{}.OpenAPIModelName(), net.IP{}.OpenAPIModelName()},
 	}
 }
 
@@ -1134,7 +1137,7 @@ func schema_ironcore_net_api_core_v1alpha1_InstanceSpec(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
+										Ref: ref(net.IP{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1185,7 +1188,7 @@ func schema_ironcore_net_api_core_v1alpha1_InstanceSpec(ref common.ReferenceCall
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.Affinity{}.OpenAPIModelName(), v1alpha1.LoadBalancerPort{}.OpenAPIModelName(), v1alpha1.TopologySpreadConstraint{}.OpenAPIModelName(), "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP", v1.LocalObjectReference{}.OpenAPIModelName()},
+			v1alpha1.Affinity{}.OpenAPIModelName(), v1alpha1.LoadBalancerPort{}.OpenAPIModelName(), v1alpha1.TopologySpreadConstraint{}.OpenAPIModelName(), net.IP{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -1201,7 +1204,7 @@ func schema_ironcore_net_api_core_v1alpha1_InstanceStatus(ref common.ReferenceCa
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
+										Ref: ref(net.IP{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1217,7 +1220,7 @@ func schema_ironcore_net_api_core_v1alpha1_InstanceStatus(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"},
+			net.IP{}.OpenAPIModelName()},
 	}
 }
 
@@ -1304,7 +1307,7 @@ func schema_ironcore_net_api_core_v1alpha1_LoadBalancerDestination(ref common.Re
 					"ip": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IP is the target IP.",
-							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
+							Ref:         ref(net.IP{}.OpenAPIModelName()),
 						},
 					},
 					"targetRef": {
@@ -1318,7 +1321,7 @@ func schema_ironcore_net_api_core_v1alpha1_LoadBalancerDestination(ref common.Re
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.LoadBalancerTargetRef{}.OpenAPIModelName(), "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"},
+			v1alpha1.LoadBalancerTargetRef{}.OpenAPIModelName(), net.IP{}.OpenAPIModelName()},
 	}
 }
 
@@ -1347,7 +1350,7 @@ func schema_ironcore_net_api_core_v1alpha1_LoadBalancerIP(ref common.ReferenceCa
 					"ip": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IP specifies a specific IP to allocate. If empty, a random IP will be allocated if possible.",
-							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
+							Ref:         ref(net.IP{}.OpenAPIModelName()),
 						},
 					},
 				},
@@ -1355,7 +1358,7 @@ func schema_ironcore_net_api_core_v1alpha1_LoadBalancerIP(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"},
+			net.IP{}.OpenAPIModelName()},
 	}
 }
 
@@ -1917,7 +1920,7 @@ func schema_ironcore_net_api_core_v1alpha1_NATGatewayIP(ref common.ReferenceCall
 					"ip": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IP specifies a specific IP to allocate. If empty, a random IP will be allocated if possible.",
-							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
+							Ref:         ref(net.IP{}.OpenAPIModelName()),
 						},
 					},
 				},
@@ -1925,7 +1928,7 @@ func schema_ironcore_net_api_core_v1alpha1_NATGatewayIP(ref common.ReferenceCall
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"},
+			net.IP{}.OpenAPIModelName()},
 	}
 }
 
@@ -2072,7 +2075,7 @@ func schema_ironcore_net_api_core_v1alpha1_NATIP(ref common.ReferenceCallback) c
 					"ip": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IP is the IP to NAT.",
-							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
+							Ref:         ref(net.IP{}.OpenAPIModelName()),
 						},
 					},
 					"sections": {
@@ -2094,7 +2097,7 @@ func schema_ironcore_net_api_core_v1alpha1_NATIP(ref common.ReferenceCallback) c
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.NATIPSection{}.OpenAPIModelName(), "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"},
+			v1alpha1.NATIPSection{}.OpenAPIModelName(), net.IP{}.OpenAPIModelName()},
 	}
 }
 
@@ -2107,7 +2110,7 @@ func schema_ironcore_net_api_core_v1alpha1_NATIPSection(ref common.ReferenceCall
 					"ip": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IP is the source IP.",
-							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
+							Ref:         ref(net.IP{}.OpenAPIModelName()),
 						},
 					},
 					"port": {
@@ -2137,7 +2140,7 @@ func schema_ironcore_net_api_core_v1alpha1_NATIPSection(ref common.ReferenceCall
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.NATTableIPTargetRef{}.OpenAPIModelName(), "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"},
+			v1alpha1.NATTableIPTargetRef{}.OpenAPIModelName(), net.IP{}.OpenAPIModelName()},
 	}
 }
 
@@ -2658,7 +2661,7 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkInterfacePublicIP(ref common.R
 					"ip": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IP specifies a specific IP to allocate. If empty, a random ephemeral IP will be allocated.",
-							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
+							Ref:         ref(net.IP{}.OpenAPIModelName()),
 						},
 					},
 				},
@@ -2666,7 +2669,7 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkInterfacePublicIP(ref common.R
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"},
+			net.IP{}.OpenAPIModelName()},
 	}
 }
 
@@ -2698,7 +2701,7 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkInterfaceSpec(ref common.Refer
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
+										Ref: ref(net.IP{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -2711,7 +2714,7 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkInterfaceSpec(ref common.Refer
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"),
+										Ref: ref(net.IPPrefix{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -2763,7 +2766,7 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkInterfaceSpec(ref common.Refer
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.NetworkInterfaceNAT{}.OpenAPIModelName(), v1alpha1.NetworkInterfacePublicIP{}.OpenAPIModelName(), "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP", "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix", v1.LocalObjectReference{}.OpenAPIModelName()},
+			v1alpha1.NetworkInterfaceNAT{}.OpenAPIModelName(), v1alpha1.NetworkInterfacePublicIP{}.OpenAPIModelName(), net.IP{}.OpenAPIModelName(), net.IPPrefix{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -2800,7 +2803,7 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkInterfaceStatus(ref common.Ref
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"),
+										Ref: ref(net.IPPrefix{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -2813,7 +2816,7 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkInterfaceStatus(ref common.Ref
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
+										Ref: ref(net.IP{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -2826,7 +2829,7 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkInterfaceStatus(ref common.Ref
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
+										Ref: ref(net.IP{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -2836,7 +2839,7 @@ func schema_ironcore_net_api_core_v1alpha1_NetworkInterfaceStatus(ref common.Ref
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.PCIAddress{}.OpenAPIModelName(), v1alpha1.TAPDevice{}.OpenAPIModelName(), "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP", "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"},
+			v1alpha1.PCIAddress{}.OpenAPIModelName(), v1alpha1.TAPDevice{}.OpenAPIModelName(), net.IP{}.OpenAPIModelName(), net.IPPrefix{}.OpenAPIModelName()},
 	}
 }
 
@@ -3763,14 +3766,14 @@ func schema_ironcore_net_api_core_v1alpha1_ObjectIP(ref common.ReferenceCallback
 					"prefix": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Prefix is the prefix of the IP.",
-							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"),
+							Ref:         ref(net.IPPrefix{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"},
+			net.IPPrefix{}.OpenAPIModelName()},
 	}
 }
 
@@ -3888,7 +3891,7 @@ func schema_ironcore_net_api_core_v1alpha1_PeeringPrefix(ref common.ReferenceCal
 					"prefix": {
 						SchemaProps: spec.SchemaProps{
 							Description: "CIDR to be exposed to the peered network",
-							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"),
+							Ref:         ref(net.IPPrefix{}.OpenAPIModelName()),
 						},
 					},
 				},
@@ -3896,7 +3899,7 @@ func schema_ironcore_net_api_core_v1alpha1_PeeringPrefix(ref common.ReferenceCal
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IPPrefix"},
+			net.IPPrefix{}.OpenAPIModelName()},
 	}
 }
 
@@ -3986,7 +3989,7 @@ func schema_ironcore_net_api_core_v1alpha1_TargetNetworkInterface(ref common.Ref
 					"ip": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IP is the IP address of the target network interface.",
-							Ref:         ref("github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"),
+							Ref:         ref(net.IP{}.OpenAPIModelName()),
 						},
 					},
 					"targetRef": {
@@ -4000,7 +4003,7 @@ func schema_ironcore_net_api_core_v1alpha1_TargetNetworkInterface(ref common.Ref
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.LocalUIDReference{}.OpenAPIModelName(), "github.com/ironcore-dev/ironcore-net/apimachinery/api/net.IP"},
+			v1alpha1.LocalUIDReference{}.OpenAPIModelName(), net.IP{}.OpenAPIModelName()},
 	}
 }
 
@@ -4047,6 +4050,30 @@ func schema_ironcore_net_api_core_v1alpha1_TopologySpreadConstraint(ref common.R
 		},
 		Dependencies: []string{
 			metav1.LabelSelector{}.OpenAPIModelName()},
+	}
+}
+
+func schema_ironcore_net_apimachinery_api_net_IP(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "IP is an IP address.",
+				Type:        net.IP{}.OpenAPISchemaType(),
+				Format:      net.IP{}.OpenAPISchemaFormat(),
+			},
+		},
+	}
+}
+
+func schema_ironcore_net_apimachinery_api_net_IPPrefix(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "IPPrefix represents a network prefix.",
+				Type:        net.IPPrefix{}.OpenAPISchemaType(),
+				Format:      net.IPPrefix{}.OpenAPISchemaFormat(),
+			},
+		},
 	}
 }
 

@@ -77,7 +77,7 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 }
 
 func (r *LoadBalancerReconciler) applyDaemonSetForLoadBalancer(ctx context.Context, loadBalancer *v1alpha1.LoadBalancer) error {
-	daemonsetApplyconfig := corev1alpha1apply.DaemonSet(loadBalancer.Namespace, v1alpha1.LoadBalancerDaemonSetName(loadBalancer.Name)).
+	daemonsetApplyconfig := corev1alpha1apply.DaemonSet(v1alpha1.LoadBalancerDaemonSetName(loadBalancer.Name), loadBalancer.Namespace).
 		WithOwnerReferences(v1.OwnerReference().
 			WithAPIVersion(v1alpha1.SchemeGroupVersion.String()).
 			WithKind("LoadBalancer").

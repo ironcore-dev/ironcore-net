@@ -22,6 +22,7 @@ import (
 	"github.com/ironcore-dev/ironcore/utils/generic"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
+	metalnetv1alpha1ac "github.com/ironcore-dev/metalnet/api/v1alpha1/applyconfiguration/api/v1alpha1"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -240,11 +241,11 @@ func extractFirewallRulesFromRule(rule v1alpha1.Rule, direction metalnetv1alpha1
 			// TODO: no support for SCTP protocol in metalnetlet and metalnetlet FirewallRuleProtocolTypeICMP is not defined in ironcore
 		}
 
-		if port.Port != nil {
+		if port.Port != 0 {
 			if direction == metalnetv1alpha1.FirewallRuleDirectionIngress {
-				baseFirewallRule.ProtocolMatch.PortRange = &metalnetv1alpha1.PortMatch{SrcPort: port.Port}
+				baseFirewallRule.ProtocolMatch.PortRange = &metalnetv1alpha1.PortMatch{SrcPort: &port.Port}
 			} else {
-				baseFirewallRule.ProtocolMatch.PortRange = &metalnetv1alpha1.PortMatch{DstPort: port.Port}
+				baseFirewallRule.ProtocolMatch.PortRange = &metalnetv1alpha1.PortMatch{DstPort: &port.Port}
 			}
 			if port.EndPort != nil {
 				if direction == metalnetv1alpha1.FirewallRuleDirectionIngress {
@@ -301,6 +302,58 @@ func extractFirewallRulesFromRule(rule v1alpha1.Rule, direction metalnetv1alpha1
 	}
 
 	return firewallRules
+}
+
+func convertFirewallRulesToApply(in []metalnetv1alpha1.FirewallRule) []*metalnetv1alpha1ac.FirewallRuleApplyConfiguration {
+	var out []*metalnetv1alpha1ac.FirewallRuleApplyConfiguration
+
+	for _, rule := range in {
+		cfg := metalnetv1alpha1ac.FirewallRule().
+			WithFirewallRuleID(rule.FirewallRuleID).
+			WithDirection(rule.Direction).
+			WithAction(rule.Action).
+			WithIpFamily(rule.IpFamily)
+
+		if rule.Priority != nil {
+			cfg = cfg.WithPriority(*rule.Priority)
+		}
+
+		if rule.ProtocolMatch != nil {
+			protocolMatchCfg := &metalnetv1alpha1ac.ProtocolMatchApplyConfiguration{}
+			if rule.ProtocolMatch.ProtocolType != nil {
+				protocolMatchCfg = protocolMatchCfg.WithProtocolType(*rule.ProtocolMatch.ProtocolType)
+			}
+			if rule.ProtocolMatch.PortRange != nil {
+				portMatchCfg := &metalnetv1alpha1ac.PortMatchApplyConfiguration{}
+				if rule.ProtocolMatch.PortRange.SrcPort != nil {
+					portMatchCfg = portMatchCfg.WithSrcPort(*rule.ProtocolMatch.PortRange.SrcPort)
+				}
+				if rule.ProtocolMatch.PortRange.DstPort != nil {
+					portMatchCfg = portMatchCfg.WithDstPort(*rule.ProtocolMatch.PortRange.DstPort)
+				}
+				if rule.ProtocolMatch.PortRange.EndSrcPort != 0 {
+					portMatchCfg = portMatchCfg.WithEndSrcPort(rule.ProtocolMatch.PortRange.EndSrcPort)
+				}
+				if rule.ProtocolMatch.PortRange.EndDstPort != 0 {
+					portMatchCfg = portMatchCfg.WithEndDstPort(rule.ProtocolMatch.PortRange.EndDstPort)
+				}
+				protocolMatchCfg = protocolMatchCfg.WithPortRange(portMatchCfg)
+			}
+			cfg = cfg.WithProtocolMatch(protocolMatchCfg)
+		}
+
+		if rule.SourcePrefix != nil {
+			cfg = cfg.WithSourcePrefix(*rule.SourcePrefix)
+		}
+
+		if rule.DestinationPrefix != nil {
+			cfg = cfg.WithDestinationPrefix(*rule.DestinationPrefix)
+		}
+
+		out = append(out, cfg)
+	}
+
+	return out
 }
 
 func (r *NetworkInterfaceReconciler) getNATDetailsForNetworkInterface(
@@ -506,33 +559,49 @@ func (r *NetworkInterfaceReconciler) applyMetalnetNic(ctx context.Context, log l
 		return nil, false, fmt.Errorf("error getting NAT IPs: %w", err)
 	}
 
-	metalnetNic := &metalnetv1alpha1.NetworkInterface{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: metalnetv1alpha1.GroupVersion.String(),
-			Kind:       "NetworkInterface",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: r.MetalnetNamespace,
-			Name:      string(nic.UID),
-			Labels:    metalnetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), nic),
-		},
-		Spec: metalnetv1alpha1.NetworkInterfaceSpec{
-			NetworkRef:          corev1.LocalObjectReference{Name: metalnetNetworkName},
-			IPFamilies:          ipsIPFamilies(nic.Spec.IPs),
-			IPs:                 ipsToMetalnetIPs(nic.Spec.IPs),
-			VirtualIP:           workaroundMetalnetNoIPv6VirtualIPSupportIPsToIP(ipsToMetalnetIPs(publicIPs)),
-			Prefixes:            ipPrefixesToMetalnetPrefixes(nic.Spec.Prefixes),
-			LoadBalancerTargets: ipsToMetalnetIPPrefixes(targets),
-			NAT:                 workaroundMetalnetNoIPv6NATDetailsToNATDetailsPointer(natIPs),
-			NodeName:            &metalnetNodeName,
-			FirewallRules:       npRules,
-			Hostname:            &nic.Spec.Hostname,
-		},
+	metalnetNicName := string(nic.UID)
+
+	metalnetNicApplyCfg := metalnetv1alpha1ac.NetworkInterface(metalnetNicName, r.MetalnetNamespace).
+		WithKind("NetworkInterface").
+		WithAPIVersion(metalnetv1alpha1.GroupVersion.String()).
+		WithLabels(metalnetletclient.SourceLabels(r.Scheme(), r.RESTMapper(), nic))
+
+	specApplyCfg := metalnetv1alpha1ac.NetworkInterfaceSpec().
+		WithNetworkRef(corev1.LocalObjectReference{Name: metalnetNetworkName}).
+		WithIPFamilies(ipsIPFamilies(nic.Spec.IPs)...).
+		WithIPs(ipsToMetalnetIPs(nic.Spec.IPs)...).
+		WithPrefixes(ipPrefixesToMetalnetPrefixes(nic.Spec.Prefixes)...).
+		WithLoadBalancerTargets(ipsToMetalnetIPPrefixes(targets)...).
+		WithNodeName(metalnetNodeName).
+		WithFirewallRules(convertFirewallRulesToApply(npRules)...).
+		WithHostname(nic.Spec.Hostname)
+
+	if virtualIP := workaroundMetalnetNoIPv6VirtualIPSupportIPsToIP(ipsToMetalnetIPs(publicIPs)); virtualIP != nil {
+		specApplyCfg = specApplyCfg.WithVirtualIP(*virtualIP)
 	}
+
+	if nat := workaroundMetalnetNoIPv6NATDetailsToNATDetailsPointer(natIPs); nat != nil {
+		natApplyCfg := metalnetv1alpha1ac.NATDetails().
+			WithIP(*nat.IP).
+			WithPort(nat.Port).
+			WithEndPort(nat.EndPort)
+		specApplyCfg = specApplyCfg.WithNAT(natApplyCfg)
+	}
+
+	metalnetNicApplyCfg = metalnetNicApplyCfg.WithSpec(specApplyCfg)
+
 	log.V(1).Info("Applying metalnet network interface")
-	if err := r.MetalnetClient.Patch(ctx, metalnetNic, client.Apply, MetalnetFieldOwner, client.ForceOwnership); err != nil {
+	if err := r.MetalnetClient.Apply(ctx, metalnetNicApplyCfg, MetalnetFieldOwner, client.ForceOwnership); err != nil {
 		return nil, false, fmt.Errorf("error applying metalnet network interface: %w", err)
 	}
+
+	// Fetch the applied object
+	metalnetNic := &metalnetv1alpha1.NetworkInterface{}
+	key := client.ObjectKey{Namespace: r.MetalnetNamespace, Name: metalnetNicName}
+	if err := r.MetalnetClient.Get(ctx, key, metalnetNic); err != nil {
+		return nil, false, fmt.Errorf("error getting applied metalnet network interface: %w", err)
+	}
+
 	return metalnetNic, true, nil
 }
 
