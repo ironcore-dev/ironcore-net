@@ -77,22 +77,46 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 }
 
 func (r *LoadBalancerReconciler) applyDaemonSetForLoadBalancer(ctx context.Context, loadBalancer *v1alpha1.LoadBalancer) error {
+	// Convert LoadBalancer.Spec.Ports to applyconfiguration LoadBalancerPort objects
+	var lbPortApplyConfigs []*corev1alpha1apply.LoadBalancerPortApplyConfiguration
+	if len(loadBalancer.Spec.Ports) > 0 {
+		lbPortApplyConfigs = make([]*corev1alpha1apply.LoadBalancerPortApplyConfiguration, 0, len(loadBalancer.Spec.Ports))
+		for _, p := range loadBalancer.Spec.Ports {
+			pa := corev1alpha1apply.LoadBalancerPort()
+			if p.Protocol != nil {
+				pa = pa.WithProtocol(*p.Protocol)
+			}
+			pa = pa.WithPort(p.Port)
+			if p.EndPort != nil {
+				pa = pa.WithEndPort(*p.EndPort)
+			}
+			lbPortApplyConfigs = append(lbPortApplyConfigs, pa)
+		}
+	}
+
 	daemonsetApplyconfig := corev1alpha1apply.DaemonSet(v1alpha1.LoadBalancerDaemonSetName(loadBalancer.Name), loadBalancer.Namespace).
 		WithOwnerReferences(v1.OwnerReference().
 			WithAPIVersion(v1alpha1.SchemeGroupVersion.String()).
 			WithKind("LoadBalancer").
 			WithName(loadBalancer.Name).
-			WithUID(loadBalancer.UID)).
+			WithUID(loadBalancer.UID).
+			WithController(true)).
 		WithSpec(corev1alpha1apply.DaemonSetSpec().
 			WithSelector(v1.LabelSelector().
 				WithMatchLabels(loadBalancer.Spec.Selector.MatchLabels)).
 			WithTemplate(corev1alpha1apply.InstanceTemplate().
 				WithLabels(loadBalancer.Spec.Template.ObjectMeta.Labels).
-				WithSpec(corev1alpha1apply.InstanceSpec().
-					WithType(v1alpha1.InstanceTypeLoadBalancer).
-					WithLoadBalancerType(loadBalancer.Spec.Type).
-					WithNetworkRef(corev1.LocalObjectReference{Name: loadBalancer.Spec.NetworkRef.Name}).
-					WithIPs(v1alpha1.GetLoadBalancerIPs(loadBalancer)...))))
+				WithSpec(func() *corev1alpha1apply.InstanceSpecApplyConfiguration {
+					is := corev1alpha1apply.InstanceSpec().
+						WithType(v1alpha1.InstanceTypeLoadBalancer).
+						WithLoadBalancerType(loadBalancer.Spec.Type).
+						WithNetworkRef(corev1.LocalObjectReference{Name: loadBalancer.Spec.NetworkRef.Name}).
+						WithIPs(v1alpha1.GetLoadBalancerIPs(loadBalancer)...)
+					if len(lbPortApplyConfigs) > 0 {
+						is = is.WithLoadBalancerPorts(lbPortApplyConfigs...)
+					}
+					return is
+				}())))
 	err := r.Apply(ctx, daemonsetApplyconfig, fieldOwner, client.ForceOwnership)
 	return err
 }

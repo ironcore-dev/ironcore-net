@@ -1601,7 +1601,7 @@ func schema_ironcore_net_api_core_v1alpha1_LoadBalancerSpec(ref common.Reference
 					},
 					"selector": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Selector selects all Instance that are managed by this daemon set.",
+							Description: "Selector selects all Instances matching the given labels",
 							Ref:         ref(metav1.LabelSelector{}.OpenAPIModelName()),
 						},
 					},

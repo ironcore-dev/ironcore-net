@@ -192,7 +192,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 				WithPeeredPrefixes(convertPeeredPrefixesToApply(peeredPrefixes)...),
 		)
 
-	if err := r.Apply(ctx, metalnetNetworkapplyCfg, MetalnetFieldOwner); err != nil {
+	if err := r.MetalnetClient.Apply(ctx, metalnetNetworkapplyCfg, MetalnetFieldOwner, client.ForceOwnership); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error applying metalnet network: %w", err)
 	}
 

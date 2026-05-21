@@ -23,7 +23,7 @@ type LoadBalancerSpecApplyConfiguration struct {
 	// Ports are the ports the load balancer should allow.
 	// If empty, the load balancer allows all ports.
 	Ports []LoadBalancerPortApplyConfiguration `json:"ports,omitempty"`
-	// Selector selects all Instance that are managed by this daemon set.
+	// Selector selects all Instances matching the given labels
 	Selector *metav1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
 	// Template is the instance template.
 	Template *InstanceTemplateApplyConfiguration `json:"template,omitempty"`
