@@ -13,9 +13,14 @@ import (
 // LoadBalancerIPApplyConfiguration represents a declarative configuration of the LoadBalancerIP type for use
 // with apply.
 type LoadBalancerIPApplyConfiguration struct {
-	Name     *string      `json:"name,omitempty"`
+	// Name is the name of the load balancer IP.
+	Name *string `json:"name,omitempty"`
+	// IPFamily is the IP family of the IP. Has to match IP if specified. If unspecified and IP is specified,
+	// will be defaulted by using the IP family of IP.
+	// If only IPFamily is specified, a random IP of that family will be allocated if possible.
 	IPFamily *v1.IPFamily `json:"ipFamily,omitempty"`
-	IP       *net.IP      `json:"ip,omitempty"`
+	// IP specifies a specific IP to allocate. If empty, a random IP will be allocated if possible.
+	IP *net.IP `json:"ip,omitempty"`
 }
 
 // LoadBalancerIPApplyConfiguration constructs a declarative configuration of the LoadBalancerIP type for use with

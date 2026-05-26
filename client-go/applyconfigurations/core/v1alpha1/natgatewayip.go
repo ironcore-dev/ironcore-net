@@ -12,8 +12,10 @@ import (
 // NATGatewayIPApplyConfiguration represents a declarative configuration of the NATGatewayIP type for use
 // with apply.
 type NATGatewayIPApplyConfiguration struct {
+	// Name is the semantic name of the NAT gateway IP.
 	Name *string `json:"name,omitempty"`
-	IP   *net.IP `json:"ip,omitempty"`
+	// IP specifies a specific IP to allocate. If empty, a random IP will be allocated if possible.
+	IP *net.IP `json:"ip,omitempty"`
 }
 
 // NATGatewayIPApplyConfiguration constructs a declarative configuration of the NATGatewayIP type for use with

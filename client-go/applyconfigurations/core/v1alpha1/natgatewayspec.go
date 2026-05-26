@@ -12,10 +12,14 @@ import (
 // NATGatewaySpecApplyConfiguration represents a declarative configuration of the NATGatewaySpec type for use
 // with apply.
 type NATGatewaySpecApplyConfiguration struct {
-	IPFamily                 *v1.IPFamily                     `json:"ipFamily,omitempty"`
-	NetworkRef               *v1.LocalObjectReference         `json:"networkRef,omitempty"`
-	IPs                      []NATGatewayIPApplyConfiguration `json:"ips,omitempty"`
-	PortsPerNetworkInterface *int32                           `json:"portsPerNetworkInterface,omitempty"`
+	// IPFamily is the IP family of the NAT gateway.
+	IPFamily *v1.IPFamily `json:"ipFamily,omitempty"`
+	// NetworkRef references the network the NAT gateway is part of.
+	NetworkRef *v1.LocalObjectReference `json:"networkRef,omitempty"`
+	// IPs specifies the IPs of the NAT gateway.
+	IPs []NATGatewayIPApplyConfiguration `json:"ips,omitempty"`
+	// PortsPerNetworkInterface specifies how many ports to allocate per network interface.
+	PortsPerNetworkInterface *int32 `json:"portsPerNetworkInterface,omitempty"`
 }
 
 // NATGatewaySpecApplyConfiguration constructs a declarative configuration of the NATGatewaySpec type for use with

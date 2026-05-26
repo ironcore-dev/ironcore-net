@@ -16,6 +16,8 @@ import (
 
 // IPApplyConfiguration represents a declarative configuration of the IP type for use
 // with apply.
+//
+// IP is the schema for the ips API.
 type IPApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -34,29 +36,14 @@ func IP(name, namespace string) *IPApplyConfiguration {
 	return b
 }
 
-// ExtractIP extracts the applied configuration owned by fieldManager from
-// iP. If no managedFields are found in iP for fieldManager, a
-// IPApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractIPFrom extracts the applied configuration owned by fieldManager from
+// iP for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // iP must be a unmodified IP API object that was retrieved from the Kubernetes API.
-// ExtractIP provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractIPFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractIP(iP *corev1alpha1.IP, fieldManager string) (*IPApplyConfiguration, error) {
-	return extractIP(iP, fieldManager, "")
-}
-
-// ExtractIPStatus is the same as ExtractIP except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractIPStatus(iP *corev1alpha1.IP, fieldManager string) (*IPApplyConfiguration, error) {
-	return extractIP(iP, fieldManager, "status")
-}
-
-func extractIP(iP *corev1alpha1.IP, fieldManager string, subresource string) (*IPApplyConfiguration, error) {
+func ExtractIPFrom(iP *corev1alpha1.IP, fieldManager string, subresource string) (*IPApplyConfiguration, error) {
 	b := &IPApplyConfiguration{}
 	err := managedfields.ExtractInto(iP, internal.Parser().Type("com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.IP"), fieldManager, b, subresource)
 	if err != nil {
@@ -69,6 +56,27 @@ func extractIP(iP *corev1alpha1.IP, fieldManager string, subresource string) (*I
 	b.WithAPIVersion("core.apinet.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractIP extracts the applied configuration owned by fieldManager from
+// iP. If no managedFields are found in iP for fieldManager, a
+// IPApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// iP must be a unmodified IP API object that was retrieved from the Kubernetes API.
+// ExtractIP provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractIP(iP *corev1alpha1.IP, fieldManager string) (*IPApplyConfiguration, error) {
+	return ExtractIPFrom(iP, fieldManager, "")
+}
+
+// ExtractIPStatus extracts the applied configuration owned by fieldManager from
+// iP for the status subresource.
+func ExtractIPStatus(iP *corev1alpha1.IP, fieldManager string) (*IPApplyConfiguration, error) {
+	return ExtractIPFrom(iP, fieldManager, "status")
+}
+
 func (b IPApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

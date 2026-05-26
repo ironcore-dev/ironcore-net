@@ -11,8 +11,12 @@ import (
 
 // PeeringPrefixApplyConfiguration represents a declarative configuration of the PeeringPrefix type for use
 // with apply.
+//
+// PeeringPrefix defines prefixes to be exposed to the peered network
 type PeeringPrefixApplyConfiguration struct {
-	Name   *string       `json:"name,omitempty"`
+	// Name is the semantical name of the peering prefixes
+	Name *string `json:"name,omitempty"`
+	// CIDR to be exposed to the peered network
 	Prefix *net.IPPrefix `json:"prefix,omitempty"`
 }
 

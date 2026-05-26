@@ -27,7 +27,7 @@ type LoadBalancerSpec struct {
 	// +optional
 	// +patchMergeKey=name
 	// +patchStrategy=merge,retainKeys
-	IPs []LoadBalancerIP
+	IPs []LoadBalancerIP `patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
 
 	// Ports are the ports the load balancer should allow.
 	// If empty, the load balancer allows all ports.

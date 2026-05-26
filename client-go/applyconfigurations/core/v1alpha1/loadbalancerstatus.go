@@ -8,6 +8,7 @@ package v1alpha1
 // LoadBalancerStatusApplyConfiguration represents a declarative configuration of the LoadBalancerStatus type for use
 // with apply.
 type LoadBalancerStatusApplyConfiguration struct {
+	// CollisionCount is used to construct names for IP addresses for the load balancer.
 	CollisionCount *int32 `json:"collisionCount,omitempty"`
 }
 

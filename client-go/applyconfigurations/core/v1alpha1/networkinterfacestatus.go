@@ -12,13 +12,21 @@ import (
 
 // NetworkInterfaceStatusApplyConfiguration represents a declarative configuration of the NetworkInterfaceStatus type for use
 // with apply.
+//
+// NetworkInterfaceStatus defines the observed state of NetworkInterface.
 type NetworkInterfaceStatusApplyConfiguration struct {
-	State      *corev1alpha1.NetworkInterfaceState `json:"state,omitempty"`
-	PCIAddress *PCIAddressApplyConfiguration       `json:"pciAddress,omitempty"`
-	TAPDevice  *TAPDeviceApplyConfiguration        `json:"tapDevice,omitempty"`
-	Prefixes   []net.IPPrefix                      `json:"prefixes,omitempty"`
-	PublicIPs  []net.IP                            `json:"publicIPs,omitempty"`
-	NATIPs     []net.IP                            `json:"natIPs,omitempty"`
+	// State is the state of the network interface.
+	State *corev1alpha1.NetworkInterfaceState `json:"state,omitempty"`
+	// PCIAddress is the PCI address of the network interface.
+	PCIAddress *PCIAddressApplyConfiguration `json:"pciAddress,omitempty"`
+	// TAPDevice is the TAP device of the network interface.
+	TAPDevice *TAPDeviceApplyConfiguration `json:"tapDevice,omitempty"`
+	// Prefixes are the prefixes of the network interface.
+	Prefixes []net.IPPrefix `json:"prefixes,omitempty"`
+	// PublicIPs are the public IPs of the network interface.
+	PublicIPs []net.IP `json:"publicIPs,omitempty"`
+	// NATIPs are the NAT IPs of the network interface.
+	NATIPs []net.IP `json:"natIPs,omitempty"`
 }
 
 // NetworkInterfaceStatusApplyConfiguration constructs a declarative configuration of the NetworkInterfaceStatus type for use with

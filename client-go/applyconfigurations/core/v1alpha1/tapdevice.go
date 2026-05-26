@@ -7,7 +7,10 @@ package v1alpha1
 
 // TAPDeviceApplyConfiguration represents a declarative configuration of the TAPDevice type for use
 // with apply.
+//
+// TAPDevice is a TAP device.
 type TAPDeviceApplyConfiguration struct {
+	// Name is the name of the TAP device.
 	Name *string `json:"name,omitempty"`
 }
 

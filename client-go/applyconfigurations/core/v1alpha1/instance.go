@@ -16,6 +16,8 @@ import (
 
 // InstanceApplyConfiguration represents a declarative configuration of the Instance type for use
 // with apply.
+//
+// Instance is the schema for the instances API.
 type InstanceApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -34,29 +36,14 @@ func Instance(name, namespace string) *InstanceApplyConfiguration {
 	return b
 }
 
-// ExtractInstance extracts the applied configuration owned by fieldManager from
-// instance. If no managedFields are found in instance for fieldManager, a
-// InstanceApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractInstanceFrom extracts the applied configuration owned by fieldManager from
+// instance for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // instance must be a unmodified Instance API object that was retrieved from the Kubernetes API.
-// ExtractInstance provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractInstanceFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractInstance(instance *corev1alpha1.Instance, fieldManager string) (*InstanceApplyConfiguration, error) {
-	return extractInstance(instance, fieldManager, "")
-}
-
-// ExtractInstanceStatus is the same as ExtractInstance except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractInstanceStatus(instance *corev1alpha1.Instance, fieldManager string) (*InstanceApplyConfiguration, error) {
-	return extractInstance(instance, fieldManager, "status")
-}
-
-func extractInstance(instance *corev1alpha1.Instance, fieldManager string, subresource string) (*InstanceApplyConfiguration, error) {
+func ExtractInstanceFrom(instance *corev1alpha1.Instance, fieldManager string, subresource string) (*InstanceApplyConfiguration, error) {
 	b := &InstanceApplyConfiguration{}
 	err := managedfields.ExtractInto(instance, internal.Parser().Type("com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.Instance"), fieldManager, b, subresource)
 	if err != nil {
@@ -69,6 +56,27 @@ func extractInstance(instance *corev1alpha1.Instance, fieldManager string, subre
 	b.WithAPIVersion("core.apinet.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractInstance extracts the applied configuration owned by fieldManager from
+// instance. If no managedFields are found in instance for fieldManager, a
+// InstanceApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// instance must be a unmodified Instance API object that was retrieved from the Kubernetes API.
+// ExtractInstance provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractInstance(instance *corev1alpha1.Instance, fieldManager string) (*InstanceApplyConfiguration, error) {
+	return ExtractInstanceFrom(instance, fieldManager, "")
+}
+
+// ExtractInstanceStatus extracts the applied configuration owned by fieldManager from
+// instance for the status subresource.
+func ExtractInstanceStatus(instance *corev1alpha1.Instance, fieldManager string) (*InstanceApplyConfiguration, error) {
+	return ExtractInstanceFrom(instance, fieldManager, "status")
+}
+
 func (b InstanceApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value
