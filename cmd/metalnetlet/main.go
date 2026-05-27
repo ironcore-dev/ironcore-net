@@ -18,7 +18,11 @@ import (
 	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
 	flag "github.com/spf13/pflag"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/rest"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/certwatcher"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 	"sigs.k8s.io/controller-runtime/pkg/metrics/filters"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
@@ -64,6 +68,7 @@ func main() {
 	var configOptions config.GetConfigOptions
 	var metalnetKubeconfig string
 	var metalnetNamespace string
+	var metalnetNodeSelectorValue string
 	var disableNetworkPeering bool
 	var tlsOpts []func(*tls.Config)
 
@@ -88,6 +93,7 @@ func main() {
 	flag.StringVar(&metalnetNamespace, "metalnet-namespace", corev1.NamespaceDefault, "Metalnet namespace to use.")
 	flag.BoolVar(&disableNetworkPeering, "disable-network-peering", false,
 		"Disable the metalnet based network peering. If set to true the network peering is handled externally.")
+	flag.StringVar(&metalnetNodeSelectorValue, "metalnet-node-selector", "", "Selector for metalnet nodes to expose as apinet nodes.")
 
 	opts := zap.Options{
 		Development: true,
@@ -104,6 +110,18 @@ func main() {
 	if name == "" {
 		setupLog.Error(fmt.Errorf("must specify name"), "invalid configuration")
 		os.Exit(1)
+	}
+
+	var metalnetNodeSelector labels.Selector
+	if metalnetNodeSelectorValue != "" {
+		sel, err := labels.Parse(metalnetNodeSelectorValue)
+		if err != nil {
+			setupLog.Error(err, "error parsing metalnet node selector")
+			os.Exit(1)
+		}
+
+		metalnetNodeSelector = sel
+		setupLog.Info("Using metalnet node selector", "selector", metalnetNodeSelector)
 	}
 
 	getter := metalnetletconfig.NewGetterOrDie(name)
@@ -189,6 +207,15 @@ func main() {
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "bf12dae0.metalnetlet.apinet.ironcore.dev",
 		LeaderElectionConfig:   metalnetCfg,
+		NewCache: func(config *rest.Config, opts cache.Options) (cache.Cache, error) {
+			if opts.ByObject == nil {
+				opts.ByObject = make(map[client.Object]cache.ByObject)
+			}
+			opts.ByObject[&corev1.Node{}] = cache.ByObject{
+				Label: metalnetNodeSelector,
+			}
+			return cache.New(config, opts)
+		},
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
