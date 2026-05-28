@@ -207,15 +207,6 @@ func main() {
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "bf12dae0.metalnetlet.apinet.ironcore.dev",
 		LeaderElectionConfig:   metalnetCfg,
-		NewCache: func(config *rest.Config, opts cache.Options) (cache.Cache, error) {
-			if opts.ByObject == nil {
-				opts.ByObject = make(map[client.Object]cache.ByObject)
-			}
-			opts.ByObject[&corev1.Node{}] = cache.ByObject{
-				Label: metalnetNodeSelector,
-			}
-			return cache.New(config, opts)
-		},
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -228,6 +219,15 @@ func main() {
 
 	metalnetCluster, err := cluster.New(metalnetCfg, func(options *cluster.Options) {
 		options.Scheme = scheme
+		options.NewCache = func(config *rest.Config, opts cache.Options) (cache.Cache, error) {
+			if opts.ByObject == nil {
+				opts.ByObject = make(map[client.Object]cache.ByObject)
+			}
+			opts.ByObject[&corev1.Node{}] = cache.ByObject{
+				Label: metalnetNodeSelector,
+			}
+			return cache.New(config, opts)
+		}
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to create metalnet cluster")
