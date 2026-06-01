@@ -64,8 +64,7 @@ manifests: controller-gen ## Generate rbac objects.
 	./hack/promote-let-role.sh config/metalnetlet/apinet-rbac/role.yaml config/apiserver/rbac/metalnetlet_role.yaml apinet.ironcore.dev:system:metalnetlets
 
 .PHONY: generate
-generate: vgopath models-schema openapi-gen
-	VGOPATH=$(VGOPATH) \
+generate: models-schema openapi-gen
 	MODELS_SCHEMA=$(MODELS_SCHEMA) \
 	OPENAPI_GEN=$(OPENAPI_GEN) \
 	./hack/update-codegen.sh
@@ -333,7 +332,6 @@ CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 ENVTEST ?= $(LOCALBIN)/setup-envtest
 OPENAPI_EXTRACTOR ?= $(LOCALBIN)/openapi-extractor
 OPENAPI_GEN ?= $(LOCALBIN)/openapi-gen
-VGOPATH ?= $(LOCALBIN)/vgopath
 GEN_CRD_API_REFERENCE_DOCS ?= $(LOCALBIN)/gen-crd-api-reference-docs
 ADDLICENSE ?= $(LOCALBIN)/addlicense
 MODELS_SCHEMA ?= $(LOCALBIN)/models-schema
@@ -342,7 +340,6 @@ GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.5.0
-VGOPATH_VERSION ?= v0.1.5
 CONTROLLER_TOOLS_VERSION ?= v0.20.1
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.1
@@ -368,12 +365,6 @@ $(CONTROLLER_GEN): $(LOCALBIN)
 openapi-gen: $(OPENAPI_GEN) ## Download openapi-gen locally if necessary.
 $(OPENAPI_GEN): $(LOCALBIN)
 	test -s $(LOCALBIN)/openapi-gen || GOBIN=$(LOCALBIN) go install k8s.io/kube-openapi/cmd/openapi-gen
-
-.PHONY: vgopath
-vgopath: $(VGOPATH) ## Download vgopath locally if necessary.
-.PHONY: $(VGOPATH)
-$(VGOPATH): $(LOCALBIN)
-	$(call go-install-tool,$(VGOPATH),github.com/ironcore-dev/vgopath,$(VGOPATH_VERSION))
 
 .PHONY: openapi-extractor
 openapi-extractor: $(OPENAPI_EXTRACTOR) ## Download openapi-extractor locally if necessary.
