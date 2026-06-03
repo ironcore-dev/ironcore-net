@@ -11,8 +11,8 @@ require (
 	github.com/ironcore-dev/controller-utils v0.11.1-0.20260416072254-416d8be454e4
 	github.com/ironcore-dev/ironcore v0.3.1-0.20260512064631-3efeaee6c3b0
 	github.com/ironcore-dev/metalnet v0.3.16-0.20260521073450-7205b95190a7
-	github.com/onsi/ginkgo/v2 v2.28.3
-	github.com/onsi/gomega v1.40.0
+	github.com/onsi/ginkgo/v2 v2.29.0
+	github.com/onsi/gomega v1.41.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba
