@@ -16,18 +16,10 @@ bold="$(tput bold)"
 blue="$(tput setaf 4)"
 normal="$(tput sgr0)"
 
-
-VGOPATH="$VGOPATH"
 MODELS_SCHEMA="$MODELS_SCHEMA"
 OPENAPI_GEN="$OPENAPI_GEN"
-VIRTUAL_GOPATH="$(mktemp -d)"
-trap 'rm -rf "$VIRTUAL_GOPATH"' EXIT
 
-# Setup virtual GOPATH so the codegen tools work as expected.
-(cd "$PROJECT_ROOT"; go mod download && "$VGOPATH" -o "$VIRTUAL_GOPATH")
-
-export GOROOT="${GOROOT:-"$(go env GOROOT)"}"
-export GOPATH="$VIRTUAL_GOPATH"
+(cd "$PROJECT_ROOT"; go mod download)
 
 CODE_GEN_DIR=$(go list -m -f '{{.Dir}}' k8s.io/code-generator)
 source "${CODE_GEN_DIR}/kube_codegen.sh"
