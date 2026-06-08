@@ -103,11 +103,11 @@ test: envtest generate fmt check-license test-only ## Run tests.
 ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 .PHONY: test-only
 test-only: envtest ## Only run tests.
-	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test ./... -coverprofile cover.out
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" go test ./... -coverprofile cover.out
 
 .PHONY: extract-openapi
 extract-openapi: envtest openapi-extractor
-	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" $(OPENAPI_EXTRACTOR) \
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" $(OPENAPI_EXTRACTOR) \
 		--apiserver-package="github.com/ironcore-dev/ironcore-net/cmd/apiserver" \
 		--apiserver-build-opts=mod \
 		--apiservices="./config/apiserver/apiservice/bases" \

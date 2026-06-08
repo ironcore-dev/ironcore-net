@@ -6,8 +6,8 @@ package controllers
 import (
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
-	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
+	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	. "github.com/ironcore-dev/ironcore-net/utils/testing"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -50,9 +50,6 @@ var _ = Describe("NetworkInterfaceController", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    apiNetNs.Name,
 				GenerateName: "apinet-nic-",
-				Labels: map[string]string{
-					"foo": "bar",
-				},
 			},
 			Spec: apinetv1alpha1.NetworkInterfaceSpec{
 				NetworkRef: corev1.LocalObjectReference{Name: apiNetNetwork.Name},
@@ -67,9 +64,6 @@ var _ = Describe("NetworkInterfaceController", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "nic-",
-				Labels: map[string]string{
-					"app": "test",
-				},
 			},
 			Spec: networkingv1alpha1.NetworkInterfaceSpec{
 				ProviderID: provider.GetNetworkInterfaceID(apiNetNs.Name, apiNetNic.Name, "node", apiNetNic.UID),
@@ -87,19 +81,8 @@ var _ = Describe("NetworkInterfaceController", func() {
 
 		By("waiting for the APINet network interface to be claimed")
 		Eventually(Object(apiNetNic)).Should(SatisfyAll(
-			HaveField("Labels", HaveKeysWithValues(map[string]string{
-				"app": "test",
-				"foo": "bar",
-			})),
 			HaveField("Spec.PublicIPs", ConsistOf(HaveField("IP", net.IP{Addr: publicIP.Addr}))),
-			WithTransform(func(apiNetNic *apinetv1alpha1.NetworkInterface) *apinetletclient.SourceObjectData {
-				return apinetletclient.SourceObjectDataFromObject(
-					k8sClient.Scheme(),
-					k8sClient.RESTMapper(),
-					nic,
-					apiNetNic,
-				)
-			}, Equal(&apinetletclient.SourceObjectData{
+			WithTransform(NetworkInterfaceOrigin.DataOf, Equal(&origin.Data{
 				Namespace: nic.Namespace,
 				Name:      nic.Name,
 				UID:       nic.UID,
@@ -132,9 +115,7 @@ var _ = Describe("NetworkInterfaceController", func() {
 				Name:      string(vip.UID),
 			},
 		}
-		Eventually(Object(ip)).Should(SatisfyAll(
-			HaveField("Labels", HaveKeysWithValues(apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), vip))),
-		))
+		Eventually(Object(ip)).Should(StemFrom(VirtualIPOrigin, vip))
 
 		By("creating an ironcore-net network interface")
 		apiNetNic := &apinetv1alpha1.NetworkInterface{
@@ -173,14 +154,7 @@ var _ = Describe("NetworkInterfaceController", func() {
 		By("waiting for the APINet network interface to be claimed")
 		Eventually(Object(apiNetNic)).Should(SatisfyAll(
 			HaveField("Spec.PublicIPs", ConsistOf(HaveField("IP", net.IP{Addr: publicIP.Addr}))),
-			WithTransform(func(apiNetNic *apinetv1alpha1.NetworkInterface) *apinetletclient.SourceObjectData {
-				return apinetletclient.SourceObjectDataFromObject(
-					k8sClient.Scheme(),
-					k8sClient.RESTMapper(),
-					nic,
-					apiNetNic,
-				)
-			}, Equal(&apinetletclient.SourceObjectData{
+			WithTransform(NetworkInterfaceOrigin.DataOf, Equal(&origin.Data{
 				Namespace: nic.Namespace,
 				Name:      nic.Name,
 				UID:       nic.UID,

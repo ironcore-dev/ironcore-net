@@ -8,7 +8,7 @@ import (
 
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
-	apinetletclient "github.com/ironcore-dev/ironcore-net/apinetlet/client"
+	. "github.com/ironcore-dev/ironcore-net/utils/testing"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -167,7 +167,7 @@ var _ = Describe("NetworkPolicyController", func() {
 		}
 
 		Eventually(Object(apiNetNP)).Should(SatisfyAll(
-			HaveField("Labels", apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), np)),
+			StemFrom(NetworkPolicyOrigin, np),
 			HaveField("Spec.NetworkRef", Equal(corev1.LocalObjectReference{Name: apiNetNetwork.Name})),
 			HaveField("Spec.NetworkInterfaceSelector.MatchLabels", Equal(map[string]string{"app": "target"})),
 			HaveField("Spec.PolicyTypes", ConsistOf(apinetv1alpha1.PolicyTypeIngress, apinetv1alpha1.PolicyTypeEgress)),
@@ -463,7 +463,7 @@ var _ = Describe("NetworkPolicyController", func() {
 		}
 
 		Eventually(Object(apiNetNP)).Should(SatisfyAll(
-			HaveField("Labels", apinetletclient.SourceLabels(k8sClient.Scheme(), k8sClient.RESTMapper(), np)),
+			StemFrom(NetworkPolicyOrigin, np),
 			HaveField("Spec.NetworkRef", Equal(corev1.LocalObjectReference{Name: apiNetNetwork.Name})),
 			HaveField("Spec.NetworkInterfaceSelector.MatchLabels", Equal(map[string]string{"app": "target"})),
 			HaveField("Spec.PolicyTypes", ConsistOf(apinetv1alpha1.PolicyTypeIngress, apinetv1alpha1.PolicyTypeEgress)),
