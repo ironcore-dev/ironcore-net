@@ -9,13 +9,14 @@ import (
 	"slices"
 
 	"github.com/go-logr/logr"
-	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
-	utilhandlers "github.com/ironcore-dev/ironcore-net/utils/handler"
-	"github.com/ironcore-dev/ironcore-net/utils/origin"
-
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	ironcorenet "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
+	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	utilhandlers "github.com/ironcore-dev/ironcore-net/utils/handler"
+	"github.com/ironcore-dev/ironcore-net/utils/origin"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
@@ -217,6 +218,24 @@ func (r *NATGatewayReconciler) updateNATGatewayStatus(
 	return r.Status().Patch(ctx, natGateway, client.StrategicMergeFrom(base))
 }
 
+func (r *NATGatewayReconciler) enqueueNATGatewayByNetwork() handler.TypedEventHandler[client.Object, reconcile.Request] {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []reconcile.Request {
+		network := obj.(*networkingv1alpha1.Network)
+		natGatewayList := &networkingv1alpha1.NATGatewayList{}
+		if err := r.List(ctx, natGatewayList, client.InNamespace(network.Namespace)); err != nil {
+			ctrl.LoggerFrom(ctx).Error(err, "Failed to list NAT gateways for network", "Network", network.Name)
+			return nil
+		}
+		var req []ctrl.Request
+		for _, natGateway := range natGatewayList.Items {
+			if natGateway.Spec.NetworkRef.Name == network.Name {
+				req = append(req, reconcile.Request{NamespacedName: client.ObjectKeyFromObject(&natGateway)})
+			}
+		}
+		return req
+	})
+}
+
 func (r *NATGatewayReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache cache.Cache) error {
 	log := ctrl.Log.WithName("natgateway").WithName("setup")
 
@@ -227,6 +246,10 @@ func (r *NATGatewayReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache ca
 				predicates.ResourceHasFilterLabel(log, r.WatchFilterValue),
 				predicates.ResourceIsNotExternallyManaged(log),
 			),
+		).
+		Watches(
+			&networkingv1alpha1.Network{},
+			r.enqueueNATGatewayByNetwork(),
 		).
 		WatchesRawSource(
 			source.Kind[client.Object](
