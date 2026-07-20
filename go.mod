@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/bits-and-blooms/bitset v1.24.6
-	github.com/go-logr/logr v1.4.3
+	github.com/go-logr/logr v1.4.4
 	github.com/gogo/protobuf v1.3.2
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
