@@ -2,15 +2,15 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - ../default
-  - apinet-rbac
+- ../default
+- apinet-rbac
 
 patches:
-  - path: patch-controller.yaml
-  - target:
-      group: apps
-      version: v1
-      kind: Deployment
-      namespace: metalnetlet-system
-      name: metalnetlet-controller-manager
-    path: add-manager-args.yaml
+- path: patch-controller.yaml
+- path: add-manager-args.yaml
+  target:
+    group: apps
+    kind: Deployment
+    name: metalnetlet-controller-manager
+    namespace: metalnetlet-system
+    version: v1

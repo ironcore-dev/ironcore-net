@@ -2,16 +2,15 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - ../default
+- ../default
 
-patchesStrategicMerge:
-  - patch-controller.yaml
   
-patchesJson6902:
-  - target:
-      group: apps
-      version: v1
-      kind: Deployment
-      namespace: ironcore-net-system
-      name: ironcore-net-controller-manager
-    path: add-manager-args.yaml
+patches:
+- path: add-manager-args.yaml
+  target:
+    group: apps
+    kind: Deployment
+    name: ironcore-net-controller-manager
+    namespace: ironcore-net-system
+    version: v1
+- path: patch-controller.yaml

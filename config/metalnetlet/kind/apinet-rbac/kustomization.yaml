@@ -5,13 +5,13 @@ namespace: metalnetlet-system
 namePrefix: metalnetlet-
 
 resources:
-  - ../../apinet-rbac
+- ../../apinet-rbac
 
 patches:
-  - patch: |
-      $patch: delete
-      apiVersion: v1
-      kind: ServiceAccount
-      metadata:
-        name: controller-manager
-        namespace: system
+- patch: |
+    $patch: delete
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: controller-manager
+      namespace: system
