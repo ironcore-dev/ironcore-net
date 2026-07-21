@@ -299,6 +299,7 @@ func main() {
 	if err := (&controllers.InstanceReconciler{
 		Client:            mgr.GetClient(),
 		MetalnetClient:    metalnetCluster.GetClient(),
+		MetalnetAPIReader: metalnetCluster.GetAPIReader(),
 		PartitionName:     name,
 		MetalnetNamespace: metalnetNamespace,
 	}).SetupWithManager(mgr, metalnetCluster.GetCache()); err != nil {

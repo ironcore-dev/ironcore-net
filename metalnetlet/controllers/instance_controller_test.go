@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
@@ -125,5 +126,50 @@ var _ = Describe("LoadBalancerInstanceController", func() {
 			Should(HaveField("Items", ContainElement(
 				HaveField("UID", Not(Equal(metalnetLoadBalancer.UID))),
 			)))
+	})
+
+	It("should correctly finalize and delete an instance", func(ctx SpecContext) {
+		By("creating a load balancer instance")
+		protocol := corev1.ProtocolTCP
+		inst := &v1alpha1.Instance{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "lb-",
+			},
+			Spec: v1alpha1.InstanceSpec{
+				Type:             v1alpha1.InstanceTypeLoadBalancer,
+				LoadBalancerType: v1alpha1.LoadBalancerTypePublic,
+				NetworkRef:       corev1.LocalObjectReference{Name: network.Name},
+				IPs:              []net.IP{net.MustParseIP("10.0.0.1")},
+				NodeRef: &corev1.LocalObjectReference{
+					Name: PartitionNodeName(partitionName, metalnetNode.Name),
+				},
+				LoadBalancerPorts: []v1alpha1.LoadBalancerPort{
+					{
+						Protocol: &protocol,
+						Port:     1000,
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, inst)).To(Succeed())
+
+		By("waiting for the load balancer instance to have a finalizer")
+		Eventually(Object(inst)).Should(HaveField("Finalizers", ConsistOf(PartitionFinalizer(partitionName))))
+
+		By("waiting for the metalnet load balancer to appear")
+		metalnetLoadBalancerList := &metalnetv1alpha1.LoadBalancerList{}
+		Eventually(ObjectList(metalnetLoadBalancerList, client.InNamespace(metalnetNs.Name))).
+			Should(HaveField("Items", HaveLen(1)))
+
+		By("deleting the load balancer instance")
+		Expect(k8sClient.Delete(ctx, inst)).To(Succeed())
+
+		By("waiting for the instance to be gone")
+		Eventually(Get(inst)).Should(Satisfy(apierrors.IsNotFound))
+
+		By("asserting there are no metalnet load balancers left")
+		Eventually(ObjectList(metalnetLoadBalancerList, client.InNamespace(metalnetNs.Name))).
+			Should(HaveField("Items", BeEmpty()))
 	})
 })

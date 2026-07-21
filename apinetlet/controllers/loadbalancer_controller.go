@@ -359,8 +359,16 @@ func (r *LoadBalancerReconciler) applyAPINetLoadBalancer(ctx context.Context, lo
 				uniqueDsts[dst.TargetRef.NodeRef.Name] = dst
 			}
 
+			// Build up sorted node names to make apply deterministic.
+			nodeNames := make([]string, 0, len(uniqueDsts))
+			for dstName := range uniqueDsts {
+				nodeNames = append(nodeNames, dstName)
+			}
+			slices.Sort(nodeNames)
+
 			nodeSelector := apinetv1alpha1ac.NodeSelector()
-			for dstName, dst := range uniqueDsts {
+			for _, dstName := range nodeNames {
+				dst := uniqueDsts[dstName]
 				if dst.TargetRef != nil {
 					nodeSelector.WithNodeSelectorTerms(apinetv1alpha1ac.NodeSelectorTerm().WithMatchFields(apinetv1alpha1ac.NodeSelectorRequirement().
 						WithKey("metadata.name").

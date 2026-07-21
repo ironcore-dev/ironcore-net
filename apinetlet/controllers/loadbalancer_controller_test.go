@@ -259,7 +259,7 @@ var _ = Describe("LoadBalancerController", func() {
 		)
 	})
 
-	It("should manage the APINet load balancer and its node affintity", func(ctx SpecContext) {
+	It("should manage the APINet load balancer and its node affinity + routing", func(ctx SpecContext) {
 		By("creating a load balancer")
 		loadBalancer := &networkingv1alpha1.LoadBalancer{
 			ObjectMeta: metav1.ObjectMeta{
@@ -372,5 +372,35 @@ var _ = Describe("LoadBalancerController", func() {
 				}),
 			}))),
 		)
+
+		By("waiting for the APINet load balancer routing")
+		apiNetLoadBalancerRouting := &v1alpha1.LoadBalancerRouting{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: apiNetNs.Name,
+				Name:      string(loadBalancer.UID),
+			},
+		}
+		Eventually(Object(apiNetLoadBalancerRouting)).Should(HaveField("Destinations", ConsistOf(
+			v1alpha1.LoadBalancerDestination{
+				IP: net.MustParseIP("192.168.0.1"),
+				TargetRef: &v1alpha1.LoadBalancerTargetRef{
+					UID:  "first-metalnet-nic-uid",
+					Name: "first-apinet-nic-name",
+					NodeRef: corev1.LocalObjectReference{
+						Name: "first-node-name",
+					},
+				},
+			},
+			v1alpha1.LoadBalancerDestination{
+				IP: net.MustParseIP("192.168.0.2"),
+				TargetRef: &v1alpha1.LoadBalancerTargetRef{
+					UID:  "second-metalnet-nic-uid",
+					Name: "second-apinet-nic-name",
+					NodeRef: corev1.LocalObjectReference{
+						Name: "second-node-name",
+					},
+				},
+			},
+		)))
 	})
 })

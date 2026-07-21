@@ -44,7 +44,8 @@ var (
 
 type InstanceReconciler struct {
 	client.Client
-	MetalnetClient client.Client
+	MetalnetClient    client.Client
+	MetalnetAPIReader client.Reader
 
 	PartitionName string
 
@@ -103,7 +104,7 @@ func (r *InstanceReconciler) deleteMetalnetLoadBalancersByLoadBalancerInstanceAn
 		return false, err
 	}
 
-	return netclientutils.AnyExists(ctx, r.MetalnetClient, &metalnetv1alpha1.LoadBalancer{},
+	return netclientutils.AnyExists(ctx, r.MetalnetClient.Scheme(), r.MetalnetAPIReader, &metalnetv1alpha1.LoadBalancer{},
 		client.InNamespace(r.MetalnetNamespace),
 		&netclientutils.StemmingFrom{Origin: InstanceOrigin, Source: inst},
 	)

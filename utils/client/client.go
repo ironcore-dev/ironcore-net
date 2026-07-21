@@ -13,6 +13,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/selection"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -70,8 +71,8 @@ func (s *StemmingFromKey) Matches(obj client.Object) bool {
 	return s.Origin.StemsFromKey(obj, s.SourceKey)
 }
 
-func AnyExists(ctx context.Context, c client.Client, obj client.Object, opts ...client.ListOption) (bool, error) {
-	_, list, err := metautils.NewListForObject(c.Scheme(), obj)
+func AnyExists(ctx context.Context, scheme *runtime.Scheme, c client.Reader, obj client.Object, opts ...client.ListOption) (bool, error) {
+	_, list, err := metautils.NewListForObject(scheme, obj)
 	if err != nil {
 		return false, fmt.Errorf("error creating new list for object: %w", err)
 	}
