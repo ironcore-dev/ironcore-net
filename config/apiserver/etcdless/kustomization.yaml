@@ -31,12 +31,12 @@ replacements:
       group: cert-manager.io
       version: v1
       name: apiserver-cert
-      fieldPath: .metadata.namespace
+      fieldPath: metadata.namespace
     targets:
       - select:
           kind: APIService
         fieldPaths:
-          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+          - metadata.annotations.[cert-manager.io/inject-ca-from]
         options:
           delimiter: '/'
           index: 0
@@ -46,12 +46,12 @@ replacements:
       group: cert-manager.io
       version: v1
       name: apiserver-cert
-      fieldPath: .metadata.name
+      fieldPath: metadata.name
     targets:
       - select:
           kind: APIService
         fieldPaths:
-          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+          - metadata.annotations.[cert-manager.io/inject-ca-from]
         options:
           delimiter: '/'
           index: 1
@@ -60,15 +60,15 @@ replacements:
       kind: Service
       version: v1
       name: apiserver-service
-      fieldPath: .metadata.name
+      fieldPath: metadata.name
     targets:
       - select:
           kind: Certificate
           group: cert-manager.io
           version: v1
         fieldPaths:
-          - .spec.dnsNames.0
-          - .spec.dnsNames.1
+          - spec.dnsNames.0
+          - spec.dnsNames.1
         options:
           delimiter: '.'
           index: 0
@@ -77,15 +77,15 @@ replacements:
       kind: Service
       version: v1
       name: apiserver-service
-      fieldPath: .metadata.namespace
+      fieldPath: metadata.namespace
     targets:
       - select:
           kind: Certificate
           group: cert-manager.io
           version: v1
         fieldPaths:
-          - .spec.dnsNames.0
-          - .spec.dnsNames.1
+          - spec.dnsNames.0
+          - spec.dnsNames.1
         options:
           delimiter: '.'
           index: 1
