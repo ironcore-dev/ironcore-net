@@ -1,3 +1,6 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
 # Adds namespace to all resources.
 namespace: ironcore-net-system
 
@@ -13,14 +16,14 @@ namePrefix: ironcore-net-
 #  someName: someValue
 
 resources:
-  - ../rbac
-  - ../server
-  - ../apiservice
-  - ../certmanager
+- ../rbac
+- ../server
+- ../apiservice
+- ../certmanager
 
-patchesStrategicMerge:
-  - apiserver_certificate_patch.yaml
-  - apiservicecainjection_patch.yaml
+patches:
+- path: apiserver_certificate_patch.yaml
+- path: apiservicecainjection_patch.yaml
 
 replacements:
   - source:
@@ -28,12 +31,12 @@ replacements:
       group: cert-manager.io
       version: v1
       name: apiserver-cert
-      fieldPath: .metadata.namespace
+      fieldPath: metadata.namespace
     targets:
       - select:
           kind: APIService
         fieldPaths:
-          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+          - metadata.annotations.[cert-manager.io/inject-ca-from]
         options:
           delimiter: '/'
           index: 0
@@ -43,12 +46,12 @@ replacements:
       group: cert-manager.io
       version: v1
       name: apiserver-cert
-      fieldPath: .metadata.name
+      fieldPath: metadata.name
     targets:
       - select:
           kind: APIService
         fieldPaths:
-          - .metadata.annotations.[cert-manager.io/inject-ca-from]
+          - metadata.annotations.[cert-manager.io/inject-ca-from]
         options:
           delimiter: '/'
           index: 1
@@ -57,15 +60,15 @@ replacements:
       kind: Service
       version: v1
       name: apiserver-service
-      fieldPath: .metadata.name
+      fieldPath: metadata.name
     targets:
       - select:
           kind: Certificate
           group: cert-manager.io
           version: v1
         fieldPaths:
-          - .spec.dnsNames.0
-          - .spec.dnsNames.1
+          - spec.dnsNames.0
+          - spec.dnsNames.1
         options:
           delimiter: '.'
           index: 0
@@ -74,15 +77,15 @@ replacements:
       kind: Service
       version: v1
       name: apiserver-service
-      fieldPath: .metadata.namespace
+      fieldPath: metadata.namespace
     targets:
       - select:
           kind: Certificate
           group: cert-manager.io
           version: v1
         fieldPaths:
-          - .spec.dnsNames.0
-          - .spec.dnsNames.1
+          - spec.dnsNames.0
+          - spec.dnsNames.1
         options:
           delimiter: '.'
           index: 1
