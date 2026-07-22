@@ -173,6 +173,7 @@ func SetupTest(metalnetNs *corev1.Namespace) {
 		Expect((&InstanceReconciler{
 			Client:            k8sManager.GetClient(),
 			MetalnetClient:    k8sManager.GetClient(),
+			MetalnetAPIReader: k8sManager.GetAPIReader(),
 			PartitionName:     partitionName,
 			MetalnetNamespace: metalnetNs.Name,
 		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
@@ -222,6 +223,7 @@ func SetupTestWithNetworkPeeringDisabled(metalnetNs *corev1.Namespace) {
 		Expect((&InstanceReconciler{
 			Client:            k8sManager.GetClient(),
 			MetalnetClient:    k8sManager.GetClient(),
+			MetalnetAPIReader: k8sManager.GetAPIReader(),
 			PartitionName:     partitionName,
 			MetalnetNamespace: metalnetNs.Name,
 		}).SetupWithManager(k8sManager, k8sManager.GetCache())).To(Succeed())
