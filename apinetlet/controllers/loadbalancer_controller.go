@@ -224,10 +224,10 @@ func (r *LoadBalancerReconciler) prepareApiNetDestinations(ctx context.Context, 
 
 func (r *LoadBalancerReconciler) manageAPINetLoadBalancerRouting(ctx context.Context, loadBalancer *networkingv1alpha1.LoadBalancer, apiNetLoadBalancer *apinetv1alpha1.LoadBalancer, apiNetDsts []apinetv1alpha1.LoadBalancerDestination) error {
 	ownerRef := metav1apply.OwnerReference().
-		WithAPIVersion(networkingv1alpha1.SchemeGroupVersion.String()).
+		WithAPIVersion(apinetv1alpha1.SchemeGroupVersion.String()).
 		WithKind("LoadBalancer").
-		WithName(loadBalancer.Name).
-		WithUID(loadBalancer.UID).
+		WithName(apiNetLoadBalancer.Name).
+		WithUID(apiNetLoadBalancer.UID).
 		WithController(true).
 		WithBlockOwnerDeletion(true)
 

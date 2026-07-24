@@ -380,27 +380,39 @@ var _ = Describe("LoadBalancerController", func() {
 				Name:      string(loadBalancer.UID),
 			},
 		}
-		Eventually(Object(apiNetLoadBalancerRouting)).Should(HaveField("Destinations", ConsistOf(
-			v1alpha1.LoadBalancerDestination{
-				IP: net.MustParseIP("192.168.0.1"),
-				TargetRef: &v1alpha1.LoadBalancerTargetRef{
-					UID:  "first-metalnet-nic-uid",
-					Name: "first-apinet-nic-name",
-					NodeRef: corev1.LocalObjectReference{
-						Name: "first-node-name",
+		Eventually(Object(apiNetLoadBalancerRouting)).Should(
+			SatisfyAll(
+				HaveField("OwnerReferences", []metav1.OwnerReference{
+					{
+						APIVersion:         v1alpha1.SchemeGroupVersion.String(),
+						Kind:               "LoadBalancer",
+						Name:               apiNetLoadBalancer.Name,
+						UID:                apiNetLoadBalancer.UID,
+						Controller:         new(true),
+						BlockOwnerDeletion: new(true),
 					},
-				},
-			},
-			v1alpha1.LoadBalancerDestination{
-				IP: net.MustParseIP("192.168.0.2"),
-				TargetRef: &v1alpha1.LoadBalancerTargetRef{
-					UID:  "second-metalnet-nic-uid",
-					Name: "second-apinet-nic-name",
-					NodeRef: corev1.LocalObjectReference{
-						Name: "second-node-name",
+				}),
+				HaveField("Destinations", ConsistOf(
+					v1alpha1.LoadBalancerDestination{
+						IP: net.MustParseIP("192.168.0.1"),
+						TargetRef: &v1alpha1.LoadBalancerTargetRef{
+							UID:  "first-metalnet-nic-uid",
+							Name: "first-apinet-nic-name",
+							NodeRef: corev1.LocalObjectReference{
+								Name: "first-node-name",
+							},
+						},
 					},
-				},
-			},
-		)))
+					v1alpha1.LoadBalancerDestination{
+						IP: net.MustParseIP("192.168.0.2"),
+						TargetRef: &v1alpha1.LoadBalancerTargetRef{
+							UID:  "second-metalnet-nic-uid",
+							Name: "second-apinet-nic-name",
+							NodeRef: corev1.LocalObjectReference{
+								Name: "second-node-name",
+							},
+						},
+					},
+				))))
 	})
 })
