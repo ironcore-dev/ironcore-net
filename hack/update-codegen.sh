@@ -44,8 +44,7 @@ declare -a GOMODS=(
 )
 echo "Setting permissions for files of relevant go modules to 644"
 for MOD in "${GOMODS[@]}"; do
-  # Use 'go list' directly to avoid an external 'jq' dependency.
-  find "$(go list -m -f '{{.Dir}}' "${MOD}")" -type f -exec chmod 644 -- {} +
+  find "$(go list -json -m -u "${MOD}" | jq -r '.Dir')" -type f -exec chmod 644 {} +
 done
 
 echo "Generating ${blue}openapi${normal}"
