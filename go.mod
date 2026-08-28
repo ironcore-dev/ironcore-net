@@ -9,9 +9,9 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/ironcore-dev/brokers v0.0.0-20260928082849-628cc25fd8ca
-	github.com/ironcore-dev/controller-utils v0.14.1-0.20260904065051-9ddd709051f4
+	github.com/ironcore-dev/controller-utils v0.15.0
 	github.com/ironcore-dev/ironcore v0.8.1-0.20260924093634-7346f4f9b904
-	github.com/ironcore-dev/metalnet v0.3.19
+	github.com/ironcore-dev/metalnet v0.3.16
 	github.com/onsi/ginkgo/v2 v2.33.1
 	github.com/onsi/gomega v1.44.0
 	github.com/spf13/cobra v1.10.2

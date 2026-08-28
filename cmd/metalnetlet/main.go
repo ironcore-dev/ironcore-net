@@ -11,10 +11,10 @@ import (
 	"path/filepath"
 
 	"github.com/ironcore-dev/controller-utils/configutils"
+	"github.com/ironcore-dev/controller-utils/migration"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	metalnetletconfig "github.com/ironcore-dev/ironcore-net/metalnetlet/client/config"
 	"github.com/ironcore-dev/ironcore-net/metalnetlet/controllers"
-	"github.com/ironcore-dev/ironcore-net/utils/migration"
 	"github.com/ironcore-dev/ironcore-net/utils/migrations"
 	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
