@@ -11,7 +11,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ironcore-dev/ironcore-net/utils/migration"
+	"github.com/ironcore-dev/controller-utils/migration"
 	"github.com/ironcore-dev/ironcore-net/utils/migrations"
 	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	flag "github.com/spf13/pflag"
