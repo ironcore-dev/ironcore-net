@@ -267,7 +267,8 @@ func (r *NetworkReconciler) applyAPINetNetwork(ctx context.Context, log logr.Log
 		WithAnnotations(NetworkOrigin.Annotations(network)).
 		WithLabels(NetworkOrigin.Labels(network)).
 		WithSpec(apinetv1alpha1ac.NetworkSpec().
-			WithPeerings(peeringCfgs...))
+			WithPeerings(peeringCfgs...).
+			WithEnableEncryption(network.Spec.EnableEncryption))
 
 	if err := r.APINetClient.Apply(ctx, apiNetNetworkApplyCfg, fieldOwner, client.ForceOwnership); err != nil {
 		return nil, fmt.Errorf("error applying apinet network: %w", err)

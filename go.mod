@@ -129,3 +129,7 @@ require (
 	sigs.k8s.io/randfill v1.0.0 // indirect
 	sigs.k8s.io/yaml v1.6.0 // indirect
 )
+
+replace github.com/ironcore-dev/ironcore => github.com/cloudandheat/ironcore-dev-ironcore v0.0.0-20261112160800-b10a75a0843a
+
+replace github.com/ironcore-dev/metalnet => github.com/cloudandheat/ironcore-dev-metalnet v0.0.0-20261112161239-071894b2aae5

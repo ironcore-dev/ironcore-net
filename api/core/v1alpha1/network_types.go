@@ -13,6 +13,9 @@ type NetworkSpec struct {
 	ID string `json:"id,omitempty"`
 	// Peerings are the network peerings with this network
 	Peerings []NetworkPeering `json:"peerings,omitempty"`
+	// EnableEncryption specifies whether the traffic of this network shall be encrypted.
+	// +optional
+	EnableEncryption bool `json:"enableEncryption,omitempty"`
 }
 
 // NetworkPeering defines a network peering with another network.
