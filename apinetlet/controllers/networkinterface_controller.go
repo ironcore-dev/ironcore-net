@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-logr/logr"
 	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	netcore "github.com/ironcore-dev/ironcore-net/utils/core"
 	utilhandlers "github.com/ironcore-dev/ironcore-net/utils/handler"
 	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	"golang.org/x/exp/slices"
@@ -444,7 +445,7 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	}
 	if modified {
 		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 	}
 	log.V(1).Info("Finalizer is present")
 

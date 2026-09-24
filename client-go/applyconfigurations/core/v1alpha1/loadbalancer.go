@@ -19,7 +19,7 @@ import (
 //
 // LoadBalancer is the schema for the loadbalancers API.
 type LoadBalancerApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *LoadBalancerSpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *LoadBalancerStatusApplyConfiguration `json:"status,omitempty"`

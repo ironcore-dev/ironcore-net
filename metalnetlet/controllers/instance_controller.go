@@ -15,6 +15,7 @@ import (
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	netcore "github.com/ironcore-dev/ironcore-net/utils/core"
 	"github.com/ironcore-dev/ironcore-net/utils/handler"
 	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	"github.com/ironcore-dev/ironcore/utils/generic"
@@ -80,7 +81,7 @@ func (r *InstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		}
 		if n > 0 {
 			log.V(1).Info("Some metalnet load balancers still exist, requeueing")
-			return ctrl.Result{Requeue: true}, nil
+			return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 		}
 		log.V(1).Info("Any potential leftover metalnet load balancer is gone")
 		return ctrl.Result{}, nil
@@ -123,7 +124,7 @@ func (r *InstanceReconciler) delete(ctx context.Context, log logr.Logger, loadBa
 	}
 	if anyExists {
 		log.V(1).Info("Some metalnet load balancers are still present, requeuing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 	}
 
 	log.V(1).Info("All metalnet load balancers gone, removing finalizer")
@@ -333,7 +334,7 @@ func (r *InstanceReconciler) reconcile(ctx context.Context, log logr.Logger, ins
 		}
 		if anyExists {
 			log.V(1).Info("Not yet all metalnet load balancers gone, requeueing")
-			return ctrl.Result{Requeue: true}, nil
+			return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 		}
 
 		log.V(1).Info("All metalnet load balancers gone, removing finalizer")
@@ -351,7 +352,7 @@ func (r *InstanceReconciler) reconcile(ctx context.Context, log logr.Logger, ins
 	}
 	if modified {
 		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 	}
 	log.V(1).Info("Finalizer present")
 

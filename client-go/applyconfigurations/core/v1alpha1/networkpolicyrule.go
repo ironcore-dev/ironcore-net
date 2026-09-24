@@ -19,7 +19,7 @@ import (
 //
 // NetworkPolicyRule is the schema for the networkpolicyrules API.
 type NetworkPolicyRuleApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// NetworkRef is the network to which network policy is applied.
 	NetworkRef *LocalUIDReferenceApplyConfiguration `json:"networkRef,omitempty"`

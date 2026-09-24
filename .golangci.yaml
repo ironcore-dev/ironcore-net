@@ -5,6 +5,9 @@ linters:
     - misspell
     - revive
   settings:
+    govet:
+      disable:
+      - inline
     misspell:
       ignore-rules:
         - strat

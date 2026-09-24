@@ -199,6 +199,7 @@ func (c *Cache) ForgetInstance(instance *v1alpha1.Instance) error {
 
 	if ok && c.assumedInstances.Has(key) {
 		c.removeInstance(log, key, instance)
+		return nil
 	}
 	return fmt.Errorf("instance %s(%v) wasn't assumed so cannot be forgotten", key, klog.KObj(instance))
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/uuid"
 	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	netcore "github.com/ironcore-dev/ironcore-net/utils/core"
 	utilhandlers "github.com/ironcore-dev/ironcore-net/utils/handler"
 	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	"golang.org/x/exp/slices"
@@ -91,7 +92,7 @@ func (r *NetworkInterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		}
 		if n > 0 {
 			log.V(1).Info("Matching metalnet network interfaces are still present, requeueing")
-			return ctrl.Result{Requeue: true}, nil
+			return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 		}
 		log.V(1).Info("All matching metalnet network interfaces are gone")
 		return ctrl.Result{}, nil
@@ -136,7 +137,7 @@ func (r *NetworkInterfaceReconciler) delete(ctx context.Context, log logr.Logger
 		return ctrl.Result{}, nil
 	}
 	log.V(1).Info("Issued metalnet network interface deletion, requeueing")
-	return ctrl.Result{Requeue: true}, nil
+	return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 }
 
 func (r *NetworkInterfaceReconciler) getMetalnetNetworkNameForNetworkInterface(ctx context.Context, nic *v1alpha1.NetworkInterface) (string, error) {
@@ -498,7 +499,7 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 		}
 		if existed {
 			log.V(1).Info("Issued metalnet network interface deletion, requeueing")
-			return ctrl.Result{Requeue: true}, nil
+			return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 		}
 
 		log.V(1).Info("Metalnet network interface is gone, removing partition finalizer")
@@ -515,7 +516,7 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	}
 	if modified {
 		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 	}
 	log.V(1).Info("Finalizer is present")
 
