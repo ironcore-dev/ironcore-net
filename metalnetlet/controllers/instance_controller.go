@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"hash/fnv"
+	"slices"
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
@@ -20,7 +21,6 @@ import (
 	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	"github.com/ironcore-dev/ironcore/utils/generic"
 	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
-	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

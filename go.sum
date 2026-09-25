@@ -117,12 +117,10 @@ github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3 h1:B+8ClL/kCQkRiU82d9xajR
 github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3/go.mod h1:NbCUVmiS4foBGBHOYlCT25+YmGpJ32dZPi75pGEUpj4=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0 h1:5VipnvEpbqr2gA2VbM+nYVbkIF28c5ZQfqCBQ5g2xfk=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0/go.mod h1:Hyl3n6Twe1hvtd9XUXDec4pTvgMSEixRuQKPTMH2bNs=
-github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0 h1:5VipnvEpbqr2gA2VbM+nYVbkIF28c5ZQfqCBQ5g2xfk=
-github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0/go.mod h1:Hyl3n6Twe1hvtd9XUXDec4pTvgMSEixRuQKPTMH2bNs=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
-github.com/ironcore-dev/brokers v0.0.0-20260917130553-debbfaf33bf3 h1:wq9hPpDzMJwg+OrJLV7QV4gjR3f7Vxwrjrb+gdDzhI8=
-github.com/ironcore-dev/brokers v0.0.0-20260917130553-debbfaf33bf3/go.mod h1:YphhQ6Mmex642iqvAhZ6Vd0B2RJLTSKoz6UBiq61Xio=
+github.com/ironcore-dev/brokers v0.0.0-20260928082849-628cc25fd8ca h1:fLdDpNuymitSwZF1RBulWB2n9u9UAc/IYfGsQRPi2Gk=
+github.com/ironcore-dev/brokers v0.0.0-20260928082849-628cc25fd8ca/go.mod h1:2RWGtX3C0UaYqah5SgglJH2fM9oUu1njzY5oXneVWoI=
 github.com/ironcore-dev/controller-utils v0.14.1-0.20260904065051-9ddd709051f4 h1:fKocO3kKaPg6c1SDufxAM+k5abTTfoIk4U/t+IjSOEI=
 github.com/ironcore-dev/controller-utils v0.14.1-0.20260904065051-9ddd709051f4/go.mod h1:8rLIaac9ovKzlKupxCrw9V/IF2rjI6zqv+VI0kRS6fE=
 github.com/ironcore-dev/ironcore v0.8.1-0.20260924093634-7346f4f9b904 h1:/EDdIi+hDurZy1zJCNprTWaqZQDAg4mo5wW7s78PXUk=

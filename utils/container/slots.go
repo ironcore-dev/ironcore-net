@@ -4,8 +4,10 @@
 package container
 
 import (
+	"maps"
+	"slices"
+
 	"github.com/bits-and-blooms/bitset"
-	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
@@ -45,7 +47,7 @@ func (s *KeySlots[K]) HasKey(key K) bool {
 }
 
 func (s *KeySlots[K]) Keys() []K {
-	return maps.Keys(s.slotsByKey)
+	return slices.Collect(maps.Keys(s.slotsByKey))
 }
 
 // Total returns the total number of slots.
