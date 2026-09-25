@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
@@ -17,7 +18,6 @@ import (
 	"github.com/ironcore-dev/ironcore-net/internal/natgateway"
 	"github.com/ironcore-dev/ironcore-net/utils/maps"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
-	"golang.org/x/exp/slices"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"

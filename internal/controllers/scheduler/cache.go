@@ -6,12 +6,13 @@ package scheduler
 import (
 	"context"
 	"fmt"
+	"maps"
+	"slices"
 	"sync"
 	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -67,7 +68,7 @@ func (n *ContainerInfo) NumInstances() int {
 }
 
 func (n *ContainerInfo) Instances() []*InstanceInfo {
-	return maps.Values(n.instances)
+	return slices.Collect(maps.Values(n.instances))
 }
 
 func (n *ContainerInfo) shallowCopy() *ContainerInfo {
