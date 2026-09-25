@@ -12,13 +12,9 @@ import (
 	unsafe "unsafe"
 
 	corev1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
-	net "github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	core "github.com/ironcore-dev/ironcore-net/internal/apis/core"
-	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
-	types "k8s.io/apimachinery/pkg/types"
 )
 
 func init() {
@@ -922,8 +918,7 @@ func RegisterConversions(s *runtime.Scheme) error {
 }
 
 func autoConvert_v1alpha1_Affinity_To_core_Affinity(in *corev1alpha1.Affinity, out *core.Affinity, s conversion.Scope) error {
-	out.NodeAffinity = (*core.NodeAffinity)(unsafe.Pointer(in.NodeAffinity))
-	out.InstanceAntiAffinity = (*core.InstanceAntiAffinity)(unsafe.Pointer(in.InstanceAntiAffinity))
+	*out = *(*core.Affinity)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -933,8 +928,7 @@ func Convert_v1alpha1_Affinity_To_core_Affinity(in *corev1alpha1.Affinity, out *
 }
 
 func autoConvert_core_Affinity_To_v1alpha1_Affinity(in *core.Affinity, out *corev1alpha1.Affinity, s conversion.Scope) error {
-	out.NodeAffinity = (*corev1alpha1.NodeAffinity)(unsafe.Pointer(in.NodeAffinity))
-	out.InstanceAntiAffinity = (*corev1alpha1.InstanceAntiAffinity)(unsafe.Pointer(in.InstanceAntiAffinity))
+	*out = *(*corev1alpha1.Affinity)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -998,10 +992,7 @@ func Convert_core_DaemonSetList_To_v1alpha1_DaemonSetList(in *core.DaemonSetList
 }
 
 func autoConvert_v1alpha1_DaemonSetSpec_To_core_DaemonSetSpec(in *corev1alpha1.DaemonSetSpec, out *core.DaemonSetSpec, s conversion.Scope) error {
-	out.Selector = (*v1.LabelSelector)(unsafe.Pointer(in.Selector))
-	if err := Convert_v1alpha1_InstanceTemplate_To_core_InstanceTemplate(&in.Template, &out.Template, s); err != nil {
-		return err
-	}
+	*out = *(*core.DaemonSetSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1011,10 +1002,7 @@ func Convert_v1alpha1_DaemonSetSpec_To_core_DaemonSetSpec(in *corev1alpha1.Daemo
 }
 
 func autoConvert_core_DaemonSetSpec_To_v1alpha1_DaemonSetSpec(in *core.DaemonSetSpec, out *corev1alpha1.DaemonSetSpec, s conversion.Scope) error {
-	out.Selector = (*v1.LabelSelector)(unsafe.Pointer(in.Selector))
-	if err := Convert_core_InstanceTemplate_To_v1alpha1_InstanceTemplate(&in.Template, &out.Template, s); err != nil {
-		return err
-	}
+	*out = *(*corev1alpha1.DaemonSetSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1024,7 +1012,7 @@ func Convert_core_DaemonSetSpec_To_v1alpha1_DaemonSetSpec(in *core.DaemonSetSpec
 }
 
 func autoConvert_v1alpha1_DaemonSetStatus_To_core_DaemonSetStatus(in *corev1alpha1.DaemonSetStatus, out *core.DaemonSetStatus, s conversion.Scope) error {
-	out.CollisionCount = (*int32)(unsafe.Pointer(in.CollisionCount))
+	*out = *(*core.DaemonSetStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1034,7 +1022,7 @@ func Convert_v1alpha1_DaemonSetStatus_To_core_DaemonSetStatus(in *corev1alpha1.D
 }
 
 func autoConvert_core_DaemonSetStatus_To_v1alpha1_DaemonSetStatus(in *core.DaemonSetStatus, out *corev1alpha1.DaemonSetStatus, s conversion.Scope) error {
-	out.CollisionCount = (*int32)(unsafe.Pointer(in.CollisionCount))
+	*out = *(*corev1alpha1.DaemonSetStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1102,11 +1090,7 @@ func Convert_core_IPAddress_To_v1alpha1_IPAddress(in *core.IPAddress, out *corev
 }
 
 func autoConvert_v1alpha1_IPAddressClaimRef_To_core_IPAddressClaimRef(in *corev1alpha1.IPAddressClaimRef, out *core.IPAddressClaimRef, s conversion.Scope) error {
-	out.Group = in.Group
-	out.Resource = in.Resource
-	out.Namespace = in.Namespace
-	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	*out = *(*core.IPAddressClaimRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1116,11 +1100,7 @@ func Convert_v1alpha1_IPAddressClaimRef_To_core_IPAddressClaimRef(in *corev1alph
 }
 
 func autoConvert_core_IPAddressClaimRef_To_v1alpha1_IPAddressClaimRef(in *core.IPAddressClaimRef, out *corev1alpha1.IPAddressClaimRef, s conversion.Scope) error {
-	out.Group = in.Group
-	out.Resource = in.Resource
-	out.Namespace = in.Namespace
-	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	*out = *(*corev1alpha1.IPAddressClaimRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1152,10 +1132,7 @@ func Convert_core_IPAddressList_To_v1alpha1_IPAddressList(in *core.IPAddressList
 }
 
 func autoConvert_v1alpha1_IPAddressSpec_To_core_IPAddressSpec(in *corev1alpha1.IPAddressSpec, out *core.IPAddressSpec, s conversion.Scope) error {
-	out.IP = in.IP
-	if err := Convert_v1alpha1_IPAddressClaimRef_To_core_IPAddressClaimRef(&in.ClaimRef, &out.ClaimRef, s); err != nil {
-		return err
-	}
+	*out = *(*core.IPAddressSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1165,10 +1142,7 @@ func Convert_v1alpha1_IPAddressSpec_To_core_IPAddressSpec(in *corev1alpha1.IPAdd
 }
 
 func autoConvert_core_IPAddressSpec_To_v1alpha1_IPAddressSpec(in *core.IPAddressSpec, out *corev1alpha1.IPAddressSpec, s conversion.Scope) error {
-	out.IP = in.IP
-	if err := Convert_core_IPAddressClaimRef_To_v1alpha1_IPAddressClaimRef(&in.ClaimRef, &out.ClaimRef, s); err != nil {
-		return err
-	}
+	*out = *(*corev1alpha1.IPAddressSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1178,8 +1152,7 @@ func Convert_core_IPAddressSpec_To_v1alpha1_IPAddressSpec(in *core.IPAddressSpec
 }
 
 func autoConvert_v1alpha1_IPBlock_To_core_IPBlock(in *corev1alpha1.IPBlock, out *core.IPBlock, s conversion.Scope) error {
-	out.CIDR = in.CIDR
-	out.Except = *(*[]net.IPPrefix)(unsafe.Pointer(&in.Except))
+	*out = *(*core.IPBlock)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1189,8 +1162,7 @@ func Convert_v1alpha1_IPBlock_To_core_IPBlock(in *corev1alpha1.IPBlock, out *cor
 }
 
 func autoConvert_core_IPBlock_To_v1alpha1_IPBlock(in *core.IPBlock, out *corev1alpha1.IPBlock, s conversion.Scope) error {
-	out.CIDR = in.CIDR
-	out.Except = *(*[]net.IPPrefix)(unsafe.Pointer(&in.Except))
+	*out = *(*corev1alpha1.IPBlock)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1200,10 +1172,7 @@ func Convert_core_IPBlock_To_v1alpha1_IPBlock(in *core.IPBlock, out *corev1alpha
 }
 
 func autoConvert_v1alpha1_IPClaimRef_To_core_IPClaimRef(in *corev1alpha1.IPClaimRef, out *core.IPClaimRef, s conversion.Scope) error {
-	out.Group = in.Group
-	out.Resource = in.Resource
-	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	*out = *(*core.IPClaimRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1213,10 +1182,7 @@ func Convert_v1alpha1_IPClaimRef_To_core_IPClaimRef(in *corev1alpha1.IPClaimRef,
 }
 
 func autoConvert_core_IPClaimRef_To_v1alpha1_IPClaimRef(in *core.IPClaimRef, out *corev1alpha1.IPClaimRef, s conversion.Scope) error {
-	out.Group = in.Group
-	out.Resource = in.Resource
-	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	*out = *(*corev1alpha1.IPClaimRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1248,10 +1214,7 @@ func Convert_core_IPList_To_v1alpha1_IPList(in *core.IPList, out *corev1alpha1.I
 }
 
 func autoConvert_v1alpha1_IPSpec_To_core_IPSpec(in *corev1alpha1.IPSpec, out *core.IPSpec, s conversion.Scope) error {
-	out.Type = core.IPType(in.Type)
-	out.IPFamily = corev1.IPFamily(in.IPFamily)
-	out.IP = in.IP
-	out.ClaimRef = (*core.IPClaimRef)(unsafe.Pointer(in.ClaimRef))
+	*out = *(*core.IPSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1261,10 +1224,7 @@ func Convert_v1alpha1_IPSpec_To_core_IPSpec(in *corev1alpha1.IPSpec, out *core.I
 }
 
 func autoConvert_core_IPSpec_To_v1alpha1_IPSpec(in *core.IPSpec, out *corev1alpha1.IPSpec, s conversion.Scope) error {
-	out.Type = corev1alpha1.IPType(in.Type)
-	out.IPFamily = corev1.IPFamily(in.IPFamily)
-	out.IP = in.IP
-	out.ClaimRef = (*corev1alpha1.IPClaimRef)(unsafe.Pointer(in.ClaimRef))
+	*out = *(*corev1alpha1.IPSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1274,6 +1234,7 @@ func Convert_core_IPSpec_To_v1alpha1_IPSpec(in *core.IPSpec, out *corev1alpha1.I
 }
 
 func autoConvert_v1alpha1_IPStatus_To_core_IPStatus(in *corev1alpha1.IPStatus, out *core.IPStatus, s conversion.Scope) error {
+	*out = *(*core.IPStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1283,6 +1244,7 @@ func Convert_v1alpha1_IPStatus_To_core_IPStatus(in *corev1alpha1.IPStatus, out *
 }
 
 func autoConvert_core_IPStatus_To_v1alpha1_IPStatus(in *core.IPStatus, out *corev1alpha1.IPStatus, s conversion.Scope) error {
+	*out = *(*corev1alpha1.IPStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1324,8 +1286,7 @@ func Convert_core_Instance_To_v1alpha1_Instance(in *core.Instance, out *corev1al
 }
 
 func autoConvert_v1alpha1_InstanceAffinityTerm_To_core_InstanceAffinityTerm(in *corev1alpha1.InstanceAffinityTerm, out *core.InstanceAffinityTerm, s conversion.Scope) error {
-	out.LabelSelector = (*v1.LabelSelector)(unsafe.Pointer(in.LabelSelector))
-	out.TopologyKey = in.TopologyKey
+	*out = *(*core.InstanceAffinityTerm)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1335,8 +1296,7 @@ func Convert_v1alpha1_InstanceAffinityTerm_To_core_InstanceAffinityTerm(in *core
 }
 
 func autoConvert_core_InstanceAffinityTerm_To_v1alpha1_InstanceAffinityTerm(in *core.InstanceAffinityTerm, out *corev1alpha1.InstanceAffinityTerm, s conversion.Scope) error {
-	out.LabelSelector = (*v1.LabelSelector)(unsafe.Pointer(in.LabelSelector))
-	out.TopologyKey = in.TopologyKey
+	*out = *(*corev1alpha1.InstanceAffinityTerm)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1346,7 +1306,7 @@ func Convert_core_InstanceAffinityTerm_To_v1alpha1_InstanceAffinityTerm(in *core
 }
 
 func autoConvert_v1alpha1_InstanceAntiAffinity_To_core_InstanceAntiAffinity(in *corev1alpha1.InstanceAntiAffinity, out *core.InstanceAntiAffinity, s conversion.Scope) error {
-	out.RequiredDuringSchedulingIgnoredDuringExecution = *(*[]core.InstanceAffinityTerm)(unsafe.Pointer(&in.RequiredDuringSchedulingIgnoredDuringExecution))
+	*out = *(*core.InstanceAntiAffinity)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1356,7 +1316,7 @@ func Convert_v1alpha1_InstanceAntiAffinity_To_core_InstanceAntiAffinity(in *core
 }
 
 func autoConvert_core_InstanceAntiAffinity_To_v1alpha1_InstanceAntiAffinity(in *core.InstanceAntiAffinity, out *corev1alpha1.InstanceAntiAffinity, s conversion.Scope) error {
-	out.RequiredDuringSchedulingIgnoredDuringExecution = *(*[]corev1alpha1.InstanceAffinityTerm)(unsafe.Pointer(&in.RequiredDuringSchedulingIgnoredDuringExecution))
+	*out = *(*corev1alpha1.InstanceAntiAffinity)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1388,14 +1348,7 @@ func Convert_core_InstanceList_To_v1alpha1_InstanceList(in *core.InstanceList, o
 }
 
 func autoConvert_v1alpha1_InstanceSpec_To_core_InstanceSpec(in *corev1alpha1.InstanceSpec, out *core.InstanceSpec, s conversion.Scope) error {
-	out.Type = core.InstanceType(in.Type)
-	out.LoadBalancerType = core.LoadBalancerType(in.LoadBalancerType)
-	out.NetworkRef = in.NetworkRef
-	out.IPs = *(*[]net.IP)(unsafe.Pointer(&in.IPs))
-	out.LoadBalancerPorts = *(*[]core.LoadBalancerPort)(unsafe.Pointer(&in.LoadBalancerPorts))
-	out.Affinity = (*core.Affinity)(unsafe.Pointer(in.Affinity))
-	out.TopologySpreadConstraints = *(*[]core.TopologySpreadConstraint)(unsafe.Pointer(&in.TopologySpreadConstraints))
-	out.NodeRef = (*corev1.LocalObjectReference)(unsafe.Pointer(in.NodeRef))
+	*out = *(*core.InstanceSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1405,14 +1358,7 @@ func Convert_v1alpha1_InstanceSpec_To_core_InstanceSpec(in *corev1alpha1.Instanc
 }
 
 func autoConvert_core_InstanceSpec_To_v1alpha1_InstanceSpec(in *core.InstanceSpec, out *corev1alpha1.InstanceSpec, s conversion.Scope) error {
-	out.Type = corev1alpha1.InstanceType(in.Type)
-	out.LoadBalancerType = corev1alpha1.LoadBalancerType(in.LoadBalancerType)
-	out.NetworkRef = in.NetworkRef
-	out.IPs = *(*[]net.IP)(unsafe.Pointer(&in.IPs))
-	out.LoadBalancerPorts = *(*[]corev1alpha1.LoadBalancerPort)(unsafe.Pointer(&in.LoadBalancerPorts))
-	out.Affinity = (*corev1alpha1.Affinity)(unsafe.Pointer(in.Affinity))
-	out.TopologySpreadConstraints = *(*[]corev1alpha1.TopologySpreadConstraint)(unsafe.Pointer(&in.TopologySpreadConstraints))
-	out.NodeRef = (*corev1.LocalObjectReference)(unsafe.Pointer(in.NodeRef))
+	*out = *(*corev1alpha1.InstanceSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1422,8 +1368,7 @@ func Convert_core_InstanceSpec_To_v1alpha1_InstanceSpec(in *core.InstanceSpec, o
 }
 
 func autoConvert_v1alpha1_InstanceStatus_To_core_InstanceStatus(in *corev1alpha1.InstanceStatus, out *core.InstanceStatus, s conversion.Scope) error {
-	out.IPs = *(*[]net.IP)(unsafe.Pointer(&in.IPs))
-	out.CollisionCount = (*int32)(unsafe.Pointer(in.CollisionCount))
+	*out = *(*core.InstanceStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1433,8 +1378,7 @@ func Convert_v1alpha1_InstanceStatus_To_core_InstanceStatus(in *corev1alpha1.Ins
 }
 
 func autoConvert_core_InstanceStatus_To_v1alpha1_InstanceStatus(in *core.InstanceStatus, out *corev1alpha1.InstanceStatus, s conversion.Scope) error {
-	out.IPs = *(*[]net.IP)(unsafe.Pointer(&in.IPs))
-	out.CollisionCount = (*int32)(unsafe.Pointer(in.CollisionCount))
+	*out = *(*corev1alpha1.InstanceStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1444,10 +1388,7 @@ func Convert_core_InstanceStatus_To_v1alpha1_InstanceStatus(in *core.InstanceSta
 }
 
 func autoConvert_v1alpha1_InstanceTemplate_To_core_InstanceTemplate(in *corev1alpha1.InstanceTemplate, out *core.InstanceTemplate, s conversion.Scope) error {
-	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_v1alpha1_InstanceSpec_To_core_InstanceSpec(&in.Spec, &out.Spec, s); err != nil {
-		return err
-	}
+	*out = *(*core.InstanceTemplate)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1457,10 +1398,7 @@ func Convert_v1alpha1_InstanceTemplate_To_core_InstanceTemplate(in *corev1alpha1
 }
 
 func autoConvert_core_InstanceTemplate_To_v1alpha1_InstanceTemplate(in *core.InstanceTemplate, out *corev1alpha1.InstanceTemplate, s conversion.Scope) error {
-	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_core_InstanceSpec_To_v1alpha1_InstanceSpec(&in.Spec, &out.Spec, s); err != nil {
-		return err
-	}
+	*out = *(*corev1alpha1.InstanceTemplate)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1502,8 +1440,7 @@ func Convert_core_LoadBalancer_To_v1alpha1_LoadBalancer(in *core.LoadBalancer, o
 }
 
 func autoConvert_v1alpha1_LoadBalancerDestination_To_core_LoadBalancerDestination(in *corev1alpha1.LoadBalancerDestination, out *core.LoadBalancerDestination, s conversion.Scope) error {
-	out.IP = in.IP
-	out.TargetRef = (*core.LoadBalancerTargetRef)(unsafe.Pointer(in.TargetRef))
+	*out = *(*core.LoadBalancerDestination)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1513,8 +1450,7 @@ func Convert_v1alpha1_LoadBalancerDestination_To_core_LoadBalancerDestination(in
 }
 
 func autoConvert_core_LoadBalancerDestination_To_v1alpha1_LoadBalancerDestination(in *core.LoadBalancerDestination, out *corev1alpha1.LoadBalancerDestination, s conversion.Scope) error {
-	out.IP = in.IP
-	out.TargetRef = (*corev1alpha1.LoadBalancerTargetRef)(unsafe.Pointer(in.TargetRef))
+	*out = *(*corev1alpha1.LoadBalancerDestination)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1524,9 +1460,7 @@ func Convert_core_LoadBalancerDestination_To_v1alpha1_LoadBalancerDestination(in
 }
 
 func autoConvert_v1alpha1_LoadBalancerIP_To_core_LoadBalancerIP(in *corev1alpha1.LoadBalancerIP, out *core.LoadBalancerIP, s conversion.Scope) error {
-	out.Name = in.Name
-	out.IPFamily = corev1.IPFamily(in.IPFamily)
-	out.IP = in.IP
+	*out = *(*core.LoadBalancerIP)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1536,9 +1470,7 @@ func Convert_v1alpha1_LoadBalancerIP_To_core_LoadBalancerIP(in *corev1alpha1.Loa
 }
 
 func autoConvert_core_LoadBalancerIP_To_v1alpha1_LoadBalancerIP(in *core.LoadBalancerIP, out *corev1alpha1.LoadBalancerIP, s conversion.Scope) error {
-	out.Name = in.Name
-	out.IPFamily = corev1.IPFamily(in.IPFamily)
-	out.IP = in.IP
+	*out = *(*corev1alpha1.LoadBalancerIP)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1570,9 +1502,7 @@ func Convert_core_LoadBalancerList_To_v1alpha1_LoadBalancerList(in *core.LoadBal
 }
 
 func autoConvert_v1alpha1_LoadBalancerPort_To_core_LoadBalancerPort(in *corev1alpha1.LoadBalancerPort, out *core.LoadBalancerPort, s conversion.Scope) error {
-	out.Protocol = (*corev1.Protocol)(unsafe.Pointer(in.Protocol))
-	out.Port = in.Port
-	out.EndPort = (*int32)(unsafe.Pointer(in.EndPort))
+	*out = *(*core.LoadBalancerPort)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1582,9 +1512,7 @@ func Convert_v1alpha1_LoadBalancerPort_To_core_LoadBalancerPort(in *corev1alpha1
 }
 
 func autoConvert_core_LoadBalancerPort_To_v1alpha1_LoadBalancerPort(in *core.LoadBalancerPort, out *corev1alpha1.LoadBalancerPort, s conversion.Scope) error {
-	out.Protocol = (*corev1.Protocol)(unsafe.Pointer(in.Protocol))
-	out.Port = in.Port
-	out.EndPort = (*int32)(unsafe.Pointer(in.EndPort))
+	*out = *(*corev1alpha1.LoadBalancerPort)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1638,14 +1566,7 @@ func Convert_core_LoadBalancerRoutingList_To_v1alpha1_LoadBalancerRoutingList(in
 }
 
 func autoConvert_v1alpha1_LoadBalancerSpec_To_core_LoadBalancerSpec(in *corev1alpha1.LoadBalancerSpec, out *core.LoadBalancerSpec, s conversion.Scope) error {
-	out.Type = core.LoadBalancerType(in.Type)
-	out.NetworkRef = in.NetworkRef
-	out.IPs = *(*[]core.LoadBalancerIP)(unsafe.Pointer(&in.IPs))
-	out.Ports = *(*[]core.LoadBalancerPort)(unsafe.Pointer(&in.Ports))
-	out.Selector = (*v1.LabelSelector)(unsafe.Pointer(in.Selector))
-	if err := Convert_v1alpha1_InstanceTemplate_To_core_InstanceTemplate(&in.Template, &out.Template, s); err != nil {
-		return err
-	}
+	*out = *(*core.LoadBalancerSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1655,14 +1576,7 @@ func Convert_v1alpha1_LoadBalancerSpec_To_core_LoadBalancerSpec(in *corev1alpha1
 }
 
 func autoConvert_core_LoadBalancerSpec_To_v1alpha1_LoadBalancerSpec(in *core.LoadBalancerSpec, out *corev1alpha1.LoadBalancerSpec, s conversion.Scope) error {
-	out.Type = corev1alpha1.LoadBalancerType(in.Type)
-	out.NetworkRef = in.NetworkRef
-	out.IPs = *(*[]corev1alpha1.LoadBalancerIP)(unsafe.Pointer(&in.IPs))
-	out.Ports = *(*[]corev1alpha1.LoadBalancerPort)(unsafe.Pointer(&in.Ports))
-	out.Selector = (*v1.LabelSelector)(unsafe.Pointer(in.Selector))
-	if err := Convert_core_InstanceTemplate_To_v1alpha1_InstanceTemplate(&in.Template, &out.Template, s); err != nil {
-		return err
-	}
+	*out = *(*corev1alpha1.LoadBalancerSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1672,7 +1586,7 @@ func Convert_core_LoadBalancerSpec_To_v1alpha1_LoadBalancerSpec(in *core.LoadBal
 }
 
 func autoConvert_v1alpha1_LoadBalancerStatus_To_core_LoadBalancerStatus(in *corev1alpha1.LoadBalancerStatus, out *core.LoadBalancerStatus, s conversion.Scope) error {
-	out.CollisionCount = (*int32)(unsafe.Pointer(in.CollisionCount))
+	*out = *(*core.LoadBalancerStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1682,7 +1596,7 @@ func Convert_v1alpha1_LoadBalancerStatus_To_core_LoadBalancerStatus(in *corev1al
 }
 
 func autoConvert_core_LoadBalancerStatus_To_v1alpha1_LoadBalancerStatus(in *core.LoadBalancerStatus, out *corev1alpha1.LoadBalancerStatus, s conversion.Scope) error {
-	out.CollisionCount = (*int32)(unsafe.Pointer(in.CollisionCount))
+	*out = *(*corev1alpha1.LoadBalancerStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1692,9 +1606,7 @@ func Convert_core_LoadBalancerStatus_To_v1alpha1_LoadBalancerStatus(in *core.Loa
 }
 
 func autoConvert_v1alpha1_LoadBalancerTargetRef_To_core_LoadBalancerTargetRef(in *corev1alpha1.LoadBalancerTargetRef, out *core.LoadBalancerTargetRef, s conversion.Scope) error {
-	out.UID = types.UID(in.UID)
-	out.Name = in.Name
-	out.NodeRef = in.NodeRef
+	*out = *(*core.LoadBalancerTargetRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1704,9 +1616,7 @@ func Convert_v1alpha1_LoadBalancerTargetRef_To_core_LoadBalancerTargetRef(in *co
 }
 
 func autoConvert_core_LoadBalancerTargetRef_To_v1alpha1_LoadBalancerTargetRef(in *core.LoadBalancerTargetRef, out *corev1alpha1.LoadBalancerTargetRef, s conversion.Scope) error {
-	out.UID = types.UID(in.UID)
-	out.Name = in.Name
-	out.NodeRef = in.NodeRef
+	*out = *(*corev1alpha1.LoadBalancerTargetRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1716,8 +1626,7 @@ func Convert_core_LoadBalancerTargetRef_To_v1alpha1_LoadBalancerTargetRef(in *co
 }
 
 func autoConvert_v1alpha1_LocalUIDReference_To_core_LocalUIDReference(in *corev1alpha1.LocalUIDReference, out *core.LocalUIDReference, s conversion.Scope) error {
-	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	*out = *(*core.LocalUIDReference)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1727,8 +1636,7 @@ func Convert_v1alpha1_LocalUIDReference_To_core_LocalUIDReference(in *corev1alph
 }
 
 func autoConvert_core_LocalUIDReference_To_v1alpha1_LocalUIDReference(in *core.LocalUIDReference, out *corev1alpha1.LocalUIDReference, s conversion.Scope) error {
-	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	*out = *(*corev1alpha1.LocalUIDReference)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1824,9 +1732,7 @@ func Convert_core_NATGatewayAutoscalerList_To_v1alpha1_NATGatewayAutoscalerList(
 }
 
 func autoConvert_v1alpha1_NATGatewayAutoscalerSpec_To_core_NATGatewayAutoscalerSpec(in *corev1alpha1.NATGatewayAutoscalerSpec, out *core.NATGatewayAutoscalerSpec, s conversion.Scope) error {
-	out.NATGatewayRef = in.NATGatewayRef
-	out.MinPublicIPs = (*int32)(unsafe.Pointer(in.MinPublicIPs))
-	out.MaxPublicIPs = (*int32)(unsafe.Pointer(in.MaxPublicIPs))
+	*out = *(*core.NATGatewayAutoscalerSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1836,9 +1742,7 @@ func Convert_v1alpha1_NATGatewayAutoscalerSpec_To_core_NATGatewayAutoscalerSpec(
 }
 
 func autoConvert_core_NATGatewayAutoscalerSpec_To_v1alpha1_NATGatewayAutoscalerSpec(in *core.NATGatewayAutoscalerSpec, out *corev1alpha1.NATGatewayAutoscalerSpec, s conversion.Scope) error {
-	out.NATGatewayRef = in.NATGatewayRef
-	out.MinPublicIPs = (*int32)(unsafe.Pointer(in.MinPublicIPs))
-	out.MaxPublicIPs = (*int32)(unsafe.Pointer(in.MaxPublicIPs))
+	*out = *(*corev1alpha1.NATGatewayAutoscalerSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1848,6 +1752,7 @@ func Convert_core_NATGatewayAutoscalerSpec_To_v1alpha1_NATGatewayAutoscalerSpec(
 }
 
 func autoConvert_v1alpha1_NATGatewayAutoscalerStatus_To_core_NATGatewayAutoscalerStatus(in *corev1alpha1.NATGatewayAutoscalerStatus, out *core.NATGatewayAutoscalerStatus, s conversion.Scope) error {
+	*out = *(*core.NATGatewayAutoscalerStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1857,6 +1762,7 @@ func Convert_v1alpha1_NATGatewayAutoscalerStatus_To_core_NATGatewayAutoscalerSta
 }
 
 func autoConvert_core_NATGatewayAutoscalerStatus_To_v1alpha1_NATGatewayAutoscalerStatus(in *core.NATGatewayAutoscalerStatus, out *corev1alpha1.NATGatewayAutoscalerStatus, s conversion.Scope) error {
+	*out = *(*corev1alpha1.NATGatewayAutoscalerStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1866,8 +1772,7 @@ func Convert_core_NATGatewayAutoscalerStatus_To_v1alpha1_NATGatewayAutoscalerSta
 }
 
 func autoConvert_v1alpha1_NATGatewayIP_To_core_NATGatewayIP(in *corev1alpha1.NATGatewayIP, out *core.NATGatewayIP, s conversion.Scope) error {
-	out.Name = in.Name
-	out.IP = in.IP
+	*out = *(*core.NATGatewayIP)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1877,8 +1782,7 @@ func Convert_v1alpha1_NATGatewayIP_To_core_NATGatewayIP(in *corev1alpha1.NATGate
 }
 
 func autoConvert_core_NATGatewayIP_To_v1alpha1_NATGatewayIP(in *core.NATGatewayIP, out *corev1alpha1.NATGatewayIP, s conversion.Scope) error {
-	out.Name = in.Name
-	out.IP = in.IP
+	*out = *(*corev1alpha1.NATGatewayIP)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1910,10 +1814,7 @@ func Convert_core_NATGatewayList_To_v1alpha1_NATGatewayList(in *core.NATGatewayL
 }
 
 func autoConvert_v1alpha1_NATGatewaySpec_To_core_NATGatewaySpec(in *corev1alpha1.NATGatewaySpec, out *core.NATGatewaySpec, s conversion.Scope) error {
-	out.IPFamily = corev1.IPFamily(in.IPFamily)
-	out.NetworkRef = in.NetworkRef
-	out.IPs = *(*[]core.NATGatewayIP)(unsafe.Pointer(&in.IPs))
-	out.PortsPerNetworkInterface = in.PortsPerNetworkInterface
+	*out = *(*core.NATGatewaySpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1923,10 +1824,7 @@ func Convert_v1alpha1_NATGatewaySpec_To_core_NATGatewaySpec(in *corev1alpha1.NAT
 }
 
 func autoConvert_core_NATGatewaySpec_To_v1alpha1_NATGatewaySpec(in *core.NATGatewaySpec, out *corev1alpha1.NATGatewaySpec, s conversion.Scope) error {
-	out.IPFamily = corev1.IPFamily(in.IPFamily)
-	out.NetworkRef = in.NetworkRef
-	out.IPs = *(*[]corev1alpha1.NATGatewayIP)(unsafe.Pointer(&in.IPs))
-	out.PortsPerNetworkInterface = in.PortsPerNetworkInterface
+	*out = *(*corev1alpha1.NATGatewaySpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1936,8 +1834,7 @@ func Convert_core_NATGatewaySpec_To_v1alpha1_NATGatewaySpec(in *core.NATGatewayS
 }
 
 func autoConvert_v1alpha1_NATGatewayStatus_To_core_NATGatewayStatus(in *corev1alpha1.NATGatewayStatus, out *core.NATGatewayStatus, s conversion.Scope) error {
-	out.UsedNATIPs = in.UsedNATIPs
-	out.RequestedNATIPs = in.RequestedNATIPs
+	*out = *(*core.NATGatewayStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1947,8 +1844,7 @@ func Convert_v1alpha1_NATGatewayStatus_To_core_NATGatewayStatus(in *corev1alpha1
 }
 
 func autoConvert_core_NATGatewayStatus_To_v1alpha1_NATGatewayStatus(in *core.NATGatewayStatus, out *corev1alpha1.NATGatewayStatus, s conversion.Scope) error {
-	out.UsedNATIPs = in.UsedNATIPs
-	out.RequestedNATIPs = in.RequestedNATIPs
+	*out = *(*corev1alpha1.NATGatewayStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1958,8 +1854,7 @@ func Convert_core_NATGatewayStatus_To_v1alpha1_NATGatewayStatus(in *core.NATGate
 }
 
 func autoConvert_v1alpha1_NATIP_To_core_NATIP(in *corev1alpha1.NATIP, out *core.NATIP, s conversion.Scope) error {
-	out.IP = in.IP
-	out.Sections = *(*[]core.NATIPSection)(unsafe.Pointer(&in.Sections))
+	*out = *(*core.NATIP)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1969,8 +1864,7 @@ func Convert_v1alpha1_NATIP_To_core_NATIP(in *corev1alpha1.NATIP, out *core.NATI
 }
 
 func autoConvert_core_NATIP_To_v1alpha1_NATIP(in *core.NATIP, out *corev1alpha1.NATIP, s conversion.Scope) error {
-	out.IP = in.IP
-	out.Sections = *(*[]corev1alpha1.NATIPSection)(unsafe.Pointer(&in.Sections))
+	*out = *(*corev1alpha1.NATIP)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1980,10 +1874,7 @@ func Convert_core_NATIP_To_v1alpha1_NATIP(in *core.NATIP, out *corev1alpha1.NATI
 }
 
 func autoConvert_v1alpha1_NATIPSection_To_core_NATIPSection(in *corev1alpha1.NATIPSection, out *core.NATIPSection, s conversion.Scope) error {
-	out.IP = in.IP
-	out.Port = in.Port
-	out.EndPort = in.EndPort
-	out.TargetRef = (*core.NATTableIPTargetRef)(unsafe.Pointer(in.TargetRef))
+	*out = *(*core.NATIPSection)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1993,10 +1884,7 @@ func Convert_v1alpha1_NATIPSection_To_core_NATIPSection(in *corev1alpha1.NATIPSe
 }
 
 func autoConvert_core_NATIPSection_To_v1alpha1_NATIPSection(in *core.NATIPSection, out *corev1alpha1.NATIPSection, s conversion.Scope) error {
-	out.IP = in.IP
-	out.Port = in.Port
-	out.EndPort = in.EndPort
-	out.TargetRef = (*corev1alpha1.NATTableIPTargetRef)(unsafe.Pointer(in.TargetRef))
+	*out = *(*corev1alpha1.NATIPSection)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2028,9 +1916,7 @@ func Convert_core_NATTable_To_v1alpha1_NATTable(in *core.NATTable, out *corev1al
 }
 
 func autoConvert_v1alpha1_NATTableIPTargetRef_To_core_NATTableIPTargetRef(in *corev1alpha1.NATTableIPTargetRef, out *core.NATTableIPTargetRef, s conversion.Scope) error {
-	out.UID = types.UID(in.UID)
-	out.Name = in.Name
-	out.NodeRef = in.NodeRef
+	*out = *(*core.NATTableIPTargetRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2040,9 +1926,7 @@ func Convert_v1alpha1_NATTableIPTargetRef_To_core_NATTableIPTargetRef(in *corev1
 }
 
 func autoConvert_core_NATTableIPTargetRef_To_v1alpha1_NATTableIPTargetRef(in *core.NATTableIPTargetRef, out *corev1alpha1.NATTableIPTargetRef, s conversion.Scope) error {
-	out.UID = types.UID(in.UID)
-	out.Name = in.Name
-	out.NodeRef = in.NodeRef
+	*out = *(*corev1alpha1.NATTableIPTargetRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2132,11 +2016,7 @@ func Convert_core_NetworkID_To_v1alpha1_NetworkID(in *core.NetworkID, out *corev
 }
 
 func autoConvert_v1alpha1_NetworkIDClaimRef_To_core_NetworkIDClaimRef(in *corev1alpha1.NetworkIDClaimRef, out *core.NetworkIDClaimRef, s conversion.Scope) error {
-	out.Group = in.Group
-	out.Resource = in.Resource
-	out.Namespace = in.Namespace
-	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	*out = *(*core.NetworkIDClaimRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2146,11 +2026,7 @@ func Convert_v1alpha1_NetworkIDClaimRef_To_core_NetworkIDClaimRef(in *corev1alph
 }
 
 func autoConvert_core_NetworkIDClaimRef_To_v1alpha1_NetworkIDClaimRef(in *core.NetworkIDClaimRef, out *corev1alpha1.NetworkIDClaimRef, s conversion.Scope) error {
-	out.Group = in.Group
-	out.Resource = in.Resource
-	out.Namespace = in.Namespace
-	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	*out = *(*corev1alpha1.NetworkIDClaimRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2182,9 +2058,7 @@ func Convert_core_NetworkIDList_To_v1alpha1_NetworkIDList(in *core.NetworkIDList
 }
 
 func autoConvert_v1alpha1_NetworkIDSpec_To_core_NetworkIDSpec(in *corev1alpha1.NetworkIDSpec, out *core.NetworkIDSpec, s conversion.Scope) error {
-	if err := Convert_v1alpha1_NetworkIDClaimRef_To_core_NetworkIDClaimRef(&in.ClaimRef, &out.ClaimRef, s); err != nil {
-		return err
-	}
+	*out = *(*core.NetworkIDSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2194,9 +2068,7 @@ func Convert_v1alpha1_NetworkIDSpec_To_core_NetworkIDSpec(in *corev1alpha1.Netwo
 }
 
 func autoConvert_core_NetworkIDSpec_To_v1alpha1_NetworkIDSpec(in *core.NetworkIDSpec, out *corev1alpha1.NetworkIDSpec, s conversion.Scope) error {
-	if err := Convert_core_NetworkIDClaimRef_To_v1alpha1_NetworkIDClaimRef(&in.ClaimRef, &out.ClaimRef, s); err != nil {
-		return err
-	}
+	*out = *(*corev1alpha1.NetworkIDSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2260,10 +2132,7 @@ func Convert_core_NetworkInterfaceList_To_v1alpha1_NetworkInterfaceList(in *core
 }
 
 func autoConvert_v1alpha1_NetworkInterfaceNAT_To_core_NetworkInterfaceNAT(in *corev1alpha1.NetworkInterfaceNAT, out *core.NetworkInterfaceNAT, s conversion.Scope) error {
-	out.IPFamily = corev1.IPFamily(in.IPFamily)
-	if err := Convert_v1alpha1_NetworkInterfaceNATClaimRef_To_core_NetworkInterfaceNATClaimRef(&in.ClaimRef, &out.ClaimRef, s); err != nil {
-		return err
-	}
+	*out = *(*core.NetworkInterfaceNAT)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2273,10 +2142,7 @@ func Convert_v1alpha1_NetworkInterfaceNAT_To_core_NetworkInterfaceNAT(in *corev1
 }
 
 func autoConvert_core_NetworkInterfaceNAT_To_v1alpha1_NetworkInterfaceNAT(in *core.NetworkInterfaceNAT, out *corev1alpha1.NetworkInterfaceNAT, s conversion.Scope) error {
-	out.IPFamily = corev1.IPFamily(in.IPFamily)
-	if err := Convert_core_NetworkInterfaceNATClaimRef_To_v1alpha1_NetworkInterfaceNATClaimRef(&in.ClaimRef, &out.ClaimRef, s); err != nil {
-		return err
-	}
+	*out = *(*corev1alpha1.NetworkInterfaceNAT)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2286,8 +2152,7 @@ func Convert_core_NetworkInterfaceNAT_To_v1alpha1_NetworkInterfaceNAT(in *core.N
 }
 
 func autoConvert_v1alpha1_NetworkInterfaceNATClaimRef_To_core_NetworkInterfaceNATClaimRef(in *corev1alpha1.NetworkInterfaceNATClaimRef, out *core.NetworkInterfaceNATClaimRef, s conversion.Scope) error {
-	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	*out = *(*core.NetworkInterfaceNATClaimRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2297,8 +2162,7 @@ func Convert_v1alpha1_NetworkInterfaceNATClaimRef_To_core_NetworkInterfaceNATCla
 }
 
 func autoConvert_core_NetworkInterfaceNATClaimRef_To_v1alpha1_NetworkInterfaceNATClaimRef(in *core.NetworkInterfaceNATClaimRef, out *corev1alpha1.NetworkInterfaceNATClaimRef, s conversion.Scope) error {
-	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	*out = *(*corev1alpha1.NetworkInterfaceNATClaimRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2308,9 +2172,7 @@ func Convert_core_NetworkInterfaceNATClaimRef_To_v1alpha1_NetworkInterfaceNATCla
 }
 
 func autoConvert_v1alpha1_NetworkInterfacePublicIP_To_core_NetworkInterfacePublicIP(in *corev1alpha1.NetworkInterfacePublicIP, out *core.NetworkInterfacePublicIP, s conversion.Scope) error {
-	out.Name = in.Name
-	out.IPFamily = corev1.IPFamily(in.IPFamily)
-	out.IP = in.IP
+	*out = *(*core.NetworkInterfacePublicIP)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2320,9 +2182,7 @@ func Convert_v1alpha1_NetworkInterfacePublicIP_To_core_NetworkInterfacePublicIP(
 }
 
 func autoConvert_core_NetworkInterfacePublicIP_To_v1alpha1_NetworkInterfacePublicIP(in *core.NetworkInterfacePublicIP, out *corev1alpha1.NetworkInterfacePublicIP, s conversion.Scope) error {
-	out.Name = in.Name
-	out.IPFamily = corev1.IPFamily(in.IPFamily)
-	out.IP = in.IP
+	*out = *(*corev1alpha1.NetworkInterfacePublicIP)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2332,13 +2192,7 @@ func Convert_core_NetworkInterfacePublicIP_To_v1alpha1_NetworkInterfacePublicIP(
 }
 
 func autoConvert_v1alpha1_NetworkInterfaceSpec_To_core_NetworkInterfaceSpec(in *corev1alpha1.NetworkInterfaceSpec, out *core.NetworkInterfaceSpec, s conversion.Scope) error {
-	out.NodeRef = in.NodeRef
-	out.NetworkRef = in.NetworkRef
-	out.IPs = *(*[]net.IP)(unsafe.Pointer(&in.IPs))
-	out.Prefixes = *(*[]net.IPPrefix)(unsafe.Pointer(&in.Prefixes))
-	out.NATs = *(*[]core.NetworkInterfaceNAT)(unsafe.Pointer(&in.NATs))
-	out.Hostname = in.Hostname
-	out.PublicIPs = *(*[]core.NetworkInterfacePublicIP)(unsafe.Pointer(&in.PublicIPs))
+	*out = *(*core.NetworkInterfaceSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2348,13 +2202,7 @@ func Convert_v1alpha1_NetworkInterfaceSpec_To_core_NetworkInterfaceSpec(in *core
 }
 
 func autoConvert_core_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(in *core.NetworkInterfaceSpec, out *corev1alpha1.NetworkInterfaceSpec, s conversion.Scope) error {
-	out.NodeRef = in.NodeRef
-	out.NetworkRef = in.NetworkRef
-	out.IPs = *(*[]net.IP)(unsafe.Pointer(&in.IPs))
-	out.Prefixes = *(*[]net.IPPrefix)(unsafe.Pointer(&in.Prefixes))
-	out.NATs = *(*[]corev1alpha1.NetworkInterfaceNAT)(unsafe.Pointer(&in.NATs))
-	out.Hostname = in.Hostname
-	out.PublicIPs = *(*[]corev1alpha1.NetworkInterfacePublicIP)(unsafe.Pointer(&in.PublicIPs))
+	*out = *(*corev1alpha1.NetworkInterfaceSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2364,12 +2212,7 @@ func Convert_core_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(in *core
 }
 
 func autoConvert_v1alpha1_NetworkInterfaceStatus_To_core_NetworkInterfaceStatus(in *corev1alpha1.NetworkInterfaceStatus, out *core.NetworkInterfaceStatus, s conversion.Scope) error {
-	out.State = core.NetworkInterfaceState(in.State)
-	out.PCIAddress = (*core.PCIAddress)(unsafe.Pointer(in.PCIAddress))
-	out.TAPDevice = (*core.TAPDevice)(unsafe.Pointer(in.TAPDevice))
-	out.Prefixes = *(*[]net.IPPrefix)(unsafe.Pointer(&in.Prefixes))
-	out.PublicIPs = *(*[]net.IP)(unsafe.Pointer(&in.PublicIPs))
-	out.NATIPs = *(*[]net.IP)(unsafe.Pointer(&in.NATIPs))
+	*out = *(*core.NetworkInterfaceStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2379,12 +2222,7 @@ func Convert_v1alpha1_NetworkInterfaceStatus_To_core_NetworkInterfaceStatus(in *
 }
 
 func autoConvert_core_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in *core.NetworkInterfaceStatus, out *corev1alpha1.NetworkInterfaceStatus, s conversion.Scope) error {
-	out.State = corev1alpha1.NetworkInterfaceState(in.State)
-	out.PCIAddress = (*corev1alpha1.PCIAddress)(unsafe.Pointer(in.PCIAddress))
-	out.TAPDevice = (*corev1alpha1.TAPDevice)(unsafe.Pointer(in.TAPDevice))
-	out.Prefixes = *(*[]net.IPPrefix)(unsafe.Pointer(&in.Prefixes))
-	out.PublicIPs = *(*[]net.IP)(unsafe.Pointer(&in.PublicIPs))
-	out.NATIPs = *(*[]net.IP)(unsafe.Pointer(&in.NATIPs))
+	*out = *(*corev1alpha1.NetworkInterfaceStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2416,9 +2254,7 @@ func Convert_core_NetworkList_To_v1alpha1_NetworkList(in *core.NetworkList, out 
 }
 
 func autoConvert_v1alpha1_NetworkPeering_To_core_NetworkPeering(in *corev1alpha1.NetworkPeering, out *core.NetworkPeering, s conversion.Scope) error {
-	out.Name = in.Name
-	out.ID = in.ID
-	out.Prefixes = *(*[]core.PeeringPrefix)(unsafe.Pointer(&in.Prefixes))
+	*out = *(*core.NetworkPeering)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2428,9 +2264,7 @@ func Convert_v1alpha1_NetworkPeering_To_core_NetworkPeering(in *corev1alpha1.Net
 }
 
 func autoConvert_core_NetworkPeering_To_v1alpha1_NetworkPeering(in *core.NetworkPeering, out *corev1alpha1.NetworkPeering, s conversion.Scope) error {
-	out.Name = in.Name
-	out.ID = in.ID
-	out.Prefixes = *(*[]corev1alpha1.PeeringPrefix)(unsafe.Pointer(&in.Prefixes))
+	*out = *(*corev1alpha1.NetworkPeering)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2440,8 +2274,7 @@ func Convert_core_NetworkPeering_To_v1alpha1_NetworkPeering(in *core.NetworkPeer
 }
 
 func autoConvert_v1alpha1_NetworkPeeringStatus_To_core_NetworkPeeringStatus(in *corev1alpha1.NetworkPeeringStatus, out *core.NetworkPeeringStatus, s conversion.Scope) error {
-	out.ID = in.ID
-	out.State = core.NetworkPeeringState(in.State)
+	*out = *(*core.NetworkPeeringStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2451,8 +2284,7 @@ func Convert_v1alpha1_NetworkPeeringStatus_To_core_NetworkPeeringStatus(in *core
 }
 
 func autoConvert_core_NetworkPeeringStatus_To_v1alpha1_NetworkPeeringStatus(in *core.NetworkPeeringStatus, out *corev1alpha1.NetworkPeeringStatus, s conversion.Scope) error {
-	out.ID = in.ID
-	out.State = corev1alpha1.NetworkPeeringState(in.State)
+	*out = *(*corev1alpha1.NetworkPeeringStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2488,8 +2320,7 @@ func Convert_core_NetworkPolicy_To_v1alpha1_NetworkPolicy(in *core.NetworkPolicy
 }
 
 func autoConvert_v1alpha1_NetworkPolicyEgressRule_To_core_NetworkPolicyEgressRule(in *corev1alpha1.NetworkPolicyEgressRule, out *core.NetworkPolicyEgressRule, s conversion.Scope) error {
-	out.Ports = *(*[]core.NetworkPolicyPort)(unsafe.Pointer(&in.Ports))
-	out.To = *(*[]core.NetworkPolicyPeer)(unsafe.Pointer(&in.To))
+	*out = *(*core.NetworkPolicyEgressRule)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2499,8 +2330,7 @@ func Convert_v1alpha1_NetworkPolicyEgressRule_To_core_NetworkPolicyEgressRule(in
 }
 
 func autoConvert_core_NetworkPolicyEgressRule_To_v1alpha1_NetworkPolicyEgressRule(in *core.NetworkPolicyEgressRule, out *corev1alpha1.NetworkPolicyEgressRule, s conversion.Scope) error {
-	out.Ports = *(*[]corev1alpha1.NetworkPolicyPort)(unsafe.Pointer(&in.Ports))
-	out.To = *(*[]corev1alpha1.NetworkPolicyPeer)(unsafe.Pointer(&in.To))
+	*out = *(*corev1alpha1.NetworkPolicyEgressRule)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2510,8 +2340,7 @@ func Convert_core_NetworkPolicyEgressRule_To_v1alpha1_NetworkPolicyEgressRule(in
 }
 
 func autoConvert_v1alpha1_NetworkPolicyIngressRule_To_core_NetworkPolicyIngressRule(in *corev1alpha1.NetworkPolicyIngressRule, out *core.NetworkPolicyIngressRule, s conversion.Scope) error {
-	out.From = *(*[]core.NetworkPolicyPeer)(unsafe.Pointer(&in.From))
-	out.Ports = *(*[]core.NetworkPolicyPort)(unsafe.Pointer(&in.Ports))
+	*out = *(*core.NetworkPolicyIngressRule)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2521,8 +2350,7 @@ func Convert_v1alpha1_NetworkPolicyIngressRule_To_core_NetworkPolicyIngressRule(
 }
 
 func autoConvert_core_NetworkPolicyIngressRule_To_v1alpha1_NetworkPolicyIngressRule(in *core.NetworkPolicyIngressRule, out *corev1alpha1.NetworkPolicyIngressRule, s conversion.Scope) error {
-	out.From = *(*[]corev1alpha1.NetworkPolicyPeer)(unsafe.Pointer(&in.From))
-	out.Ports = *(*[]corev1alpha1.NetworkPolicyPort)(unsafe.Pointer(&in.Ports))
+	*out = *(*corev1alpha1.NetworkPolicyIngressRule)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2554,8 +2382,7 @@ func Convert_core_NetworkPolicyList_To_v1alpha1_NetworkPolicyList(in *core.Netwo
 }
 
 func autoConvert_v1alpha1_NetworkPolicyPeer_To_core_NetworkPolicyPeer(in *corev1alpha1.NetworkPolicyPeer, out *core.NetworkPolicyPeer, s conversion.Scope) error {
-	out.ObjectSelector = (*core.ObjectSelector)(unsafe.Pointer(in.ObjectSelector))
-	out.IPBlock = (*core.IPBlock)(unsafe.Pointer(in.IPBlock))
+	*out = *(*core.NetworkPolicyPeer)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2565,8 +2392,7 @@ func Convert_v1alpha1_NetworkPolicyPeer_To_core_NetworkPolicyPeer(in *corev1alph
 }
 
 func autoConvert_core_NetworkPolicyPeer_To_v1alpha1_NetworkPolicyPeer(in *core.NetworkPolicyPeer, out *corev1alpha1.NetworkPolicyPeer, s conversion.Scope) error {
-	out.ObjectSelector = (*corev1alpha1.ObjectSelector)(unsafe.Pointer(in.ObjectSelector))
-	out.IPBlock = (*corev1alpha1.IPBlock)(unsafe.Pointer(in.IPBlock))
+	*out = *(*corev1alpha1.NetworkPolicyPeer)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2576,9 +2402,7 @@ func Convert_core_NetworkPolicyPeer_To_v1alpha1_NetworkPolicyPeer(in *core.Netwo
 }
 
 func autoConvert_v1alpha1_NetworkPolicyPort_To_core_NetworkPolicyPort(in *corev1alpha1.NetworkPolicyPort, out *core.NetworkPolicyPort, s conversion.Scope) error {
-	out.Protocol = (*corev1.Protocol)(unsafe.Pointer(in.Protocol))
-	out.Port = in.Port
-	out.EndPort = (*int32)(unsafe.Pointer(in.EndPort))
+	*out = *(*core.NetworkPolicyPort)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2588,9 +2412,7 @@ func Convert_v1alpha1_NetworkPolicyPort_To_core_NetworkPolicyPort(in *corev1alph
 }
 
 func autoConvert_core_NetworkPolicyPort_To_v1alpha1_NetworkPolicyPort(in *core.NetworkPolicyPort, out *corev1alpha1.NetworkPolicyPort, s conversion.Scope) error {
-	out.Protocol = (*corev1.Protocol)(unsafe.Pointer(in.Protocol))
-	out.Port = in.Port
-	out.EndPort = (*int32)(unsafe.Pointer(in.EndPort))
+	*out = *(*corev1alpha1.NetworkPolicyPort)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2656,12 +2478,7 @@ func Convert_core_NetworkPolicyRuleList_To_v1alpha1_NetworkPolicyRuleList(in *co
 }
 
 func autoConvert_v1alpha1_NetworkPolicySpec_To_core_NetworkPolicySpec(in *corev1alpha1.NetworkPolicySpec, out *core.NetworkPolicySpec, s conversion.Scope) error {
-	out.NetworkRef = in.NetworkRef
-	out.NetworkInterfaceSelector = in.NetworkInterfaceSelector
-	out.Priority = (*int32)(unsafe.Pointer(in.Priority))
-	out.Ingress = *(*[]core.NetworkPolicyIngressRule)(unsafe.Pointer(&in.Ingress))
-	out.Egress = *(*[]core.NetworkPolicyEgressRule)(unsafe.Pointer(&in.Egress))
-	out.PolicyTypes = *(*[]core.PolicyType)(unsafe.Pointer(&in.PolicyTypes))
+	*out = *(*core.NetworkPolicySpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2671,12 +2488,7 @@ func Convert_v1alpha1_NetworkPolicySpec_To_core_NetworkPolicySpec(in *corev1alph
 }
 
 func autoConvert_core_NetworkPolicySpec_To_v1alpha1_NetworkPolicySpec(in *core.NetworkPolicySpec, out *corev1alpha1.NetworkPolicySpec, s conversion.Scope) error {
-	out.NetworkRef = in.NetworkRef
-	out.NetworkInterfaceSelector = in.NetworkInterfaceSelector
-	out.Priority = (*int32)(unsafe.Pointer(in.Priority))
-	out.Ingress = *(*[]corev1alpha1.NetworkPolicyIngressRule)(unsafe.Pointer(&in.Ingress))
-	out.Egress = *(*[]corev1alpha1.NetworkPolicyEgressRule)(unsafe.Pointer(&in.Egress))
-	out.PolicyTypes = *(*[]corev1alpha1.PolicyType)(unsafe.Pointer(&in.PolicyTypes))
+	*out = *(*corev1alpha1.NetworkPolicySpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2686,8 +2498,7 @@ func Convert_core_NetworkPolicySpec_To_v1alpha1_NetworkPolicySpec(in *core.Netwo
 }
 
 func autoConvert_v1alpha1_NetworkSpec_To_core_NetworkSpec(in *corev1alpha1.NetworkSpec, out *core.NetworkSpec, s conversion.Scope) error {
-	out.ID = in.ID
-	out.Peerings = *(*[]core.NetworkPeering)(unsafe.Pointer(&in.Peerings))
+	*out = *(*core.NetworkSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2697,8 +2508,7 @@ func Convert_v1alpha1_NetworkSpec_To_core_NetworkSpec(in *corev1alpha1.NetworkSp
 }
 
 func autoConvert_core_NetworkSpec_To_v1alpha1_NetworkSpec(in *core.NetworkSpec, out *corev1alpha1.NetworkSpec, s conversion.Scope) error {
-	out.ID = in.ID
-	out.Peerings = *(*[]corev1alpha1.NetworkPeering)(unsafe.Pointer(&in.Peerings))
+	*out = *(*corev1alpha1.NetworkSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2708,7 +2518,7 @@ func Convert_core_NetworkSpec_To_v1alpha1_NetworkSpec(in *core.NetworkSpec, out 
 }
 
 func autoConvert_v1alpha1_NetworkStatus_To_core_NetworkStatus(in *corev1alpha1.NetworkStatus, out *core.NetworkStatus, s conversion.Scope) error {
-	out.Peerings = *(*map[string][]core.NetworkPeeringStatus)(unsafe.Pointer(&in.Peerings))
+	*out = *(*core.NetworkStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2718,7 +2528,7 @@ func Convert_v1alpha1_NetworkStatus_To_core_NetworkStatus(in *corev1alpha1.Netwo
 }
 
 func autoConvert_core_NetworkStatus_To_v1alpha1_NetworkStatus(in *core.NetworkStatus, out *corev1alpha1.NetworkStatus, s conversion.Scope) error {
-	out.Peerings = *(*map[string][]corev1alpha1.NetworkPeeringStatus)(unsafe.Pointer(&in.Peerings))
+	*out = *(*corev1alpha1.NetworkStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2760,7 +2570,7 @@ func Convert_core_Node_To_v1alpha1_Node(in *core.Node, out *corev1alpha1.Node, s
 }
 
 func autoConvert_v1alpha1_NodeAffinity_To_core_NodeAffinity(in *corev1alpha1.NodeAffinity, out *core.NodeAffinity, s conversion.Scope) error {
-	out.RequiredDuringSchedulingIgnoredDuringExecution = (*core.NodeSelector)(unsafe.Pointer(in.RequiredDuringSchedulingIgnoredDuringExecution))
+	*out = *(*core.NodeAffinity)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2770,7 +2580,7 @@ func Convert_v1alpha1_NodeAffinity_To_core_NodeAffinity(in *corev1alpha1.NodeAff
 }
 
 func autoConvert_core_NodeAffinity_To_v1alpha1_NodeAffinity(in *core.NodeAffinity, out *corev1alpha1.NodeAffinity, s conversion.Scope) error {
-	out.RequiredDuringSchedulingIgnoredDuringExecution = (*corev1alpha1.NodeSelector)(unsafe.Pointer(in.RequiredDuringSchedulingIgnoredDuringExecution))
+	*out = *(*corev1alpha1.NodeAffinity)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2802,7 +2612,7 @@ func Convert_core_NodeList_To_v1alpha1_NodeList(in *core.NodeList, out *corev1al
 }
 
 func autoConvert_v1alpha1_NodeSelector_To_core_NodeSelector(in *corev1alpha1.NodeSelector, out *core.NodeSelector, s conversion.Scope) error {
-	out.NodeSelectorTerms = *(*[]core.NodeSelectorTerm)(unsafe.Pointer(&in.NodeSelectorTerms))
+	*out = *(*core.NodeSelector)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2812,7 +2622,7 @@ func Convert_v1alpha1_NodeSelector_To_core_NodeSelector(in *corev1alpha1.NodeSel
 }
 
 func autoConvert_core_NodeSelector_To_v1alpha1_NodeSelector(in *core.NodeSelector, out *corev1alpha1.NodeSelector, s conversion.Scope) error {
-	out.NodeSelectorTerms = *(*[]corev1alpha1.NodeSelectorTerm)(unsafe.Pointer(&in.NodeSelectorTerms))
+	*out = *(*corev1alpha1.NodeSelector)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2822,9 +2632,7 @@ func Convert_core_NodeSelector_To_v1alpha1_NodeSelector(in *core.NodeSelector, o
 }
 
 func autoConvert_v1alpha1_NodeSelectorRequirement_To_core_NodeSelectorRequirement(in *corev1alpha1.NodeSelectorRequirement, out *core.NodeSelectorRequirement, s conversion.Scope) error {
-	out.Key = in.Key
-	out.Operator = core.NodeSelectorOperator(in.Operator)
-	out.Values = *(*[]string)(unsafe.Pointer(&in.Values))
+	*out = *(*core.NodeSelectorRequirement)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2834,9 +2642,7 @@ func Convert_v1alpha1_NodeSelectorRequirement_To_core_NodeSelectorRequirement(in
 }
 
 func autoConvert_core_NodeSelectorRequirement_To_v1alpha1_NodeSelectorRequirement(in *core.NodeSelectorRequirement, out *corev1alpha1.NodeSelectorRequirement, s conversion.Scope) error {
-	out.Key = in.Key
-	out.Operator = corev1alpha1.NodeSelectorOperator(in.Operator)
-	out.Values = *(*[]string)(unsafe.Pointer(&in.Values))
+	*out = *(*corev1alpha1.NodeSelectorRequirement)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2846,8 +2652,7 @@ func Convert_core_NodeSelectorRequirement_To_v1alpha1_NodeSelectorRequirement(in
 }
 
 func autoConvert_v1alpha1_NodeSelectorTerm_To_core_NodeSelectorTerm(in *corev1alpha1.NodeSelectorTerm, out *core.NodeSelectorTerm, s conversion.Scope) error {
-	out.MatchExpressions = *(*[]core.NodeSelectorRequirement)(unsafe.Pointer(&in.MatchExpressions))
-	out.MatchFields = *(*[]core.NodeSelectorRequirement)(unsafe.Pointer(&in.MatchFields))
+	*out = *(*core.NodeSelectorTerm)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2857,8 +2662,7 @@ func Convert_v1alpha1_NodeSelectorTerm_To_core_NodeSelectorTerm(in *corev1alpha1
 }
 
 func autoConvert_core_NodeSelectorTerm_To_v1alpha1_NodeSelectorTerm(in *core.NodeSelectorTerm, out *corev1alpha1.NodeSelectorTerm, s conversion.Scope) error {
-	out.MatchExpressions = *(*[]corev1alpha1.NodeSelectorRequirement)(unsafe.Pointer(&in.MatchExpressions))
-	out.MatchFields = *(*[]corev1alpha1.NodeSelectorRequirement)(unsafe.Pointer(&in.MatchFields))
+	*out = *(*corev1alpha1.NodeSelectorTerm)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2868,6 +2672,7 @@ func Convert_core_NodeSelectorTerm_To_v1alpha1_NodeSelectorTerm(in *core.NodeSel
 }
 
 func autoConvert_v1alpha1_NodeSpec_To_core_NodeSpec(in *corev1alpha1.NodeSpec, out *core.NodeSpec, s conversion.Scope) error {
+	*out = *(*core.NodeSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2877,6 +2682,7 @@ func Convert_v1alpha1_NodeSpec_To_core_NodeSpec(in *corev1alpha1.NodeSpec, out *
 }
 
 func autoConvert_core_NodeSpec_To_v1alpha1_NodeSpec(in *core.NodeSpec, out *corev1alpha1.NodeSpec, s conversion.Scope) error {
+	*out = *(*corev1alpha1.NodeSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2886,6 +2692,7 @@ func Convert_core_NodeSpec_To_v1alpha1_NodeSpec(in *core.NodeSpec, out *corev1al
 }
 
 func autoConvert_v1alpha1_NodeStatus_To_core_NodeStatus(in *corev1alpha1.NodeStatus, out *core.NodeStatus, s conversion.Scope) error {
+	*out = *(*core.NodeStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2895,6 +2702,7 @@ func Convert_v1alpha1_NodeStatus_To_core_NodeStatus(in *corev1alpha1.NodeStatus,
 }
 
 func autoConvert_core_NodeStatus_To_v1alpha1_NodeStatus(in *core.NodeStatus, out *corev1alpha1.NodeStatus, s conversion.Scope) error {
+	*out = *(*corev1alpha1.NodeStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2904,8 +2712,7 @@ func Convert_core_NodeStatus_To_v1alpha1_NodeStatus(in *core.NodeStatus, out *co
 }
 
 func autoConvert_v1alpha1_ObjectIP_To_core_ObjectIP(in *corev1alpha1.ObjectIP, out *core.ObjectIP, s conversion.Scope) error {
-	out.IPFamily = corev1.IPFamily(in.IPFamily)
-	out.Prefix = in.Prefix
+	*out = *(*core.ObjectIP)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2915,8 +2722,7 @@ func Convert_v1alpha1_ObjectIP_To_core_ObjectIP(in *corev1alpha1.ObjectIP, out *
 }
 
 func autoConvert_core_ObjectIP_To_v1alpha1_ObjectIP(in *core.ObjectIP, out *corev1alpha1.ObjectIP, s conversion.Scope) error {
-	out.IPFamily = corev1.IPFamily(in.IPFamily)
-	out.Prefix = in.Prefix
+	*out = *(*corev1alpha1.ObjectIP)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2926,8 +2732,7 @@ func Convert_core_ObjectIP_To_v1alpha1_ObjectIP(in *core.ObjectIP, out *corev1al
 }
 
 func autoConvert_v1alpha1_ObjectSelector_To_core_ObjectSelector(in *corev1alpha1.ObjectSelector, out *core.ObjectSelector, s conversion.Scope) error {
-	out.Kind = in.Kind
-	out.LabelSelector = in.LabelSelector
+	*out = *(*core.ObjectSelector)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2937,8 +2742,7 @@ func Convert_v1alpha1_ObjectSelector_To_core_ObjectSelector(in *corev1alpha1.Obj
 }
 
 func autoConvert_core_ObjectSelector_To_v1alpha1_ObjectSelector(in *core.ObjectSelector, out *corev1alpha1.ObjectSelector, s conversion.Scope) error {
-	out.Kind = in.Kind
-	out.LabelSelector = in.LabelSelector
+	*out = *(*corev1alpha1.ObjectSelector)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2948,10 +2752,7 @@ func Convert_core_ObjectSelector_To_v1alpha1_ObjectSelector(in *core.ObjectSelec
 }
 
 func autoConvert_v1alpha1_PCIAddress_To_core_PCIAddress(in *corev1alpha1.PCIAddress, out *core.PCIAddress, s conversion.Scope) error {
-	out.Domain = in.Domain
-	out.Bus = in.Bus
-	out.Slot = in.Slot
-	out.Function = in.Function
+	*out = *(*core.PCIAddress)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2961,10 +2762,7 @@ func Convert_v1alpha1_PCIAddress_To_core_PCIAddress(in *corev1alpha1.PCIAddress,
 }
 
 func autoConvert_core_PCIAddress_To_v1alpha1_PCIAddress(in *core.PCIAddress, out *corev1alpha1.PCIAddress, s conversion.Scope) error {
-	out.Domain = in.Domain
-	out.Bus = in.Bus
-	out.Slot = in.Slot
-	out.Function = in.Function
+	*out = *(*corev1alpha1.PCIAddress)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2974,8 +2772,7 @@ func Convert_core_PCIAddress_To_v1alpha1_PCIAddress(in *core.PCIAddress, out *co
 }
 
 func autoConvert_v1alpha1_PeeringPrefix_To_core_PeeringPrefix(in *corev1alpha1.PeeringPrefix, out *core.PeeringPrefix, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Prefix = (*net.IPPrefix)(unsafe.Pointer(in.Prefix))
+	*out = *(*core.PeeringPrefix)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2985,8 +2782,7 @@ func Convert_v1alpha1_PeeringPrefix_To_core_PeeringPrefix(in *corev1alpha1.Peeri
 }
 
 func autoConvert_core_PeeringPrefix_To_v1alpha1_PeeringPrefix(in *core.PeeringPrefix, out *corev1alpha1.PeeringPrefix, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Prefix = (*net.IPPrefix)(unsafe.Pointer(in.Prefix))
+	*out = *(*corev1alpha1.PeeringPrefix)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -2996,9 +2792,7 @@ func Convert_core_PeeringPrefix_To_v1alpha1_PeeringPrefix(in *core.PeeringPrefix
 }
 
 func autoConvert_v1alpha1_Rule_To_core_Rule(in *corev1alpha1.Rule, out *core.Rule, s conversion.Scope) error {
-	out.CIDRBlock = *(*[]core.IPBlock)(unsafe.Pointer(&in.CIDRBlock))
-	out.ObjectIPs = *(*[]core.ObjectIP)(unsafe.Pointer(&in.ObjectIPs))
-	out.NetworkPolicyPorts = *(*[]core.NetworkPolicyPort)(unsafe.Pointer(&in.NetworkPolicyPorts))
+	*out = *(*core.Rule)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -3008,9 +2802,7 @@ func Convert_v1alpha1_Rule_To_core_Rule(in *corev1alpha1.Rule, out *core.Rule, s
 }
 
 func autoConvert_core_Rule_To_v1alpha1_Rule(in *core.Rule, out *corev1alpha1.Rule, s conversion.Scope) error {
-	out.CIDRBlock = *(*[]corev1alpha1.IPBlock)(unsafe.Pointer(&in.CIDRBlock))
-	out.ObjectIPs = *(*[]corev1alpha1.ObjectIP)(unsafe.Pointer(&in.ObjectIPs))
-	out.NetworkPolicyPorts = *(*[]corev1alpha1.NetworkPolicyPort)(unsafe.Pointer(&in.NetworkPolicyPorts))
+	*out = *(*corev1alpha1.Rule)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -3020,7 +2812,7 @@ func Convert_core_Rule_To_v1alpha1_Rule(in *core.Rule, out *corev1alpha1.Rule, s
 }
 
 func autoConvert_v1alpha1_TAPDevice_To_core_TAPDevice(in *corev1alpha1.TAPDevice, out *core.TAPDevice, s conversion.Scope) error {
-	out.Name = in.Name
+	*out = *(*core.TAPDevice)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -3030,7 +2822,7 @@ func Convert_v1alpha1_TAPDevice_To_core_TAPDevice(in *corev1alpha1.TAPDevice, ou
 }
 
 func autoConvert_core_TAPDevice_To_v1alpha1_TAPDevice(in *core.TAPDevice, out *corev1alpha1.TAPDevice, s conversion.Scope) error {
-	out.Name = in.Name
+	*out = *(*corev1alpha1.TAPDevice)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -3040,8 +2832,7 @@ func Convert_core_TAPDevice_To_v1alpha1_TAPDevice(in *core.TAPDevice, out *corev
 }
 
 func autoConvert_v1alpha1_TargetNetworkInterface_To_core_TargetNetworkInterface(in *corev1alpha1.TargetNetworkInterface, out *core.TargetNetworkInterface, s conversion.Scope) error {
-	out.IP = in.IP
-	out.TargetRef = (*core.LocalUIDReference)(unsafe.Pointer(in.TargetRef))
+	*out = *(*core.TargetNetworkInterface)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -3051,8 +2842,7 @@ func Convert_v1alpha1_TargetNetworkInterface_To_core_TargetNetworkInterface(in *
 }
 
 func autoConvert_core_TargetNetworkInterface_To_v1alpha1_TargetNetworkInterface(in *core.TargetNetworkInterface, out *corev1alpha1.TargetNetworkInterface, s conversion.Scope) error {
-	out.IP = in.IP
-	out.TargetRef = (*corev1alpha1.LocalUIDReference)(unsafe.Pointer(in.TargetRef))
+	*out = *(*corev1alpha1.TargetNetworkInterface)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -3062,10 +2852,7 @@ func Convert_core_TargetNetworkInterface_To_v1alpha1_TargetNetworkInterface(in *
 }
 
 func autoConvert_v1alpha1_TopologySpreadConstraint_To_core_TopologySpreadConstraint(in *corev1alpha1.TopologySpreadConstraint, out *core.TopologySpreadConstraint, s conversion.Scope) error {
-	out.MaxSkew = in.MaxSkew
-	out.TopologyKey = in.TopologyKey
-	out.WhenUnsatisfiable = core.UnsatisfiableConstraintAction(in.WhenUnsatisfiable)
-	out.LabelSelector = (*v1.LabelSelector)(unsafe.Pointer(in.LabelSelector))
+	*out = *(*core.TopologySpreadConstraint)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -3075,10 +2862,7 @@ func Convert_v1alpha1_TopologySpreadConstraint_To_core_TopologySpreadConstraint(
 }
 
 func autoConvert_core_TopologySpreadConstraint_To_v1alpha1_TopologySpreadConstraint(in *core.TopologySpreadConstraint, out *corev1alpha1.TopologySpreadConstraint, s conversion.Scope) error {
-	out.MaxSkew = in.MaxSkew
-	out.TopologyKey = in.TopologyKey
-	out.WhenUnsatisfiable = corev1alpha1.UnsatisfiableConstraintAction(in.WhenUnsatisfiable)
-	out.LabelSelector = (*v1.LabelSelector)(unsafe.Pointer(in.LabelSelector))
+	*out = *(*corev1alpha1.TopologySpreadConstraint)(unsafe.Pointer(in))
 	return nil
 }
 

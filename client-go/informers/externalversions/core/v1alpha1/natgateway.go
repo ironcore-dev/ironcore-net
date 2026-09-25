@@ -21,11 +21,39 @@ import (
 )
 
 // NATGatewayInformer provides access to a shared informer and lister for
-// NATGateways.
+// NATGateways. Prefer using the type-safe variant (see [TypedNATGatewayInformer]).
 type NATGatewayInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() corev1alpha1.NATGatewayLister
 }
+
+// TypedNATGatewayInformer provides access to a shared informer and lister for
+// NATGateways, including the type-safe TypedInformer variant.
+// It is a superset of NATGatewayInformer.
+type TypedNATGatewayInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() NATGatewayIndexInformer
+	Lister() corev1alpha1.NATGatewayLister
+}
+
+// NATGatewayIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type NATGatewayIndexInformer cache.TypedSharedIndexInformer[*apicorev1alpha1.NATGateway]
+
+// NATGatewayHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for NATGateway.
+type NATGatewayHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apicorev1alpha1.NATGateway]
+
+// NATGatewayDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for NATGateway.
+type NATGatewayDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apicorev1alpha1.NATGateway]
+
+// NATGatewayFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for NATGateway.
+type NATGatewayFilteringHandler = cache.TypedFilteringResourceEventHandler[*apicorev1alpha1.NATGateway]
+
+// NATGatewayIndexers is a specialization of [cache.TypedIndexers] for NATGateway.
+type NATGatewayIndexers = cache.TypedIndexers[*apicorev1alpha1.NATGateway]
+
+// DeletedNATGateway is a specialization of [cache.DeletedObject] for NATGateway.
+type DeletedNATGateway = cache.DeletedObject[*apicorev1alpha1.NATGateway]
 
 type nATGatewayInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -36,25 +64,49 @@ type nATGatewayInformer struct {
 // NewNATGatewayInformer constructs a new informer for NATGateway type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedNATGatewayInformer]).
 func NewNATGatewayInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewNATGatewayInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedNATGatewayInformer constructs a new informer for NATGateway type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedNATGatewayInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers NATGatewayIndexers) NATGatewayIndexInformer {
+	return NewTypedNATGatewayInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredNATGatewayInformer constructs a new informer for NATGateway type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredNATGatewayInformer]).
 func NewFilteredNATGatewayInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewNATGatewayInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedNATGatewayInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredNATGatewayInformer constructs a new informer for NATGateway type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredNATGatewayInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers NATGatewayIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) NATGatewayIndexInformer {
+	return NewTypedNATGatewayInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewNATGatewayInformerWithOptions constructs a new informer for NATGateway type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedNATGatewayInformerWithOptions]).
 func NewNATGatewayInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedNATGatewayInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedNATGatewayInformerWithOptions constructs a new informer for NATGateway type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedNATGatewayInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) NATGatewayIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "core.apinet.ironcore.dev", Version: "v1alpha1", Resource: "natgateways"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.NATGateway](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -87,17 +139,57 @@ func NewNATGatewayInformerWithOptions(client versioned.Interface, namespace stri
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *nATGatewayInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewNATGatewayInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedNATGatewayInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *nATGatewayInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apicorev1alpha1.NATGateway{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *nATGatewayInformer) TypedInformer() NATGatewayIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.NATGateway](f.factory.InformerFor(&apicorev1alpha1.NATGateway{}, f.defaultInformer))
 }
 
 func (f *nATGatewayInformer) Lister() corev1alpha1.NATGatewayLister {
 	return corev1alpha1.NewNATGatewayLister(f.Informer().GetIndexer())
+}
+
+// ToTypedNATGatewayInformer converts an untyped informer into a TypedNATGatewayInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *NATGateway. If that is not the case, calling type-safe methods of the returned
+// TypedNATGatewayInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedNATGatewayInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedNATGatewayInformer(informer NATGatewayInformer) TypedNATGatewayInformer {
+	if informer, ok := informer.(TypedNATGatewayInformer); ok {
+		return informer
+	}
+	return &nATGatewayTypedInformerAdapter{informer}
+}
+
+type nATGatewayTypedInformerAdapter struct {
+	NATGatewayInformer
+}
+
+func (a *nATGatewayTypedInformerAdapter) TypedInformer() NATGatewayIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.NATGateway](a.Informer())
+}
+
+// ToNATGatewayIndexInformer converts an untyped informer into a NATGatewayIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *NATGateway. If that is not the case, calling type-safe methods of the returned
+// NATGatewayIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a NATGatewayIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToNATGatewayIndexInformer(informer cache.SharedIndexInformer) NATGatewayIndexInformer {
+	if informer, ok := informer.(NATGatewayIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.NATGateway](informer)
 }

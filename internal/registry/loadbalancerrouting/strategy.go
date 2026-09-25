@@ -66,11 +66,11 @@ func (loadBalancerRoutingStrategy) WarningsOnCreate(ctx context.Context, obj run
 	return nil
 }
 
-func (loadBalancerRoutingStrategy) AllowCreateOnUpdate() bool {
+func (loadBalancerRoutingStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (loadBalancerRoutingStrategy) AllowUnconditionalUpdate() bool {
+func (loadBalancerRoutingStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

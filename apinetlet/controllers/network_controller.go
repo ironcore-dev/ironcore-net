@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-logr/logr"
 	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	netcore "github.com/ironcore-dev/ironcore-net/utils/core"
 	utilhandlers "github.com/ironcore-dev/ironcore-net/utils/handler"
 	"github.com/ironcore-dev/ironcore-net/utils/origin"
 
@@ -132,7 +133,7 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 	}
 
 	log.V(1).Info("Target APINet network is not yet gone, requeueing")
-	return ctrl.Result{Requeue: true}, nil
+	return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 }
 
 func (r *NetworkReconciler) updateNetworkStatus(ctx context.Context, log logr.Logger, network *networkingv1alpha1.Network, apiNetNetwork *apinetv1alpha1.Network, state networkingv1alpha1.NetworkState) error {
@@ -160,7 +161,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	}
 	if modified {
 		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 	}
 
 	apiNetNetwork, err := r.applyAPINetNetwork(ctx, log, network)
@@ -182,7 +183,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 		}
 
 		log.V(1).Info("Set network provider id, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 	}
 
 	log.V(1).Info("Updating network status")

@@ -21,11 +21,39 @@ import (
 )
 
 // NetworkPolicyRuleInformer provides access to a shared informer and lister for
-// NetworkPolicyRules.
+// NetworkPolicyRules. Prefer using the type-safe variant (see [TypedNetworkPolicyRuleInformer]).
 type NetworkPolicyRuleInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() corev1alpha1.NetworkPolicyRuleLister
 }
+
+// TypedNetworkPolicyRuleInformer provides access to a shared informer and lister for
+// NetworkPolicyRules, including the type-safe TypedInformer variant.
+// It is a superset of NetworkPolicyRuleInformer.
+type TypedNetworkPolicyRuleInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() NetworkPolicyRuleIndexInformer
+	Lister() corev1alpha1.NetworkPolicyRuleLister
+}
+
+// NetworkPolicyRuleIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type NetworkPolicyRuleIndexInformer cache.TypedSharedIndexInformer[*apicorev1alpha1.NetworkPolicyRule]
+
+// NetworkPolicyRuleHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for NetworkPolicyRule.
+type NetworkPolicyRuleHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apicorev1alpha1.NetworkPolicyRule]
+
+// NetworkPolicyRuleDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for NetworkPolicyRule.
+type NetworkPolicyRuleDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apicorev1alpha1.NetworkPolicyRule]
+
+// NetworkPolicyRuleFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for NetworkPolicyRule.
+type NetworkPolicyRuleFilteringHandler = cache.TypedFilteringResourceEventHandler[*apicorev1alpha1.NetworkPolicyRule]
+
+// NetworkPolicyRuleIndexers is a specialization of [cache.TypedIndexers] for NetworkPolicyRule.
+type NetworkPolicyRuleIndexers = cache.TypedIndexers[*apicorev1alpha1.NetworkPolicyRule]
+
+// DeletedNetworkPolicyRule is a specialization of [cache.DeletedObject] for NetworkPolicyRule.
+type DeletedNetworkPolicyRule = cache.DeletedObject[*apicorev1alpha1.NetworkPolicyRule]
 
 type networkPolicyRuleInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -36,25 +64,49 @@ type networkPolicyRuleInformer struct {
 // NewNetworkPolicyRuleInformer constructs a new informer for NetworkPolicyRule type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedNetworkPolicyRuleInformer]).
 func NewNetworkPolicyRuleInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewNetworkPolicyRuleInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedNetworkPolicyRuleInformer constructs a new informer for NetworkPolicyRule type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedNetworkPolicyRuleInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers NetworkPolicyRuleIndexers) NetworkPolicyRuleIndexInformer {
+	return NewTypedNetworkPolicyRuleInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredNetworkPolicyRuleInformer constructs a new informer for NetworkPolicyRule type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredNetworkPolicyRuleInformer]).
 func NewFilteredNetworkPolicyRuleInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewNetworkPolicyRuleInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedNetworkPolicyRuleInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredNetworkPolicyRuleInformer constructs a new informer for NetworkPolicyRule type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredNetworkPolicyRuleInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers NetworkPolicyRuleIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) NetworkPolicyRuleIndexInformer {
+	return NewTypedNetworkPolicyRuleInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewNetworkPolicyRuleInformerWithOptions constructs a new informer for NetworkPolicyRule type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedNetworkPolicyRuleInformerWithOptions]).
 func NewNetworkPolicyRuleInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedNetworkPolicyRuleInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedNetworkPolicyRuleInformerWithOptions constructs a new informer for NetworkPolicyRule type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedNetworkPolicyRuleInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) NetworkPolicyRuleIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "core.apinet.ironcore.dev", Version: "v1alpha1", Resource: "networkpolicyrules"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.NetworkPolicyRule](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -87,17 +139,57 @@ func NewNetworkPolicyRuleInformerWithOptions(client versioned.Interface, namespa
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *networkPolicyRuleInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewNetworkPolicyRuleInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedNetworkPolicyRuleInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *networkPolicyRuleInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apicorev1alpha1.NetworkPolicyRule{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *networkPolicyRuleInformer) TypedInformer() NetworkPolicyRuleIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.NetworkPolicyRule](f.factory.InformerFor(&apicorev1alpha1.NetworkPolicyRule{}, f.defaultInformer))
 }
 
 func (f *networkPolicyRuleInformer) Lister() corev1alpha1.NetworkPolicyRuleLister {
 	return corev1alpha1.NewNetworkPolicyRuleLister(f.Informer().GetIndexer())
+}
+
+// ToTypedNetworkPolicyRuleInformer converts an untyped informer into a TypedNetworkPolicyRuleInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *NetworkPolicyRule. If that is not the case, calling type-safe methods of the returned
+// TypedNetworkPolicyRuleInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedNetworkPolicyRuleInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedNetworkPolicyRuleInformer(informer NetworkPolicyRuleInformer) TypedNetworkPolicyRuleInformer {
+	if informer, ok := informer.(TypedNetworkPolicyRuleInformer); ok {
+		return informer
+	}
+	return &networkPolicyRuleTypedInformerAdapter{informer}
+}
+
+type networkPolicyRuleTypedInformerAdapter struct {
+	NetworkPolicyRuleInformer
+}
+
+func (a *networkPolicyRuleTypedInformerAdapter) TypedInformer() NetworkPolicyRuleIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.NetworkPolicyRule](a.Informer())
+}
+
+// ToNetworkPolicyRuleIndexInformer converts an untyped informer into a NetworkPolicyRuleIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *NetworkPolicyRule. If that is not the case, calling type-safe methods of the returned
+// NetworkPolicyRuleIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a NetworkPolicyRuleIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToNetworkPolicyRuleIndexInformer(informer cache.SharedIndexInformer) NetworkPolicyRuleIndexInformer {
+	if informer, ok := informer.(NetworkPolicyRuleIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.NetworkPolicyRule](informer)
 }

@@ -19,7 +19,7 @@ import (
 //
 // Instance is the schema for the instances API.
 type InstanceApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *InstanceSpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *InstanceStatusApplyConfiguration `json:"status,omitempty"`

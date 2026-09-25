@@ -66,11 +66,11 @@ func (natTableStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object
 	return nil
 }
 
-func (natTableStrategy) AllowCreateOnUpdate() bool {
+func (natTableStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (natTableStrategy) AllowUnconditionalUpdate() bool {
+func (natTableStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

@@ -10,6 +10,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/internal/natgateway"
+	netcore "github.com/ironcore-dev/ironcore-net/utils/core"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	utilrand "k8s.io/apimachinery/pkg/util/rand"
@@ -72,7 +73,7 @@ func (r *NATGatewayAutoscalerReconciler) reconcile(ctx context.Context, log logr
 		}
 
 		log.V(1).Info("Conflict managing public IPs, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 	}
 
 	log.V(1).Info("Reconciled")

@@ -19,7 +19,7 @@ import (
 //
 // NATGatewayAutoscaler is the schema for the natgatewayautoscalers API.
 type NATGatewayAutoscalerApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *NATGatewayAutoscalerSpecApplyConfiguration `json:"spec,omitempty"`
 	Status                           *corev1alpha1.NATGatewayAutoscalerStatus    `json:"status,omitempty"`
