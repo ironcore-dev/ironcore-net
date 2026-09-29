@@ -19,7 +19,7 @@ import (
 //
 // Node is the schema for the nodes API.
 type NodeApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *corev1alpha1.NodeSpec   `json:"spec,omitempty"`
 	Status                           *corev1alpha1.NodeStatus `json:"status,omitempty"`

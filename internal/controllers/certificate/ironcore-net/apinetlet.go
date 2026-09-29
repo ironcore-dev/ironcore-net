@@ -6,11 +6,11 @@ package ironcorenet
 import (
 	"crypto/x509"
 	"fmt"
+	"slices"
 	"strings"
 
 	ironcorenetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/internal/controllers/certificate/generic"
-	"golang.org/x/exp/slices"
 	authv1 "k8s.io/api/authorization/v1"
 	certificatesv1 "k8s.io/api/certificates/v1"
 	"k8s.io/apimachinery/pkg/util/sets"

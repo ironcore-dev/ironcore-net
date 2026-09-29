@@ -19,7 +19,7 @@ import (
 //
 // IP is the schema for the ips API.
 type IPApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *IPSpecApplyConfiguration `json:"spec,omitempty"`
 	Status                           *corev1alpha1.IPStatus    `json:"status,omitempty"`

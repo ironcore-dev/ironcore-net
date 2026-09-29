@@ -21,11 +21,39 @@ import (
 )
 
 // NATTableInformer provides access to a shared informer and lister for
-// NATTables.
+// NATTables. Prefer using the type-safe variant (see [TypedNATTableInformer]).
 type NATTableInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() corev1alpha1.NATTableLister
 }
+
+// TypedNATTableInformer provides access to a shared informer and lister for
+// NATTables, including the type-safe TypedInformer variant.
+// It is a superset of NATTableInformer.
+type TypedNATTableInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() NATTableIndexInformer
+	Lister() corev1alpha1.NATTableLister
+}
+
+// NATTableIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type NATTableIndexInformer cache.TypedSharedIndexInformer[*apicorev1alpha1.NATTable]
+
+// NATTableHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for NATTable.
+type NATTableHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apicorev1alpha1.NATTable]
+
+// NATTableDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for NATTable.
+type NATTableDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apicorev1alpha1.NATTable]
+
+// NATTableFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for NATTable.
+type NATTableFilteringHandler = cache.TypedFilteringResourceEventHandler[*apicorev1alpha1.NATTable]
+
+// NATTableIndexers is a specialization of [cache.TypedIndexers] for NATTable.
+type NATTableIndexers = cache.TypedIndexers[*apicorev1alpha1.NATTable]
+
+// DeletedNATTable is a specialization of [cache.DeletedObject] for NATTable.
+type DeletedNATTable = cache.DeletedObject[*apicorev1alpha1.NATTable]
 
 type nATTableInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -36,25 +64,49 @@ type nATTableInformer struct {
 // NewNATTableInformer constructs a new informer for NATTable type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedNATTableInformer]).
 func NewNATTableInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewNATTableInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedNATTableInformer constructs a new informer for NATTable type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedNATTableInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers NATTableIndexers) NATTableIndexInformer {
+	return NewTypedNATTableInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredNATTableInformer constructs a new informer for NATTable type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredNATTableInformer]).
 func NewFilteredNATTableInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewNATTableInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedNATTableInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredNATTableInformer constructs a new informer for NATTable type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredNATTableInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers NATTableIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) NATTableIndexInformer {
+	return NewTypedNATTableInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewNATTableInformerWithOptions constructs a new informer for NATTable type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedNATTableInformerWithOptions]).
 func NewNATTableInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedNATTableInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedNATTableInformerWithOptions constructs a new informer for NATTable type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedNATTableInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) NATTableIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "core.apinet.ironcore.dev", Version: "v1alpha1", Resource: "nattables"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.NATTable](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -87,17 +139,57 @@ func NewNATTableInformerWithOptions(client versioned.Interface, namespace string
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *nATTableInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewNATTableInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedNATTableInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *nATTableInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apicorev1alpha1.NATTable{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *nATTableInformer) TypedInformer() NATTableIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.NATTable](f.factory.InformerFor(&apicorev1alpha1.NATTable{}, f.defaultInformer))
 }
 
 func (f *nATTableInformer) Lister() corev1alpha1.NATTableLister {
 	return corev1alpha1.NewNATTableLister(f.Informer().GetIndexer())
+}
+
+// ToTypedNATTableInformer converts an untyped informer into a TypedNATTableInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *NATTable. If that is not the case, calling type-safe methods of the returned
+// TypedNATTableInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedNATTableInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedNATTableInformer(informer NATTableInformer) TypedNATTableInformer {
+	if informer, ok := informer.(TypedNATTableInformer); ok {
+		return informer
+	}
+	return &nATTableTypedInformerAdapter{informer}
+}
+
+type nATTableTypedInformerAdapter struct {
+	NATTableInformer
+}
+
+func (a *nATTableTypedInformerAdapter) TypedInformer() NATTableIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.NATTable](a.Informer())
+}
+
+// ToNATTableIndexInformer converts an untyped informer into a NATTableIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *NATTable. If that is not the case, calling type-safe methods of the returned
+// NATTableIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a NATTableIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToNATTableIndexInformer(informer cache.SharedIndexInformer) NATTableIndexInformer {
+	if informer, ok := informer.(NATTableIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.NATTable](informer)
 }

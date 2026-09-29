@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/metautils"
@@ -17,7 +18,6 @@ import (
 	"github.com/ironcore-dev/ironcore-net/utils/expectations"
 	utilhandler "github.com/ironcore-dev/ironcore-net/utils/handler"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
-	"golang.org/x/exp/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

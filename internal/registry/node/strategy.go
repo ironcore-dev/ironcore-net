@@ -67,11 +67,11 @@ func (nodeStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []
 	return nil
 }
 
-func (nodeStrategy) AllowCreateOnUpdate() bool {
+func (nodeStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (nodeStrategy) AllowUnconditionalUpdate() bool {
+func (nodeStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

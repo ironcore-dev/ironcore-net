@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-logr/logr"
 	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	netcore "github.com/ironcore-dev/ironcore-net/utils/core"
 	utilhandlers "github.com/ironcore-dev/ironcore-net/utils/handler"
 	"github.com/ironcore-dev/ironcore-net/utils/origin"
 
@@ -134,7 +135,7 @@ func (r *VirtualIPReconciler) delete(ctx context.Context, log logr.Logger, virtu
 	}
 
 	log.V(1).Info("Target APINet ip is not yet gone, requeueing")
-	return ctrl.Result{Requeue: true}, nil
+	return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 }
 
 func (r *VirtualIPReconciler) reconcile(ctx context.Context, log logr.Logger, virtualIP *networkingv1alpha1.VirtualIP) (ctrl.Result, error) {
@@ -147,7 +148,7 @@ func (r *VirtualIPReconciler) reconcile(ctx context.Context, log logr.Logger, vi
 	}
 	if modified {
 		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 	}
 
 	ip, err := r.applyIP(ctx, log, virtualIP)
