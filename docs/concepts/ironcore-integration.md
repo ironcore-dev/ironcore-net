@@ -89,7 +89,11 @@ the `MachinePool` implementor has to patch the `ironcore`'s
 / format the provider ID correctly).
 
 Once the `providerID` of the `ironcore` `NetworkInterface` is set,
-`apinetlet` takes care reporting the status of the `ironcore`
-`NetworkInterface` by observing the matching `apinet` `NetworkInterface`.
-`apinetlet` then also applies requested `VirtualIP`s and `LoadBalancer`
-targets to the `apinet` `NetworkInterface`.
+`apinetlet` applies requested `VirtualIP`s and `LoadBalancer`
+targets to the matching `apinet` `NetworkInterface`.
+
+Note that `apinetlet` deliberately does *not* report the status of the
+`ironcore` `NetworkInterface`: its status is owned by the `MachinePool`
+implementor, which derives it from the network interface status reported via
+the machine runtime interface (in case of the libvirt-provider, from the
+status of the `apinet` `NetworkInterface`).

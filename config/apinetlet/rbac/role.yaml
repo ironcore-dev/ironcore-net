@@ -70,7 +70,6 @@ rules:
   resources:
   - loadbalancers/status
   - natgateways/status
-  - networkinterfaces/status
   - networks/status
   - virtualips/status
   verbs:

@@ -18,6 +18,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
@@ -88,6 +89,61 @@ var _ = Describe("NetworkInterfaceController", func() {
 				UID:       nic.UID,
 			}))),
 		)
+	})
+
+	It("should not manage the status of the network interface", func(ctx SpecContext) {
+		// The status of an ironcore network interface is owned by the machinepoollet, which
+		// derives it from the status reported via IRI. The apinetlet must not modify it, as
+		// that would race with the machinepoollet.
+		By("creating an apinet network interface")
+		apiNetNic := &apinetv1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    apiNetNs.Name,
+				GenerateName: "apinet-nic-",
+			},
+			Spec: apinetv1alpha1.NetworkInterfaceSpec{
+				NetworkRef: corev1.LocalObjectReference{Name: apiNetNetwork.Name},
+				IPs:        []net.IP{net.MustParseIP("192.168.178.1")},
+				NodeRef:    corev1.LocalObjectReference{Name: "my-node"},
+			},
+		}
+		Expect(k8sClient.Create(ctx, apiNetNic)).To(Succeed())
+
+		By("reporting the apinet network interface as ready with a public ip")
+		baseAPINetNic := apiNetNic.DeepCopy()
+		apiNetNic.Status = apinetv1alpha1.NetworkInterfaceStatus{
+			State:     apinetv1alpha1.NetworkInterfaceStateReady,
+			PublicIPs: []net.IP{net.MustParseIP("10.0.0.1")},
+		}
+		Expect(k8sClient.Status().Patch(ctx, apiNetNic, client.MergeFrom(baseAPINetNic))).To(Succeed())
+
+		By("creating a network interface")
+		nic := &networkingv1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "nic-",
+			},
+			Spec: networkingv1alpha1.NetworkInterfaceSpec{
+				ProviderID: provider.GetNetworkInterfaceID(apiNetNs.Name, apiNetNic.Name, "node", apiNetNic.UID),
+				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+				IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+				IPs: []networkingv1alpha1.IPSource{
+					{Value: commonv1alpha1.MustParseNewIP("192.168.178.1")},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+		initialStatus := nic.Status
+
+		By("waiting for the APINet network interface to be claimed")
+		Eventually(Object(apiNetNic)).Should(WithTransform(NetworkInterfaceOrigin.DataOf, Equal(&origin.Data{
+			Namespace: nic.Namespace,
+			Name:      nic.Name,
+			UID:       nic.UID,
+		})))
+
+		By("asserting the status of the network interface is left untouched")
+		Consistently(Object(nic)).Should(HaveField("Status", Equal(initialStatus)))
 	})
 
 	It("should release IP Object when claimer NetworkInterface is deleted", func(ctx SpecContext) {
