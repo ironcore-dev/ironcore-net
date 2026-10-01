@@ -55,29 +55,8 @@ func apiNetIPsToIPs(ips []net.IP) []commonv1alpha1.IP {
 	return utilslices.Map(ips, apiNetIPToIP)
 }
 
-func apiNetIPPrefixToIPPrefix(prefix net.IPPrefix) commonv1alpha1.IPPrefix {
-	return commonv1alpha1.IPPrefix{Prefix: prefix.Prefix}
-}
-
-func apiNetIPPrefixesToIPPrefixes(ips []net.IPPrefix) []commonv1alpha1.IPPrefix {
-	return utilslices.Map(ips, apiNetIPPrefixToIPPrefix)
-}
-
 func iPPrefixToAPINetIPPrefix(prefix commonv1alpha1.IPPrefix) *net.IPPrefix {
 	return &net.IPPrefix{Prefix: prefix.Prefix}
-}
-
-func apiNetNetworkInterfaceStateToNetworkInterfaceState(state apinetv1alpha1.NetworkInterfaceState) networkingv1alpha1.NetworkInterfaceState {
-	switch state {
-	case apinetv1alpha1.NetworkInterfaceStatePending:
-		return networkingv1alpha1.NetworkInterfaceStatePending
-	case apinetv1alpha1.NetworkInterfaceStateReady:
-		return networkingv1alpha1.NetworkInterfaceStateAvailable
-	case apinetv1alpha1.NetworkInterfaceStateError:
-		return networkingv1alpha1.NetworkInterfaceStateError
-	default:
-		return networkingv1alpha1.NetworkInterfaceStatePending
-	}
 }
 
 func apiNetNetworkPeeringsStatusToNetworkPeeringsStatus(partitionPeeringsMap map[string][]apinetv1alpha1.NetworkPeeringStatus, specPeerings []apinetv1alpha1.NetworkPeering) []networkingv1alpha1.NetworkPeeringStatus {
