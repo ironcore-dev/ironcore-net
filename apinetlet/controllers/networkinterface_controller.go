@@ -17,7 +17,6 @@ import (
 	apinetv1alpha1 "github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore-net/apimachinery/api/net"
 	"github.com/ironcore-dev/ironcore-net/apinetlet/provider"
-	utilgeneric "github.com/ironcore-dev/ironcore-net/utils/generic"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
@@ -29,7 +28,6 @@ import (
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -62,7 +60,6 @@ type NetworkInterfaceReconciler struct {
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces/finalizers,verbs=update;patch
-//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=networking.ironcore.dev,resources=virtualips,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=ipam.ironcore.dev,resources=prefixes,verbs=get;list;watch
 
@@ -420,21 +417,6 @@ func (r *NetworkInterfaceReconciler) manageAPINetNetworkInterface(ctx context.Co
 	return r.APINetClient.Patch(ctx, apiNetNic, client.StrategicMergeFrom(base))
 }
 
-func (r *NetworkInterfaceReconciler) setNetworkInterfacePending(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) error {
-	now := metav1.Now()
-
-	base := nic.DeepCopy()
-	nic.Status.VirtualIP = nil
-	nic.Status.IPs = nil
-	nic.Status.Prefixes = nil
-	if nic.Status.State != networkingv1alpha1.NetworkInterfaceStatePending {
-		nic.Status.LastStateTransitionTime = &now
-	}
-	nic.Status.State = networkingv1alpha1.NetworkInterfaceStatePending
-
-	return r.Status().Patch(ctx, nic, client.StrategicMergeFrom(base))
-}
-
 func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
@@ -470,10 +452,10 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 	}
 
 	if apiNetNic == nil {
-		if err := r.setNetworkInterfacePending(ctx, nic); err != nil {
-			return ctrl.Result{}, fmt.Errorf("error setting network interface to pending: %w", err)
-		}
-		log.V(1).Info("Set network interface to pending")
+		// The network interface is not (yet) backed by an APINet network interface. As the
+		// status of the network interface is owned by the machinepoollet, there is nothing
+		// to do here.
+		log.V(1).Info("No APINet network interface found, nothing to do")
 		return ctrl.Result{}, nil
 	}
 
@@ -481,56 +463,11 @@ func (r *NetworkInterfaceReconciler) reconcile(ctx context.Context, log logr.Log
 		return ctrl.Result{}, fmt.Errorf("error managing APINet network interface: %w", err)
 	}
 
-	var (
-		expectedState     = apiNetNetworkInterfaceStateToNetworkInterfaceState(apiNetNic.Status.State)
-		expectedIPs       = apiNetIPsToIPs(apiNetNic.Spec.IPs)
-		expectedPrefixes  = apiNetIPPrefixesToIPPrefixes(apiNetNic.Spec.Prefixes)
-		expectedVirtualIP = WorkaroundOnlyV4VirtualIPs(apiNetIPsToIPs(apiNetNic.Status.PublicIPs))
-	)
-	if !NetworkInterfaceStatusUpToDate(nic, expectedState, expectedIPs, expectedPrefixes, expectedVirtualIP) {
-		if err := r.updateNetworkInterfaceStatus(ctx, nic, expectedState, expectedIPs, expectedPrefixes, expectedVirtualIP); err != nil {
-			return ctrl.Result{}, fmt.Errorf("error updating network interface status: %w", err)
-		}
-		log.V(1).Info("Updated network interface status")
-	}
+	// Note: the status of the network interface must not be touched here. It is owned by the
+	// machinepoollet, which derives it from the network interface status reported via IRI.
 
 	log.V(1).Info("Reconciled")
 	return ctrl.Result{}, nil
-}
-
-func (r *NetworkInterfaceReconciler) updateNetworkInterfaceStatus(ctx context.Context, nic *networkingv1alpha1.NetworkInterface, state networkingv1alpha1.NetworkInterfaceState, ips []commonv1alpha1.IP, prefixes []commonv1alpha1.IPPrefix, virtualIP *commonv1alpha1.IP) error {
-	now := metav1.Now()
-	base := nic.DeepCopy()
-
-	if nic.Status.State != state {
-		nic.Status.LastStateTransitionTime = &now
-	}
-	nic.Status.State = state
-	nic.Status.IPs = ips
-	nic.Status.Prefixes = prefixes
-	nic.Status.VirtualIP = virtualIP
-
-	if err := r.Status().Patch(ctx, nic, client.StrategicMergeFrom(base)); err != nil {
-		return fmt.Errorf("error patching status: %w", err)
-	}
-	return nil
-}
-
-func NetworkInterfaceStatusUpToDate(nic *networkingv1alpha1.NetworkInterface, expectedState networkingv1alpha1.NetworkInterfaceState, expectedIPs []commonv1alpha1.IP, expectedIPPrefixes []commonv1alpha1.IPPrefix, expectedVirtualIP *commonv1alpha1.IP) bool {
-	return nic.Status.State == expectedState &&
-		slices.Equal(nic.Status.IPs, expectedIPs) &&
-		slices.Equal(nic.Status.Prefixes, expectedIPPrefixes) &&
-		utilgeneric.EqualPointers(nic.Status.VirtualIP, expectedVirtualIP)
-}
-
-func WorkaroundOnlyV4VirtualIPs(ips []commonv1alpha1.IP) *commonv1alpha1.IP {
-	for i := range ips {
-		ip := &ips[i]
-		if ip.Family() == corev1.IPv4Protocol {
-			return ip
-		}
-	}
-	return nil
 }
 
 func (r *NetworkInterfaceReconciler) enqueueByVirtualIP() handler.EventHandler {
