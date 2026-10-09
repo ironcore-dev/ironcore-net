@@ -19,7 +19,7 @@ import (
 //
 // IPAddress is the schema for the ipaddresses API.
 type IPAddressApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *IPAddressSpecApplyConfiguration `json:"spec,omitempty"`
 }

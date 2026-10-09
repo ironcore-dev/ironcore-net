@@ -21,11 +21,39 @@ import (
 )
 
 // IPInformer provides access to a shared informer and lister for
-// IPs.
+// IPs. Prefer using the type-safe variant (see [TypedIPInformer]).
 type IPInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() corev1alpha1.IPLister
 }
+
+// TypedIPInformer provides access to a shared informer and lister for
+// IPs, including the type-safe TypedInformer variant.
+// It is a superset of IPInformer.
+type TypedIPInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() IPIndexInformer
+	Lister() corev1alpha1.IPLister
+}
+
+// IPIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type IPIndexInformer cache.TypedSharedIndexInformer[*apicorev1alpha1.IP]
+
+// IPHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for IP.
+type IPHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apicorev1alpha1.IP]
+
+// IPDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for IP.
+type IPDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apicorev1alpha1.IP]
+
+// IPFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for IP.
+type IPFilteringHandler = cache.TypedFilteringResourceEventHandler[*apicorev1alpha1.IP]
+
+// IPIndexers is a specialization of [cache.TypedIndexers] for IP.
+type IPIndexers = cache.TypedIndexers[*apicorev1alpha1.IP]
+
+// DeletedIP is a specialization of [cache.DeletedObject] for IP.
+type DeletedIP = cache.DeletedObject[*apicorev1alpha1.IP]
 
 type iPInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -36,25 +64,49 @@ type iPInformer struct {
 // NewIPInformer constructs a new informer for IP type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedIPInformer]).
 func NewIPInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewIPInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedIPInformer constructs a new informer for IP type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedIPInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers IPIndexers) IPIndexInformer {
+	return NewTypedIPInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredIPInformer constructs a new informer for IP type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredIPInformer]).
 func NewFilteredIPInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewIPInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedIPInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredIPInformer constructs a new informer for IP type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredIPInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers IPIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) IPIndexInformer {
+	return NewTypedIPInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewIPInformerWithOptions constructs a new informer for IP type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedIPInformerWithOptions]).
 func NewIPInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedIPInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedIPInformerWithOptions constructs a new informer for IP type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedIPInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) IPIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "core.apinet.ironcore.dev", Version: "v1alpha1", Resource: "ips"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.IP](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -87,17 +139,57 @@ func NewIPInformerWithOptions(client versioned.Interface, namespace string, opti
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *iPInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewIPInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedIPInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *iPInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apicorev1alpha1.IP{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *iPInformer) TypedInformer() IPIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.IP](f.factory.InformerFor(&apicorev1alpha1.IP{}, f.defaultInformer))
 }
 
 func (f *iPInformer) Lister() corev1alpha1.IPLister {
 	return corev1alpha1.NewIPLister(f.Informer().GetIndexer())
+}
+
+// ToTypedIPInformer converts an untyped informer into a TypedIPInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *IP. If that is not the case, calling type-safe methods of the returned
+// TypedIPInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedIPInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedIPInformer(informer IPInformer) TypedIPInformer {
+	if informer, ok := informer.(TypedIPInformer); ok {
+		return informer
+	}
+	return &iPTypedInformerAdapter{informer}
+}
+
+type iPTypedInformerAdapter struct {
+	IPInformer
+}
+
+func (a *iPTypedInformerAdapter) TypedInformer() IPIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.IP](a.Informer())
+}
+
+// ToIPIndexInformer converts an untyped informer into a IPIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *IP. If that is not the case, calling type-safe methods of the returned
+// IPIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a IPIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToIPIndexInformer(informer cache.SharedIndexInformer) IPIndexInformer {
+	if informer, ok := informer.(IPIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apicorev1alpha1.IP](informer)
 }

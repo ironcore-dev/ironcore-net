@@ -11,6 +11,7 @@ import (
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
+	netcore "github.com/ironcore-dev/ironcore-net/utils/core"
 	"github.com/ironcore-dev/ironcore/utils/maps"
 	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -103,7 +104,7 @@ func (r *MetalnetNodeReconciler) delete(ctx context.Context, log logr.Logger, me
 		return ctrl.Result{}, nil
 	}
 	log.V(1).Info("Issued node deletion, requeuing")
-	return ctrl.Result{Requeue: true}, nil
+	return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 }
 
 func (r *MetalnetNodeReconciler) reconcile(ctx context.Context, log logr.Logger, metalnetNode *corev1.Node) (ctrl.Result, error) {
@@ -116,7 +117,7 @@ func (r *MetalnetNodeReconciler) reconcile(ctx context.Context, log logr.Logger,
 	}
 	if modified {
 		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 	}
 	log.V(1).Info("Finalizer is present")
 

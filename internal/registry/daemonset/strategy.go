@@ -67,11 +67,11 @@ func (daemonSetStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Objec
 	return nil
 }
 
-func (daemonSetStrategy) AllowCreateOnUpdate() bool {
+func (daemonSetStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (daemonSetStrategy) AllowUnconditionalUpdate() bool {
+func (daemonSetStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

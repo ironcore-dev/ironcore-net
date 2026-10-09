@@ -66,11 +66,11 @@ func (networkPolicyRuleStrategy) WarningsOnCreate(ctx context.Context, obj runti
 	return nil
 }
 
-func (networkPolicyRuleStrategy) AllowCreateOnUpdate() bool {
+func (networkPolicyRuleStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (networkPolicyRuleStrategy) AllowUnconditionalUpdate() bool {
+func (networkPolicyRuleStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

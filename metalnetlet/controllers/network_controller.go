@@ -14,6 +14,7 @@ import (
 	"github.com/ironcore-dev/ironcore-net/apimachinery/equality"
 	"github.com/ironcore-dev/ironcore-net/networkid"
 	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	netcore "github.com/ironcore-dev/ironcore-net/utils/core"
 	utilhandler "github.com/ironcore-dev/ironcore-net/utils/handler"
 	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	metalnetv1alpha1 "github.com/ironcore-dev/metalnet/api/v1alpha1"
@@ -112,7 +113,7 @@ func (r *NetworkReconciler) delete(ctx context.Context, log logr.Logger, network
 	}
 	if err == nil {
 		log.V(1).Info("Issued deletion of metalnet network")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 	}
 
 	log.V(1).Info("Metalnet network is gone, removing finalizer")
@@ -160,7 +161,7 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 	}
 	if modified {
 		log.V(1).Info("Added finalizer")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 	}
 	log.V(1).Info("Finalizer is present")
 

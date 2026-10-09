@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-logr/logr"
 	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	netcore "github.com/ironcore-dev/ironcore-net/utils/core"
 	utilhandlers "github.com/ironcore-dev/ironcore-net/utils/handler"
 	"github.com/ironcore-dev/ironcore-net/utils/origin"
 
@@ -157,7 +158,7 @@ func (r *NetworkPolicyReconciler) reconcile(ctx context.Context, log logr.Logger
 	}
 	if modified {
 		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 	}
 
 	networkKey := client.ObjectKey{Namespace: networkPolicy.Namespace, Name: networkPolicy.Spec.NetworkRef.Name}

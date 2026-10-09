@@ -67,11 +67,11 @@ func (natGatewayAutoscalerStrategy) WarningsOnCreate(ctx context.Context, obj ru
 	return nil
 }
 
-func (natGatewayAutoscalerStrategy) AllowCreateOnUpdate() bool {
+func (natGatewayAutoscalerStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (natGatewayAutoscalerStrategy) AllowUnconditionalUpdate() bool {
+func (natGatewayAutoscalerStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 
