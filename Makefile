@@ -344,7 +344,7 @@ CONTROLLER_TOOLS_VERSION ?= v0.22.0
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.1
 GOIMPORTS_VERSION ?= v0.41.0
-GOLANGCI_LINT_VERSION ?= v2.13
+GOLANGCI_LINT_VERSION ?= v2.14
 OPENAPI_EXTRACTOR_VERSION ?= v0.2.0
 #ENVTEST_VERSION is the version of controller-runtime release branch to fetch the envtest setup script (i.e. release-0.20)
 ENVTEST_VERSION ?= $(shell go list -m -f "{{ .Version }}" sigs.k8s.io/controller-runtime | awk -F'[v.]' '{printf "release-%d.%d", $$2, $$3}')
