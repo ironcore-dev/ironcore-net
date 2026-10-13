@@ -4,10 +4,6 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-# TODO: Remove once "Making unsupported type entry" in gengo is fixed.
-# Tracking issue: https://github.com/kubernetes/gengo/issues/269
-export GODEBUG="gotypesalias=0"
-
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_ROOT="$SCRIPT_DIR/.."
 export TERM="xterm-256color"
