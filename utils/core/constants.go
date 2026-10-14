@@ -5,4 +5,4 @@ package core
 
 import "time"
 
-const RequeueInterval = time.Second
+const RequeueInterval = 10 * time.Millisecond
