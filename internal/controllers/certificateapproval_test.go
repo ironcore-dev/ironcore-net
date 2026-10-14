@@ -48,4 +48,39 @@ var _ = Describe("CertificateApprovalController", func() {
 			ironcorenetv1alpha1.APINetletsGroup,
 		),
 	)
+
+	DescribeTable("certificate denial",
+		func(ctx SpecContext, commonName, organization string) {
+			By("creating a non-conformant certificate signing request")
+			csr, _, _, err := utilcertificate.GenerateAndCreateCertificateSigningRequest(
+				ctx,
+				k8sClient,
+				certificatesv1.KubeAPIServerClientSignerName,
+				&x509.CertificateRequest{
+					Subject: pkix.Name{
+						CommonName:   commonName,
+						Organization: []string{organization},
+					},
+				},
+				utilcertificate.DefaultKubeAPIServerClientGetUsages,
+				nil,
+			)
+			Expect(err).NotTo(HaveOccurred())
+
+			By("Ensuring the csr is not approved")
+			Consistently(ctx, Object(csr)).Should(
+				HaveField("Status.Conditions", Not(ContainElement(
+					HaveField("Type", certificatesv1.CertificateApproved),
+				))),
+			)
+		},
+		Entry("non-conformant certificate",
+			"pwn",
+			"unknown-org",
+		),
+		Entry("elevated organization",
+			"kubernetes-admin",
+			"kubeadm:cluster-admins",
+		),
+	)
 })
