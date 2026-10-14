@@ -19,7 +19,7 @@ import (
 //
 // LoadBalancerRouting is the schema for the loadbalancerroutings API.
 type LoadBalancerRoutingApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Destinations                     []LoadBalancerDestinationApplyConfiguration `json:"destinations,omitempty"`
 }

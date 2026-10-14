@@ -19,7 +19,7 @@ import (
 //
 // NATTable is the schema for the nattables API.
 type NATTableApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// IPs specifies how to NAT the IPs for the NAT gateway.
 	IPs []NATIPApplyConfiguration `json:"ips,omitempty"`

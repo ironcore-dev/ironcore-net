@@ -12,35 +12,35 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// DaemonSets returns a DaemonSetInformer.
-	DaemonSets() DaemonSetInformer
+	DaemonSets() TypedDaemonSetInformer
 	// IPs returns a IPInformer.
-	IPs() IPInformer
+	IPs() TypedIPInformer
 	// IPAddresses returns a IPAddressInformer.
-	IPAddresses() IPAddressInformer
+	IPAddresses() TypedIPAddressInformer
 	// Instances returns a InstanceInformer.
-	Instances() InstanceInformer
+	Instances() TypedInstanceInformer
 	// LoadBalancers returns a LoadBalancerInformer.
-	LoadBalancers() LoadBalancerInformer
+	LoadBalancers() TypedLoadBalancerInformer
 	// LoadBalancerRoutings returns a LoadBalancerRoutingInformer.
-	LoadBalancerRoutings() LoadBalancerRoutingInformer
+	LoadBalancerRoutings() TypedLoadBalancerRoutingInformer
 	// NATGateways returns a NATGatewayInformer.
-	NATGateways() NATGatewayInformer
+	NATGateways() TypedNATGatewayInformer
 	// NATGatewayAutoscalers returns a NATGatewayAutoscalerInformer.
-	NATGatewayAutoscalers() NATGatewayAutoscalerInformer
+	NATGatewayAutoscalers() TypedNATGatewayAutoscalerInformer
 	// NATTables returns a NATTableInformer.
-	NATTables() NATTableInformer
+	NATTables() TypedNATTableInformer
 	// Networks returns a NetworkInformer.
-	Networks() NetworkInformer
+	Networks() TypedNetworkInformer
 	// NetworkIDs returns a NetworkIDInformer.
-	NetworkIDs() NetworkIDInformer
+	NetworkIDs() TypedNetworkIDInformer
 	// NetworkInterfaces returns a NetworkInterfaceInformer.
-	NetworkInterfaces() NetworkInterfaceInformer
+	NetworkInterfaces() TypedNetworkInterfaceInformer
 	// NetworkPolicies returns a NetworkPolicyInformer.
-	NetworkPolicies() NetworkPolicyInformer
+	NetworkPolicies() TypedNetworkPolicyInformer
 	// NetworkPolicyRules returns a NetworkPolicyRuleInformer.
-	NetworkPolicyRules() NetworkPolicyRuleInformer
+	NetworkPolicyRules() TypedNetworkPolicyRuleInformer
 	// Nodes returns a NodeInformer.
-	Nodes() NodeInformer
+	Nodes() TypedNodeInformer
 }
 
 type version struct {
@@ -54,77 +54,77 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// DaemonSets returns a DaemonSetInformer.
-func (v *version) DaemonSets() DaemonSetInformer {
+// DaemonSets returns a TypedDaemonSetInformer.
+func (v *version) DaemonSets() TypedDaemonSetInformer {
 	return &daemonSetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// IPs returns a IPInformer.
-func (v *version) IPs() IPInformer {
+// IPs returns a TypedIPInformer.
+func (v *version) IPs() TypedIPInformer {
 	return &iPInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// IPAddresses returns a IPAddressInformer.
-func (v *version) IPAddresses() IPAddressInformer {
+// IPAddresses returns a TypedIPAddressInformer.
+func (v *version) IPAddresses() TypedIPAddressInformer {
 	return &iPAddressInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// Instances returns a InstanceInformer.
-func (v *version) Instances() InstanceInformer {
+// Instances returns a TypedInstanceInformer.
+func (v *version) Instances() TypedInstanceInformer {
 	return &instanceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// LoadBalancers returns a LoadBalancerInformer.
-func (v *version) LoadBalancers() LoadBalancerInformer {
+// LoadBalancers returns a TypedLoadBalancerInformer.
+func (v *version) LoadBalancers() TypedLoadBalancerInformer {
 	return &loadBalancerInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// LoadBalancerRoutings returns a LoadBalancerRoutingInformer.
-func (v *version) LoadBalancerRoutings() LoadBalancerRoutingInformer {
+// LoadBalancerRoutings returns a TypedLoadBalancerRoutingInformer.
+func (v *version) LoadBalancerRoutings() TypedLoadBalancerRoutingInformer {
 	return &loadBalancerRoutingInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// NATGateways returns a NATGatewayInformer.
-func (v *version) NATGateways() NATGatewayInformer {
+// NATGateways returns a TypedNATGatewayInformer.
+func (v *version) NATGateways() TypedNATGatewayInformer {
 	return &nATGatewayInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// NATGatewayAutoscalers returns a NATGatewayAutoscalerInformer.
-func (v *version) NATGatewayAutoscalers() NATGatewayAutoscalerInformer {
+// NATGatewayAutoscalers returns a TypedNATGatewayAutoscalerInformer.
+func (v *version) NATGatewayAutoscalers() TypedNATGatewayAutoscalerInformer {
 	return &nATGatewayAutoscalerInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// NATTables returns a NATTableInformer.
-func (v *version) NATTables() NATTableInformer {
+// NATTables returns a TypedNATTableInformer.
+func (v *version) NATTables() TypedNATTableInformer {
 	return &nATTableInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// Networks returns a NetworkInformer.
-func (v *version) Networks() NetworkInformer {
+// Networks returns a TypedNetworkInformer.
+func (v *version) Networks() TypedNetworkInformer {
 	return &networkInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// NetworkIDs returns a NetworkIDInformer.
-func (v *version) NetworkIDs() NetworkIDInformer {
+// NetworkIDs returns a TypedNetworkIDInformer.
+func (v *version) NetworkIDs() TypedNetworkIDInformer {
 	return &networkIDInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// NetworkInterfaces returns a NetworkInterfaceInformer.
-func (v *version) NetworkInterfaces() NetworkInterfaceInformer {
+// NetworkInterfaces returns a TypedNetworkInterfaceInformer.
+func (v *version) NetworkInterfaces() TypedNetworkInterfaceInformer {
 	return &networkInterfaceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// NetworkPolicies returns a NetworkPolicyInformer.
-func (v *version) NetworkPolicies() NetworkPolicyInformer {
+// NetworkPolicies returns a TypedNetworkPolicyInformer.
+func (v *version) NetworkPolicies() TypedNetworkPolicyInformer {
 	return &networkPolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// NetworkPolicyRules returns a NetworkPolicyRuleInformer.
-func (v *version) NetworkPolicyRules() NetworkPolicyRuleInformer {
+// NetworkPolicyRules returns a TypedNetworkPolicyRuleInformer.
+func (v *version) NetworkPolicyRules() TypedNetworkPolicyRuleInformer {
 	return &networkPolicyRuleInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// Nodes returns a NodeInformer.
-func (v *version) Nodes() NodeInformer {
+// Nodes returns a TypedNodeInformer.
+func (v *version) Nodes() TypedNodeInformer {
 	return &nodeInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }

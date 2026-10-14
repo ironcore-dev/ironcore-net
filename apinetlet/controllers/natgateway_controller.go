@@ -13,6 +13,7 @@ import (
 	apinetv1alpha1ac "github.com/ironcore-dev/ironcore-net/client-go/applyconfigurations/core/v1alpha1"
 	ironcorenet "github.com/ironcore-dev/ironcore-net/client-go/ironcorenet/versioned"
 	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
+	netcore "github.com/ironcore-dev/ironcore-net/utils/core"
 	utilhandlers "github.com/ironcore-dev/ironcore-net/utils/handler"
 	"github.com/ironcore-dev/ironcore-net/utils/origin"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -131,7 +132,7 @@ func (r *NATGatewayReconciler) delete(ctx context.Context, log logr.Logger, natG
 	}
 
 	log.V(1).Info("Issued APINet NAT gateway deletion")
-	return ctrl.Result{Requeue: true}, nil
+	return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 }
 
 func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, natGateway *networkingv1alpha1.NATGateway) (ctrl.Result, error) {
@@ -144,7 +145,7 @@ func (r *NATGatewayReconciler) reconcile(ctx context.Context, log logr.Logger, n
 	}
 	if modified {
 		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: netcore.RequeueInterval}, nil
 	}
 	log.V(1).Info("Finalizer is present")
 

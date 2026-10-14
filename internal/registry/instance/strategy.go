@@ -67,11 +67,11 @@ func (instanceStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object
 	return nil
 }
 
-func (instanceStrategy) AllowCreateOnUpdate() bool {
+func (instanceStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (instanceStrategy) AllowUnconditionalUpdate() bool {
+func (instanceStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

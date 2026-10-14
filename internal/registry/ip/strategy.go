@@ -89,11 +89,11 @@ func (ipStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []st
 	return nil
 }
 
-func (ipStrategy) AllowCreateOnUpdate() bool {
+func (ipStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (ipStrategy) AllowUnconditionalUpdate() bool {
+func (ipStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

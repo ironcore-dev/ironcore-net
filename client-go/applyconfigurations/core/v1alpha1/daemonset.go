@@ -19,7 +19,7 @@ import (
 //
 // DaemonSet is the schema for the daemonsets API.
 type DaemonSetApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *DaemonSetSpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *DaemonSetStatusApplyConfiguration `json:"status,omitempty"`

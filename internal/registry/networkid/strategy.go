@@ -66,11 +66,11 @@ func (networkIDStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Objec
 	return nil
 }
 
-func (networkIDStrategy) AllowCreateOnUpdate() bool {
+func (networkIDStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (networkIDStrategy) AllowUnconditionalUpdate() bool {
+func (networkIDStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

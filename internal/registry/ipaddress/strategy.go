@@ -66,11 +66,11 @@ func (ipAddressStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Objec
 	return nil
 }
 
-func (ipAddressStrategy) AllowCreateOnUpdate() bool {
+func (ipAddressStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (ipAddressStrategy) AllowUnconditionalUpdate() bool {
+func (ipAddressStrategy) AllowUnconditionalUpdate(ctx context.Context) bool {
 	return false
 }
 

@@ -6,7 +6,7 @@ package expectations
 import (
 	"time"
 
-	"github.com/ironcore-dev/ironcore/broker/common/sync"
+	"github.com/ironcore-dev/brokers/common/sync"
 	utilclient "github.com/ironcore-dev/ironcore/utils/client"
 	utilrand "k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/apimachinery/pkg/util/sets"
