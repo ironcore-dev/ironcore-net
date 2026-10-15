@@ -53,7 +53,7 @@ const (
 	pollingInterval      = 50 * time.Millisecond
 	eventuallyTimeout    = 3 * time.Second
 	consistentlyDuration = 1 * time.Second
-	apiServiceTimeout    = 1 * time.Minute
+	apiServiceTimeout    = 2 * time.Minute
 )
 
 func TestControllers(t *testing.T) {
@@ -200,4 +200,6 @@ var _ = BeforeSuite(func() {
 		defer GinkgoRecover()
 		Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
 	}()
+
+	Expect(k8sManager.GetCache().WaitForCacheSync(mgrCtx)).To(BeTrue())
 })
