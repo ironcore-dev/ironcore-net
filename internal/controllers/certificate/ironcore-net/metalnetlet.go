@@ -22,6 +22,12 @@ var (
 		certificatesv1.UsageKeyEncipherment,
 		certificatesv1.UsageClientAuth,
 	)
+
+	//Usage for ECDSA keys
+	MetalnetletRequiredUsagesNoEncipherment = sets.New[certificatesv1.KeyUsage](
+		certificatesv1.UsageDigitalSignature,
+		certificatesv1.UsageClientAuth,
+	)
 )
 
 func IsMetalnetletClientCert(csr *certificatesv1.CertificateSigningRequest, x509cr *x509.CertificateRequest) bool {
@@ -54,7 +60,7 @@ func ValidateMetalnetletClientCSR(req *x509.CertificateRequest, usages sets.Set[
 		return fmt.Errorf("subject common name does not begin with %s", ironcorenetv1alpha1.MetalnetletUserNamePrefix)
 	}
 
-	if !MetalnetletRequiredUsages.Equal(usages) {
+	if !MetalnetletRequiredUsages.Equal(usages) && !MetalnetletRequiredUsagesNoEncipherment.Equal(usages) {
 		return fmt.Errorf("usages did not match %v", sets.List(MetalnetletRequiredUsages))
 	}
 
