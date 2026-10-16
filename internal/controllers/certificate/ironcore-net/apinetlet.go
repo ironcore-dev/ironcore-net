@@ -23,7 +23,7 @@ var (
 		certificatesv1.UsageClientAuth,
 	)
 
-	//Usage for ECDSA keys
+	// APINetletRequiredUsagesNoEncipherment Usage for ECDSA keys
 	APINetletRequiredUsagesNoEncipherment = sets.New[certificatesv1.KeyUsage](
 		certificatesv1.UsageDigitalSignature,
 		certificatesv1.UsageClientAuth,
