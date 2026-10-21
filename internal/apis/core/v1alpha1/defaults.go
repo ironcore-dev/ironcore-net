@@ -5,6 +5,8 @@ package v1alpha1
 
 import (
 	"github.com/ironcore-dev/ironcore-net/api/core/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/generic"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -27,5 +29,11 @@ func SetDefaults_NetworkInterfacePublicIP(ip *v1alpha1.NetworkInterfacePublicIP)
 func SetDefaults_LoadBalancerIP(ip *v1alpha1.LoadBalancerIP) {
 	if ip.IPFamily == "" && ip.IP.IsValid() {
 		ip.IPFamily = ip.IP.Family()
+	}
+}
+
+func SetDefaults_NetworkPolicyPort(port *v1alpha1.NetworkPolicyPort) {
+	if port.Protocol == nil {
+		port.Protocol = generic.Pointer(corev1.ProtocolTCP)
 	}
 }

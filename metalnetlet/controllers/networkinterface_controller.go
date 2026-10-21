@@ -244,7 +244,14 @@ func extractFirewallRulesFromRule(rule v1alpha1.Rule, direction metalnetv1alpha1
 			ProtocolMatch: &metalnetv1alpha1.ProtocolMatch{},
 		}
 
-		switch *port.Protocol {
+		var proto corev1.Protocol
+		if port.Protocol == nil {
+			proto = corev1.ProtocolTCP
+		} else {
+			proto = *port.Protocol
+		}
+
+		switch proto {
 		case corev1.ProtocolTCP:
 			baseFirewallRule.ProtocolMatch.ProtocolType = generic.Pointer(metalnetv1alpha1.FirewallRuleProtocolTypeTCP)
 		case corev1.ProtocolUDP:

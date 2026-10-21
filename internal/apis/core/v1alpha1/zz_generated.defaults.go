@@ -25,6 +25,12 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 	scheme.AddTypeDefaultingFunc(&corev1alpha1.NetworkInterfaceList{}, func(obj interface{}) {
 		SetObjectDefaults_NetworkInterfaceList(obj.(*corev1alpha1.NetworkInterfaceList))
 	})
+	scheme.AddTypeDefaultingFunc(&corev1alpha1.NetworkPolicy{}, func(obj interface{}) { SetObjectDefaults_NetworkPolicy(obj.(*corev1alpha1.NetworkPolicy)) })
+	scheme.AddTypeDefaultingFunc(&corev1alpha1.NetworkPolicyList{}, func(obj interface{}) { SetObjectDefaults_NetworkPolicyList(obj.(*corev1alpha1.NetworkPolicyList)) })
+	scheme.AddTypeDefaultingFunc(&corev1alpha1.NetworkPolicyRule{}, func(obj interface{}) { SetObjectDefaults_NetworkPolicyRule(obj.(*corev1alpha1.NetworkPolicyRule)) })
+	scheme.AddTypeDefaultingFunc(&corev1alpha1.NetworkPolicyRuleList{}, func(obj interface{}) {
+		SetObjectDefaults_NetworkPolicyRuleList(obj.(*corev1alpha1.NetworkPolicyRuleList))
+	})
 	return nil
 }
 
@@ -64,5 +70,53 @@ func SetObjectDefaults_NetworkInterfaceList(in *corev1alpha1.NetworkInterfaceLis
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_NetworkInterface(a)
+	}
+}
+
+func SetObjectDefaults_NetworkPolicy(in *corev1alpha1.NetworkPolicy) {
+	for i := range in.Spec.Ingress {
+		a := &in.Spec.Ingress[i]
+		for j := range a.Ports {
+			b := &a.Ports[j]
+			SetDefaults_NetworkPolicyPort(b)
+		}
+	}
+	for i := range in.Spec.Egress {
+		a := &in.Spec.Egress[i]
+		for j := range a.Ports {
+			b := &a.Ports[j]
+			SetDefaults_NetworkPolicyPort(b)
+		}
+	}
+}
+
+func SetObjectDefaults_NetworkPolicyList(in *corev1alpha1.NetworkPolicyList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_NetworkPolicy(a)
+	}
+}
+
+func SetObjectDefaults_NetworkPolicyRule(in *corev1alpha1.NetworkPolicyRule) {
+	for i := range in.IngressRules {
+		a := &in.IngressRules[i]
+		for j := range a.NetworkPolicyPorts {
+			b := &a.NetworkPolicyPorts[j]
+			SetDefaults_NetworkPolicyPort(b)
+		}
+	}
+	for i := range in.EgressRules {
+		a := &in.EgressRules[i]
+		for j := range a.NetworkPolicyPorts {
+			b := &a.NetworkPolicyPorts[j]
+			SetDefaults_NetworkPolicyPort(b)
+		}
+	}
+}
+
+func SetObjectDefaults_NetworkPolicyRuleList(in *corev1alpha1.NetworkPolicyRuleList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_NetworkPolicyRule(a)
 	}
 }
