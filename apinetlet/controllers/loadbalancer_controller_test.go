@@ -348,6 +348,106 @@ var _ = Describe("LoadBalancerController", func() {
 		)))
 	})
 
+	It("should clear obsolete status IPs before requeuing when APINet IPs are pending", func(ctx SpecContext) {
+		By("creating a new parent prefix")
+		parentPrefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      "load-balancer-transition",
+			},
+			Spec: ipamv1alpha1.PrefixSpec{
+				IPFamily: corev1.IPv4Protocol,
+				Prefix:   commonv1alpha1.MustParseNewIPPrefix("10.2.0.0/24"),
+			},
+		}
+		Expect(k8sClient.Create(ctx, parentPrefix)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, parentPrefix)
+
+		By("creating an internal load balancer with a discrete IP")
+		loadBalancer := &networkingv1alpha1.LoadBalancer{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      "load-balancer-transition",
+			},
+			Spec: networkingv1alpha1.LoadBalancerSpec{
+				Type:       networkingv1alpha1.LoadBalancerTypeInternal,
+				IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+				IPs: []networkingv1alpha1.IPSource{
+					{
+						Value: commonv1alpha1.MustParseNewIP("10.2.0.1"),
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, loadBalancer)
+
+		By("waiting for the load balancer status to be populated with the allocated IP")
+		Eventually(Object(loadBalancer), "20s", "100ms").Should(HaveField("Status.IPs", ConsistOf(
+			*commonv1alpha1.MustParseNewIP("10.2.0.1"),
+		)))
+
+		By("creating an owned but not yet allocated prefix")
+		prefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      "load-balancer-transition-0",
+			},
+			Spec: ipamv1alpha1.PrefixSpec{
+				IPFamily: corev1.IPv4Protocol,
+				Prefix:   commonv1alpha1.MustParseNewIPPrefix("10.2.0.2/32"),
+			},
+		}
+		Expect(controllerutil.SetControllerReference(loadBalancer, prefix, k8sClient.Scheme())).To(Succeed())
+		Expect(k8sClient.Create(ctx, prefix)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, prefix)
+
+		By("switching the load balancer from discrete to pending ephemeral IP")
+		Eventually(Update(loadBalancer, func() {
+			loadBalancer.Spec.IPs = []networkingv1alpha1.IPSource{
+				{
+					Ephemeral: &networkingv1alpha1.EphemeralPrefixSource{
+						PrefixTemplate: &ipamv1alpha1.PrefixTemplateSpec{
+							Spec: ipamv1alpha1.PrefixSpec{
+								IPFamily: corev1.IPv4Protocol,
+								ParentRef: &corev1.LocalObjectReference{
+									Name: "load-balancer-transition",
+								},
+							},
+						},
+					},
+				},
+			}
+		})).Should(Succeed())
+
+		By("waiting for the APINet load balancer to drop the obsolete IP")
+		apiNetLoadBalancer := &v1alpha1.LoadBalancer{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: apiNetNs.Name,
+				Name:      string(loadBalancer.UID),
+			},
+		}
+		Eventually(Object(apiNetLoadBalancer), "20s", "100ms").Should(
+			HaveField("Spec.IPs", BeEmpty()),
+		)
+
+		By("waiting for the load balancer status to clear the obsolete IP")
+		Eventually(Object(loadBalancer), "20s", "100ms").Should(
+			HaveField("Status.IPs", BeEmpty()),
+		)
+
+		By("allocating the prefix")
+		Eventually(UpdateStatus(prefix, func() {
+			prefix.Status.Phase = ipamv1alpha1.PrefixPhaseAllocated
+		})).Should(Succeed())
+
+		By("waiting for the load balancer status to be populated with the new IP")
+		Eventually(Object(loadBalancer), "20s", "100ms").Should(HaveField("Status.IPs", ConsistOf(
+			*commonv1alpha1.MustParseNewIP("10.2.0.2"),
+		)))
+	})
+
 	It("should manage the APINet load balancer and its node affinity + routing", func(ctx SpecContext) {
 		By("creating a load balancer")
 		loadBalancer := &networkingv1alpha1.LoadBalancer{

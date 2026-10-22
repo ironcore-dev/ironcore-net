@@ -26,6 +26,7 @@ import (
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
+	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -189,18 +190,27 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 	// success, and requeue on nothing, leaving the load balancer IP-less.
 	apiNetIPs := apinetv1alpha1.GetLoadBalancerIPs(apiNetLoadBalancer)
 	wantedIPs := loadBalancerWantedIPCount(loadBalancer)
-	if allocated := allAPINetIPsAllocated(apiNetIPs); allocated < wantedIPs {
+	allocatedIPs := apiNetIPsToIPs(utilslices.FilterFunc(apiNetIPs, func(e net.IP) bool { return e.IsValid() }))
+	if len(allocatedIPs) < wantedIPs {
+		// Forwarding follows the APINet spec, so an address that is no longer
+		// present there has already stopped being routed: clear it from the
+		// status to not keep advertising it, then keep waiting for the rest.
+		if !slices.Equal(allocatedIPs, loadBalancer.Status.IPs) {
+			log.V(1).Info("Clearing no-longer-allocated load balancer status IPs")
+			if err := r.updateLoadBalancerIPs(ctx, loadBalancer, allocatedIPs); err != nil {
+				return ctrl.Result{}, fmt.Errorf("error patching load balancer status: %w", err)
+			}
+		}
 		log.V(1).Info("APINet load balancer IPs are not allocated yet, requeueing",
 			"wanted", wantedIPs,
-			"allocated", allocated,
+			"allocated", len(allocatedIPs),
 		)
 		return ctrl.Result{RequeueAfter: time.Second}, nil
 	}
 
-	actualIPs := apiNetIPsToIPs(apiNetIPs)
-	if !slices.Equal(actualIPs, loadBalancer.Status.IPs) {
+	if !slices.Equal(allocatedIPs, loadBalancer.Status.IPs) {
 		log.V(1).Info("Updating load balancer status IPs")
-		if err := r.updateLoadBalancerIPs(ctx, loadBalancer, actualIPs); err != nil {
+		if err := r.updateLoadBalancerIPs(ctx, loadBalancer, allocatedIPs); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error patching load balancer status: %w", err)
 		}
 	}
@@ -428,18 +438,6 @@ func loadBalancerWantedIPCount(loadBalancer *networkingv1alpha1.LoadBalancer) in
 		return len(loadBalancer.Spec.IPs)
 	}
 	return len(loadBalancer.Spec.IPFamilies)
-}
-
-// allAPINetIPsAllocated reports how many of the given APINet IPs are actually
-// allocated (valid), as opposed to an unset spec IP which reads back invalid.
-func allAPINetIPsAllocated(ips []net.IP) int {
-	var n int
-	for _, ip := range ips {
-		if ip.IsValid() {
-			n++
-		}
-	}
-	return n
 }
 
 func (r *LoadBalancerReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache cache.Cache) error {
