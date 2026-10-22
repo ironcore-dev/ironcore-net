@@ -303,6 +303,22 @@ var _ = Describe("LoadBalancerController", func() {
 		Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())
 		DeferCleanup(k8sClient.Delete, loadBalancer)
 
+		By("waiting for the APINet load balancer to exist without any IPs while the prefix is missing")
+		apiNetLoadBalancer := &v1alpha1.LoadBalancer{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: apiNetNs.Name,
+				Name:      string(loadBalancer.UID),
+			},
+		}
+		Eventually(Object(apiNetLoadBalancer)).Should(SatisfyAll(
+			StemFrom(LoadBalancerOrigin, loadBalancer),
+			HaveField("Spec.Type", Equal(v1alpha1.LoadBalancerTypeInternal)),
+			HaveField("Spec.IPs", BeEmpty()),
+		))
+
+		By("ensuring the load balancer status stays empty while the APINet load balancer has no IPs")
+		Consistently(Object(loadBalancer)).Should(HaveField("Status.IPs", BeEmpty()))
+
 		By("creating an owned but not yet allocated prefix")
 		prefix := &ipamv1alpha1.Prefix{
 			ObjectMeta: metav1.ObjectMeta{
@@ -317,18 +333,6 @@ var _ = Describe("LoadBalancerController", func() {
 		Expect(controllerutil.SetControllerReference(loadBalancer, prefix, k8sClient.Scheme())).To(Succeed())
 		Expect(k8sClient.Create(ctx, prefix)).To(Succeed())
 		DeferCleanup(k8sClient.Delete, prefix)
-
-		By("waiting for the internal APINet load balancer to exist without an IP")
-		apiNetLoadBalancer := &v1alpha1.LoadBalancer{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: apiNetNs.Name,
-				Name:      string(loadBalancer.UID),
-			},
-		}
-		Eventually(Object(apiNetLoadBalancer)).Should(SatisfyAll(
-			StemFrom(LoadBalancerOrigin, loadBalancer),
-			HaveField("Spec.Type", Equal(v1alpha1.LoadBalancerTypeInternal)),
-		))
 
 		By("ensuring the load balancer status is not populated with a pending (unset) IP")
 		Consistently(Object(loadBalancer)).Should(HaveField("Status.IPs", BeEmpty()))

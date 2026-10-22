@@ -181,17 +181,18 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 		return ctrl.Result{}, err
 	}
 
+	// Wait until the APINet load balancer carries as many valid IPs as the
+	// source load balancer requests. An internal IP backed by an ephemeral
+	// prefix is skipped while the prefix is not yet allocated, and any other
+	// unset IP slot reads back as an invalid (zero) IP. Otherwise the status
+	// comparison below would treat a short or zeroed list as in-sync, report
+	// success, and requeue on nothing, leaving the load balancer IP-less.
 	apiNetIPs := apinetv1alpha1.GetLoadBalancerIPs(apiNetLoadBalancer)
-
-	// An unset APINet load balancer IP reads back as an invalid (zero) IP,
-	// which slices.Equal would treat as equal to a likewise unset status IP,
-	// so without this guard the reconcile would report success and requeue on
-	// nothing, leaving the load balancer IP-less. Do not propagate unset IPs
-	// into the status; wait for them to be allocated instead.
-	if allAPINetIPsAllocated(apiNetIPs) < len(apiNetIPs) {
+	wantedIPs := loadBalancerWantedIPCount(loadBalancer)
+	if allocated := allAPINetIPsAllocated(apiNetIPs); allocated < wantedIPs {
 		log.V(1).Info("APINet load balancer IPs are not allocated yet, requeueing",
-			"requested", len(apiNetIPs),
-			"allocated", allAPINetIPsAllocated(apiNetIPs),
+			"wanted", wantedIPs,
+			"allocated", allocated,
 		)
 		return ctrl.Result{RequeueAfter: time.Second}, nil
 	}
@@ -416,6 +417,17 @@ func (r *LoadBalancerReconciler) updateLoadBalancerIPs(ctx context.Context, load
 	base := loadBalancer.DeepCopy()
 	loadBalancer.Status.IPs = ips
 	return r.Status().Patch(ctx, loadBalancer, client.MergeFrom(base))
+}
+
+// loadBalancerWantedIPCount returns how many IPs the source load balancer
+// requests: for internal load balancers the number of spec IPs (discrete or
+// ephemeral), for public load balancers the number of IP families, which the
+// APINet side allocates an IP for each.
+func loadBalancerWantedIPCount(loadBalancer *networkingv1alpha1.LoadBalancer) int {
+	if loadBalancer.Spec.Type == networkingv1alpha1.LoadBalancerTypeInternal {
+		return len(loadBalancer.Spec.IPs)
+	}
+	return len(loadBalancer.Spec.IPFamilies)
 }
 
 // allAPINetIPsAllocated reports how many of the given APINet IPs are actually
