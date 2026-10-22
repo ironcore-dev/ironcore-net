@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/go-logr/logr"
 	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
@@ -180,11 +181,26 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 		return ctrl.Result{}, err
 	}
 
-	actualIPs := apiNetIPsToIPs(apinetv1alpha1.GetLoadBalancerIPs(apiNetLoadBalancer))
+	apiNetIPs := apinetv1alpha1.GetLoadBalancerIPs(apiNetLoadBalancer)
+
+	// An unset APINet load balancer IP reads back as an invalid (zero) IP,
+	// which slices.Equal would treat as equal to a likewise unset status IP,
+	// so without this guard the reconcile would report success and requeue on
+	// nothing, leaving the load balancer IP-less. Do not propagate unset IPs
+	// into the status; wait for them to be allocated instead.
+	if allAPINetIPsAllocated(apiNetIPs) < len(apiNetIPs) {
+		log.V(1).Info("APINet load balancer IPs are not allocated yet, requeueing",
+			"requested", len(apiNetIPs),
+			"allocated", allAPINetIPsAllocated(apiNetIPs),
+		)
+		return ctrl.Result{RequeueAfter: time.Second}, nil
+	}
+
+	actualIPs := apiNetIPsToIPs(apiNetIPs)
 	if !slices.Equal(actualIPs, loadBalancer.Status.IPs) {
 		log.V(1).Info("Updating load balancer status IPs")
 		if err := r.updateLoadBalancerIPs(ctx, loadBalancer, actualIPs); err != nil {
-			return ctrl.Result{}, fmt.Errorf("error patching load balancer status")
+			return ctrl.Result{}, fmt.Errorf("error patching load balancer status: %w", err)
 		}
 	}
 
@@ -400,6 +416,18 @@ func (r *LoadBalancerReconciler) updateLoadBalancerIPs(ctx context.Context, load
 	base := loadBalancer.DeepCopy()
 	loadBalancer.Status.IPs = ips
 	return r.Status().Patch(ctx, loadBalancer, client.MergeFrom(base))
+}
+
+// allAPINetIPsAllocated reports how many of the given APINet IPs are actually
+// allocated (valid), as opposed to an unset spec IP which reads back invalid.
+func allAPINetIPsAllocated(ips []net.IP) int {
+	var n int
+	for _, ip := range ips {
+		if ip.IsValid() {
+			n++
+		}
+	}
+	return n
 }
 
 func (r *LoadBalancerReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache cache.Cache) error {

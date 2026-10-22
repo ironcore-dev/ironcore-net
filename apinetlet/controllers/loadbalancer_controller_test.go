@@ -259,6 +259,91 @@ var _ = Describe("LoadBalancerController", func() {
 		)
 	})
 
+	It("should not report a stale empty status while APINet load balancer IPs are pending", func(ctx SpecContext) {
+		By("creating a new parent prefix")
+		parentPrefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      "load-balancer-pending",
+			},
+			Spec: ipamv1alpha1.PrefixSpec{
+				IPFamily: corev1.IPv4Protocol,
+				Prefix:   commonv1alpha1.MustParseNewIPPrefix("10.1.0.0/24"),
+			},
+		}
+		Expect(k8sClient.Create(ctx, parentPrefix)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, parentPrefix)
+
+		By("creating an internal load balancer with an ephemeral IP")
+		loadBalancer := &networkingv1alpha1.LoadBalancer{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      "load-balancer-pending",
+			},
+			Spec: networkingv1alpha1.LoadBalancerSpec{
+				Type:       networkingv1alpha1.LoadBalancerTypeInternal,
+				IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+				IPs: []networkingv1alpha1.IPSource{
+					{
+						Ephemeral: &networkingv1alpha1.EphemeralPrefixSource{
+							PrefixTemplate: &ipamv1alpha1.PrefixTemplateSpec{
+								Spec: ipamv1alpha1.PrefixSpec{
+									IPFamily: corev1.IPv4Protocol,
+									ParentRef: &corev1.LocalObjectReference{
+										Name: "load-balancer-pending",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, loadBalancer)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, loadBalancer)
+
+		By("creating an owned but not yet allocated prefix")
+		prefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      "load-balancer-pending-0",
+			},
+			Spec: ipamv1alpha1.PrefixSpec{
+				IPFamily: corev1.IPv4Protocol,
+				Prefix:   commonv1alpha1.MustParseNewIPPrefix("10.1.0.1/32"),
+			},
+		}
+		Expect(controllerutil.SetControllerReference(loadBalancer, prefix, k8sClient.Scheme())).To(Succeed())
+		Expect(k8sClient.Create(ctx, prefix)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, prefix)
+
+		By("waiting for the internal APINet load balancer to exist without an IP")
+		apiNetLoadBalancer := &v1alpha1.LoadBalancer{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: apiNetNs.Name,
+				Name:      string(loadBalancer.UID),
+			},
+		}
+		Eventually(Object(apiNetLoadBalancer)).Should(SatisfyAll(
+			StemFrom(LoadBalancerOrigin, loadBalancer),
+			HaveField("Spec.Type", Equal(v1alpha1.LoadBalancerTypeInternal)),
+		))
+
+		By("ensuring the load balancer status is not populated with a pending (unset) IP")
+		Consistently(Object(loadBalancer)).Should(HaveField("Status.IPs", BeEmpty()))
+
+		By("allocating the prefix")
+		Eventually(UpdateStatus(prefix, func() {
+			prefix.Status.Phase = ipamv1alpha1.PrefixPhaseAllocated
+		})).Should(Succeed())
+
+		By("waiting for the load balancer status to be populated with the allocated IP")
+		Eventually(Object(loadBalancer), "20s", "100ms").Should(HaveField("Status.IPs", ConsistOf(
+			*commonv1alpha1.MustParseNewIP("10.1.0.1"),
+		)))
+	})
+
 	It("should manage the APINet load balancer and its node affinity + routing", func(ctx SpecContext) {
 		By("creating a load balancer")
 		loadBalancer := &networkingv1alpha1.LoadBalancer{
