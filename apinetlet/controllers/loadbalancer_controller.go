@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/go-logr/logr"
 	netclientutils "github.com/ironcore-dev/ironcore-net/utils/client"
@@ -25,6 +26,7 @@ import (
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
+	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -180,11 +182,36 @@ func (r *LoadBalancerReconciler) reconcile(ctx context.Context, log logr.Logger,
 		return ctrl.Result{}, err
 	}
 
-	actualIPs := apiNetIPsToIPs(apinetv1alpha1.GetLoadBalancerIPs(apiNetLoadBalancer))
-	if !slices.Equal(actualIPs, loadBalancer.Status.IPs) {
+	// Wait until the APINet load balancer carries as many valid IPs as the
+	// source load balancer requests. An internal IP backed by an ephemeral
+	// prefix is skipped while the prefix is not yet allocated, and any other
+	// unset IP slot reads back as an invalid (zero) IP. Otherwise the status
+	// comparison below would treat a short or zeroed list as in-sync, report
+	// success, and requeue on nothing, leaving the load balancer IP-less.
+	apiNetIPs := apinetv1alpha1.GetLoadBalancerIPs(apiNetLoadBalancer)
+	wantedIPs := loadBalancerWantedIPCount(loadBalancer)
+	allocatedIPs := apiNetIPsToIPs(utilslices.FilterFunc(apiNetIPs, func(e net.IP) bool { return e.IsValid() }))
+	if len(allocatedIPs) < wantedIPs {
+		// Forwarding follows the APINet spec, so an address that is no longer
+		// present there has already stopped being routed: clear it from the
+		// status to not keep advertising it, then keep waiting for the rest.
+		if !slices.Equal(allocatedIPs, loadBalancer.Status.IPs) {
+			log.V(1).Info("Clearing no-longer-allocated load balancer status IPs")
+			if err := r.updateLoadBalancerIPs(ctx, loadBalancer, allocatedIPs); err != nil {
+				return ctrl.Result{}, fmt.Errorf("error patching load balancer status: %w", err)
+			}
+		}
+		log.V(1).Info("APINet load balancer IPs are not allocated yet, requeueing",
+			"wanted", wantedIPs,
+			"allocated", len(allocatedIPs),
+		)
+		return ctrl.Result{RequeueAfter: time.Second}, nil
+	}
+
+	if !slices.Equal(allocatedIPs, loadBalancer.Status.IPs) {
 		log.V(1).Info("Updating load balancer status IPs")
-		if err := r.updateLoadBalancerIPs(ctx, loadBalancer, actualIPs); err != nil {
-			return ctrl.Result{}, fmt.Errorf("error patching load balancer status")
+		if err := r.updateLoadBalancerIPs(ctx, loadBalancer, allocatedIPs); err != nil {
+			return ctrl.Result{}, fmt.Errorf("error patching load balancer status: %w", err)
 		}
 	}
 
@@ -400,6 +427,17 @@ func (r *LoadBalancerReconciler) updateLoadBalancerIPs(ctx context.Context, load
 	base := loadBalancer.DeepCopy()
 	loadBalancer.Status.IPs = ips
 	return r.Status().Patch(ctx, loadBalancer, client.MergeFrom(base))
+}
+
+// loadBalancerWantedIPCount returns how many IPs the source load balancer
+// requests: for internal load balancers the number of spec IPs (discrete or
+// ephemeral), for public load balancers the number of IP families, which the
+// APINet side allocates an IP for each.
+func loadBalancerWantedIPCount(loadBalancer *networkingv1alpha1.LoadBalancer) int {
+	if loadBalancer.Spec.Type == networkingv1alpha1.LoadBalancerTypeInternal {
+		return len(loadBalancer.Spec.IPs)
+	}
+	return len(loadBalancer.Spec.IPFamilies)
 }
 
 func (r *LoadBalancerReconciler) SetupWithManager(mgr ctrl.Manager, apiNetCache cache.Cache) error {
