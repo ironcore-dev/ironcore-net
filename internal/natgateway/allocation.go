@@ -12,7 +12,15 @@ const (
 	minEphemeralPort   int32 = 1024
 	maxEphemeralPort   int32 = 65535
 	noOfEphemeralPorts       = maxEphemeralPort + 1 - minEphemeralPort
+
+	MinPortsPerNetworkInterface int32 = 1
+	MaxPortsPerNetworkInterface int32 = noOfEphemeralPorts
 )
+
+func IsValidPortsPerNetworkInterface(portsPerNetworkInterface int32) bool {
+	return portsPerNetworkInterface >= MinPortsPerNetworkInterface &&
+		portsPerNetworkInterface <= MaxPortsPerNetworkInterface
+}
 
 type AllocationManager struct {
 	portsPerNetworkInterface int32
@@ -20,11 +28,14 @@ type AllocationManager struct {
 }
 
 func SlotsPerIP(portsPerNetworkInterface int32) int32 {
+	if !IsValidPortsPerNetworkInterface(portsPerNetworkInterface) {
+		return 0
+	}
 	return noOfEphemeralPorts / portsPerNetworkInterface
 }
 
 func NewAllocationManager(portsPerNetworkInterface int32, ips []net.IP) *AllocationManager {
-	slotsPerIP := uint(noOfEphemeralPorts / portsPerNetworkInterface)
+	slotsPerIP := uint(SlotsPerIP(portsPerNetworkInterface))
 	slots := container.NewKeySlots(slotsPerIP, ips)
 
 	return &AllocationManager{
