@@ -3,7 +3,7 @@ module github.com/ironcore-dev/ironcore-net
 go 1.26.4
 
 require (
-	github.com/bits-and-blooms/bitset v1.27.0
+	github.com/bits-and-blooms/bitset v1.29.0
 	github.com/go-logr/logr v1.4.4
 	github.com/gogo/protobuf v1.3.2
 	github.com/google/go-cmp v0.7.0
@@ -12,10 +12,10 @@ require (
 	github.com/ironcore-dev/controller-utils v0.15.1
 	github.com/ironcore-dev/ironcore v0.9.0
 	github.com/ironcore-dev/metalnet v0.4.0
-	github.com/onsi/ginkgo/v2 v2.33.1
+	github.com/onsi/ginkgo/v2 v2.34.0
 	github.com/onsi/gomega v1.44.0
 	github.com/spf13/cobra v1.10.2
-	github.com/spf13/pflag v1.0.10
+	github.com/spf13/pflag v1.1.0
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba
 	k8s.io/api v0.37.0
 	k8s.io/apimachinery v0.37.0
