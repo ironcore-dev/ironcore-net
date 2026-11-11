@@ -410,8 +410,9 @@ var _ = Describe("Core", func() {
 					GenerateName: "lb-",
 				},
 				Spec: v1alpha1.NATGatewaySpec{
-					NetworkRef: corev1.LocalObjectReference{Name: "foo"},
-					IPFamily:   corev1.IPv4Protocol,
+					NetworkRef:               corev1.LocalObjectReference{Name: "foo"},
+					IPFamily:                 corev1.IPv4Protocol,
+					PortsPerNetworkInterface: 1024,
 					IPs: []v1alpha1.NATGatewayIP{
 						{
 							Name: "ip-1",
