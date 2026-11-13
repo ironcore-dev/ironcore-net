@@ -75,6 +75,41 @@ var _ = Describe("NetworkController", func() {
 		Expect(k8sClient.Get(ctx, client.ObjectKeyFromObject(apiNetNetwork), apiNetNetwork)).To(Satisfy(apierrors.IsNotFound))
 	})
 
+	It("should forward the encryption setting to the APINet network", func(ctx SpecContext) {
+		By("creating a network with encryption enabled")
+		network := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "network-",
+			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				EnableEncryption: true,
+			},
+		}
+		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("waiting for the corresponding APINet network to carry the encryption setting")
+		apiNetNetwork := &apinetv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: apiNetNs.Name,
+				Name:      string(network.UID),
+			},
+		}
+		Eventually(Object(apiNetNetwork)).Should(
+			HaveField("Spec.EnableEncryption", BeTrue()),
+		)
+
+		By("disabling encryption on the network")
+		baseNetwork := network.DeepCopy()
+		network.Spec.EnableEncryption = false
+		Expect(k8sClient.Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
+
+		By("asserting the APINet network follows")
+		Eventually(Object(apiNetNetwork)).Should(
+			HaveField("Spec.EnableEncryption", BeFalse()),
+		)
+	})
+
 	It("should clean up dangling apinet networks", func(ctx SpecContext) {
 		By("creating a apinet network")
 		apiNetNetwork := &apinetv1alpha1.Network{

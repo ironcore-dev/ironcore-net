@@ -198,7 +198,8 @@ func (r *NetworkReconciler) reconcile(ctx context.Context, log logr.Logger, netw
 			metalnetv1alpha1ac.NetworkSpec().
 				WithID(vni).
 				WithPeeredIDs(peeredIDs...).
-				WithPeeredPrefixes(convertPeeredPrefixesToApply(peeredPrefixes)...),
+				WithPeeredPrefixes(convertPeeredPrefixesToApply(peeredPrefixes)...).
+				WithEnableEncryption(network.Spec.EnableEncryption),
 		)
 
 	if err := r.MetalnetClient.Apply(ctx, metalnetNetworkapplyCfg, MetalnetFieldOwner, client.ForceOwnership); err != nil {

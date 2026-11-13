@@ -141,6 +141,46 @@ var _ = Describe("NetworkController", func() {
 
 	})
 
+	It("should forward the encryption setting to the metalnet network", func(ctx SpecContext) {
+		By("creating an apinet network with encryption enabled")
+		network := &apinetv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      "network-encrypted",
+			},
+			Spec: apinetv1alpha1.NetworkSpec{
+				EnableEncryption: true,
+			},
+		}
+		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+
+		By("parsing the VNI of the network")
+		vni, err := networkid.ParseVNI(network.Spec.ID)
+		Expect(err).NotTo(HaveOccurred())
+
+		By("waiting for the metalnet network to be created with encryption enabled")
+		metalnetNetwork := &metalnetv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: metalnetNs.Name,
+				Name:      string(network.UID),
+			},
+		}
+		Eventually(Object(metalnetNetwork)).Should(SatisfyAll(
+			HaveField("Spec.ID", vni),
+			HaveField("Spec.EnableEncryption", BeTrue()),
+		))
+
+		By("disabling encryption on the apinet network")
+		baseNetwork := network.DeepCopy()
+		network.Spec.EnableEncryption = false
+		Expect(k8sClient.Patch(ctx, network, client.MergeFrom(baseNetwork))).To(Succeed())
+
+		By("asserting the metalnet network follows")
+		Eventually(Object(metalnetNetwork)).Should(
+			HaveField("Spec.EnableEncryption", BeFalse()),
+		)
+	})
+
 	var _ = Describe("NetworkPeeringController", func() {
 		ns := SetupNamespace(&k8sClient)
 		metalnetNs := SetupNamespace(&k8sClient)
