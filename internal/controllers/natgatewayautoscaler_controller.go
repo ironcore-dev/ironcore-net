@@ -97,6 +97,10 @@ func (r *NATGatewayAutoscalerReconciler) manageNATGatewayIPs(
 	natGatewayAutoscaler *v1alpha1.NATGatewayAutoscaler,
 	natGateway *v1alpha1.NATGateway,
 ) error {
+	if natgateway.SlotsPerIP(natGateway.Spec.PortsPerNetworkInterface) <= 0 {
+		return fmt.Errorf("invalid ports per network interface %d", natGateway.Spec.PortsPerNetworkInterface)
+	}
+
 	totalRequests := natGateway.Status.RequestedNATIPs
 	currentNoOfIPs := len(natGateway.Spec.IPs)
 	desiredNoOfIPs := r.determineDesiredNumberOfIPs(natGatewayAutoscaler, natGateway, currentNoOfIPs, int(totalRequests))
