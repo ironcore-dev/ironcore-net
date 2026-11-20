@@ -67742,6 +67742,10 @@
 		"com.github.ironcore-dev.ironcore-net.api.core.v1alpha1.NetworkSpec": {
 			"type": "object",
 			"properties": {
+				"enableEncryption": {
+					"description": "EnableEncryption specifies whether the traffic of this network shall be encrypted.",
+					"type": "boolean"
+				},
 				"id": {
 					"description": "ID is the ID of the network.",
 					"type": "string"

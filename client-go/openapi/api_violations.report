@@ -46,6 +46,7 @@ API rule violation: names_match,github.com/ironcore-dev/ironcore-net/api/core/v1
 API rule violation: names_match,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NetworkInterfaceSpec,NATs
 API rule violation: names_match,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NetworkPolicyRule,EgressRules
 API rule violation: names_match,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NetworkPolicyRule,IngressRules
+API rule violation: names_match,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,NetworkSpec,EnableEncryption
 API rule violation: names_match,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,Rule,CIDRBlock
 API rule violation: names_match,github.com/ironcore-dev/ironcore-net/api/core/v1alpha1,Rule,ObjectIPs
 API rule violation: names_match,k8s.io/api/core/v1,AzureDiskVolumeSource,DataDiskURI

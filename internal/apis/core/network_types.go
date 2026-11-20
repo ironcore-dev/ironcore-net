@@ -13,6 +13,9 @@ type NetworkSpec struct {
 	ID string
 	// Peerings are the network peerings with this network
 	Peerings []NetworkPeering
+	// EnableEncryption specifies whether the traffic of this network shall be encrypted.
+	// +optional
+	EnableEncryption bool
 }
 
 // NetworkPeering defines a network peering with another network.
